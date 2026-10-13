@@ -102,7 +102,9 @@ aestheticcardgenerator/
 
 ## Deployment to Cloudflare Pages
 
-The application is fully prepared and optimized for Cloudflare Pages with edge-caching rules and SPA URL rewrites.
+> **Live Cloudflare Production URL:** [aestheticcardgenerator.pages.dev](https://aestheticcardgenerator.pages.dev)
+
+The application is deployed and optimized for Cloudflare Pages with edge-caching rules and SPA URL rewrites.
 
 ### Cloudflare Build Configuration
 When connecting the GitHub repository (`aestheticcardgenerator`) to Cloudflare Pages:
