@@ -83,11 +83,14 @@ aestheticcardgenerator/
 │   ├── main.tsx                            # React 19 root mount
 │   └── index.css                           # Tailwind CSS v4 setup + DESIGN.md custom CSS tokens
 ├── public/
+│   ├── _headers                            # Cloudflare Pages edge caching and security headers
+│   ├── _redirects                          # Cloudflare Pages SPA rewrite rule (/* -> /index.html 200)
 │   ├── favicon.svg                         # Studio brand favicon
 │   ├── robots.txt                          # Search crawler rules and sitemap reference
 │   └── sitemap.xml                         # Canonical XML sitemap for all 21 indexable routes
 ├── index.html                              # Vite single-page application mount point
-├── vite.config.ts                          # Vite bundler configuration with @tailwindcss/vite
+├── vite.config.ts                          # Vite bundler config with chunk-splitting & Tailwind v4
+├── wrangler.jsonc                          # Cloudflare Pages deployment configuration
 ├── package.json                            # React 19, TypeScript, Tailwind v4, Lucide dependencies
 ├── tsconfig.json                           # TypeScript configuration
 ├── DESIGN.md                               # Master design system specification (Airtable + Binance)
@@ -97,9 +100,58 @@ aestheticcardgenerator/
 
 ---
 
+## Deployment to Cloudflare Pages
+
+The application is fully prepared and optimized for Cloudflare Pages with edge-caching rules and SPA URL rewrites.
+
+### Cloudflare Build Configuration
+When connecting the GitHub repository (`aestheticcardgenerator`) to Cloudflare Pages:
+
+| Setting | Value |
+| --- | --- |
+| **Framework preset** | Vite |
+| **Build command** | `npm run build` |
+| **Build output directory** | `dist` |
+| **Root directory** | `/` (default) |
+| **Node.js Version** | 18, 20, or 22 |
+
+### Cloudflare Edge Optimizations Included
+1. **SPA Rewrites (`public/_redirects`)**: Contains `/* /index.html 200` to prevent 404 errors on deep routes like `/canvas`, `/templates`, `/guides`, and `/blog` during browser reloads.
+2. **Edge Caching & Security Headers (`public/_headers`)**:
+   - `/assets/*`: Set to `Cache-Control: public, max-age=31536000, immutable` for 1-year browser and Cloudflare edge CDN caching of hashed bundles.
+   - `/*.html`: Set to `Cache-Control: public, max-age=0, must-revalidate` ensuring new deployments are immediately visible without stale cache issues.
+   - Global security headers: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`.
+3. **Optimized Rollup Chunk Splitting**: Vendor dependencies are partitioned into dedicated cached chunks (`vendor-react`, `vendor-icons`, `vendor-canvas`), eliminating large monolithic bundles and maximizing edge cache hit rates.
+
+### Deployment Methods
+
+#### Method A: Automatic Git Deployment (Recommended)
+1. Go to the [Cloudflare Dashboard](https://dash.cloudflare.com/) and navigate to **Workers & Pages** -> **Create application** -> **Pages** -> **Connect to Git**.
+2. Select your repository `ddheerajccarpenter/aestheticcardgenerator`.
+3. Choose the **Vite** preset (Build command: `npm run build`, Output directory: `dist`).
+4. Click **Save and Deploy**. Every subsequent push to `main` will build and deploy automatically to your `*.pages.dev` domain.
+
+#### Method B: Direct CLI Deployment via Wrangler
+Run the deployment script from your terminal:
+```bash
+npm run pages:deploy
+```
+Or directly with Wrangler:
+```bash
+npx wrangler pages deploy dist --project-name=aestheticcardgenerator
+```
+
+---
+
 ## Changelog & Architecture Decision Records (ADRs)
 
 *Every modification to the application architecture, UI, design tokens, or features must be appended to this log.*
+
+### [2026-10-14] — Cloudflare Pages Production Architecture & Edge Optimizations
+- **Cloudflare Pages SPA Routing (`public/_redirects`)**: Added universal rewrite rule (`/* /index.html 200`) so all 21 deep routes resolve seamlessly without 404 errors on direct navigation or refresh.
+- **Edge Caching & Security Configuration (`public/_headers`)**: Configured 1-year immutable caching for hashed Vite static assets, zero-cache revalidation for HTML, and modern browser security headers.
+- **Rollup Chunk Optimization (`vite.config.ts`)**: Implemented manual chunk separation for React (`vendor-react`), Lucide icons (`vendor-icons`), and canvas export engines (`vendor-canvas`), reducing main bundle size and maximizing CDN edge cache efficiency.
+- **Deployment Automation (`wrangler.jsonc` & `package.json`)**: Added official `wrangler.jsonc` and `npm run pages:deploy` script for 1-command deployments.
 
 ### [2026-10-13] — Root Reference Image Removal & Repository Asset Hygiene
 - Removed legacy reference screenshots (`asthethiccardgenerator ui 2.png`, `ui for astheticcardgenerateor.png`, `reference_home_screen.png`, `reference_editor_screen.png`) from the root directory and main branch.
