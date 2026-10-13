@@ -1,0 +1,3 @@
+# Cloudflare Pages SPA rewrite rule
+# Rewrites all subroutes to index.html with 200 status for client-side routing
+/*    /index.html   200
