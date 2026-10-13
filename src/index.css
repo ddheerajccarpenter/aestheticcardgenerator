@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Airtable + Binance Design System Tokens from DESIGN.md */
+    --color-canvas: #0b0e11;
+    --color-canvas-light: #f8fafc;
+    --color-surface-card: #181d24;
+    --color-surface-soft: #14171d;
+    --color-surface-elevated: #222730;
+    --color-hairline: #262c36;
+    --color-hairline-light: #e2e8f0;
+    --color-border-subtle: #1f242c;
+    --color-border-focus: #3b82f6;
+
+    --color-primary: #ffffff;
+    --color-primary-binance: #fcd535;
+    --color-primary-airtable: #181d26;
+    --color-accent: #fcd535;
+    --color-secondary: #f5cf2e;
+    
+    --color-ink: #ffffff;
+    --color-ink-dark: #181a20;
+    --color-body: #9ca3af;
+    --color-muted: #707a8a;
+    
+    --color-trading-up: #0ecb81;
+    --color-trading-down: #f6465d;
+
+    /* Signature Card Palettes from DESIGN.md */
+    --color-signature-coral: #aa2d00;
+    --color-signature-forest: #0a2e0e;
+    --color-signature-cream: #f5e9d4;
+    --color-signature-peach: #fcab79;
+    --color-signature-mint: #a8d8c4;
+    --color-card-editorial-bg: #f4ede4;
+    --color-card-editorial-ink: #2c2825;
+    --color-card-minimal-bg: #18191c;
+    --color-card-minimal-ink: #f5f5f7;
+    --color-card-retro-bg: #fce7cf;
+    --color-card-retro-ink: #451a03;
+    --color-card-pastel-bg: #e2ecf9;
+    --color-card-pastel-ink: #1e293b;
+  }
+
+  html.light {
+    --color-canvas: #f6f8fa;
+    --color-surface-card: #ffffff;
+    --color-surface-soft: #f1f3f5;
+    --color-surface-elevated: #e9ecef;
+    --color-hairline: #e1e4e8;
+    --color-hairline-light: #d1d5da;
+    --color-border-subtle: #eaecef;
+    --color-ink: #181a20;
+    --color-body: #57606a;
+    --color-muted: #6a737d;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overscroll-behavior: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+/* Custom font utilities */
+.font-editorial {
+  font-family: 'Newsreader', Georgia, serif;
+}
+.font-display-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+.font-modern-sans {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+/* Grain texture overlay */
+.card-noise {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 0);
+  background-size: 4px 4px;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #272a2e;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #37393d;
+}
