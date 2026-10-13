@@ -25,3 +25,8 @@ dist-ssr
 
 # Vercel
 .vercel
+
+# Reference Screenshots
+*.png
+*.jpg
+*.jpeg

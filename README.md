@@ -6,18 +6,10 @@ An elegant, browser-based **text-to-card generator** featuring a curated preload
 
 ---
 
-## Important Project & Wireframe Notices
+## Important Project Principles
 
-### 1. Wireframe Images are Structural References Only (Not App Content)
-The two UI mockups provided in the repository:
-- [`asthethiccardgenerator ui 2.png`](./asthethiccardgenerator%20ui%202.png)
-- [`ui for astheticcardgenerateor.png`](./ui%20for%20astheticcardgenerateor.png)
-
-> [!IMPORTANT]
-> **Wireframe Reference Notice:**
-> These images are provided **strictly as layout, spatial, and wireframe references** (to inform the split-pane layout, property panel hierarchy, canvas zoom/pan controls, and responsive UI structure).
-> - **DO NOT** use the images as static app content, placeholder cards, or hardcoded dummy copy.
-> - The application generates dynamic, fully editable cards driven by user input and structured template definitions.
+### 1. Architectural Integrity & Dynamic Card Rendering
+All card generations are dynamic, fully editable cards driven by user input, vector canvas shapes, and structured template definitions. Zero static mockups or placeholder images are used.
 
 ### 2. Mandatory Change Documentation Policy
 > [!IMPORTANT]
@@ -100,11 +92,7 @@ aestheticcardgenerator/
 ├── tsconfig.json                           # TypeScript configuration
 ├── DESIGN.md                               # Master design system specification (Airtable + Binance)
 ├── DESIGN_STUDIO_REFERENCE.md              # Studio UI tokens reference
-├── README.md                               # Project documentation, guidelines & changelog (this file)
-├── asthethiccardgenerator ui 2.png         # Layout & wireframe reference image 1
-├── ui for astheticcardgenerateor.png       # Layout & wireframe reference image 2
-├── reference_home_screen.png               # Reference capture of home screen layout
-└── reference_editor_screen.png             # Reference capture of card editor layout
+└── README.md                               # Project documentation, guidelines & changelog (this file)
 ```
 
 ---
@@ -112,6 +100,10 @@ aestheticcardgenerator/
 ## Changelog & Architecture Decision Records (ADRs)
 
 *Every modification to the application architecture, UI, design tokens, or features must be appended to this log.*
+
+### [2026-10-13] — Root Reference Image Removal & Repository Asset Hygiene
+- Removed legacy reference screenshots (`asthethiccardgenerator ui 2.png`, `ui for astheticcardgenerateor.png`, `reference_home_screen.png`, `reference_editor_screen.png`) from the root directory and main branch.
+- Streamlined repository footprint and updated documentation trees.
 
 ### [2026-10-13] — Freeform Canvas Studio Engine & 56-Template Multi-Layer Library Expansion
 - **Freeform Canvas Studio (`/canvas`)**:
