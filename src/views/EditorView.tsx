@@ -986,6 +986,58 @@ export const EditorView: React.FC<EditorViewProps> = ({
   // Text length warnings
   const isLongText = quote.length > 240;
 
+  // Pure vector Boxicon mapping to completely prevent unstyled ligature words (e.g. 'terminal') from leaking as raw text
+  const getCardHeaderIconClass = (icon: string): string => {
+    const iconMap: Record<string, string> = {
+      terminal: 'bx bx-terminal',
+      format_quote: 'bx bxs-quote-left',
+      bookmark: 'bx bxs-bookmark-alt',
+      auto_awesome: 'bx bxs-magic-wand',
+      sparkles: 'bx bxs-sparkles',
+      grid_view: 'bx bx-grid-alt',
+      edit_note: 'bx bx-edit-alt',
+      stars: 'bx bxs-star',
+      star: 'bx bxs-star',
+      favorite: 'bx bxs-heart',
+      qr_code: 'bx bx-qr',
+      badge: 'bx bx-id-card',
+      verified: 'bx bxs-badge-check',
+      fingerprint: 'bx bx-fingerprint',
+      palette: 'bx bx-palette',
+      album: 'bx bx-disc',
+      cloud: 'bx bx-cloud',
+      menu_book: 'bx bx-book-open',
+      task_alt: 'bx bx-check-circle',
+      draw: 'bx bx-pencil',
+      restaurant: 'bx bx-restaurant',
+      flight_takeoff: 'bx bx-paper-plane',
+      shield: 'bx bxs-shield',
+      stream: 'bx bx-slider',
+      public: 'bx bx-globe',
+      hotel: 'bx bx-hotel',
+      local_florist: 'bx bxs-florist',
+      description: 'bx bx-file',
+      crop_square: 'bx bx-square',
+    };
+    return iconMap[icon] || 'bx bxs-quote-left';
+  };
+
+  const renderCardHeaderIcon = () => {
+    if (!showIcon) return null;
+    const elDef = getElementById(selectedElementId);
+    if (elDef && selectedElementId !== 'none') {
+      return (
+        <span className={`text-[13px] leading-none shrink-0 select-none ${isHolographic ? 'holographic-foil' : ''}`}>
+          {elDef.glyph || '✦'}
+        </span>
+      );
+    }
+    const iconCls = getCardHeaderIconClass(iconName);
+    return (
+      <i className={`${iconCls} text-[14px] leading-none shrink-0 select-none ${isHolographic ? 'holographic-foil' : ''}`} />
+    );
+  };
+
   // ───────────────────────────────────────────────────────────────────────────
   // REUSABLE CONTROL TABS & PANELS (Shared between desktop sidebar & mobile sheet)
   // ───────────────────────────────────────────────────────────────────────────
@@ -2170,10 +2222,21 @@ export const EditorView: React.FC<EditorViewProps> = ({
     >
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#181d24] text-white border border-[#384252] shadow-2xl animate-fade-in text-xs font-medium">
+        <div
+          className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-xl border shadow-2xl animate-fade-in text-xs font-medium ${
+            isLight
+              ? 'bg-white text-[#0f172a] border-[#e2e8f0]'
+              : 'bg-[#181d24] text-white border-[#384252]'
+          }`}
+        >
           <CheckCircle2 className="w-4 h-4 text-[#0ecb81] shrink-0" />
           <span>{toastMessage}</span>
-          <button onClick={() => setToastMessage(null)} className="ml-2 text-[#707a8a] hover:text-white">
+          <button
+            onClick={() => setToastMessage(null)}
+            className={`ml-2 cursor-pointer ${
+              isLight ? 'text-[#64748b] hover:text-[#0f172a]' : 'text-[#707a8a] hover:text-white'
+            }`}
+          >
             <X className="w-3 h-3" />
           </button>
         </div>
@@ -2794,7 +2857,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   e.stopPropagation();
                   setSelectedElement(null);
                 }}
-                className="ml-1 text-[#707a8a] hover:text-white cursor-pointer"
+                className={`ml-1 cursor-pointer ${
+                  isLight ? 'text-[#64748b] hover:text-[#0f172a]' : 'text-[#707a8a] hover:text-white'
+                }`}
                 title="Deselect element"
               >
                 <X className="w-3 h-3" />
@@ -2907,23 +2972,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   }`}
                   title="Click to edit folio header tag"
                 >
-                  <div className="flex items-center gap-1.5">
-                    {showIcon && (() => {
-                      const elDef = getElementById(selectedElementId);
-                      if (elDef) {
-                        return (
-                          <span className={`text-[13px] leading-none ${isHolographic ? 'holographic-foil' : ''}`}>
-                            {elDef.glyph || '✦'}
-                          </span>
-                        );
-                      }
-                      return (
-                        <span className={`material-symbols-outlined text-[14px] ${isHolographic ? 'holographic-foil' : ''}`}>
-                          {iconName}
-                        </span>
-                      );
-                    })()}
-                    <span className="uppercase font-semibold">{tag}</span>
+                  <div className="flex items-center gap-1.5 min-w-0 max-w-[75%]">
+                    {renderCardHeaderIcon()}
+                    <span className="uppercase font-semibold truncate tracking-wider">{tag}</span>
                   </div>
                   {badge && (
                     <span
@@ -2932,10 +2983,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         setSelectedElement('badge');
                         openMobileTab('content');
                       }}
-                      className={`px-1.5 py-0.5 rounded text-[10px] cursor-pointer ${
+                      className={`px-1.5 py-0.5 rounded text-[10px] shrink-0 whitespace-nowrap cursor-pointer ${
                         isHolographic
                           ? 'holographic-foil shadow-sm border border-transparent font-bold'
-                          : 'border border-current/25'
+                          : 'border border-current/25 font-mono'
                       } ${selectedElement === 'badge' ? 'ring-1 ring-[#fcd535] bg-black/10' : ''}`}
                       title="Click to edit corner badge"
                     >
@@ -2967,7 +3018,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     }}
                     className={`${getFontFamilyClass(fontChoice)} transition-all`}
                   >
-                    “{parseRichText(quote, inkColor)}”
+                    “{parseRichText(quote, '#fcd535')}”
                   </blockquote>
                 </div>
 
@@ -3266,7 +3317,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
               </div>
               <button
                 onClick={() => setTemplateDrawerOpen(false)}
-                className="text-[#707a8a] hover:text-white cursor-pointer"
+                className={`cursor-pointer ${
+                  isLight ? 'text-[#64748b] hover:text-[#0f172a]' : 'text-[#707a8a] hover:text-white'
+                }`}
               >
                 <X className="w-4 h-4" />
               </button>

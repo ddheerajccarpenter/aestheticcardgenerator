@@ -310,6 +310,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     ? isLight
                       ? 'bg-white text-[#0f172a] shadow-sm'
                       : 'bg-[#facc15] text-[#0b0e11] shadow-sm'
+                    : isLight
+                    ? 'text-[#64748b] hover:text-[#0f172a]'
                     : 'text-[#707a8a] hover:text-white'
                 }`}
               >
@@ -323,6 +325,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     ? isLight
                       ? 'bg-white text-[#0f172a] shadow-sm'
                       : 'bg-[#facc15] text-[#0b0e11] shadow-sm'
+                    : isLight
+                    ? 'text-[#64748b] hover:text-[#0f172a]'
                     : 'text-[#707a8a] hover:text-white'
                 }`}
               >
