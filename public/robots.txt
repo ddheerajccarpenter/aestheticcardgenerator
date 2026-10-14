@@ -1,8 +1,4 @@
-# Technical robots.txt for Aesthetic Card Studio
-# Domain: https://aestheticcardstudio.com
-
 User-agent: *
 Allow: /
 
-# Canonical XML Sitemap
-Sitemap: https://aestheticcardstudio.com/sitemap.xml
+Sitemap: https://aestheticcardgenerator.pages.dev/sitemap.xml

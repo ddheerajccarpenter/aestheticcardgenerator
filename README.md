@@ -61,6 +61,8 @@ The studio is designed around strict mathematical balance and tactile typography
 ### 4. Ultra-HD Master Export
 - **Multi-Format Export**: Lossless PNG, clean WebP, or compact JPEG.
 - **Ultra-HD Scales**: 2x Retina, 4K (3840px), 8K (7680px), and 16K (15360px) pure card renders with zero UI bleed.
+- **3D Transparent PNG**: Offscreen WebGL render of tilted cards with pure alpha transparency and grounding contact shadow.
+- **Studio Filename Standard**: Every export downloads cleanly as `aestheticcardgenerator.com.png` (or `-3D.png`, `-4K.png`, etc.).
 
 ---
 

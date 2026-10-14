@@ -39,7 +39,7 @@ export interface CardTheme {
 export interface CardTemplate {
   id: string;
   title: string;
-  category: 'quote' | 'reflection' | 'notes' | 'review' | 'poetry' | 'minimal' | 'id-card' | 'pastel' | 'fan' | 'vintage' | 'school';
+  category: 'quote' | 'reflection' | 'notes' | 'review' | 'poetry' | 'minimal' | 'id-card' | 'pastel' | 'fan' | 'vintage' | 'school' | 'poster';
   categoryLabel: string;
   quote: string;
   author: string;

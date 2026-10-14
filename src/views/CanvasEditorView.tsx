@@ -77,6 +77,10 @@ import {
 } from '../engines/canvasGridAndDimensionEngine';
 import { updateWorkspaceAmbientBackdrop } from '../engines/ambientStageEngine';
 import { createThreeCardPreviewScene } from '../engines/threeCardStage';
+import {
+  getBrandedExportFilename,
+  exportThreeDimensionalCardPNG,
+} from '../engines/brandedExportAndThreePng';
 import type { ImageFilterPreset, ImageClipMask } from '../types/card';
 
 interface CanvasEditorViewProps {
@@ -1047,7 +1051,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // EXPORT ENGINE (Standard 2x Retina & Ultra-HD 4K / 8K / 16K Pure Card Isolation)
   // ───────────────────────────────────────────────────────────────────────────
 
-  const handleExport = async (format: 'png' | 'jpeg' | 'webp' | '4k' | '8k' | '16k') => {
+  const handleExport = async (format: 'png' | 'jpeg' | 'webp' | '4k' | '8k' | '16k' | '3d-4k' | '3d-8k') => {
     if (!canvasElementRef.current) return;
     setExporting(true);
     setExportDropdownOpen(false);
@@ -1058,6 +1062,37 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
     try {
       const node = canvasElementRef.current;
+
+      // Handle 3D Transparent PNG Export (Part V.2 & Part IX.1)
+      if (format === '3d-4k' || format === '3d-8k') {
+        const rawUrl = await toPng(node, { pixelRatio: 2, cacheBust: true });
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = rawUrl;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = img.naturalWidth;
+        offCanvas.height = img.naturalHeight;
+        const oCtx = offCanvas.getContext('2d');
+        if (oCtx) {
+          oCtx.drawImage(img, 0, 0);
+        }
+        const resolution = format === '3d-8k' ? 7680 : 3840;
+        await exportThreeDimensionalCardPNG(
+          offCanvas,
+          doc.canvasWidth,
+          doc.canvasHeight,
+          'pvc-clearcoat',
+          { rotX: -0.14, rotY: 0.24, rotZ: -0.02 },
+          resolution
+        );
+        showToast(`Exported 3D Card (${resolution}px Transparent PNG)!`);
+        return;
+      }
+
       let scale = 2; // Default 2x Retina
       if (format === '4k') {
         scale = Math.max(2, Math.round(3840 / doc.canvasWidth));
@@ -1088,8 +1123,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         dataUrl = URL.createObjectURL(blob);
       }
 
-      const resolutionSuffix = isUltra ? `-${format}` : '-2x';
-      const filename = `${doc.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'aesthetic-card'}${resolutionSuffix}.${actualFormat}`;
+      // MANDATORY FILENAME RULE: Always starts with aestheticcardgenerator.com
+      const filename = getBrandedExportFilename(
+        actualFormat === 'jpeg' ? 'png' : (actualFormat as 'png' | 'webp'),
+        '2d',
+        isUltra ? (format.toUpperCase() as '4K' | '8K' | '16K') : undefined
+      );
+
       const link = document.createElement('a');
       link.download = filename;
       link.href = dataUrl;
@@ -1569,6 +1609,28 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 >
                   <span>Ultra-HD 16K</span>
                   <span className="text-[10px] text-[#3b82f6] font-mono">15360px</span>
+                </button>
+                <div className={`h-px my-1 ${isLight ? 'bg-slate-200' : 'bg-[#262c36]'}`} />
+                <div className="px-3 py-1 text-[10px] font-semibold text-[#707a8a] uppercase tracking-wider">
+                  3D Transparent PNG
+                </div>
+                <button
+                  onClick={() => handleExport('3d-4k')}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                  }`}
+                >
+                  <span>🧊 3D Card (4K Alpha)</span>
+                  <span className="text-[10px] text-[#0ecb81] font-mono">3840px</span>
+                </button>
+                <button
+                  onClick={() => handleExport('3d-8k')}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                  }`}
+                >
+                  <span>🧊 3D Card (8K Alpha)</span>
+                  <span className="text-[10px] text-[#0ecb81] font-mono">7680px</span>
                 </button>
               </div>
             )}

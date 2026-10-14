@@ -147,6 +147,26 @@ export const ASSET_AVATARS = {
     <!-- Confident smile -->
     <path d="M188 220 Q200 230 212 220" stroke="%23d00000" stroke-width="3" fill="none" stroke-linecap="round" />
   </svg>`,
+
+  frenchGirl: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+    <rect width="400" height="400" fill="%232b2e35" />
+    <!-- Monochrome trench coat -->
+    <path d="M60 400 L130 270 L270 270 L340 400 Z" fill="%231a1b1e" />
+    <polygon points="170,270 200,340 230,270" fill="%23ffffff" />
+    <!-- Classic French Beret -->
+    <ellipse cx="200" cy="140" rx="85" ry="35" fill="%23111215" transform="rotate(-10 200 140)" />
+    <!-- Face -->
+    <ellipse cx="200" cy="190" rx="66" ry="76" fill="%23f2ede6" />
+    <!-- Chic bob haircut -->
+    <path d="M130 180 C125 120 275 120 270 180 L270 230 L250 240 L250 200 C230 160 170 160 150 200 L150 240 L130 230 Z" fill="%2318191c" />
+    <!-- Subtle eyeliner eyes -->
+    <ellipse cx="172" cy="188" rx="8" ry="6" fill="%2318191c" />
+    <ellipse cx="228" cy="188" rx="8" ry="6" fill="%2318191c" />
+    <circle cx="174" cy="186" r="2" fill="%23ffffff" />
+    <circle cx="230" cy="186" r="2" fill="%23ffffff" />
+    <!-- Red French lip -->
+    <path d="M188 226 Q200 234 212 226 Q200 222 188 226 Z" fill="%23c1121f" />
+  </svg>`,
 };
 
 export const ASSET_STICKERS = {
@@ -283,5 +303,101 @@ export const ASSET_STICKERS = {
     <path d="M25 65 Q25 73 33 73 Q25 73 25 81 Q25 73 17 73 Q25 73 25 65 Z" fill="%234cc9f0" />
     <circle cx="50" cy="78" r="3" fill="%23ffffff" />
     <circle cx="76" cy="28" r="2.5" fill="%23ffffff" />
+  </svg>`,
+};
+
+export const ASSET_POSTER_ART = {
+  kyoto1984: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+    <rect width="600" height="700" fill="%23f4ede2" />
+    <!-- Architectural grid lines -->
+    <line x1="80" y1="40" x2="80" y2="660" stroke="%232b2622" stroke-width="0.75" opacity="0.3" />
+    <line x1="520" y1="40" x2="520" y2="660" stroke="%232b2622" stroke-width="0.75" opacity="0.3" />
+    <line x1="40" y1="520" x2="560" y2="520" stroke="%232b2622" stroke-width="0.75" opacity="0.3" />
+    <!-- Crimson Sun -->
+    <circle cx="300" cy="270" r="140" fill="%23c83e2b" />
+    <!-- Minimalist Mountain Peaks -->
+    <path d="M100 480 L230 320 L320 420 L420 300 L540 480 Z" fill="%231e232a" opacity="0.95" />
+    <path d="M180 480 L280 370 L380 480 Z" fill="%233a414c" opacity="0.8" />
+    <!-- Torii gate minimalist lines -->
+    <rect x="250" y="440" width="100" height="12" fill="%23f4ede2" />
+    <rect x="260" y="456" width="80" height="8" fill="%23f4ede2" />
+    <rect x="268" y="464" width="10" height="56" fill="%23f4ede2" />
+    <rect x="322" y="464" width="10" height="56" fill="%23f4ede2" />
+    <!-- Japanese Kanji Typography -->
+    <text x="300" y="580" font-family="'Murecho', sans-serif" font-size="34" font-weight="900" fill="%232b2622" text-anchor="middle" letter-spacing="14">京都 • 1984</text>
+    <text x="300" y="612" font-family="'Funnel Sans', sans-serif" font-size="12" font-weight="600" fill="%237a6f66" text-anchor="middle" letter-spacing="4">KYOTO NATIONAL MUSEUM OF MODERN ART</text>
+  </svg>`,
+
+  bauhaus1923: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+    <rect width="600" height="700" fill="%23ebe5d8" />
+    <!-- Constructivist diagonal band -->
+    <polygon points="0,180 600,60 600,120 0,240" fill="%231a1a1a" />
+    <!-- Bauhaus Primary Circle: Deep Cobalt Blue -->
+    <circle cx="210" cy="360" r="130" fill="%231a3b8b" />
+    <!-- Bauhaus Primary Triangle: Canary Yellow -->
+    <polygon points="380,220 520,460 240,460" fill="%23e8a317" opacity="0.92" />
+    <!-- Bauhaus Primary Rectangle: Crimson Red -->
+    <rect x="120" y="240" width="120" height="180" fill="%23c92a2a" opacity="0.85" />
+    <!-- Concentric quarter arc -->
+    <path d="M 460,200 A 180,180 0 0,0 280,20" fill="none" stroke="%231a1a1a" stroke-width="24" stroke-linecap="square" />
+    <circle cx="460" cy="200" r="14" fill="%231a1a1a" />
+    <!-- Structural grid lines -->
+    <line x1="80" y1="520" x2="520" y2="520" stroke="%231a1a1a" stroke-width="4" />
+    <text x="80" y="580" font-family="'Funnel Sans', sans-serif" font-size="44" font-weight="900" fill="%231a1a1a" letter-spacing="2">BAUHAUS</text>
+    <text x="80" y="620" font-family="'Funnel Sans', sans-serif" font-size="18" font-weight="700" fill="%23c92a2a" letter-spacing="6">DESSAU • WEIMAR 1923</text>
+  </svg>`,
+
+  frenchCinema: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+    <rect width="600" height="700" fill="%2317181c" />
+    <!-- 35mm film frame borders -->
+    <rect x="60" y="60" width="480" height="420" fill="%2322242b" rx="4" />
+    <!-- Film sprocket perforations -->
+    <g fill="%23f5eedc" opacity="0.85">
+      <rect x="24" y="80" width="20" height="28" rx="3" />
+      <rect x="24" y="140" width="20" height="28" rx="3" />
+      <rect x="24" y="200" width="20" height="28" rx="3" />
+      <rect x="24" y="260" width="20" height="28" rx="3" />
+      <rect x="24" y="320" width="20" height="28" rx="3" />
+      <rect x="24" y="380" width="20" height="28" rx="3" />
+      <rect x="24" y="440" width="20" height="28" rx="3" />
+      <rect x="556" y="80" width="20" height="28" rx="3" />
+      <rect x="556" y="140" width="20" height="28" rx="3" />
+      <rect x="556" y="200" width="20" height="28" rx="3" />
+      <rect x="556" y="260" width="20" height="28" rx="3" />
+      <rect x="556" y="320" width="20" height="28" rx="3" />
+      <rect x="556" y="380" width="20" height="28" rx="3" />
+      <rect x="556" y="440" width="20" height="28" rx="3" />
+    </g>
+    <!-- Cinematic silhouette & spotlight -->
+    <circle cx="300" cy="270" r="160" fill="%23f5eedc" opacity="0.12" />
+    <path d="M180 480 C180 340 220 250 300 240 C380 250 420 340 420 480 Z" fill="%230b0c0e" />
+    <ellipse cx="300" cy="210" rx="48" ry="56" fill="%230b0c0e" />
+    <!-- Parisian beret silhouette -->
+    <ellipse cx="300" cy="180" rx="64" ry="22" fill="%230b0c0e" transform="rotate(-8 300 180)" />
+    <!-- Iconic Typography -->
+    <text x="300" y="550" font-family="'Murecho', sans-serif" font-size="40" font-weight="900" fill="%23f5eedc" text-anchor="middle" letter-spacing="3">NOUVELLE VAGUE</text>
+    <text x="300" y="588" font-family="'Funnel Sans', sans-serif" font-size="15" font-weight="700" fill="%23e63946" text-anchor="middle" letter-spacing="8">CINÉMATHÈQUE FRANÇAISE • 1965</text>
+    <text x="300" y="626" font-family="'Newsreader', Georgia, serif" font-style="italic" font-size="14" fill="%239e9aa8" text-anchor="middle">“Le cinéma, c'est vingt-quatre fois la vérité par seconde.”</text>
+  </svg>`,
+
+  nordicBotanical: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+    <rect width="600" height="700" fill="%23f7f4ee" />
+    <!-- Archival specimen frame -->
+    <rect x="50" y="50" width="500" height="600" fill="none" stroke="%233a4036" stroke-width="1.5" />
+    <rect x="56" y="56" width="488" height="588" fill="none" stroke="%233a4036" stroke-width="0.5" />
+    <!-- Botanical branch vector -->
+    <path d="M300 480 Q290 320 310 160" stroke="%233a4036" stroke-width="3" fill="none" stroke-linecap="round" />
+    <!-- Eucalyptus / Ginkgo leaves -->
+    <ellipse cx="270" cy="220" rx="36" ry="24" fill="%23606c38" opacity="0.85" transform="rotate(-25 270 220)" />
+    <ellipse cx="340" cy="200" rx="34" ry="22" fill="%23738043" opacity="0.85" transform="rotate(30 340 200)" />
+    <ellipse cx="255" cy="290" rx="42" ry="28" fill="%23606c38" opacity="0.85" transform="rotate(-30 255 290)" />
+    <ellipse cx="350" cy="275" rx="40" ry="26" fill="%2385944d" opacity="0.85" transform="rotate(25 350 275)" />
+    <ellipse cx="250" cy="370" rx="44" ry="30" fill="%23606c38" opacity="0.85" transform="rotate(-20 250 370)" />
+    <ellipse cx="355" cy="360" rx="42" ry="28" fill="%23738043" opacity="0.85" transform="rotate(35 355 360)" />
+    <ellipse cx="305" cy="140" rx="28" ry="20" fill="%2385944d" opacity="0.9" transform="rotate(5 305 140)" />
+    <!-- Scientific specimen plate label -->
+    <rect x="180" y="515" width="240" height="60" fill="%23ebe5d8" stroke="%233a4036" stroke-width="1" rx="2" />
+    <text x="300" y="538" font-family="'Newsreader', Georgia, serif" font-style="italic" font-size="16" font-weight="bold" fill="%23283618" text-anchor="middle">Ginkgo Biloba L.</text>
+    <text x="300" y="558" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700" fill="%23606c38" text-anchor="middle" letter-spacing="2">HERBARIUM NORDICUM • NO. 1892</text>
   </svg>`,
 };

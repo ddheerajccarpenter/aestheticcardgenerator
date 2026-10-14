@@ -582,7 +582,99 @@ export const CookieView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => 
               2. Third-Party Advertising Cookies
             </h2>
             <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
-              If Google AdSense or another advertising provider is enabled in the future, third-party cookies will be placed by advertising partners to serve personalized and non-personalized advertisements based on your browsing history. You can control or disable cookies via your browser settings at any time.
+              Third-party vendors, including Google, use cookies (such as the DART cookie) to serve ads based on prior visits to this website or other sites across the internet. You can manage your preferences or opt out of personalized advertising by visiting Google Ads Settings and aboutads.info.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --------------------------------------------------------------------------
+// 6b. EDITORIAL, PARODY & DMCA DISCLAIMER (/disclaimer) — AdSense & DMCA Hub
+// --------------------------------------------------------------------------
+export const DisclaimerView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
+  const isLight = theme === 'light';
+
+  useEffect(() => {
+    updatePageSEO({
+      title: 'Editorial, Parody & DMCA Copyright Disclaimer — Aesthetic Card Studio',
+      description:
+        'Legal, artistic, and DMCA copyright disclaimer for Aesthetic Card Studio. Fictional credential layouts, parody rights, and direct rights-holder contact.',
+      canonicalPath: '/disclaimer',
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  return (
+    <div className={`w-full pt-20 pb-16 transition-colors duration-200 ${isLight ? 'bg-[#f8fafc] text-[#0f172a]' : 'bg-[#0b0e11] text-[#e1e2e7]'}`}>
+      <div className="max-w-3xl mx-auto px-4 md:px-8 flex flex-col gap-8">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#707a8a]">
+          <a href="/" className="hover:underline cursor-pointer">Home</a>
+          <ChevronRight className="w-3.5 h-3.5" />
+          <span className={`font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Disclaimer</span>
+        </nav>
+
+        <header className="flex flex-col gap-3 border-b pb-6 border-[#262c36]/40">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className={`w-5 h-5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
+            <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight font-heading">
+              Editorial, Parody &amp; DMCA Copyright Disclaimer
+            </h1>
+          </div>
+          <p className="text-xs text-[#707a8a]">
+            Effective Date: October 14, 2026 • Studio License Version 3.4
+          </p>
+        </header>
+
+        <div className="flex flex-col gap-8 text-sm leading-relaxed">
+          <section className="flex flex-col gap-3">
+            <h2 className={`text-base font-bold font-heading ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+              1. Artistic Expression, Parody &amp; Creative Templates
+            </h2>
+            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
+              All sample Aesthetic ID Card designs, vintage transit badges, fan credentials, collector cards, and literary layouts offered on Aesthetic Card Studio are original artistic design compositions created solely for personal entertainment, worldbuilding, graphic design portfolios, and creative self-expression.
+            </p>
+            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
+              These designs are <strong>NOT</strong> government-issued identity documents, official state IDs, real-world law enforcement credentials, or valid corporate security passes. They possess zero legal status and cannot be used for any official identification, impersonation, deception, or fraudulent activity.
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className={`text-base font-bold font-heading ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+              2. Fair Use &amp; Pop-Culture Homage
+            </h2>
+            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
+              Any names, pop-culture motifs, literary citations, or fictional character references (such as parody club badges or fan cards) used in preview templates are protected under fair-use commentary, transformative artistic design, and parody doctrines. All referenced trademarks, intellectual properties, and artist names belong to their respective copyright holders.
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className={`text-base font-bold font-heading ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+              3. User-Generated Content &amp; Local Privacy
+            </h2>
+            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
+              Aesthetic Card Studio operates 100% locally in your client web browser. Because no user-edited cards, uploaded portraits, or custom fonts are transmitted to or stored on our servers, each individual user retains full responsibility for the content they generate, download, or distribute. Users agree not to produce unlawful, defamatory, or fraudulent materials.
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className={`text-base font-bold font-heading ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+              4. DMCA Notice &amp; Copyright Takedown Procedure
+            </h2>
+            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
+              Aesthetic Card Studio respects the intellectual property rights of all creators. If you are a copyright owner or authorized representative and believe that any sample template, font reference, or decorative graphic on this site infringes upon your copyright, please contact our designated Copyright Agent directly:
+            </p>
+            <div className={`p-4 rounded-xl border flex flex-col gap-1 text-xs font-mono ${
+              isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+            }`}>
+              <span className="font-bold text-[#fcd535]">Designated DMCA Agent: Dheeraj Carpenter</span>
+              <span>Email: <a href="mailto:ddheerajcarpenter@gmail.com" className="underline hover:text-[#fcd535]">ddheerajcarpenter@gmail.com</a></span>
+              <span>Response Window: Typically under 24 business hours</span>
+            </div>
+            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
+              Upon receiving a bona fide notification, we will immediately review the inquiry and remove or disable access to the relevant content in accordance with the Digital Millennium Copyright Act (17 U.S.C. § 512).
             </p>
           </section>
         </div>

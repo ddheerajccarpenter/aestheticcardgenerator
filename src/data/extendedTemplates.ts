@@ -1,5 +1,5 @@
 import type { CardTemplate, CanvasDocument, CanvasObject } from '../types/card';
-import { ASSET_AVATARS, ASSET_STICKERS } from './canvasAssets';
+import { ASSET_AVATARS, ASSET_STICKERS, ASSET_POSTER_ART } from './canvasAssets';
 import { createTextObject, createImageObject, createShapeObject } from '../utils/canvasBuilder';
 
 // Helper to make full CanvasDocuments for templates
@@ -671,10 +671,164 @@ const docSchoolArtGuild: CanvasDocument = buildDoc('school_art_guild', 'Fine Art
 ]);
 
 // ─────────────────────────────────────────────────────────────────────────────
-// EXPORT ALL 38 BRAND NEW DETAILED TEMPLATES
+// PINTEREST EXHIBITION POSTERS (4 high-aesthetic museum & editorial templates)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const docPinterestKyoto: CanvasDocument = buildDoc('pinterest_kyoto', 'Kyoto 1984 Modernist Poster', 700, 980, '#f4ede2', [
+  createShapeObject('rect', { name: 'Poster Frame', x: 24, y: 24, width: 652, height: 932, fill: '#fdfbf7', stroke: '#2b2622', strokeWidth: 1.5, zIndex: 1 }),
+  createTextObject({ name: 'Header French', text: "EXPOSITION D'ART MODERNE JAPONAIS // KYOTO", fontFamily: "'Funnel Sans', sans-serif", fontSize: 13, fontWeight: '700', color: '#2b2622', letterSpacing: 3, x: 40, y: 46, width: 620, height: 24, align: 'center', zIndex: 10 }),
+  createImageObject(ASSET_POSTER_ART.kyoto1984, { name: 'Kyoto Sun Art', x: 60, y: 80, width: 580, height: 640, borderRadius: 0, zIndex: 5 }),
+  createTextObject({ name: 'Exhibition Dates', text: '14 AVRIL — 28 MAI 1984 • GALERIE NATIONALE DE KYOTO', fontFamily: "'Murecho', sans-serif", fontSize: 16, fontWeight: '800', color: '#c83e2b', letterSpacing: 4, x: 40, y: 735, width: 620, height: 30, align: 'center', zIndex: 10 }),
+  createTextObject({ name: 'Curator Note', text: '“Une méditation visuelle sur les estampes traditionnelles et la sérigraphie géométrique moderne.”', fontFamily: "'Newsreader', Georgia, serif", fontSize: 16, fontStyle: 'italic', color: '#574f48', x: 70, y: 775, width: 560, height: 50, align: 'center', zIndex: 10 }),
+  createImageObject(ASSET_STICKERS.barcode, { name: 'Archive Barcode', x: 230, y: 835, width: 240, height: 50, zIndex: 7 }),
+  createTextObject({ name: 'Footer Colophon', text: 'ARCHIVAL PRINT NO. 482 // AESTHETIC CARD STUDIO COLLECTION', fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: '600', color: '#8c8075', letterSpacing: 2, x: 40, y: 900, width: 620, height: 20, align: 'center', zIndex: 10 }),
+]);
+
+const docPinterestBauhaus: CanvasDocument = buildDoc('pinterest_bauhaus', 'Bauhaus Dessau 1923 Poster', 700, 980, '#ebe5d8', [
+  createShapeObject('rect', { name: 'Bauhaus Canvas', x: 20, y: 20, width: 660, height: 940, fill: '#ebe5d8', stroke: '#1a1a1a', strokeWidth: 3, zIndex: 1 }),
+  createTextObject({ name: 'Bauhaus Top Bar', text: 'STAATLICHES BAUHAUS WEIMAR // 1919-1923', fontFamily: "'Funnel Sans', sans-serif", fontSize: 15, fontWeight: '900', color: '#1a1a1a', letterSpacing: 4, x: 40, y: 44, width: 620, height: 28, zIndex: 10 }),
+  createImageObject(ASSET_POSTER_ART.bauhaus1923, { name: 'Constructivist Art', x: 50, y: 80, width: 600, height: 650, zIndex: 5 }),
+  createTextObject({ name: 'Manifesto Headline', text: 'KUNST UND TECHNIK — EINE NEUE EINHEIT', fontFamily: "'Funnel Sans', sans-serif", fontSize: 20, fontWeight: '900', color: '#1a1a1a', letterSpacing: 2, x: 50, y: 745, width: 600, height: 35, zIndex: 10 }),
+  createTextObject({ name: 'Master Names', text: 'LEITUNG: WALTER GROPIUS • MEISTER: WASSILY KANDINSKY, PAUL KLEE, LÁSZLÓ MOHOLY-NAGY', fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#c92a2a', letterSpacing: 1.5, x: 50, y: 785, width: 600, height: 30, zIndex: 10 }),
+  createTextObject({ name: 'Exhibition Location', text: 'AUSSTELLUNG WEIMAR / DESSAU • KATALOG PREIS 2 GOLDMARK • ARCHIV DER MODERNE', fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: '600', color: '#4a4a4a', letterSpacing: 1.5, x: 50, y: 825, width: 600, height: 25, zIndex: 10 }),
+  createImageObject(ASSET_STICKERS.stampApproved, { name: 'Bauhaus Seal', x: 520, y: 835, width: 110, height: 110, zIndex: 8 }),
+  createImageObject(ASSET_STICKERS.barcode, { name: 'Barcode', x: 50, y: 865, width: 220, height: 50, zIndex: 7 }),
+]);
+
+const docPinterestFrenchCinema: CanvasDocument = buildDoc('pinterest_french_cinema', 'Nouvelle Vague French Cinema Poster', 700, 980, '#17181c', [
+  createShapeObject('rect', { name: 'Poster Background', x: 20, y: 20, width: 660, height: 940, fill: '#17181c', stroke: '#e63946', strokeWidth: 1.5, zIndex: 1 }),
+  createTextObject({ name: 'Cinémathèque Header', text: 'CINÉMATHÈQUE FRANÇAISE // RÉTROSPECTIVE OFFICIELLE', fontFamily: "'Funnel Sans', sans-serif", fontSize: 13, fontWeight: '800', color: '#e63946', letterSpacing: 4, x: 40, y: 46, width: 620, height: 24, align: 'center', zIndex: 10 }),
+  createImageObject(ASSET_POSTER_ART.frenchCinema, { name: 'Cinema 35mm Art', x: 50, y: 80, width: 600, height: 650, zIndex: 5 }),
+  createTextObject({ name: 'Film Title Block', text: 'NOUVELLE VAGUE • PARIS 1965', fontFamily: "'Murecho', sans-serif", fontSize: 24, fontWeight: '900', color: '#f5eedc', letterSpacing: 4, x: 40, y: 745, width: 620, height: 35, align: 'center', zIndex: 10 }),
+  createTextObject({ name: 'Directors line', text: 'JEAN-LUC GODARD • FRANÇOIS TRUFFAUT • ÉRIC ROHMER • AGNÈS VARDA', fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#e63946', letterSpacing: 2.5, x: 40, y: 785, width: 620, height: 26, align: 'center', zIndex: 10 }),
+  createTextObject({ name: 'Godard Quote', text: '“Le cinéma n’est pas une reproduction de la réalité, c’est un oubli de la réalité.”', fontFamily: "'Newsreader', Georgia, serif", fontSize: 16, fontStyle: 'italic', color: '#c4bfb6', x: 60, y: 820, width: 580, height: 45, align: 'center', zIndex: 10 }),
+  createImageObject(ASSET_STICKERS.barcode, { name: 'Film Ticket Barcode', x: 230, y: 875, width: 240, height: 50, zIndex: 7 }),
+]);
+
+const docPinterestBotanical: CanvasDocument = buildDoc('pinterest_botanical', 'Nordic Botanical Herbarium Poster', 700, 980, '#f7f4ee', [
+  createShapeObject('rect', { name: 'Linen Matting', x: 20, y: 20, width: 660, height: 940, fill: '#fdfbf7', stroke: '#3a4036', strokeWidth: 1, zIndex: 1 }),
+  createTextObject({ name: 'Herbarium Top Header', text: 'UNIVERSITETET I UPPSALA // BOTANISKA INSTITUTIONEN', fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#3a4036', letterSpacing: 3, x: 40, y: 44, width: 620, height: 24, align: 'center', zIndex: 10 }),
+  createImageObject(ASSET_POSTER_ART.nordicBotanical, { name: 'Botanical Drawing Art', x: 50, y: 75, width: 600, height: 660, zIndex: 5 }),
+  createTextObject({ name: 'Latin Taxonomy', text: 'GINKGO BILOBA L. (GINKGOACEAE)', fontFamily: "'Newsreader', Georgia, serif", fontSize: 26, fontStyle: 'italic', fontWeight: '700', color: '#283618', letterSpacing: 1, x: 40, y: 750, width: 620, height: 35, align: 'center', zIndex: 10 }),
+  createTextObject({ name: 'Collection Notes', text: 'SPECIMEN HERBARIUM ARCHIVE NO. 1892 • COLLECTIO NORDICA EX SUECIA', fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#606c38', letterSpacing: 2, x: 40, y: 790, width: 620, height: 25, align: 'center', zIndex: 10 }),
+  createTextObject({ name: 'Curator Inscription', text: '“Arbor antiqua foliis flabelliformibus, per hiemem deciduis. Collectum in horto botanico anno 1892.”', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', color: '#575f4e', x: 60, y: 820, width: 580, height: 40, align: 'center', zIndex: 10 }),
+  createImageObject(ASSET_STICKERS.stampApproved, { name: 'Museum Stamp', x: 500, y: 840, width: 110, height: 110, zIndex: 8 }),
+  createImageObject(ASSET_STICKERS.barcode, { name: 'Herbarium Barcode', x: 90, y: 865, width: 220, height: 50, zIndex: 7 }),
+]);
+
+export const PINTEREST_POSTER_TEMPLATES: CardTemplate[] = [
+  {
+    id: 'poster-kyoto-1984',
+    title: 'Kyoto 1984 Modernist Poster',
+    category: 'poster',
+    categoryLabel: 'Japanese Modernism Poster',
+    quote: "EXPOSITION D'ART MODERNE JAPONAIS • KYOTO 1984\nTraditional Woodblock & Avant-Garde Screenprinting\nCurated by S. Hashimoto • Galerie Nationale.",
+    author: 'KYOTO MODERN ARCHIVE',
+    tag: 'EXHIBITION • KYOTO',
+    badge: 'PINTEREST POSTER',
+    theme: { id: 'kyoto-crimson', name: 'Kyoto Crimson & Linen', bg: '#f4ede2', ink: '#2b2622', category: 'badge' },
+    font: 'sans',
+    fontSize: 22,
+    align: 'center',
+    padding: 32,
+    borderRadius: 8,
+    showGrain: true,
+    showBorder: true,
+    showIcon: true,
+    iconName: 'landscape',
+    tags: ['poster', 'pinterest', 'kyoto', 'japan', 'exhibition', 'modernism'],
+    hasPhotoArea: true,
+    layoutHint: 'vertical',
+    accentColor: '#c83e2b',
+    description: 'Pinterest-inspired Japanese exhibition poster with crimson sun sphere, minimalist mountain contour, and bilingual museum typography.',
+    canvasDoc: docPinterestKyoto,
+  },
+  {
+    id: 'poster-bauhaus-1923',
+    title: 'Bauhaus Dessau 1923 Poster',
+    category: 'poster',
+    categoryLabel: 'Bauhaus Constructivism',
+    quote: 'STAATLICHES BAUHAUS WEIMAR // AUSSTELLUNG 1923\nKunst und Technik — Eine neue Einheit.\nMeister: Wassily Kandinsky, Paul Klee, Walter Gropius.',
+    author: 'BAUHAUS ARCHIVE DESSAU',
+    tag: 'CONSTRUCTIVISM • 1923',
+    badge: 'PINTEREST POSTER',
+    theme: { id: 'bauhaus-primary', name: 'Bauhaus Primary', bg: '#ebe5d8', ink: '#1a1a1a', category: 'badge' },
+    font: 'sans',
+    fontSize: 22,
+    align: 'left',
+    padding: 32,
+    borderRadius: 8,
+    showGrain: true,
+    showBorder: true,
+    showIcon: true,
+    iconName: 'category',
+    tags: ['poster', 'pinterest', 'bauhaus', 'constructivism', 'geometric', 'germany'],
+    hasPhotoArea: true,
+    layoutHint: 'vertical',
+    accentColor: '#1a3b8b',
+    description: 'Iconic Pinterest constructivist Bauhaus poster featuring primary geometric forms (blue circle, red wedge, yellow triangle) and Swiss typography.',
+    canvasDoc: docPinterestBauhaus,
+  },
+  {
+    id: 'poster-french-cinema',
+    title: 'Nouvelle Vague Cinema Poster',
+    category: 'poster',
+    categoryLabel: 'French Cinema Poster',
+    quote: "RÉTROSPECTIVE NOUVELLE VAGUE • PARIS 1965\n“Le cinéma, c'est vingt-quatre fois la vérité par seconde.”\nJean-Luc Godard • François Truffaut • Cinémathèque Française.",
+    author: 'CINÉMATHÈQUE FRANÇAISE',
+    tag: 'CINEMA • NOUVELLE VAGUE',
+    badge: '35MM POSTER',
+    theme: { id: 'cinema-noir', name: 'Cinema Noir & Cream', bg: '#17181c', ink: '#f5eedc', category: 'badge' },
+    font: 'serif',
+    fontSize: 22,
+    align: 'center',
+    padding: 32,
+    borderRadius: 8,
+    showGrain: true,
+    showBorder: true,
+    showIcon: true,
+    iconName: 'movie',
+    tags: ['poster', 'pinterest', 'cinema', 'french', 'monochrome', 'vintage'],
+    hasPhotoArea: true,
+    layoutHint: 'vertical',
+    accentColor: '#e63946',
+    description: 'Parisian French New Wave cinema poster with 35mm film perforations, spotlight silhouette, and Godard quote typography.',
+    canvasDoc: docPinterestFrenchCinema,
+  },
+  {
+    id: 'poster-nordic-botanical',
+    title: 'Nordic Botanical Herbarium Poster',
+    category: 'poster',
+    categoryLabel: 'Botanical Gallery Poster',
+    quote: 'HERBARIUM NORDICUM • SPECIMEN NO. 1892\nGinkgo Biloba L. — Preserved botanical plate.\nMuseum of Natural History • Archival Cotton Paper.',
+    author: 'HERBARIUM NORDICUM',
+    tag: 'BOTANICAL • HERBARIUM',
+    badge: 'ARCHIVAL POSTER',
+    theme: { id: 'botanical-sage', name: 'Nordic Sage & Clay', bg: '#f7f4ee', ink: '#283618', category: 'badge' },
+    font: 'serif',
+    fontSize: 22,
+    align: 'center',
+    padding: 32,
+    borderRadius: 8,
+    showGrain: true,
+    showBorder: true,
+    showIcon: true,
+    iconName: 'eco',
+    tags: ['poster', 'pinterest', 'botanical', 'herbarium', 'minimalist', 'nature'],
+    hasPhotoArea: true,
+    layoutHint: 'vertical',
+    accentColor: '#606c38',
+    description: 'Minimalist Scandinavian botanical specimen poster with eucalyptus/ginkgo branch illustration, Latin taxonomy, and archival seal.',
+    canvasDoc: docPinterestBotanical,
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORT ALL 42 BRAND NEW DETAILED TEMPLATES (INCLUDING 4 PINTEREST POSTERS)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const EXTENDED_AESTHETIC_TEMPLATES: CardTemplate[] = [
+  ...PINTEREST_POSTER_TEMPLATES,
   // A. Aesthetic ID Cards (8)
   {
     id: 'id-jennie-pretty',

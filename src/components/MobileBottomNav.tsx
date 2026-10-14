@@ -17,7 +17,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 }) => {
   const isLight = theme === 'light';
 
-  if (hideWhenTyping) {
+  // Unmount completely on editor routes to prevent double-stacked bars (Mobile Screenshot 2 Fix)
+  if (hideWhenTyping || currentPath.startsWith('/create') || currentPath.startsWith('/canvas')) {
     return null;
   }
 
@@ -60,7 +61,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <nav
       aria-label="Mobile Navigation"
-      className={`fixed bottom-0 left-0 right-0 z-40 md:hidden border-t backdrop-blur-xl transition-all duration-200 ${
+      className={`global-mobile-bottom-nav fixed bottom-0 left-0 right-0 z-40 md:hidden border-t backdrop-blur-xl transition-all duration-200 ${
         isLight
           ? 'bg-white/95 border-[#e2e8f0] text-[#181a20]'
           : 'bg-[#111417]/95 border-[#262c36] text-[#e1e2e7]'
