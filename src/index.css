@@ -13,7 +13,7 @@
     --c10-accent: #2c241d;     /* 10% Bottom Shade: Umber Espresso Tint */
     --ui-accent-solid: #e5b84b;
     --text-primary: #f4f1ea;
-    --text-secondary: #b5b0a6;
+    --text-secondary: #cbd5e1;
 
     /* Dark Mode Duotone Icon Tokens */
     --icon-frame-bg: rgba(255, 255, 255, 0.05);
@@ -40,8 +40,8 @@
     
     --color-ink: #ffffff;
     --color-ink-dark: #181a20;
-    --color-body: #9ca3af;
-    --color-muted: #707a8a;
+    --color-body: #cbd5e1;
+    --color-muted: #94a3b8;
     
     --color-trading-up: #0ecb81;
     --color-trading-down: #f6465d;
@@ -184,6 +184,79 @@
   color: var(--icon-duotone-secondary);
 }
 
+/* High-Contrast Variants for Square Duotone Icons */
+.sq-icon-dark,
+.bg-\[\#facc15\] .sq-duotone-icon,
+.bg-\[\#fcd535\] .sq-duotone-icon,
+.bg-\[\#ffe270\] .sq-duotone-icon,
+.bg-amber-400 .sq-duotone-icon,
+.bg-yellow-400 .sq-duotone-icon,
+.btn-primary .sq-duotone-icon {
+  --icon-frame-bg: rgba(0, 0, 0, 0.08) !important;
+  --icon-frame-border: rgba(0, 0, 0, 0.22) !important;
+  --icon-duotone-primary: #0b0e11 !important;
+  --icon-duotone-secondary: rgba(11, 14, 17, 0.35) !important;
+  color: #0b0e11 !important;
+}
+
+.sq-icon-dark .bx-duotone-primary,
+.bg-\[\#facc15\] .sq-duotone-icon .bx-duotone-primary,
+.bg-\[\#fcd535\] .sq-duotone-icon .bx-duotone-primary,
+.bg-\[\#ffe270\] .sq-duotone-icon .bx-duotone-primary,
+.bg-amber-400 .sq-duotone-icon .bx-duotone-primary,
+.bg-yellow-400 .sq-duotone-icon .bx-duotone-primary,
+.btn-primary .sq-duotone-icon .bx-duotone-primary {
+  fill: #0b0e11 !important;
+  stroke: #0b0e11 !important;
+  color: #0b0e11 !important;
+}
+
+.sq-icon-dark .bx-duotone-secondary,
+.bg-\[\#facc15\] .sq-duotone-icon .bx-duotone-secondary,
+.bg-\[\#fcd535\] .sq-duotone-icon .bx-duotone-secondary,
+.bg-\[\#ffe270\] .sq-duotone-icon .bx-duotone-secondary,
+.bg-amber-400 .sq-duotone-icon .bx-duotone-secondary,
+.bg-yellow-400 .sq-duotone-icon .bx-duotone-secondary,
+.btn-primary .sq-duotone-icon .bx-duotone-secondary {
+  fill: rgba(11, 14, 17, 0.35) !important;
+  color: rgba(11, 14, 17, 0.35) !important;
+}
+
+.sq-icon-light {
+  --icon-frame-bg: rgba(255, 255, 255, 0.08) !important;
+  --icon-frame-border: rgba(255, 255, 255, 0.22) !important;
+  --icon-duotone-primary: #ffffff !important;
+  --icon-duotone-secondary: rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+}
+
+.sq-icon-light .bx-duotone-primary {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.sq-icon-light .bx-duotone-secondary {
+  fill: rgba(255, 255, 255, 0.45) !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* Universal Dark Mode High Contrast for Muted Text */
+html:not(.light) .text-\[\#707a8a\],
+[data-theme="dark"] .text-\[\#707a8a\] {
+  color: #94a3b8 !important;
+}
+
+html:not(.light) .text-\[\#64748b\],
+[data-theme="dark"] .text-\[\#64748b\] {
+  color: #cbd5e1 !important;
+}
+
+html:not(.light) .text-\[\#475569\],
+[data-theme="dark"] .text-\[\#475569\] {
+  color: #cbd5e1 !important;
+}
+
 /* YouTube-Style Ambient Stage (Workspace editor only, never export) */
 .editor-ambient-stage {
   position: relative;
@@ -304,11 +377,13 @@ button:active, .btn-interactive:active, .sq-duotone-icon:active, .palette-swatch
   transition: transform 55ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Scroll-Velocity Reactive Template Card Container */
+/* Clean Editorial Template Card Container (Zero AI-slop mouse wobble) */
 .template-card-kinetic {
-  transform: perspective(1400px) rotateX(calc(var(--scroll-velocity, 0) * 0.45deg)) rotateY(var(--hover-rot-y, 0deg));
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 280ms ease;
-  transform-style: preserve-3d;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.template-card-kinetic:hover {
+  transform: translateY(-2px);
 }
 
 /* Guides 3D Book Page-Turning Engine */

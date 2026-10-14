@@ -277,7 +277,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm active:scale-[0.98] transition-all cursor-pointer shadow-lg bg-[#facc15] text-[#0b0e11] hover:bg-[#ffe270]"
           >
             <span>Open Card Creator</span>
-            <SquareDuotoneIcon name="arrow-right" size="sm" />
+            <SquareDuotoneIcon name="arrow-right" size="sm" variant="dark" />
           </a>
 
           <a
@@ -285,7 +285,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl border font-semibold text-sm transition-colors cursor-pointer ${
               isLight
                 ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-slate-50'
-                : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
+                : 'bg-[#181d24] border-[#384152] text-white hover:bg-[#222730]'
             }`}
           >
             <span>Launch Freeform Canvas →</span>
@@ -301,21 +301,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Mini-Studio Toolbar: Mode Switcher + Palettes + 3D View + Quick Actions */}
           <div
             className={`flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 rounded-xl border ${
-              isLight ? 'bg-slate-50 border-[#e2e8f0]' : 'bg-[#181d24] border-[#1f242c]'
+              isLight ? 'bg-slate-50 border-[#e2e8f0]' : 'bg-[#181d24] border-[#2b3340]'
             }`}
           >
             {/* Mode Toggle Buttons */}
-            <div className="flex items-center gap-1 bg-black/10 dark:bg-black/30 p-1 rounded-lg">
+            <div className="flex items-center gap-1 bg-black/10 dark:bg-black/40 p-1 rounded-lg">
               <button
                 onClick={() => setHeroMode('quote')}
                 className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                   heroMode === 'quote'
                     ? isLight
-                      ? 'bg-white text-[#0f172a] shadow-sm'
-                      : 'bg-[#facc15] text-[#0b0e11] shadow-sm'
+                      ? 'bg-white text-[#0f172a] shadow-sm font-bold'
+                      : 'bg-[#facc15] text-[#0b0e11] shadow-sm font-bold'
                     : isLight
                     ? 'text-[#64748b] hover:text-[#0f172a]'
-                    : 'text-[#707a8a] hover:text-white'
+                    : 'text-[#cbd5e1] hover:text-white font-medium'
                 }`}
               >
                 <span>Quote Mode</span>
@@ -326,11 +326,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                   heroMode === 'id'
                     ? isLight
-                      ? 'bg-white text-[#0f172a] shadow-sm'
-                      : 'bg-[#facc15] text-[#0b0e11] shadow-sm'
+                      ? 'bg-white text-[#0f172a] shadow-sm font-bold'
+                      : 'bg-[#facc15] text-[#0b0e11] shadow-sm font-bold'
                     : isLight
                     ? 'text-[#64748b] hover:text-[#0f172a]'
-                    : 'text-[#707a8a] hover:text-white'
+                    : 'text-[#cbd5e1] hover:text-white font-medium'
                 }`}
               >
                 <span>ID Card Mode</span>
@@ -339,21 +339,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             {/* Palettes */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
-              <span className={`text-[11px] px-1 font-medium ${isLight ? 'text-[#64748b]' : 'text-[#707a8a]'}`}>
+              <span className={`text-[11px] px-1 font-semibold ${isLight ? 'text-[#64748b]' : 'text-[#cbd5e1]'}`}>
                 Palette:
               </span>
               {heroPalettes.map((pal, idx) => (
                 <button
                   key={pal.id}
                   onClick={() => setHeroPaletteIndex(idx)}
-                  className={`w-6 h-6 rounded-md border transition-all cursor-pointer relative shrink-0 ${
-                    heroPaletteIndex === idx ? 'ring-2 ring-[#facc15] scale-110' : 'opacity-80 hover:opacity-100'
+                  className={`w-6 h-6 rounded-md border border-black/20 dark:border-white/30 shadow-xs transition-all cursor-pointer relative shrink-0 ${
+                    heroPaletteIndex === idx
+                      ? 'ring-2 ring-[#facc15] ring-offset-2 ring-offset-slate-50 dark:ring-offset-[#181d24] scale-110'
+                      : 'opacity-85 hover:opacity-100'
                   }`}
                   style={{ backgroundColor: pal.bg }}
                   title={pal.name}
                 >
                   <span
-                    className="absolute inset-0 m-auto w-2 h-2 rounded-full border border-black/20"
+                    className="absolute inset-0 m-auto w-2 h-2 rounded-full border border-black/30 dark:border-white/40"
                     style={{ backgroundColor: pal.ink }}
                   />
                 </button>
@@ -366,25 +368,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 onClick={() => setIs3DMode((prev) => !prev)}
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
                   is3DMode
-                    ? 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535]'
+                    ? 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535] font-bold'
                     : isLight
                     ? 'border-slate-200 text-[#475569] hover:bg-slate-100'
-                    : 'border-[#262c36] text-[#c4c7c8] hover:bg-[#222730]'
+                    : 'border-[#384152] text-[#e2e8f0] bg-[#1a2028] hover:bg-[#252c38]'
                 }`}
                 title="Toggle interactive Three.js 3D tilt view"
               >
-                <SquareDuotoneIcon name="cube" size="sm" />
+                <SquareDuotoneIcon name="cube" size="sm" variant={is3DMode ? 'dark' : isLight ? 'default' : 'light'} />
                 <span>3D View</span>
               </button>
 
               <button
                 onClick={handleCopyHero}
                 className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                  isLight ? 'border-slate-200 hover:bg-slate-100' : 'border-[#262c36] hover:bg-[#222730]'
+                  isLight ? 'border-slate-200 hover:bg-slate-100 text-[#475569]' : 'border-[#384152] hover:bg-[#252c38] text-[#e2e8f0] bg-[#1a2028]'
                 }`}
                 title="Copy Card Text"
               >
-                <SquareDuotoneIcon name={copiedHero ? 'check' : 'copy'} size="sm" />
+                <SquareDuotoneIcon name={copiedHero ? 'check' : 'copy'} size="sm" variant={isLight ? 'default' : 'light'} />
               </button>
 
               <button
@@ -393,7 +395,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-xs bg-[#facc15] text-[#0b0e11] hover:bg-[#ffe270] transition-all cursor-pointer"
                 title="Download 2x Preview"
               >
-                <SquareDuotoneIcon name="download" size="sm" />
+                <SquareDuotoneIcon name="download" size="sm" variant="dark" />
                 <span>Export</span>
               </button>
             </div>
@@ -402,7 +404,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Card Canvas or Three.js 3D View */}
           <div
             className={`relative w-full min-h-[360px] md:min-h-[440px] flex items-center justify-center p-4 sm:p-6 md:p-10 rounded-xl overflow-hidden border ${
-              isLight ? 'bg-slate-100 border-[#e2e8f0]' : 'bg-[#0b0e11] border-[#1f242c]'
+              isLight ? 'bg-slate-100 border-[#e2e8f0]' : 'bg-[#12151a] border-[#262c36]'
             }`}
           >
             {is3DMode ? (

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import type { CardTemplate } from '../types/card';
 import { ASSET_AVATARS } from '../data/canvasAssets';
 import { sanitizeQuote } from '../utils/richText';
@@ -16,44 +16,12 @@ export const UnifiedCardThumbnail: React.FC<UnifiedCardThumbnailProps> = ({
   template,
   className = '',
   minHeight,
-  interactiveTilt = true,
   onClick,
 }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
-  const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 });
-
   const isIdStyle = template.hasPhotoArea || template.category === 'id-card';
   const isVertical = template.layoutHint === 'vertical';
 
   const defaultMinH = minHeight || (isVertical ? 'min-h-[290px]' : 'min-h-[240px]');
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!interactiveTilt || !cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const px = (x / rect.width) * 100;
-    const py = (y / rect.height) * 100;
-
-    const rotY = ((x / rect.width) - 0.5) * 10;
-    const rotX = -((y / rect.height) - 0.5) * 10;
-
-    setTiltStyle({
-      transform: `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale3d(1.01, 1.01, 1.01)`,
-      transition: 'transform 80ms ease-out',
-    });
-    setGlarePos({ x: px, y: py, opacity: 0.15 });
-  };
-
-  const handlePointerLeave = () => {
-    if (!interactiveTilt) return;
-    setTiltStyle({
-      transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
-      transition: 'transform 360ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-    });
-    setGlarePos((prev) => ({ ...prev, opacity: 0 }));
-  };
 
   // Select sample avatar based on template vibe
   const avatarSrc =
@@ -70,29 +38,15 @@ export const UnifiedCardThumbnail: React.FC<UnifiedCardThumbnailProps> = ({
 
   return (
     <div
-      ref={cardRef}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
       onClick={onClick}
       style={{
         backgroundColor: template.theme.bg,
         color: template.theme.ink,
-        ...tiltStyle,
       }}
-      className={`relative p-6 flex flex-col justify-between border-b border-black/10 overflow-hidden select-none will-change-transform ${defaultMinH} ${className}`}
+      className={`relative p-6 flex flex-col justify-between border-b border-black/10 overflow-hidden select-none ${defaultMinH} ${className}`}
     >
       {/* Subtle tactile paper micro-grain */}
       <div className="absolute inset-0 card-noise opacity-20 pointer-events-none" />
-
-      {/* Dynamic 3D glare / sheen layer */}
-      {interactiveTilt && (
-        <div
-          className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-          style={{
-            background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(255,255,255,${glarePos.opacity}) 0%, transparent 60%)`,
-          }}
-        />
-      )}
 
       {/* Pure Header Strip: Folio tag & Badge */}
       <div className="flex items-center justify-between text-[11px] font-mono opacity-80 z-10 shrink-0">
