@@ -54,6 +54,7 @@ import {
 interface CanvasEditorViewProps {
   theme?: 'dark' | 'light';
   onNavigateHome?: () => void;
+  onEditingSheetChange?: (isOpen: boolean) => void;
 }
 
 const STORAGE_KEY = 'aesthetic_canvas_editor_draft_v1';
@@ -61,7 +62,10 @@ const MAX_HISTORY = 40;
 
 export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   theme = 'dark',
+  onEditingSheetChange,
 }) => {
+  const [mobileAddSheetOpen, setMobileAddSheetOpen] = useState(false);
+  const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false);
   const isLight = theme === 'light';
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -114,6 +118,31 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   // Modals & Drawers
   const [templateDrawerOpen, setTemplateDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    onEditingSheetChange?.(mobileAddSheetOpen || mobileInspectorOpen || templateDrawerOpen);
+  }, [mobileAddSheetOpen, mobileInspectorOpen, templateDrawerOpen, onEditingSheetChange]);
+
+  const handleFitToScreen = useCallback(() => {
+    if (!canvasContainerRef.current) return;
+    const container = canvasContainerRef.current;
+    const padding = window.innerWidth < 640 ? 28 : 64;
+    const availableWidth = container.clientWidth - padding;
+    const availableHeight = container.clientHeight - padding;
+    if (availableWidth <= 0 || availableHeight <= 0) return;
+
+    const scaleX = availableWidth / doc.canvasWidth;
+    const scaleY = availableHeight / doc.canvasHeight;
+    const fitScale = Math.min(scaleX, scaleY, 1.2);
+    setZoom(Number(Math.max(0.18, fitScale).toFixed(2)));
+  }, [doc.canvasWidth, doc.canvasHeight]);
+
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      const timer = setTimeout(handleFitToScreen, 120);
+      return () => clearTimeout(timer);
+    }
+  }, [doc.canvasWidth, doc.canvasHeight, handleFitToScreen]);
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -362,12 +391,24 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // ───────────────────────────────────────────────────────────────────────────
 
   const getCanvasCoords = useCallback(
-    (e: React.MouseEvent | MouseEvent) => {
+    (e: React.MouseEvent | MouseEvent | React.TouchEvent | TouchEvent) => {
       if (!canvasElementRef.current) return { x: 0, y: 0 };
       const rect = canvasElementRef.current.getBoundingClientRect();
+      const clientX =
+        'touches' in e && e.touches.length > 0
+          ? e.touches[0].clientX
+          : 'changedTouches' in e && e.changedTouches.length > 0
+          ? e.changedTouches[0].clientX
+          : (e as MouseEvent).clientX;
+      const clientY =
+        'touches' in e && e.touches.length > 0
+          ? e.touches[0].clientY
+          : 'changedTouches' in e && e.changedTouches.length > 0
+          ? e.changedTouches[0].clientY
+          : (e as MouseEvent).clientY;
       return {
-        x: (e.clientX - rect.left) / zoom,
-        y: (e.clientY - rect.top) / zoom,
+        x: (clientX - rect.left) / zoom,
+        y: (clientY - rect.top) / zoom,
       };
     },
     [zoom]
@@ -828,6 +869,15 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             >
               1:1
             </button>
+            <button
+              onClick={handleFitToScreen}
+              className={`p-1.5 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
+                isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#181d24]'
+              }`}
+              title="Fit to Screen"
+            >
+              Fit
+            </button>
           </div>
 
           <div className="h-4 w-px bg-[#262c36]/40 mx-1 hidden sm:block" />
@@ -936,9 +986,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* MAIN WORKSPACE BODY                                                   */}
       {/* ───────────────────────────────────────────────────────────────────── */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* LEFT TOOLBAR: Add Elements */}
+        {/* LEFT TOOLBAR: Add Elements (Desktop) */}
         <aside
-          className={`w-16 border-r flex flex-col items-center py-4 gap-4 shrink-0 transition-colors z-20 ${
+          className={`hidden lg:flex w-16 border-r flex-col items-center py-4 gap-4 shrink-0 transition-colors z-20 ${
             isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#222730]'
           }`}
         >
@@ -1471,10 +1521,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         </main>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* RIGHT SIDEBAR: Inspector & Layers                                   */}
+        {/* RIGHT SIDEBAR: Inspector & Layers (Desktop)                         */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         <aside
-          className={`w-80 border-l flex flex-col shrink-0 transition-colors z-20 ${
+          className={`hidden lg:flex w-80 border-l flex-col shrink-0 transition-colors z-20 ${
             isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#222730]'
           }`}
         >
@@ -2129,6 +2179,340 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           )}
         </aside>
       </div>
+
+      {/* ───────────────────────────────────────────────────────────────────── */}
+      {/* MOBILE BOTTOM DOCKED CANVAS ACTION BAR (< lg)                         */}
+      {/* ───────────────────────────────────────────────────────────────────── */}
+      <div
+        className={`lg:hidden fixed bottom-14 left-0 right-0 z-30 border-t backdrop-blur-lg px-2 py-1.5 transition-colors ${
+          isLight ? 'bg-white/95 border-[#e2e8f0]' : 'bg-[#111417]/95 border-[#262c36]'
+        }`}
+      >
+        <div className="grid grid-cols-4 gap-1 max-w-md mx-auto">
+          <button
+            onClick={() => {
+              setMobileAddSheetOpen(true);
+              setMobileInspectorOpen(false);
+            }}
+            className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
+              mobileAddSheetOpen
+                ? isLight ? 'bg-[#0f172a] text-white shadow-sm' : 'bg-[#fcd535] text-black shadow-sm'
+                : isLight ? 'text-[#475569] hover:bg-[#f1f5f9]' : 'text-[#c4c7c8] hover:bg-[#181d24]'
+            }`}
+          >
+            <FilePlus className="w-4 h-4" />
+            <span>+ Add</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveSidebarTab('inspector');
+              setMobileInspectorOpen(true);
+              setMobileAddSheetOpen(false);
+            }}
+            className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
+              mobileInspectorOpen && activeSidebarTab === 'inspector'
+                ? isLight ? 'bg-[#0f172a] text-white shadow-sm' : 'bg-[#fcd535] text-black shadow-sm'
+                : isLight ? 'text-[#475569] hover:bg-[#f1f5f9]' : 'text-[#c4c7c8] hover:bg-[#181d24]'
+            }`}
+          >
+            <Sliders className="w-4 h-4" />
+            <span>{selectedObject ? 'Edit' : 'Inspector'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveSidebarTab('layers');
+              setMobileInspectorOpen(true);
+              setMobileAddSheetOpen(false);
+            }}
+            className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
+              mobileInspectorOpen && activeSidebarTab === 'layers'
+                ? isLight ? 'bg-[#0f172a] text-white shadow-sm' : 'bg-[#fcd535] text-black shadow-sm'
+                : isLight ? 'text-[#475569] hover:bg-[#f1f5f9]' : 'text-[#c4c7c8] hover:bg-[#181d24]'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span>Layers ({doc.objects.length})</span>
+          </button>
+
+          <button
+            onClick={handleFitToScreen}
+            className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
+              isLight ? 'text-[#475569] hover:bg-[#f1f5f9]' : 'text-[#c4c7c8] hover:bg-[#181d24]'
+            }`}
+            title="Fit canvas to phone screen"
+          >
+            <ZoomIn className="w-4 h-4" />
+            <span>Fit {Math.round(zoom * 100)}%</span>
+          </button>
+        </div>
+      </div>
+
+      {/* MOBILE ADD ELEMENT SHEET */}
+      {mobileAddSheetOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            onClick={() => setMobileAddSheetOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`lg:hidden fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t shadow-2xl p-4 flex flex-col max-h-[75vh] animate-slide-up transition-colors ${
+              isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a]' : 'bg-[#111417] border-[#262c36] text-[#e1e2e7]'
+            }`}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-current/10 shrink-0">
+              <h3 className="text-xs font-bold uppercase tracking-wider">Add Elements to Canvas</h3>
+              <button
+                onClick={() => setMobileAddSheetOpen(false)}
+                className="p-1 rounded-lg hover:bg-white/10"
+              >
+                Done
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 py-4 overflow-y-auto">
+              <button
+                onClick={() => {
+                  addObject(createTextObject({ text: 'New Aesthetic Text', fontSize: 24, color: isLight ? '#0f172a' : '#ffffff' }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <Type className="w-5 h-5 text-[#3b82f6]" />
+                <span className="text-xs font-medium">Text</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  fileInputRef.current?.click();
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <Upload className="w-5 h-5 text-[#10b981]" />
+                <span className="text-xs font-medium">Upload Photo</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createImageObject(ASSET_AVATARS.jenniePretty, { name: 'Illustrated Avatar', width: 140, height: 140 }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <Sparkles className="w-5 h-5 text-[#8b5cf6]" />
+                <span className="text-xs font-medium">Avatar</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createShapeObject('rect', { name: 'Card Box', width: 200, height: 120, fill: '#f1f5f9' }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <Square className="w-5 h-5 text-[#f59e0b]" />
+                <span className="text-xs font-medium">Box</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createShapeObject('circle', { name: 'Circle Badge', width: 100, height: 100, fill: '#e2e8f0' }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <Circle className="w-5 h-5 text-[#ec4899]" />
+                <span className="text-xs font-medium">Circle</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createShapeObject('star', { name: 'Star Badge', width: 80, height: 80, fill: '#fcd535' }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <Star className="w-5 h-5 text-[#fcd535]" />
+                <span className="text-xs font-medium">Star</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createShapeObject('heart', { name: 'Heart Stamp', width: 80, height: 80, fill: '#ff4d6d' }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <Heart className="w-5 h-5 text-[#ff4d6d]" />
+                <span className="text-xs font-medium">Heart</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createImageObject(ASSET_STICKERS.barcode, { name: 'Barcode Sticker', width: 200, height: 50 }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <Barcode className="w-5 h-5 text-[#f97316]" />
+                <span className="text-xs font-medium">Barcode</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createImageObject(ASSET_STICKERS.qrCode, { name: 'QR Code Sticker', width: 80, height: 80 }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <QrCode className="w-5 h-5 text-[#06b6d4]" />
+                <span className="text-xs font-medium">QR Code</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* MOBILE INSPECTOR & LAYERS SHEET */}
+      {mobileInspectorOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            onClick={() => setMobileInspectorOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`lg:hidden fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t shadow-2xl flex flex-col max-h-[75vh] animate-slide-up transition-colors ${
+              isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a]' : 'bg-[#111417] border-[#262c36] text-[#e1e2e7]'
+            }`}
+          >
+            {/* Sheet Tabs Header */}
+            <div className={`p-2 border-b flex items-center justify-between shrink-0 ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setActiveSidebarTab('inspector')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                    activeSidebarTab === 'inspector'
+                      ? isLight ? 'bg-[#0f172a] text-white' : 'bg-[#fcd535] text-black'
+                      : 'text-[#707a8a]'
+                  }`}
+                >
+                  Inspector
+                </button>
+                <button
+                  onClick={() => setActiveSidebarTab('layers')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                    activeSidebarTab === 'layers'
+                      ? isLight ? 'bg-[#0f172a] text-white' : 'bg-[#fcd535] text-black'
+                      : 'text-[#707a8a]'
+                  }`}
+                >
+                  Layers ({doc.objects.length})
+                </button>
+              </div>
+              <button
+                onClick={() => setMobileInspectorOpen(false)}
+                className="px-2.5 py-1 text-xs font-semibold text-[#707a8a] hover:text-white"
+              >
+                Done
+              </button>
+            </div>
+
+            {/* Content Container */}
+            <div className="flex-1 overflow-y-auto p-4 pb-12">
+              {activeSidebarTab === 'inspector' ? (
+                selectedObject ? (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-current/10">
+                      <div>
+                        <span className="text-[10px] font-mono text-[#707a8a] uppercase">{selectedObject.type} Layer</span>
+                        <h4 className="text-sm font-semibold truncate max-w-[200px]">{selectedObject.name}</h4>
+                      </div>
+                      <button
+                        onClick={() => deleteObject(selectedObject.id)}
+                        className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10"
+                        title="Delete layer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {selectedObject.type === 'text' && (
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-semibold">Text Content</label>
+                        <textarea
+                          value={(selectedObject as TextCanvasObject).text}
+                          onChange={(e) => updateObject(selectedObject.id, { text: e.target.value })}
+                          rows={2}
+                          className={`w-full rounded-xl p-2.5 text-xs border focus:outline-none ${
+                            isLight ? 'bg-white border-[#cbd5e1]' : 'bg-[#181d24] border-[#262c36]'
+                          }`}
+                        />
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="flex flex-col gap-1">
+                        <span>X: {selectedObject.x}px</span>
+                        <span>Y: {selectedObject.y}px</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span>Width: {selectedObject.width}px</span>
+                        <span>Height: {selectedObject.height}px</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-xs text-[#707a8a]">
+                    Tap any layer on the canvas to inspect its properties.
+                  </div>
+                )
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {[...doc.objects]
+                    .sort((a, b) => b.zIndex - a.zIndex)
+                    .map((obj) => (
+                      <div
+                        key={obj.id}
+                        onClick={() => setSelectedId(obj.id)}
+                        className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer ${
+                          obj.id === selectedId
+                            ? isLight ? 'bg-[#f1f5f9] border-[#d97706]' : 'bg-[#181d24] border-[#fcd535]'
+                            : isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+                        }`}
+                      >
+                        <span className="text-xs font-medium truncate max-w-[180px]">{obj.name}</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateObject(obj.id, { visible: !obj.visible });
+                            }}
+                            className="p-1 text-[#707a8a]"
+                          >
+                            {obj.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteObject(obj.id);
+                            }}
+                            className="p-1 text-red-400"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ───────────────────────────────────────────────────────────────────── */}
       {/* TEMPLATE PICKER DRAWER / MODAL                                        */}

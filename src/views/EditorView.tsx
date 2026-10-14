@@ -446,6 +446,16 @@ export const EditorView: React.FC<EditorViewProps> = ({
     showToast('Loaded inspirational excerpt');
   };
 
+  // Random palette inspirer
+  const handleRandomPalette = () => {
+    const random = PALETTE_PRESETS[Math.floor(Math.random() * PALETTE_PRESETS.length)];
+    if (random) {
+      setBgColor(random.bg);
+      setInkColor(random.ink);
+      showToast(`Switched palette to ${random.name}`);
+    }
+  };
+
   // Reset to clean default values
   const handleReset = () => {
     if (window.confirm('Reset this card to clean editorial defaults? Unsaved custom styling will be replaced.')) {
@@ -625,9 +635,662 @@ export const EditorView: React.FC<EditorViewProps> = ({
   // Text length warnings
   const isLongText = quote.length > 240;
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // REUSABLE CONTROL TABS & PANELS (Shared between desktop sidebar & mobile sheet)
+  // ───────────────────────────────────────────────────────────────────────────
+
+  const renderControlTabs = (isMobileSheet = false) => (
+    <div
+      className={`grid grid-cols-4 border-b p-1 shrink-0 ${
+        isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+      }`}
+    >
+      <button
+        onClick={() => {
+          setActiveTab('content');
+          if (!isMobileSheet) setMobileSheetOpen(false);
+        }}
+        className={`py-2 text-xs font-medium rounded-lg flex flex-col items-center gap-1 transition-colors cursor-pointer ${
+          activeTab === 'content'
+            ? isLight
+              ? 'bg-white text-[#0f172a] shadow-sm font-semibold'
+              : 'bg-[#222730] text-white shadow-sm'
+            : 'text-[#707a8a] hover:text-[#0f172a]'
+        }`}
+      >
+        <Type className="w-3.5 h-3.5" />
+        <span>Words</span>
+      </button>
+      <button
+        onClick={() => {
+          setActiveTab('type');
+          if (!isMobileSheet) setMobileSheetOpen(false);
+        }}
+        className={`py-2 text-xs font-medium rounded-lg flex flex-col items-center gap-1 transition-colors cursor-pointer ${
+          activeTab === 'type'
+            ? isLight
+              ? 'bg-white text-[#0f172a] shadow-sm font-semibold'
+              : 'bg-[#222730] text-white shadow-sm'
+            : 'text-[#707a8a] hover:text-[#0f172a]'
+        }`}
+      >
+        <Sliders className="w-3.5 h-3.5" />
+        <span>Type</span>
+      </button>
+      <button
+        onClick={() => {
+          setActiveTab('palette');
+          if (!isMobileSheet) setMobileSheetOpen(false);
+        }}
+        className={`py-2 text-xs font-medium rounded-lg flex flex-col items-center gap-1 transition-colors cursor-pointer ${
+          activeTab === 'palette'
+            ? isLight
+              ? 'bg-white text-[#0f172a] shadow-sm font-semibold'
+              : 'bg-[#222730] text-white shadow-sm'
+            : 'text-[#707a8a] hover:text-[#0f172a]'
+        }`}
+      >
+        <Palette className="w-3.5 h-3.5" />
+        <span>Palette</span>
+      </button>
+      <button
+        onClick={() => {
+          setActiveTab('decor');
+          if (!isMobileSheet) setMobileSheetOpen(false);
+        }}
+        className={`py-2 text-xs font-medium rounded-lg flex flex-col items-center gap-1 transition-colors cursor-pointer ${
+          activeTab === 'decor'
+            ? isLight
+              ? 'bg-white text-[#0f172a] shadow-sm font-semibold'
+              : 'bg-[#222730] text-white shadow-sm'
+            : 'text-[#707a8a] hover:text-[#0f172a]'
+        }`}
+      >
+        <Sparkles className="w-3.5 h-3.5" />
+        <span>Details</span>
+      </button>
+    </div>
+  );
+
+  const renderControlPanelContent = (isMobileSheet = false) => (
+    <div className="p-4 sm:p-5 flex flex-col gap-6">
+      {/* TAB 1: WORDS & TEXT */}
+      {activeTab === 'content' && (
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <label
+              className={`text-xs font-semibold uppercase tracking-wider ${
+                isLight ? 'text-[#0f172a]' : 'text-white'
+              }`}
+            >
+              Quote / Main Body
+            </label>
+            <button
+              onClick={handleRandomQuote}
+              className={`inline-flex items-center gap-1 text-[11px] hover:underline cursor-pointer ${
+                isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
+              }`}
+            >
+              <Shuffle className="w-3 h-3" />
+              <span>Inspiration</span>
+            </button>
+          </div>
+
+          <div className="relative">
+            <textarea
+              ref={quoteInputRef}
+              value={quote}
+              onChange={(e) => setQuote(e.target.value)}
+              rows={isMobileSheet ? 3 : 4}
+              className={`w-full rounded-xl p-3 text-sm leading-relaxed resize-none focus:outline-none border transition-all ${
+                isLight
+                  ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
+                  : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+              }`}
+              placeholder="Paste or type your quote, poetry, or thoughts..."
+            />
+
+            {/* Character count & Long Text Warning */}
+            <div className="flex items-center justify-between pt-1 px-1 text-[11px] text-[#707a8a]">
+              <span>
+                {quote.length} characters • {quote.trim().split(/\s+/).filter(Boolean).length} words
+              </span>
+              {isLongText && (
+                <button
+                  onClick={handleAutoFitFontSize}
+                  className={`flex items-center gap-1 font-medium cursor-pointer ${
+                    isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
+                  }`}
+                  title="Auto-adjust font size to fit"
+                >
+                  <Wand2 className="w-3 h-3" />
+                  <span>Auto-fit</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label
+              className={`text-xs font-semibold uppercase tracking-wider ${
+                isLight ? 'text-[#0f172a]' : 'text-white'
+              }`}
+            >
+              Author / Attribution
+            </label>
+            <input
+              ref={authorInputRef}
+              type="text"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
+                isLight
+                  ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
+                  : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+              }`}
+              placeholder="e.g. Albert Camus — Return to Tipasa"
+            />
+          </div>
+
+          {/* Header Tag & Corner Badge stacked responsively */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label
+                className={`text-xs font-semibold uppercase tracking-wider ${
+                  isLight ? 'text-[#0f172a]' : 'text-white'
+                }`}
+              >
+                Header Tag
+              </label>
+              <input
+                ref={tagInputRef}
+                type="text"
+                value={tag}
+                onChange={(e) => setTag(e.target.value)}
+                className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
+                  isLight
+                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
+                    : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+                }`}
+                placeholder="e.g. VOL. 08 • NOTES"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label
+                className={`text-xs font-semibold uppercase tracking-wider ${
+                  isLight ? 'text-[#0f172a]' : 'text-white'
+                }`}
+              >
+                Corner Badge
+              </label>
+              <input
+                type="text"
+                value={badge}
+                onChange={(e) => setBadge(e.target.value)}
+                className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
+                  isLight
+                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
+                    : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+                }`}
+                placeholder="e.g. EST. 1997"
+              />
+            </div>
+          </div>
+
+          {/* Curated Quotes: Naturally Wrapped Cards with Dedicated "Use Quote" Action */}
+          <div
+            className={`pt-4 border-t flex flex-col gap-2.5 ${
+              isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-[#707a8a] uppercase tracking-wider">
+                Curated Quotes & Reflections
+              </span>
+              <span className="text-[10px] text-[#707a8a] font-mono">
+                {SAMPLE_QUOTES.length} Available
+              </span>
+            </div>
+            <div className="flex flex-col gap-2.5 max-h-72 overflow-y-auto pr-1">
+              {SAMPLE_QUOTES.map((item, idx) => (
+                <div
+                  key={idx}
+                  className={`p-3 rounded-xl border flex flex-col gap-2 transition-all ${
+                    isLight
+                      ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
+                      : 'bg-[#14171d] border-[#262c36] hover:border-[#444748]'
+                  }`}
+                >
+                  <p
+                    className={`text-xs leading-relaxed italic ${
+                      isLight ? 'text-[#1e293b]' : 'text-[#e2e8f0]'
+                    }`}
+                  >
+                    “{item.q}”
+                  </p>
+                  <div className="flex items-center justify-between pt-1 border-t border-current/10">
+                    <span className="text-[11px] font-medium opacity-70">
+                      {item.a} • <span className="opacity-60">{item.t}</span>
+                    </span>
+                    <button
+                      onClick={() => {
+                        setQuote(item.q);
+                        setAuthor(item.a);
+                        setTag(item.t);
+                        showToast('Loaded quote into editor');
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                        isLight
+                          ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
+                          : 'bg-[#fcd535] text-black hover:bg-[#e5c027]'
+                      }`}
+                    >
+                      Use Quote
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: TYPOGRAPHY */}
+      {activeTab === 'type' && (
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label
+              className={`text-xs font-semibold uppercase tracking-wider ${
+                isLight ? 'text-[#0f172a]' : 'text-white'
+              }`}
+            >
+              Font Family Stack
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setFontChoice('editorial')}
+                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                  fontChoice === 'editorial'
+                    ? isLight
+                      ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
+                      : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
+                    : isLight
+                    ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                    : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                }`}
+              >
+                <span className="font-editorial text-lg block leading-none">Newsreader</span>
+                <span className="text-[10px] text-[#707a8a]">Editorial Serif</span>
+              </button>
+              <button
+                onClick={() => setFontChoice('serif')}
+                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                  fontChoice === 'serif'
+                    ? isLight
+                      ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
+                      : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
+                    : isLight
+                    ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                    : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                }`}
+              >
+                <span className="font-serif text-lg block leading-none">Playfair</span>
+                <span className="text-[10px] text-[#707a8a]">High-Contrast Classic</span>
+              </button>
+              <button
+                onClick={() => setFontChoice('sans')}
+                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                  fontChoice === 'sans'
+                    ? isLight
+                      ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
+                      : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
+                    : isLight
+                    ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                    : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                }`}
+              >
+                <span className="font-sans text-lg block leading-none">Inter</span>
+                <span className="text-[10px] text-[#707a8a]">Modern Minimalist</span>
+              </button>
+              <button
+                onClick={() => setFontChoice('mono')}
+                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                  fontChoice === 'mono'
+                    ? isLight
+                      ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
+                      : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
+                    : isLight
+                    ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                    : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                }`}
+              >
+                <span className="font-mono text-lg block leading-none">Space Mono</span>
+                <span className="text-[10px] text-[#707a8a]">Archival Code</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Font Size Slider */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center text-xs">
+              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                Type Scale
+              </span>
+              <span className="font-mono text-[11px] text-[#707a8a]">{fontSize}px</span>
+            </div>
+            <input
+              type="range"
+              min="14"
+              max="42"
+              step="1"
+              value={fontSize}
+              onChange={(e) => setFontSize(Number(e.target.value))}
+              className="w-full accent-[#fcd535] cursor-pointer"
+            />
+            <div className="flex justify-between text-[10px] text-[#707a8a]">
+              <span>Small 14px</span>
+              <span>Default 26px</span>
+              <span>Hero 42px</span>
+            </div>
+          </div>
+
+          {/* Alignment */}
+          <div className="flex flex-col gap-2">
+            <label
+              className={`text-xs font-semibold uppercase tracking-wider ${
+                isLight ? 'text-[#0f172a]' : 'text-white'
+              }`}
+            >
+              Text Alignment
+            </label>
+            <div
+              className={`grid grid-cols-3 border p-1 rounded-xl ${
+                isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+              }`}
+            >
+              <button
+                onClick={() => setAlign('left')}
+                className={`py-2 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  align === 'left'
+                    ? isLight
+                      ? 'bg-white shadow-sm text-[#0f172a]'
+                      : 'bg-[#222730] text-white'
+                    : 'text-[#707a8a] hover:text-[#0f172a]'
+                }`}
+              >
+                <AlignLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setAlign('center')}
+                className={`py-2 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  align === 'center'
+                    ? isLight
+                      ? 'bg-white shadow-sm text-[#0f172a]'
+                      : 'bg-[#222730] text-white'
+                    : 'text-[#707a8a] hover:text-[#0f172a]'
+                }`}
+              >
+                <AlignCenter className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setAlign('right')}
+                className={`py-2 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  align === 'right'
+                    ? isLight
+                      ? 'bg-white shadow-sm text-[#0f172a]'
+                      : 'bg-[#222730] text-white'
+                    : 'text-[#707a8a] hover:text-[#0f172a]'
+                }`}
+              >
+                <AlignRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: PALETTE */}
+      {activeTab === 'palette' && (
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <label
+              className={`text-xs font-semibold uppercase tracking-wider ${
+                isLight ? 'text-[#0f172a]' : 'text-white'
+              }`}
+            >
+              Curated Color Sets
+            </label>
+            <button
+              onClick={handleRandomPalette}
+              className={`inline-flex items-center gap-1 text-[11px] hover:underline cursor-pointer ${
+                isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
+              }`}
+            >
+              <Shuffle className="w-3 h-3" />
+              <span>Shuffle</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {PALETTE_PRESETS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setBgColor(p.bg);
+                  setInkColor(p.ink);
+                }}
+                className={`p-2.5 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-all ${
+                  bgColor === p.bg && inkColor === p.ink
+                    ? isLight
+                      ? 'border-[#d97706] ring-2 ring-[#d97706]/40 shadow-sm'
+                      : 'border-[#fcd535] ring-1 ring-[#fcd535] shadow-sm'
+                    : isLight
+                    ? 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1]'
+                    : 'border-[#262c36] bg-[#181d24] hover:border-[#444748]'
+                }`}
+              >
+                <div
+                  style={{ backgroundColor: p.bg }}
+                  className="w-7 h-7 rounded-lg border border-black/10 shrink-0 flex items-center justify-center shadow-inner"
+                >
+                  <div style={{ backgroundColor: p.ink }} className="w-2.5 h-2.5 rounded-full" />
+                </div>
+                <div className="flex flex-col text-left truncate">
+                  <span className={`text-xs font-medium truncate ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                    {p.name}
+                  </span>
+                  <span className="text-[10px] text-[#707a8a] uppercase">{p.category}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Custom Color Pickers */}
+          <div className={`pt-3 border-t flex flex-col gap-3 ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
+            <span className="text-[11px] font-semibold text-[#707a8a] uppercase">Custom Tone Overrides</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs">Background Paper</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={bgColor}
+                    onChange={(e) => setBgColor(e.target.value)}
+                    className="w-8 h-8 rounded-lg cursor-pointer border-none bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={bgColor}
+                    onChange={(e) => setBgColor(e.target.value)}
+                    className={`w-full text-xs font-mono px-2 py-1.5 rounded-lg border focus:outline-none ${
+                      isLight ? 'bg-white border-[#cbd5e1]' : 'bg-[#181d24] border-[#262c36]'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs">Ink / Text Color</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={inkColor}
+                    onChange={(e) => setInkColor(e.target.value)}
+                    className="w-8 h-8 rounded-lg cursor-pointer border-none bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={inkColor}
+                    onChange={(e) => setInkColor(e.target.value)}
+                    className={`w-full text-xs font-mono px-2 py-1.5 rounded-lg border focus:outline-none ${
+                      isLight ? 'bg-white border-[#cbd5e1]' : 'bg-[#181d24] border-[#262c36]'
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: DETAILS */}
+      {activeTab === 'decor' && (
+        <div className="flex flex-col gap-5">
+          {/* Card Padding Slider */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center text-xs">
+              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                Card Inset Padding
+              </span>
+              <span className="font-mono text-[11px] text-[#707a8a]">{padding}px</span>
+            </div>
+            <input
+              type="range"
+              min="20"
+              max="64"
+              step="4"
+              value={padding}
+              onChange={(e) => setPadding(Number(e.target.value))}
+              className="w-full accent-[#fcd535] cursor-pointer"
+            />
+            <div className="flex justify-between text-[10px] text-[#707a8a]">
+              <span>Compact 20px</span>
+              <span>Spacious 64px</span>
+            </div>
+          </div>
+
+          {/* Corner Radius Slider */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center text-xs">
+              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                Corner Radius
+              </span>
+              <span className="font-mono text-[11px] text-[#707a8a]">{borderRadius}px</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="32"
+              step="2"
+              value={borderRadius}
+              onChange={(e) => setBorderRadius(Number(e.target.value))}
+              className="w-full accent-[#fcd535] cursor-pointer"
+            />
+            <div className="flex justify-between text-[10px] text-[#707a8a]">
+              <span>Sharp 0px</span>
+              <span>Pill 32px</span>
+            </div>
+          </div>
+
+          {/* Toggle Switches */}
+          <div className={`pt-3 border-t flex flex-col gap-3 ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
+            <span className="text-[11px] font-semibold text-[#707a8a] uppercase">Editorial Accents</span>
+
+            <label
+              className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer ${
+                isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+              }`}
+            >
+              <span className={`text-xs font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                Archival Paper Grain Texture
+              </span>
+              <input
+                type="checkbox"
+                checked={showGrain}
+                onChange={(e) => setShowGrain(e.target.checked)}
+                className="accent-[#fcd535] w-4 h-4 cursor-pointer"
+              />
+            </label>
+
+            <label
+              className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer ${
+                isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+              }`}
+            >
+              <span className={`text-xs font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                Subtle Boundary Border
+              </span>
+              <input
+                type="checkbox"
+                checked={showBorder}
+                onChange={(e) => setShowBorder(e.target.checked)}
+                className="accent-[#fcd535] w-4 h-4 cursor-pointer"
+              />
+            </label>
+
+            <label
+              className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer ${
+                isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+              }`}
+            >
+              <span className={`text-xs font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                Corner Ornament Glyph
+              </span>
+              <input
+                type="checkbox"
+                checked={showIcon}
+                onChange={(e) => setShowIcon(e.target.checked)}
+                className="accent-[#fcd535] w-4 h-4 cursor-pointer"
+              />
+            </label>
+
+            {showIcon && (
+              <div className="flex flex-col gap-1.5 pt-1">
+                <span className="text-[11px] font-semibold text-[#707a8a] uppercase">Ornament Glyph</span>
+                <div
+                  className={`grid grid-cols-6 gap-1.5 p-1.5 rounded-xl border ${
+                    isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+                  }`}
+                >
+                  {['format_quote', 'auto_awesome', 'terminal', 'edit_note', 'bookmark', 'grid_view', 'stars', 'favorite', 'badge', 'qr_code', 'verified'].map(
+                    (ic) => (
+                      <button
+                        key={ic}
+                        onClick={() => setIconName(ic)}
+                        className={`p-1.5 rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
+                          iconName === ic
+                            ? isLight
+                              ? 'bg-white text-[#d97706] shadow-sm font-bold'
+                              : 'bg-[#222730] text-[#fcd535]'
+                            : 'text-[#707a8a] hover:text-[#0f172a]'
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">{ic}</span>
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div
-      className={`w-full pt-16 min-h-screen flex flex-col transition-colors duration-200 ${
+      className={`w-full pt-13 sm:pt-16 min-h-screen flex flex-col transition-colors duration-200 ${
         isLight ? 'bg-[#f6f8fa] text-[#181a20]' : 'bg-[#0b0e11] text-[#e1e2e7]'
       }`}
       onClick={() => {
@@ -656,20 +1319,22 @@ export const EditorView: React.FC<EditorViewProps> = ({
         </p>
       </div>
 
-      {/* STUDIO TOOLBAR */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* PRIMARY STUDIO TOOLBAR (Compact, Responsive, No Collisions)         */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
       <div
-        className={`w-full border-b px-4 md:px-8 py-2.5 flex items-center justify-between gap-4 sticky top-16 z-40 backdrop-blur-md transition-colors duration-200 ${
+        className={`w-full border-b px-3 sm:px-6 py-2 flex items-center justify-between gap-2 sticky top-13 sm:top-16 z-40 backdrop-blur-md transition-colors duration-200 ${
           isLight
-            ? 'bg-white/90 border-[#e2e8f0] text-[#0f172a]'
-            : 'bg-[#111417]/90 border-[#262c36] text-[#e1e2e7]'
+            ? 'bg-white/95 border-[#e2e8f0] text-[#0f172a]'
+            : 'bg-[#111417]/95 border-[#262c36] text-[#e1e2e7]'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Left: Back, Title, Undo, Redo, Reset, Draft Status */}
-        <div className="flex items-center gap-2 min-w-0">
+        {/* Left: Back, Studio Switch, Title, Undo / Redo */}
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <a
             href="/templates"
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1 px-2 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer shrink-0 ${
               isLight
                 ? 'bg-white border-[#e2e8f0] text-[#475569] hover:text-[#0f172a] hover:bg-[#f8fafc]'
                 : 'bg-[#181d24] border-[#262c36] text-[#c4c7c8] hover:text-white hover:border-[#444748]'
@@ -683,28 +1348,29 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
           <a
             href="/canvas"
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1 px-2 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
               isLight
                 ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
                 : 'bg-[#181d24] border-[#262c36] text-white hover:border-[#444748]'
             }`}
-            title="Switch to Freeform Canvas Studio (Photo cards & multi-layer designs)"
+            title="Switch to Freeform Canvas Studio"
+            aria-label="Switch to Canvas Studio"
           >
             <Layers className="w-3.5 h-3.5 text-[#fcd535]" />
             <span className="hidden md:inline">Canvas Studio</span>
           </a>
 
           <div
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border min-w-0 ${
               isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
             }`}
           >
-            <FileText className={`w-3.5 h-3.5 ${isLight ? 'text-[#94a3b8]' : 'text-[#707a8a]'}`} />
+            <FileText className={`w-3.5 h-3.5 shrink-0 ${isLight ? 'text-[#94a3b8]' : 'text-[#707a8a]'}`} />
             <input
               type="text"
               value={docTitle}
               onChange={(e) => setDocTitle(e.target.value)}
-              className={`bg-transparent text-xs font-semibold focus:outline-none w-32 sm:w-48 truncate border-none p-0 ${
+              className={`bg-transparent text-xs font-semibold focus:outline-none w-20 sm:w-36 md:w-48 truncate border-none p-0 ${
                 isLight ? 'text-[#0f172a]' : 'text-white'
               }`}
               title="Click to rename artifact"
@@ -712,14 +1378,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
             />
           </div>
 
-          {/* Undo / Redo Buttons */}
-          <div className="flex items-center gap-1">
+          {/* Undo / Redo */}
+          <div className="flex items-center gap-0.5 sm:gap-1">
             <button
               onClick={handleUndo}
               disabled={historyIndex <= 0}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-all ${
+              className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg border transition-all ${
                 historyIndex <= 0
-                  ? 'opacity-40 cursor-not-allowed border-transparent'
+                  ? 'opacity-30 cursor-not-allowed border-transparent'
                   : isLight
                   ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f1f5f9] cursor-pointer'
                   : 'bg-[#181d24] border-[#262c36] text-[#c4c7c8] hover:text-white hover:border-[#444748] cursor-pointer'
@@ -733,9 +1399,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
             <button
               onClick={handleRedo}
               disabled={historyIndex >= history.length - 1}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-all ${
+              className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg border transition-all ${
                 historyIndex >= history.length - 1
-                  ? 'opacity-40 cursor-not-allowed border-transparent'
+                  ? 'opacity-30 cursor-not-allowed border-transparent'
                   : isLight
                   ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f1f5f9] cursor-pointer'
                   : 'bg-[#181d24] border-[#262c36] text-[#c4c7c8] hover:text-white hover:border-[#444748] cursor-pointer'
@@ -747,9 +1413,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             </button>
           </div>
 
-          <div className={`h-5 w-px hidden sm:block ${isLight ? 'bg-[#e2e8f0]' : 'bg-[#262c36]'}`}></div>
-
-          {/* Reset button */}
+          {/* Desktop-only Reset button */}
           <button
             onClick={handleReset}
             className={`w-8 h-8 hidden sm:flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
@@ -777,9 +1441,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
           </div>
         </div>
 
-        {/* Center: Dimensions, Zoom, Preset Drawer & Guidelines */}
-        <div className="flex items-center gap-2">
-          {/* Quick Style Switcher Drawer Button */}
+        {/* Center / Desktop controls: Aspect ratio & Zoom */}
+        <div className="hidden lg:flex items-center gap-2">
+          {/* Preset Styles Switcher */}
           <button
             onClick={() => setTemplateDrawerOpen(true)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
@@ -790,10 +1454,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
             title="Switch template style"
           >
             <LayoutTemplate className={`w-3.5 h-3.5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
-            <span className="hidden sm:inline">Styles</span>
+            <span>Presets</span>
           </button>
 
-          {/* Aspect ratio selector */}
+          {/* Desktop Aspect Ratio Dropdown */}
           <div className="relative">
             <button
               onClick={() => setAspectMenuOpen(!aspectMenuOpen)}
@@ -842,7 +1506,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
           {/* Zoom controls */}
           <div
-            className={`hidden lg:flex items-center border rounded-lg px-2 py-1 gap-1 ${
+            className={`flex items-center border rounded-lg px-2 py-1 gap-1 ${
               isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
             }`}
           >
@@ -866,7 +1530,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           {/* Guidelines Grid toggle */}
           <button
             onClick={() => setShowGuidelines(!showGuidelines)}
-            className={`w-8 h-8 hidden sm:flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
+            className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
               showGuidelines
                 ? isLight
                   ? 'bg-[#d97706] text-white border-[#d97706]'
@@ -882,8 +1546,36 @@ export const EditorView: React.FC<EditorViewProps> = ({
           </button>
         </div>
 
-        {/* Right: Copy Image & Multi-Format Export */}
-        <div className="flex items-center gap-2">
+        {/* Right: Presets (mobile/tablet), More Options, Export */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={() => setTemplateDrawerOpen(true)}
+            className={`lg:hidden flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+              isLight
+                ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
+                : 'bg-[#181d24] border-[#262c36] text-white hover:border-[#444748]'
+            }`}
+            title="Switch template style"
+          >
+            <LayoutTemplate className={`w-3.5 h-3.5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
+            <span className="hidden xs:inline text-[11px]">Styles</span>
+          </button>
+
+          {/* Mobile Options Drawer Button */}
+          <button
+            onClick={() => setMobileOptionsOpen(true)}
+            className={`sm:hidden w-8 h-8 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
+              isLight
+                ? 'bg-white border-[#e2e8f0] text-[#475569] hover:text-[#0f172a]'
+                : 'bg-[#181d24] border-[#262c36] text-[#c4c7c8] hover:text-white'
+            }`}
+            title="More Options"
+            aria-label="More canvas options"
+          >
+            <MoreHorizontal className="w-4 h-4" />
+          </button>
+
+          {/* Desktop Copy Button */}
           <button
             onClick={handleCopyImage}
             className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
@@ -898,22 +1590,23 @@ export const EditorView: React.FC<EditorViewProps> = ({
             ) : (
               <Copy className={`w-3.5 h-3.5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
             )}
-            <span>{copied ? 'Copied!' : 'Copy Image'}</span>
+            <span>{copied ? 'Copied!' : 'Copy'}</span>
           </button>
 
-          {/* Export Dropdown */}
+          {/* Export Dropdown (Always accessible, never squashed) */}
           <div className="relative">
             <button
               onClick={() => setExportMenuOpen(!exportMenuOpen)}
               disabled={isExporting}
-              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer shadow-lg disabled:opacity-50 ${
+              className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer shadow-md disabled:opacity-50 shrink-0 ${
                 isLight
                   ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
                   : 'bg-white text-[#0b0e11] hover:bg-[#e2e2e2]'
               }`}
+              aria-label="Export Card"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>{isExporting ? 'Rendering...' : 'Export Card'}</span>
+              <span>{isExporting ? 'Exporting...' : 'Export'}</span>
               <ChevronDown className="w-3 h-3 opacity-70" />
             </button>
 
@@ -980,600 +1673,89 @@ export const EditorView: React.FC<EditorViewProps> = ({
         </div>
       </div>
 
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* MOBILE SECONDARY SUB-BAR (Direct Aspect Ratio Chips & Quick Actions) */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      <div
+        className={`lg:hidden w-full border-b px-3 py-1.5 flex items-center justify-between gap-1.5 sticky top-[89px] sm:top-[104px] z-30 backdrop-blur-md overflow-x-auto no-scrollbar transition-colors ${
+          isLight ? 'bg-white/90 border-[#e2e8f0]' : 'bg-[#111417]/90 border-[#262c36]'
+        }`}
+      >
+        {/* Aspect Ratio Chips */}
+        <div className="flex items-center gap-1 shrink-0">
+          {ASPECT_RATIOS.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => {
+                setAspectRatio(r.id);
+                showToast(`Aspect ratio set to ${r.label}`);
+              }}
+              className={`px-2 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer shrink-0 ${
+                aspectRatio === r.id
+                  ? isLight
+                    ? 'bg-[#0f172a] text-white font-semibold'
+                    : 'bg-[#fcd535] text-black font-semibold shadow-sm'
+                  : isLight
+                  ? 'bg-[#f1f5f9] text-[#475569] hover:text-[#0f172a]'
+                  : 'bg-[#181d24] text-[#a0a5ad] hover:text-white'
+              }`}
+            >
+              {r.id === '1:1' && '1:1 Square'}
+              {r.id === '4:5' && '4:5 Portrait'}
+              {r.id === '9:16' && '9:16 Story'}
+              {r.id === '16:9' && '16:9 Landscape'}
+            </button>
+          ))}
+        </div>
+
+        {/* Secondary quick triggers */}
+        <div className="flex items-center gap-1 shrink-0">
+          {isLongText && (
+            <button
+              onClick={handleAutoFitFontSize}
+              className={`px-2 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 cursor-pointer ${
+                isLight ? 'bg-[#fffbeb] text-[#d97706]' : 'bg-[#fcd535]/15 text-[#fcd535]'
+              }`}
+              title="Auto-fit font size"
+            >
+              <Wand2 className="w-3 h-3" />
+              <span>Fit</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setShowGuidelines(!showGuidelines)}
+            className={`w-7 h-7 flex items-center justify-center rounded-md border text-xs cursor-pointer ${
+              showGuidelines
+                ? isLight ? 'bg-[#d97706] text-white border-[#d97706]' : 'bg-[#fcd535] text-black border-[#fcd535]'
+                : isLight ? 'border-[#e2e8f0] text-[#707a8a]' : 'border-[#262c36] text-[#707a8a]'
+            }`}
+            title="Toggle print guidelines"
+            aria-label="Toggle print guidelines"
+          >
+            <Grid className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
       {/* WORKSPACE: CANVAS + EDITING PALETTE */}
       <div className="flex-1 flex flex-col lg:flex-row w-full overflow-hidden">
-        {/* LEFT / DESKTOP SIDEBAR: CONTROLS */}
+        {/* DESKTOP SIDEBAR (Hidden on mobile < lg) */}
         <div
-          className={`w-full lg:w-96 border-r flex flex-col h-auto lg:h-[calc(100vh-104px)] overflow-y-auto transition-colors duration-200 ${
+          className={`hidden lg:flex w-96 border-r flex-col h-[calc(100vh-104px)] overflow-y-auto transition-colors duration-200 shrink-0 ${
             isLight
               ? 'bg-[#ffffff] border-[#e2e8f0] text-[#0f172a]'
               : 'bg-[#111417] border-[#262c36] text-[#e1e2e7]'
           }`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Navigation Control Tabs */}
-          <div
-            className={`grid grid-cols-4 border-b p-1 ${
-              isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
-            }`}
-          >
-            <button
-              onClick={() => setActiveTab('content')}
-              className={`py-2 text-xs font-medium rounded-lg flex flex-col items-center gap-1 transition-colors cursor-pointer ${
-                activeTab === 'content'
-                  ? isLight
-                    ? 'bg-white text-[#0f172a] shadow-sm font-semibold'
-                    : 'bg-[#222730] text-white shadow-sm'
-                  : 'text-[#707a8a] hover:text-[#0f172a]'
-              }`}
-            >
-              <Type className="w-3.5 h-3.5" />
-              <span>Words</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('type')}
-              className={`py-2 text-xs font-medium rounded-lg flex flex-col items-center gap-1 transition-colors cursor-pointer ${
-                activeTab === 'type'
-                  ? isLight
-                    ? 'bg-white text-[#0f172a] shadow-sm font-semibold'
-                    : 'bg-[#222730] text-white shadow-sm'
-                  : 'text-[#707a8a] hover:text-[#0f172a]'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5" />
-              <span>Type</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('palette')}
-              className={`py-2 text-xs font-medium rounded-lg flex flex-col items-center gap-1 transition-colors cursor-pointer ${
-                activeTab === 'palette'
-                  ? isLight
-                    ? 'bg-white text-[#0f172a] shadow-sm font-semibold'
-                    : 'bg-[#222730] text-white shadow-sm'
-                  : 'text-[#707a8a] hover:text-[#0f172a]'
-              }`}
-            >
-              <Palette className="w-3.5 h-3.5" />
-              <span>Palette</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('decor')}
-              className={`py-2 text-xs font-medium rounded-lg flex flex-col items-center gap-1 transition-colors cursor-pointer ${
-                activeTab === 'decor'
-                  ? isLight
-                    ? 'bg-white text-[#0f172a] shadow-sm font-semibold'
-                    : 'bg-[#222730] text-white shadow-sm'
-                  : 'text-[#707a8a] hover:text-[#0f172a]'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Details</span>
-            </button>
-          </div>
-
-          <div className="p-5 flex flex-col gap-6">
-            {/* TAB 1: CONTENT */}
-            {activeTab === 'content' && (
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-between">
-                  <label
-                    className={`text-xs font-semibold uppercase tracking-wider ${
-                      isLight ? 'text-[#0f172a]' : 'text-white'
-                    }`}
-                  >
-                    Quote / Main Body
-                  </label>
-                  <button
-                    onClick={handleRandomQuote}
-                    className={`inline-flex items-center gap-1 text-[11px] hover:underline cursor-pointer ${
-                      isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
-                    }`}
-                  >
-                    <Shuffle className="w-3 h-3" />
-                    <span>Inspiration</span>
-                  </button>
-                </div>
-
-                <div className="relative">
-                  <textarea
-                    ref={quoteInputRef}
-                    value={quote}
-                    onChange={(e) => setQuote(e.target.value)}
-                    rows={4}
-                    className={`w-full rounded-xl p-3 text-sm leading-relaxed resize-none focus:outline-none border transition-all ${
-                      isLight
-                        ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                        : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
-                    }`}
-                    placeholder="Paste or type your quote, poetry, or thoughts..."
-                  />
-
-                  {/* Character count & Long Text Warning */}
-                  <div className="flex items-center justify-between pt-1 px-1 text-[11px] text-[#707a8a]">
-                    <span>{quote.length} characters • {quote.trim().split(/\s+/).filter(Boolean).length} words</span>
-                    {isLongText && (
-                      <button
-                        onClick={handleAutoFitFontSize}
-                        className={`flex items-center gap-1 font-medium cursor-pointer ${
-                          isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
-                        }`}
-                        title="Auto-adjust font size to fit"
-                      >
-                        <Wand2 className="w-3 h-3" />
-                        <span>Auto-Fit Size</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    className={`text-xs font-semibold uppercase tracking-wider ${
-                      isLight ? 'text-[#0f172a]' : 'text-white'
-                    }`}
-                  >
-                    Author / Citation
-                  </label>
-                  <input
-                    ref={authorInputRef}
-                    type="text"
-                    value={author}
-                    onChange={(e) => setAuthor(e.target.value)}
-                    className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
-                      isLight
-                        ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                        : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
-                    }`}
-                    placeholder="e.g. Albert Camus — Return to Tipasa"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label
-                      className={`text-xs font-semibold uppercase tracking-wider ${
-                        isLight ? 'text-[#0f172a]' : 'text-white'
-                      }`}
-                    >
-                      Header Tag
-                    </label>
-                    <input
-                      ref={tagInputRef}
-                      type="text"
-                      value={tag}
-                      onChange={(e) => setTag(e.target.value)}
-                      className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
-                        isLight
-                          ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                          : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
-                      }`}
-                      placeholder="e.g. VOL. 08 • NOTES"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label
-                      className={`text-xs font-semibold uppercase tracking-wider ${
-                        isLight ? 'text-[#0f172a]' : 'text-white'
-                      }`}
-                    >
-                      Corner Badge
-                    </label>
-                    <input
-                      type="text"
-                      value={badge}
-                      onChange={(e) => setBadge(e.target.value)}
-                      className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
-                        isLight
-                          ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                          : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
-                      }`}
-                      placeholder="e.g. EST. 1997"
-                    />
-                  </div>
-                </div>
-
-                {/* Sample Excerpts */}
-                <div className={`pt-3 border-t flex flex-col gap-2 ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
-                  <span className="text-[11px] font-semibold text-[#707a8a] uppercase">Quick Curated Quotes</span>
-                  <div className="flex flex-col gap-1.5">
-                    {SAMPLE_QUOTES.slice(0, 4).map((item, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          setQuote(item.q);
-                          setAuthor(item.a);
-                          setTag(item.t);
-                          showToast('Loaded quote into editor');
-                        }}
-                        className={`text-left p-2.5 rounded-lg border text-[11px] transition-colors cursor-pointer truncate ${
-                          isLight
-                            ? 'bg-[#f8fafc] border-[#e2e8f0] text-[#334155] hover:bg-white hover:text-[#0f172a]'
-                            : 'bg-[#14171d] border-[#262c36] text-[#c4c7c8] hover:bg-[#181d24] hover:text-white'
-                        }`}
-                      >
-                        “{item.q}”
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: TYPOGRAPHY */}
-            {activeTab === 'type' && (
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-2">
-                  <label
-                    className={`text-xs font-semibold uppercase tracking-wider ${
-                      isLight ? 'text-[#0f172a]' : 'text-white'
-                    }`}
-                  >
-                    Font Family Stack
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => setFontChoice('editorial')}
-                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                        fontChoice === 'editorial'
-                          ? isLight
-                            ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
-                            : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
-                          : isLight
-                          ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                          : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
-                      }`}
-                    >
-                      <span className="font-editorial text-lg block leading-none">Newsreader</span>
-                      <span className="text-[10px] text-[#707a8a]">Editorial Serif</span>
-                    </button>
-                    <button
-                      onClick={() => setFontChoice('serif')}
-                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                        fontChoice === 'serif'
-                          ? isLight
-                            ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
-                            : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
-                          : isLight
-                          ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                          : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
-                      }`}
-                    >
-                      <span className="font-display-serif text-lg block leading-none">Playfair</span>
-                      <span className="text-[10px] text-[#707a8a]">Display Title</span>
-                    </button>
-                    <button
-                      onClick={() => setFontChoice('sans')}
-                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                        fontChoice === 'sans'
-                          ? isLight
-                            ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
-                            : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
-                          : isLight
-                          ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                          : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
-                      }`}
-                    >
-                      <span className="font-modern-sans text-lg block leading-none">Inter</span>
-                      <span className="text-[10px] text-[#707a8a]">Clean Humanist</span>
-                    </button>
-                    <button
-                      onClick={() => setFontChoice('mono')}
-                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                        fontChoice === 'mono'
-                          ? isLight
-                            ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
-                            : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
-                          : isLight
-                          ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                          : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
-                      }`}
-                    >
-                      <span className="font-mono-code text-sm block leading-none">JetBrains</span>
-                      <span className="text-[10px] text-[#707a8a]">Tabular Code</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Font Size Slider with Auto-Fit */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                      Font Size
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={handleAutoFitFontSize}
-                        className={`text-[10px] underline cursor-pointer ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`}
-                      >
-                        Auto-Fit
-                      </button>
-                      <span className={`font-mono font-bold ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`}>
-                        {fontSize}px
-                      </span>
-                    </div>
-                  </div>
-                  <input
-                    type="range"
-                    min={16}
-                    max={44}
-                    value={fontSize}
-                    onChange={(e) => setFontSize(Number(e.target.value))}
-                    className="w-full accent-[#fcd535] cursor-pointer"
-                  />
-                  <div className="flex justify-between text-[10px] text-[#707a8a]">
-                    <span>16px (Dense)</span>
-                    <span>26px (Standard)</span>
-                    <span>44px (Display)</span>
-                  </div>
-                </div>
-
-                {/* Alignment */}
-                <div className="flex flex-col gap-2">
-                  <span className={`text-xs font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                    Alignment
-                  </span>
-                  <div
-                    className={`grid grid-cols-3 gap-2 p-1 rounded-xl border ${
-                      isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
-                    }`}
-                  >
-                    <button
-                      onClick={() => setAlign('left')}
-                      className={`py-1.5 rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
-                        align === 'left'
-                          ? isLight
-                            ? 'bg-white text-[#0f172a] shadow-sm'
-                            : 'bg-[#222730] text-white shadow-sm'
-                          : 'text-[#707a8a] hover:text-white'
-                      }`}
-                      title="Align Left"
-                    >
-                      <AlignLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setAlign('center')}
-                      className={`py-1.5 rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
-                        align === 'center'
-                          ? isLight
-                            ? 'bg-white text-[#0f172a] shadow-sm'
-                            : 'bg-[#222730] text-white shadow-sm'
-                          : 'text-[#707a8a] hover:text-white'
-                      }`}
-                      title="Align Center"
-                    >
-                      <AlignCenter className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setAlign('right')}
-                      className={`py-1.5 rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
-                        align === 'right'
-                          ? isLight
-                            ? 'bg-white text-[#0f172a] shadow-sm'
-                            : 'bg-[#222730] text-white shadow-sm'
-                          : 'text-[#707a8a] hover:text-white'
-                      }`}
-                      title="Align Right"
-                    >
-                      <AlignRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: PALETTE */}
-            {activeTab === 'palette' && (
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-2">
-                  <label
-                    className={`text-xs font-semibold uppercase tracking-wider ${
-                      isLight ? 'text-[#0f172a]' : 'text-white'
-                    }`}
-                  >
-                    Curated Color Sets
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {PALETTE_PRESETS.map((p) => {
-                      const isSelected = bgColor === p.bg && inkColor === p.ink;
-                      return (
-                        <button
-                          key={p.id}
-                          onClick={() => {
-                            setBgColor(p.bg);
-                            setInkColor(p.ink);
-                            showToast(`Palette switched to ${p.name}`);
-                          }}
-                          style={{ backgroundColor: p.bg, color: p.ink }}
-                          className={`p-2.5 rounded-xl text-left border flex items-center justify-between transition-all cursor-pointer shadow-sm ${
-                            isSelected
-                              ? 'ring-2 ring-[#fcd535] border-transparent font-semibold'
-                              : 'border-black/15'
-                          }`}
-                        >
-                          <span className="text-xs truncate">{p.name}</span>
-                          <span
-                            style={{ backgroundColor: p.ink }}
-                            className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0"
-                          ></span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Custom Hex Pickers */}
-                <div className={`grid grid-cols-2 gap-3 pt-3 border-t ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-semibold text-[#707a8a] uppercase">Card Paper Hex</label>
-                    <div
-                      className={`flex items-center gap-2 p-1.5 rounded-xl border ${
-                        isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-                      }`}
-                    >
-                      <input
-                        type="color"
-                        value={bgColor}
-                        onChange={(e) => setBgColor(e.target.value)}
-                        className="w-7 h-7 rounded border-none cursor-pointer bg-transparent"
-                      />
-                      <span className={`text-xs font-mono uppercase ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                        {bgColor}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-semibold text-[#707a8a] uppercase">Ink Text Hex</label>
-                    <div
-                      className={`flex items-center gap-2 p-1.5 rounded-xl border ${
-                        isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-                      }`}
-                    >
-                      <input
-                        type="color"
-                        value={inkColor}
-                        onChange={(e) => setInkColor(e.target.value)}
-                        className="w-7 h-7 rounded border-none cursor-pointer bg-transparent"
-                      />
-                      <span className={`text-xs font-mono uppercase ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                        {inkColor}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 4: GEOMETRY & DETAILS */}
-            {activeTab === 'decor' && (
-              <div className="flex flex-col gap-5">
-                {/* Padding */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                      Internal Margins
-                    </span>
-                    <span className={`font-mono font-bold ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`}>
-                      {padding}px
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={20}
-                    max={60}
-                    value={padding}
-                    onChange={(e) => setPadding(Number(e.target.value))}
-                    className="w-full accent-[#fcd535] cursor-pointer"
-                  />
-                </div>
-
-                {/* Border Radius */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                      Corner Rounding
-                    </span>
-                    <span className={`font-mono font-bold ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`}>
-                      {borderRadius}px
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={32}
-                    value={borderRadius}
-                    onChange={(e) => setBorderRadius(Number(e.target.value))}
-                    className="w-full accent-[#fcd535] cursor-pointer"
-                  />
-                </div>
-
-                {/* Toggles */}
-                <div className={`flex flex-col gap-2.5 pt-3 border-t ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
-                  <label
-                    className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer ${
-                      isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-                    }`}
-                  >
-                    <span className={`text-xs font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                      Analog Film Grain
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={showGrain}
-                      onChange={(e) => setShowGrain(e.target.checked)}
-                      className="accent-[#fcd535] w-4 h-4 cursor-pointer"
-                    />
-                  </label>
-
-                  <label
-                    className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer ${
-                      isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-                    }`}
-                  >
-                    <span className={`text-xs font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                      Subtle Boundary Border
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={showBorder}
-                      onChange={(e) => setShowBorder(e.target.checked)}
-                      className="accent-[#fcd535] w-4 h-4 cursor-pointer"
-                    />
-                  </label>
-
-                  <label
-                    className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer ${
-                      isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-                    }`}
-                  >
-                    <span className={`text-xs font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                      Corner Ornament Glyph
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={showIcon}
-                      onChange={(e) => setShowIcon(e.target.checked)}
-                      className="accent-[#fcd535] w-4 h-4 cursor-pointer"
-                    />
-                  </label>
-
-                  {showIcon && (
-                    <div className="flex flex-col gap-1.5 pt-1">
-                      <span className="text-[11px] font-semibold text-[#707a8a] uppercase">Ornament Glyph</span>
-                      <div
-                        className={`grid grid-cols-6 gap-1.5 p-1.5 rounded-xl border ${
-                          isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
-                        }`}
-                      >
-                        {['format_quote', 'auto_awesome', 'terminal', 'edit_note', 'bookmark', 'grid_view', 'stars', 'favorite', 'badge', 'qr_code', 'verified'].map(
-                          (ic) => (
-                            <button
-                              key={ic}
-                              onClick={() => setIconName(ic)}
-                              className={`p-1.5 rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
-                                iconName === ic
-                                  ? isLight
-                                    ? 'bg-white text-[#d97706] shadow-sm font-bold'
-                                    : 'bg-[#222730] text-[#fcd535]'
-                                  : 'text-[#707a8a] hover:text-[#0f172a]'
-                              }`}
-                            >
-                              <span className="material-symbols-outlined text-[16px]">{ic}</span>
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+          {renderControlTabs(false)}
+          {renderControlPanelContent(false)}
         </div>
 
         {/* CENTER / MAIN WORKSPACE CANVAS */}
         <div
-          className={`flex-1 p-4 md:p-12 flex flex-col items-center justify-center overflow-auto min-h-[520px] transition-colors duration-200 ${
+          className={`flex-1 p-3 sm:p-6 md:p-12 flex flex-col items-center justify-center overflow-auto min-h-[300px] sm:min-h-[460px] pb-24 lg:pb-12 transition-colors duration-200 ${
             isLight ? 'bg-[#f1f5f9]' : 'bg-[#0b0e11]'
           }`}
           onClick={(e) => {
@@ -1621,6 +1803,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedElement('card');
+                if (window.innerWidth < 1024) {
+                  openMobileTab('palette');
+                }
               }}
               style={{
                 ...getCardAspectRatioStyle(),
@@ -1658,7 +1843,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedElement('tag');
-                  setActiveTab('content');
+                  openMobileTab('content');
                   tagInputRef.current?.focus();
                 }}
                 className={`relative z-10 flex items-center justify-between pb-3.5 border-b border-current/15 text-[11px] font-mono tracking-wider opacity-75 cursor-pointer rounded transition-all ${
@@ -1677,7 +1862,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedElement('badge');
-                      setActiveTab('content');
+                      openMobileTab('content');
                     }}
                     className={`px-1.5 py-0.5 rounded border border-current/25 text-[10px] cursor-pointer ${
                       selectedElement === 'badge' ? 'ring-1 ring-[#fcd535] bg-black/10' : ''
@@ -1694,7 +1879,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedElement('quote');
-                  setActiveTab('content');
+                  openMobileTab('content');
                   quoteInputRef.current?.focus();
                 }}
                 className={`relative z-10 my-auto py-4 cursor-pointer rounded transition-all ${
@@ -1718,7 +1903,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedElement('author');
-                  setActiveTab('content');
+                  openMobileTab('content');
                   authorInputRef.current?.focus();
                 }}
                 className={`relative z-10 pt-3.5 border-t border-current/15 flex items-center justify-between cursor-pointer rounded transition-all ${
@@ -1738,7 +1923,250 @@ export const EditorView: React.FC<EditorViewProps> = ({
         </div>
       </div>
 
-      {/* QUICK STYLE SWITCHER MODAL / DRAWER */}
+            {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* MOBILE BOTTOM DOCKED CATEGORY STRIP (Always visible on mobile < lg) */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      <div
+        className={`lg:hidden fixed bottom-14 left-0 right-0 z-30 border-t backdrop-blur-lg px-2 py-1.5 transition-colors ${
+          isLight ? 'bg-white/95 border-[#e2e8f0]' : 'bg-[#111417]/95 border-[#262c36]'
+        }`}
+      >
+        <div className="grid grid-cols-4 gap-1 max-w-md mx-auto">
+          <button
+            onClick={() => openMobileTab('content')}
+            className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
+              mobileSheetOpen && activeTab === 'content'
+                ? isLight
+                  ? 'bg-[#0f172a] text-white shadow-sm'
+                  : 'bg-[#fcd535] text-black shadow-sm'
+                : isLight
+                ? 'text-[#475569] hover:bg-[#f1f5f9]'
+                : 'text-[#c4c7c8] hover:bg-[#181d24]'
+            }`}
+          >
+            <Type className="w-4 h-4" />
+            <span>Words</span>
+          </button>
+          <button
+            onClick={() => openMobileTab('type')}
+            className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
+              mobileSheetOpen && activeTab === 'type'
+                ? isLight
+                  ? 'bg-[#0f172a] text-white shadow-sm'
+                  : 'bg-[#fcd535] text-black shadow-sm'
+                : isLight
+                ? 'text-[#475569] hover:bg-[#f1f5f9]'
+                : 'text-[#c4c7c8] hover:bg-[#181d24]'
+            }`}
+          >
+            <Sliders className="w-4 h-4" />
+            <span>Type</span>
+          </button>
+          <button
+            onClick={() => openMobileTab('palette')}
+            className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
+              mobileSheetOpen && activeTab === 'palette'
+                ? isLight
+                  ? 'bg-[#0f172a] text-white shadow-sm'
+                  : 'bg-[#fcd535] text-black shadow-sm'
+                : isLight
+                ? 'text-[#475569] hover:bg-[#f1f5f9]'
+                : 'text-[#c4c7c8] hover:bg-[#181d24]'
+            }`}
+          >
+            <Palette className="w-4 h-4" />
+            <span>Palette</span>
+          </button>
+          <button
+            onClick={() => openMobileTab('decor')}
+            className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
+              mobileSheetOpen && activeTab === 'decor'
+                ? isLight
+                  ? 'bg-[#0f172a] text-white shadow-sm'
+                  : 'bg-[#fcd535] text-black shadow-sm'
+                : isLight
+                ? 'text-[#475569] hover:bg-[#f1f5f9]'
+                : 'text-[#c4c7c8] hover:bg-[#181d24]'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Details</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* MOBILE EDITING BOTTOM SHEET                                         */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {mobileSheetOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            onClick={() => setMobileSheetOpen(false)}
+            aria-hidden="true"
+          />
+          {/* Slide-Up Sheet */}
+          <div
+            className={`lg:hidden fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t shadow-2xl flex flex-col max-h-[75vh] animate-slide-up transition-colors ${
+              isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a]' : 'bg-[#111417] border-[#262c36] text-[#e1e2e7]'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Sheet Handle & Header */}
+            <div className={`p-3 border-b flex items-center justify-between shrink-0 ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-1 bg-[#475569] rounded-full mr-1" />
+                <h3 className="text-xs font-bold uppercase tracking-wider">
+                  {activeTab === 'content' && 'Words / Text Content'}
+                  {activeTab === 'type' && 'Typography & Layout'}
+                  {activeTab === 'palette' && 'Color & Theme Palette'}
+                  {activeTab === 'decor' && 'Canvas & Details'}
+                </h3>
+              </div>
+              <button
+                onClick={() => setMobileSheetOpen(false)}
+                className={`p-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1 cursor-pointer ${
+                  isLight
+                    ? 'bg-[#f1f5f9] border-[#e2e8f0] text-[#0f172a] hover:bg-[#e2e8f0]'
+                    : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
+                }`}
+                aria-label="Close editing sheet"
+              >
+                <X className="w-4 h-4" />
+                <span className="text-[11px]">Done</span>
+              </button>
+            </div>
+
+            {/* Internal Tabs Switcher */}
+            {renderControlTabs(true)}
+
+            {/* Sheet Scrollable Body */}
+            <div className="overflow-y-auto overscroll-contain flex-1 pb-10">
+              {renderControlPanelContent(true)}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* MOBILE CANVAS OPTIONS DRAWER                                        */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {mobileOptionsOpen && (
+        <>
+          <div
+            className="sm:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            onClick={() => setMobileOptionsOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`sm:hidden fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t shadow-2xl p-5 flex flex-col gap-4 animate-slide-up transition-colors ${
+              isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a]' : 'bg-[#14171d] border-[#262c36] text-[#e1e2e7]'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-current/10">
+              <h4 className="text-xs font-bold uppercase tracking-wider">Canvas Options</h4>
+              <button
+                onClick={() => setMobileOptionsOpen(false)}
+                className="p-1 rounded-lg hover:bg-white/10"
+                aria-label="Close options"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-2.5 text-xs font-medium">
+              {/* Guidelines Toggle */}
+              <button
+                onClick={() => setShowGuidelines(!showGuidelines)}
+                className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer ${
+                  showGuidelines
+                    ? isLight ? 'bg-[#fffbeb] border-[#d97706] text-[#d97706]' : 'bg-[#1f242c] border-[#fcd535] text-[#fcd535]'
+                    : isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Grid className="w-4 h-4" />
+                  <span>Alignment Guidelines</span>
+                </div>
+                <span className="text-[10px] uppercase font-bold">{showGuidelines ? 'ON' : 'OFF'}</span>
+              </button>
+
+              {/* Copy Image 2x */}
+              <button
+                onClick={() => {
+                  handleCopyImage();
+                  setMobileOptionsOpen(false);
+                }}
+                className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer ${
+                  isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Copy className="w-4 h-4" />
+                  <span>Copy 2× Retina Image</span>
+                </div>
+                <span className="text-[10px] text-[#0ecb81] font-bold">2×</span>
+              </button>
+
+              {/* Zoom Controls */}
+              <div
+                className={`p-3 rounded-xl border flex items-center justify-between ${
+                  isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+                }`}
+              >
+                <span className="text-xs">Workspace Zoom</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setZoomLevel((z) => Math.max(50, z - 10))}
+                    className="p-1.5 rounded-lg border bg-current/5"
+                  >
+                    <ZoomOut className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="font-mono text-xs w-10 text-center">{zoomLevel}%</span>
+                  <button
+                    onClick={() => setZoomLevel((z) => Math.min(140, z + 10))}
+                    className="p-1.5 rounded-lg border bg-current/5"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Reset */}
+              <button
+                onClick={() => {
+                  handleReset();
+                  setMobileOptionsOpen(false);
+                }}
+                className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer ${
+                  isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Reset Card Defaults</span>
+                </div>
+              </button>
+
+              {/* Clear Draft */}
+              <button
+                onClick={() => {
+                  handleClearDraft();
+                  setMobileOptionsOpen(false);
+                }}
+                className="p-3 rounded-xl border border-red-500/20 text-red-400 bg-red-500/5 flex items-center justify-between cursor-pointer"
+              >
+                <span>Clear Local Draft</span>
+                <span className="text-[10px]">Delete</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+{/* QUICK STYLE SWITCHER MODAL / DRAWER */}
       {templateDrawerOpen && (
         <div
           className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
