@@ -997,7 +997,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             onClick={() =>
               addObject(
                 createTextObject({
-                  text: 'New Aesthetic Text',
+                  text: 'Your text here',
                   fontSize: 28,
                   x: Math.round(doc.canvasWidth / 2 - 160),
                   y: Math.round(doc.canvasHeight / 2 - 30),
@@ -2275,7 +2275,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <div className="grid grid-cols-3 gap-2 py-4 overflow-y-auto">
               <button
                 onClick={() => {
-                  addObject(createTextObject({ text: 'New Aesthetic Text', fontSize: 24, color: isLight ? '#0f172a' : '#ffffff' }));
+                  addObject(createTextObject({ text: 'Your text here', fontSize: 24, color: isLight ? '#0f172a' : '#ffffff' }));
                   setMobileAddSheetOpen(false);
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"

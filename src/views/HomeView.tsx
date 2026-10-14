@@ -59,40 +59,40 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const heroThemes = [
     {
-      id: 'st-germain',
-      name: 'St. Germain',
-      bg: '#f4ede4',
-      ink: '#2c2825',
-      tag: 'VOL. 08 • ST. GERMAIN NOTES',
-      quote: '“Simplicity is not the lack of clutter, that’s simply a consequence of simplicity.”',
-      author: '— Jony Ive, On Designing the Necessary',
-    },
-    {
       id: 'warm-linen',
-      name: 'Warm Linen',
+      name: 'Kraft Book Page',
       bg: '#fce7cf',
       ink: '#451a03',
-      tag: 'KRAFT LINEN • SPECIMEN 03',
+      tag: 'FAVORITE LINES • NO. 04',
       quote: '“In the depth of winter, I finally learned that within me there lay an invincible summer.”',
-      author: '— Albert Camus, Return to Tipasa',
+      author: 'Albert Camus',
     },
     {
       id: 'obsidian',
-      name: 'Obsidian Dark',
+      name: 'Midnight Black',
       bg: '#18191c',
       ink: '#f5f5f7',
-      tag: 'SYS.MONOCHROME • REF 01',
-      quote: '“Do not seek for things to happen the way you want them to; rather, wish that what happens happens the way it happens.”',
-      author: '— Epictetus, Enchiridion',
+      tag: 'SONG LYRIC • BLONDE',
+      quote: '“Mind over matter is that magic. I do it everyday.”',
+      author: 'Frank Ocean — White Ferrari',
     },
     {
       id: 'pastel',
-      name: 'Soft Celadon',
+      name: 'Morning Sky',
       bg: '#e2ecf9',
       ink: '#1e293b',
-      tag: 'MORNING JOURNAL • HORIZON',
-      quote: '“What you do every day matters more than what you do once in a while.”',
-      author: '— Gretchen Rubin',
+      tag: 'LATE NIGHT THOUGHTS',
+      quote: '“You don’t have to have everything figured out right now. You just have to take the next gentle step.”',
+      author: 'Daily Note',
+    },
+    {
+      id: 'st-germain',
+      name: 'Vintage Cream',
+      bg: '#f4ede4',
+      ink: '#2c2825',
+      tag: 'BOOK REFLECTION • NO. 12',
+      quote: '“If you only read the books that everyone else is reading, you can only think what everyone else is thinking.”',
+      author: 'Haruki Murakami',
     },
   ];
 
@@ -134,20 +134,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const faqs = [
     {
-      q: 'Does this app send my text or photos to any server?',
-      a: 'Never. The generator runs 100% on client-side browser technology. Your words, custom fonts, and exported cards never touch a database or external API.',
+      q: 'Is Aesthetic Card Studio really free?',
+      a: 'Yes, 100% free forever. There are no subscriptions, no paywalls, and no watermarks on your exported cards.',
     },
     {
-      q: 'Can I customize the typography, margins, and paper textures?',
-      a: 'Yes. The Studio Editor provides full granular control over font families (Newsreader, Playfair, Inter, JetBrains Mono), optical font sizes, alignment, padding, border radius, and analog film-grain layers.',
+      q: 'Does this app save or track what I write?',
+      a: 'Never. The studio runs entirely client-side inside your own web browser. Your text, photos, and drafts never touch any server or cloud database.',
     },
     {
-      q: 'What resolution are the downloaded cards?',
-      a: 'Cards are exported at crisp 2× Retina resolution (up to 2160×2160 or 2160×2700 pixels depending on aspect ratio), perfectly formatted for Instagram posts, Stories, Twitter, and print.',
+      q: 'What resolution do the cards download in?',
+      a: 'Cards export at crisp 2× Retina resolution (up to 2160×2700px), perfectly sharp for Instagram carousels, Stories, Pinterest, X/Twitter, or physical prints.',
     },
     {
-      q: 'Can I export in different aspect ratios?',
-      a: 'Yes, you can toggle between 1:1 Square, 4:5 Social Portrait, 9:16 Story/Reel, and 16:9 Landscape with a single click, and all typography reflows proportionally.',
+      q: 'Can I change aspect ratios for Stories or Square posts?',
+      a: 'Yes. You can switch between Square (1:1), Portrait (4:5), Story/Reel (9:16), and Landscape (16:9) anytime with a single click, and the layout reflows automatically.',
     },
   ];
 
@@ -164,15 +164,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
           }`}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[#f5cf2e]"></span>
-          <span>Typesetting Studio for Writers, Readers & Curators</span>
+          <span>Free online card maker • No sign-up required</span>
         </div>
 
         <h1 className={`text-4xl md:text-6xl font-bold max-w-4xl tracking-tight mb-4 leading-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-          Turn words into tactile editorial cards.
+          Turn words into cards people actually want to save.
         </h1>
         
         <p className={`text-sm md:text-base max-w-2xl mx-auto mb-8 leading-relaxed ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-          A specialized browser-native typesetting press. Transform quotes, notes, and fragments into balanced artifacts with optical kerning, hanging punctuation, and archival paper palettes.
+          Make beautiful quote cards, song lyrics, book notes, and aesthetic ID badges in seconds. Tweak fonts, choose archival paper palettes, and export 2× Retina images ready for Instagram, Pinterest, or your lockscreen.
         </p>
 
         {/* CTA Buttons */}
@@ -185,7 +185,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
             }`}
           >
-            <span>Freeform Canvas Studio</span>
+            <span>Design on Canvas Studio</span>
             <ArrowRight className="w-4 h-4" />
           </a>
 
@@ -197,7 +197,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
             }`}
           >
-            <span>Text Card Creator</span>
+            <span>Quick Text Card</span>
           </a>
 
           <a
@@ -354,14 +354,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <span className={`text-xs uppercase font-semibold tracking-wider ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`}>
-                Art Directions
+                Curated Styles
               </span>
               <h2 className={`text-2xl md:text-3xl font-bold tracking-tight mt-1 ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                Curated Typesetting Styles
+                Pick a vibe for your card.
               </h2>
             </div>
             <p className={`text-xs max-w-md ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-              Each preset pairs tested typographic hierarchy with curated archival color tokens. Select any style to customize text and layers.
+              From vintage book pages and retro passport passes to minimal Swiss layouts and pastel photocards. Click any card to customize.
             </p>
           </div>
 
@@ -542,10 +542,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="max-w-5xl mx-auto flex flex-col gap-10">
           <div className="text-center">
             <span className={`text-xs uppercase font-semibold tracking-wider ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`}>
-              Zero Setup
+              Effortless & Free
             </span>
             <h2 className={`text-2xl md:text-3xl font-bold tracking-tight mt-1 ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-              From Thought to Artifact in Seconds
+              How it works.
             </h2>
           </div>
 
@@ -562,9 +562,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               >
                 01
               </div>
-              <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Start With Words</h3>
+              <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Paste your words</h3>
               <p className={`text-xs leading-relaxed ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-                Paste your quote, book excerpt, or study note with preserved punctuation and line breaks.
+                A favorite book excerpt, a song lyric, a late-night thought, or your personal bio.
               </p>
             </div>
 
@@ -580,9 +580,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               >
                 02
               </div>
-              <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Pick Art Direction</h3>
+              <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Choose an aesthetic</h3>
               <p className={`text-xs leading-relaxed ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-                Choose between editorial serif, kraft paper, darkroom obsidian, or soft pastel themes.
+                Pick from vintage paper, retro ID passes, darkroom midnight, or soft pastel themes.
               </p>
             </div>
 
@@ -598,9 +598,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               >
                 03
               </div>
-              <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Refine Layout</h3>
+              <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Make it personal</h3>
               <p className={`text-xs leading-relaxed ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-                Adjust optical size, aspect ratio, film grain, dividers, and corner radii in real-time.
+                Tweak fonts, switch aspect ratios (1:1, 4:5, 9:16), upload a photo, or add stickers.
               </p>
             </div>
 
@@ -616,9 +616,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               >
                 04
               </div>
-              <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Export 2× Retina</h3>
+              <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Download 2× Retina</h3>
               <p className={`text-xs leading-relaxed ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-                Download high-resolution PNGs, WebP, or SVG straight to your disk with zero cloud delays.
+                Save a crisp high-res image directly to your phone or laptop. No watermarks, ever.
               </p>
             </div>
           </div>
@@ -704,13 +704,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
           }`}
         >
           <span className="text-xs text-[#0ecb81] font-mono tracking-wider uppercase">
-            Ready to Typeset
+            Start Creating
           </span>
           <h2 className={`text-3xl md:text-4xl font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-            Craft your card with zero friction.
+            Ready to make your card?
           </h2>
           <p className={`text-sm max-w-lg leading-relaxed ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-            No registration, no tokens, and no server roundtrips. Create, typeset, and download your card in your browser right now.
+            No sign-up, no app install, and no waiting. Open the editor and create something beautiful right now.
           </p>
           <a
             href="/create"
@@ -720,7 +720,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 : 'bg-white text-[#0b0e11] hover:bg-[#e2e2e2]'
             }`}
           >
-            <span>Launch Studio Editor</span>
+            <span>Open Card Creator</span>
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>

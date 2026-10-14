@@ -75,7 +75,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   }, []);
 
   // Base state definitions
-  const [docTitle, setDocTitle] = useState('Reflections on Design — Vol. 04');
+  const [docTitle, setDocTitle] = useState('My Card');
   const [aspectRatio, setAspectRatio] = useState<AspectRatioId>('1:1');
   const [zoomLevel, setZoomLevel] = useState(100);
   const [showGuidelines, setShowGuidelines] = useState(false);
@@ -87,11 +87,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
   // Content state
   const [quote, setQuote] = useState(
     initialTemplate?.quote ||
-      'Simplicity is not the lack of clutter, that’s simply a consequence of simplicity. Simplicity is describing the purpose and place of an object.'
+      'In the depth of winter, I finally learned that within me there lay an invincible summer.'
   );
-  const [author, setAuthor] = useState(initialTemplate?.author || 'Jony Ive — On Designing the Necessary');
-  const [tag, setTag] = useState(initialTemplate?.tag || 'VOL. 08 • ST. GERMAIN NOTES');
-  const [badge, setBadge] = useState(initialTemplate?.badge || 'EST. 1997');
+  const [author, setAuthor] = useState(initialTemplate?.author || 'Albert Camus — Return to Tipasa');
+  const [tag, setTag] = useState(initialTemplate?.tag || 'FAVORITE LINES • NO. 04');
+  const [badge, setBadge] = useState(initialTemplate?.badge || 'READING NOTES');
 
   // Styling state
   const [bgColor, setBgColor] = useState(initialTemplate?.theme.bg || '#f4ede4');
@@ -458,11 +458,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
   // Reset to clean default values
   const handleReset = () => {
-    if (window.confirm('Reset this card to clean editorial defaults? Unsaved custom styling will be replaced.')) {
-      setQuote('Simplicity is about subtracting the obvious and adding the meaningful.');
-      setAuthor('John Maeda — The Laws of Simplicity');
-      setTag('DAILY REFLECTION • VOLUME 01');
-      setBadge('CANON');
+    if (window.confirm('Reset this card to clean defaults? Unsaved custom styling will be replaced.')) {
+      setQuote('In the depth of winter, I finally learned that within me there lay an invincible summer.');
+      setAuthor('Albert Camus — Return to Tipasa');
+      setTag('FAVORITE LINES • NO. 04');
+      setBadge('READING NOTES');
       setBgColor('#f4ede4');
       setInkColor('#2c2825');
       setFontSize(26);
@@ -1373,7 +1373,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               className={`bg-transparent text-xs font-semibold focus:outline-none w-20 sm:w-36 md:w-48 truncate border-none p-0 ${
                 isLight ? 'text-[#0f172a]' : 'text-white'
               }`}
-              title="Click to rename artifact"
+              title="Click to rename card"
               aria-label="Document Title"
             />
           </div>
@@ -1662,7 +1662,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   }`}
                 >
                   <div>
-                    <span className="font-medium block">SVG Vector Artifact</span>
+                    <span className="font-medium block">SVG Vector File</span>
                     <span className="text-[10px] text-[#707a8a]">Scalable vector format</span>
                   </div>
                   <span className="text-[10px] font-mono text-[#d97706]">SVG</span>
