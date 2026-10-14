@@ -294,7 +294,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           {/* Live Card Canvas */}
           <div
-            className={`relative w-full min-h-[360px] md:min-h-[440px] flex items-center justify-center p-6 md:p-10 rounded-xl overflow-hidden border ${
+            className={`relative w-full min-h-[340px] md:min-h-[440px] flex items-center justify-center p-3 sm:p-6 md:p-10 rounded-xl overflow-hidden border ${
               isLight
                 ? 'bg-[#f1f5f9] border-[#e2e8f0]'
                 : 'bg-[#0b0e11] border-[#1f242c]'
@@ -305,17 +305,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 backgroundColor: currentHeroTheme.bg,
                 color: currentHeroTheme.ink,
               }}
-              className="relative w-full max-w-lg min-h-[300px] p-8 md:p-10 rounded-xl transition-all duration-300 shadow-2xl flex flex-col justify-between border border-black/10"
+              className="relative w-full max-w-lg min-h-[280px] p-5 sm:p-8 md:p-10 rounded-xl transition-all duration-300 shadow-2xl flex flex-col justify-between border border-black/10"
             >
               {/* Top Folio Bar */}
-              <div className="flex items-center justify-between pb-4 border-b border-current/15 text-[11px] font-mono tracking-wider opacity-75">
-                <span>{currentHeroTheme.tag}</span>
-                <span className="px-1.5 py-0.5 rounded border border-current/20">EST. 1997</span>
+              <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-current/15 text-[10px] sm:text-[11px] font-mono tracking-wider opacity-75">
+                <span className="truncate max-w-[200px]">{currentHeroTheme.tag}</span>
+                <span className="px-1.5 py-0.5 rounded border border-current/20 shrink-0">EST. 1997</span>
               </div>
 
               {/* Main Body Quote */}
-              <div className="my-6">
-                <blockquote className="font-editorial text-2xl md:text-3xl leading-relaxed tracking-tight">
+              <div className="my-4 sm:my-6">
+                <blockquote className="font-editorial text-xl sm:text-2xl md:text-3xl leading-relaxed tracking-tight">
                   {currentHeroTheme.quote}
                 </blockquote>
               </div>

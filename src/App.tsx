@@ -285,7 +285,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className={`flex-1 ${currentPath !== '/create' && currentPath !== '/canvas' ? 'pb-16 md:pb-0' : ''}`}>
+      <main className={`flex-1 ${currentPath !== '/create' && currentPath !== '/canvas' ? 'pb-24 md:pb-0' : ''}`}>
         {renderCurrentRoute()}
       </main>
 
