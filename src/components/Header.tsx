@@ -24,14 +24,14 @@ export const Header: React.FC<HeaderProps> = ({
         isLight
           ? 'bg-white/90 border-[#e2e8f0] text-[#181a20]'
           : 'bg-[#111417]/90 border-[#262c36] text-[#e1e2e7]'
-      }`}
+      } pt-[env(safe-area-inset-top,0px)]`}
     >
-      <div className="h-16 w-full px-4 md:px-8 flex items-center justify-between">
+      <div className="h-13 sm:h-16 w-full px-3 sm:px-6 md:px-8 flex items-center justify-between">
         {/* Left: Brand Logo & Desktop Navigation */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           <a
             href="/"
-            className={`flex items-center justify-center w-9 h-9 rounded-lg border transition-colors group cursor-pointer ${
+            className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg border transition-colors group cursor-pointer shrink-0 ${
               isLight
                 ? 'bg-[#f1f3f5] border-[#e2e8f0] hover:border-[#cbd5e1]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Aesthetic Card Studio Home"
             title="Go to Home"
           >
-            <div className="grid grid-cols-2 gap-1 p-1.5">
+            <div className="grid grid-cols-2 gap-1 p-1 sm:p-1.5">
               <span className={`w-1.5 h-1.5 rounded-full transition-colors ${isLight ? 'bg-[#181a20] group-hover:bg-[#d97706]' : 'bg-white group-hover:bg-[#fcd535]'}`}></span>
               <span className={`w-1.5 h-1.5 rounded-full ${isLight ? 'bg-[#94a3b8]' : 'bg-[#c6c6c7]'}`}></span>
               <span className={`w-1.5 h-1.5 rounded-full ${isLight ? 'bg-[#94a3b8]' : 'bg-[#c6c6c7]'}`}></span>
@@ -49,9 +49,10 @@ export const Header: React.FC<HeaderProps> = ({
 
           <a
             href="/"
-            className={`hidden sm:inline font-semibold tracking-tight text-sm text-left cursor-pointer ${isLight ? 'text-[#181a20]' : 'text-white'}`}
+            className={`font-semibold tracking-tight text-xs sm:text-sm text-left cursor-pointer truncate max-w-[150px] sm:max-w-none ${isLight ? 'text-[#181a20]' : 'text-white'}`}
           >
-            Aesthetic Card Studio
+            <span className="inline sm:hidden">Card Studio</span>
+            <span className="hidden sm:inline">Aesthetic Card Studio</span>
           </a>
 
           {/* Desktop Nav */}
@@ -252,76 +253,103 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Drawer Dropdown */}
+      {/* Mobile Drawer Dropdown & Backdrop */}
       {mobileMenuOpen && (
-        <div
-          className={`md:hidden border-b p-4 flex flex-col gap-2 transition-colors ${
-            isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#111417] border-[#262c36]'
-          }`}
-        >
-          <a
-            href="/"
-            className={`p-2.5 rounded-lg text-left text-xs font-semibold cursor-pointer block ${
-              currentPath === '/' ? (isLight ? 'bg-[#f1f5f9]' : 'bg-[#181d24]') : ''
+        <>
+          <div
+            className="fixed inset-0 top-13 bg-black/60 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`fixed top-13 left-0 right-0 z-50 md:hidden border-b p-4 flex flex-col gap-1.5 transition-colors shadow-2xl max-h-[calc(100vh-60px)] overflow-y-auto animate-in slide-in-from-top-2 ${
+              isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#111417] border-[#262c36]'
             }`}
           >
-            Home
-          </a>
-          <a
-            href="/templates"
-            className={`p-2.5 rounded-lg text-left text-xs font-semibold cursor-pointer block ${
-              currentPath.startsWith('/templates') ? (isLight ? 'bg-[#f1f5f9]' : 'bg-[#181d24]') : ''
-            }`}
-          >
-            Templates & Categories
-          </a>
-          <a
-            href="/blog"
-            className={`p-2.5 rounded-lg text-left text-xs font-semibold cursor-pointer block ${
-              currentPath.startsWith('/blog') ? (isLight ? 'bg-[#f1f5f9]' : 'bg-[#181d24]') : ''
-            }`}
-          >
-            Studio Blog
-          </a>
-          <a
-            href="/guides"
-            className={`p-2.5 rounded-lg text-left text-xs font-semibold cursor-pointer block ${
-              currentPath.startsWith('/guides') ? (isLight ? 'bg-[#f1f5f9]' : 'bg-[#181d24]') : ''
-            }`}
-          >
-            Typesetting Guides
-          </a>
-          <a
-            href="/canvas"
-            className={`p-2.5 rounded-lg text-left text-xs font-semibold cursor-pointer block border ${
-              currentPath === '/canvas'
-                ? isLight
-                  ? 'bg-[#f1f5f9] border-[#cbd5e1]'
-                  : 'bg-[#181d24] border-[#444748]'
-                : isLight
-                ? 'border-[#e2e8f0]'
-                : 'border-[#262c36]'
-            }`}
-          >
-            Freeform Canvas Studio
-          </a>
-          <a
-            href="/create"
-            className={`p-2.5 rounded-lg text-left text-xs font-semibold cursor-pointer flex items-center justify-between ${
-              isLight ? 'bg-[#0f172a] text-white' : 'bg-white text-[#0b0e11]'
-            }`}
-          >
-            <span>Open Studio Creator</span>
-            <PenTool className="w-3.5 h-3.5" />
-          </a>
-          <div className="pt-2 border-t border-current/10 flex items-center justify-between text-xs text-[#707a8a] px-1">
-            <a href="/about" className="hover:underline">About</a>
-            <a href="/contact" className="hover:underline">Contact</a>
-            <a href="/privacy" className="hover:underline">Privacy</a>
-            <a href="/terms" className="hover:underline">Terms</a>
-            <a href="/faq" className="hover:underline">FAQ</a>
+            <a
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`p-3 rounded-xl text-left text-xs font-semibold cursor-pointer block min-h-[44px] flex items-center ${
+                currentPath === '/' ? (isLight ? 'bg-[#f1f5f9] text-[#0f172a]' : 'bg-[#181d24] text-white') : isLight ? 'text-[#475569]' : 'text-[#c6c6c7]'
+              }`}
+            >
+              Home
+            </a>
+            <a
+              href="/templates"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`p-3 rounded-xl text-left text-xs font-semibold cursor-pointer block min-h-[44px] flex items-center ${
+                currentPath.startsWith('/templates') ? (isLight ? 'bg-[#f1f5f9] text-[#0f172a]' : 'bg-[#181d24] text-white') : isLight ? 'text-[#475569]' : 'text-[#c6c6c7]'
+              }`}
+            >
+              Templates & Categories
+            </a>
+            <a
+              href="/create"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`p-3 rounded-xl text-left text-xs font-semibold cursor-pointer flex items-center justify-between min-h-[44px] ${
+                currentPath === '/create'
+                  ? isLight
+                    ? 'bg-[#0f172a] text-white'
+                    : 'bg-[#fcd535] text-black'
+                  : isLight
+                  ? 'bg-[#f8fafc] text-[#0f172a] border border-[#e2e8f0]'
+                  : 'bg-[#181d24] text-white border border-[#262c36]'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <PenTool className="w-4 h-4" />
+                <span>Typesetting Studio (/create)</span>
+              </div>
+              <span className="text-[10px] font-mono opacity-70">Editor</span>
+            </a>
+            <a
+              href="/canvas"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`p-3 rounded-xl text-left text-xs font-semibold cursor-pointer flex items-center justify-between min-h-[44px] ${
+                currentPath === '/canvas'
+                  ? isLight
+                    ? 'bg-[#0f172a] text-white'
+                    : 'bg-[#fcd535] text-black'
+                  : isLight
+                  ? 'bg-[#f8fafc] text-[#0f172a] border border-[#e2e8f0]'
+                  : 'bg-[#181d24] text-white border border-[#262c36]'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px] text-[#fcd535]">layers</span>
+                <span>Freeform Canvas Studio (/canvas)</span>
+              </div>
+              <span className="text-[10px] font-mono text-[#0ecb81] font-bold">New</span>
+            </a>
+            <a
+              href="/guides"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`p-3 rounded-xl text-left text-xs font-semibold cursor-pointer block min-h-[44px] flex items-center ${
+                currentPath.startsWith('/guides') ? (isLight ? 'bg-[#f1f5f9] text-[#0f172a]' : 'bg-[#181d24] text-white') : isLight ? 'text-[#475569]' : 'text-[#c6c6c7]'
+              }`}
+            >
+              Typesetting Guides
+            </a>
+            <a
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`p-3 rounded-xl text-left text-xs font-semibold cursor-pointer block min-h-[44px] flex items-center ${
+                currentPath.startsWith('/blog') ? (isLight ? 'bg-[#f1f5f9] text-[#0f172a]' : 'bg-[#181d24] text-white') : isLight ? 'text-[#475569]' : 'text-[#c6c6c7]'
+              }`}
+            >
+              Studio Blog
+            </a>
+
+            <div className="pt-3 mt-1 border-t border-current/10 flex flex-wrap items-center justify-between gap-2 text-xs text-[#707a8a] px-1">
+              <a href="/about" onClick={() => setMobileMenuOpen(false)} className="hover:underline py-1">About</a>
+              <a href="/contact" onClick={() => setMobileMenuOpen(false)} className="hover:underline py-1">Contact</a>
+              <a href="/privacy" onClick={() => setMobileMenuOpen(false)} className="hover:underline py-1">Privacy</a>
+              <a href="/terms" onClick={() => setMobileMenuOpen(false)} className="hover:underline py-1">Terms</a>
+              <a href="/faq" onClick={() => setMobileMenuOpen(false)} className="hover:underline py-1">FAQ</a>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   );
