@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { CardTemplate } from './types/card';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { HomeView } from './views/HomeView';
 import { EditorView } from './views/EditorView';
@@ -54,6 +55,7 @@ export const App: React.FC = () => {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [guideModalOpen, setGuideModalOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');
+  const [isEditorSheetOpen, setIsEditorSheetOpen] = useState(false);
 
   // Workspace theme state (persisted locally)
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -140,6 +142,7 @@ export const App: React.FC = () => {
           theme={theme}
           initialTemplate={activeTemplate}
           onNavigateHome={() => navigate('/')}
+          onEditingSheetChange={setIsEditorSheetOpen}
         />
       );
     }
@@ -150,6 +153,7 @@ export const App: React.FC = () => {
         <CanvasEditorView
           theme={theme}
           onNavigateHome={() => navigate('/')}
+          onEditingSheetChange={setIsEditorSheetOpen}
         />
       );
     }
@@ -281,7 +285,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1">
+      <main className={`flex-1 ${currentPath !== '/create' && currentPath !== '/canvas' ? 'pb-16 md:pb-0' : ''}`}>
         {renderCurrentRoute()}
       </main>
 
@@ -292,6 +296,14 @@ export const App: React.FC = () => {
           onNavigate={navigate}
         />
       )}
+
+      {/* 4-Item Mobile Bottom Navigation */}
+      <MobileBottomNav
+        currentPath={currentPath}
+        theme={theme}
+        onNavigate={navigate}
+        hideWhenTyping={isEditorSheetOpen}
+      />
 
       {/* Command Palette (⌘K) Modal */}
       {shortcutsOpen && (

@@ -32,12 +32,14 @@ import {
   CheckCircle2,
   X,
   Layers,
+  MoreHorizontal,
 } from 'lucide-react';
 
 interface EditorViewProps {
   initialTemplate?: CardTemplate;
   onNavigateHome?: () => void;
   theme?: 'dark' | 'light';
+  onEditingSheetChange?: (isOpen: boolean) => void;
 }
 
 const DRAFT_STORAGE_KEY = 'aesthetic_card_studio_draft';
@@ -45,6 +47,7 @@ const DRAFT_STORAGE_KEY = 'aesthetic_card_studio_draft';
 export const EditorView: React.FC<EditorViewProps> = ({
   initialTemplate,
   theme = 'dark',
+  onEditingSheetChange,
 }) => {
   const isLight = theme === 'light';
 
@@ -112,6 +115,19 @@ export const EditorView: React.FC<EditorViewProps> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [draftSavedTimestamp, setDraftSavedTimestamp] = useState<string>('Saved locally');
+
+  // Mobile drawer & sheet state
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [mobileOptionsOpen, setMobileOptionsOpen] = useState(false);
+
+  useEffect(() => {
+    onEditingSheetChange?.(mobileSheetOpen || mobileOptionsOpen);
+  }, [mobileSheetOpen, mobileOptionsOpen, onEditingSheetChange]);
+
+  const openMobileTab = (tab: 'content' | 'type' | 'palette' | 'decor') => {
+    setActiveTab(tab);
+    setMobileSheetOpen(true);
+  };
 
   // Card element ref for exports
   const cardRef = useRef<HTMLDivElement>(null);
