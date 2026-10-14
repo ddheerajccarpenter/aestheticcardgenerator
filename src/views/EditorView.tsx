@@ -68,6 +68,10 @@ import {
 import { extractPaletteFromImage, type ExtractedPalette } from '../utils/paletteExtractor';
 import { createThreeCardPreviewScene } from '../engines/threeCardStage';
 import { TIER_LONG_EDGE } from '../engines/ultraHdExportEngine';
+import {
+  getBrandedExportFilename,
+  exportThreeDimensionalCardPNG,
+} from '../engines/brandedExportAndThreePng';
 
 interface EditorViewProps {
   initialTemplate?: CardTemplate;
@@ -876,8 +880,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
     }
   };
 
-  // High-Res & Ultra-HD Export (4K, 8K, 16K, WebP, PNG 1×, PNG 2×, SVG)
-  const handleExport = async (format: ExportFormat | 'ultra-4k' | 'ultra-8k' | 'ultra-16k') => {
+  // High-Res & Ultra-HD Export (4K, 8K, 16K, 3D PNG, WebP, PNG 1×, PNG 2×, SVG)
+  const handleExport = async (format: ExportFormat | 'ultra-4k' | 'ultra-8k' | 'ultra-16k' | '3d-4k' | '3d-8k') => {
     if (!cardRef.current) return;
     prepareCanvasForCapture();
     setIsExporting(true);
@@ -887,11 +891,47 @@ export const EditorView: React.FC<EditorViewProps> = ({
       // Small tick to ensure UI selection borders are removed from DOM
       await new Promise((resolve) => setTimeout(resolve, 80));
 
-      const filename = `${docTitle.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${aspectRatio}`;
-      let downloadUrl = '';
-      let downloadExt = 'png';
+      // Handle 3D Transparent PNG Export (Part V.2 & Part IX.1)
+      if (format === '3d-4k' || format === '3d-8k') {
+        const rawUrl = await toPng(cardRef.current, { pixelRatio: 2, cacheBust: true });
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = rawUrl;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = img.naturalWidth;
+        offCanvas.height = img.naturalHeight;
+        const oCtx = offCanvas.getContext('2d');
+        if (oCtx) {
+          oCtx.drawImage(img, 0, 0);
+        }
+        const resolution = format === '3d-8k' ? 7680 : 3840;
+        await exportThreeDimensionalCardPNG(
+          offCanvas,
+          cardRef.current.offsetWidth,
+          cardRef.current.offsetHeight,
+          surfaceFinish,
+          { rotX: -0.14, rotY: 0.24, rotZ: -0.02 },
+          resolution
+        );
+        showToast(`Exported 3D Card (${resolution}px Transparent PNG)!`);
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.8 },
+          colors: ['#fcd535', '#ffffff', '#aa2d00', '#0a2e0e'],
+        });
+        return;
+      }
 
-      if (format.startsWith('ultra-')) {
+      let downloadUrl = '';
+      let downloadExt: 'png' | 'webp' | 'svg' = 'png';
+      const isUltra = format.startsWith('ultra-');
+
+      if (isUltra) {
         const tier = format === 'ultra-16k' ? '16K' : format === 'ultra-8k' ? '8K' : '4K';
         const targetLongEdge = TIER_LONG_EDGE[tier];
         const currentLongEdge = Math.max(cardRef.current.offsetWidth, cardRef.current.offsetHeight) || 520;
@@ -945,8 +985,15 @@ export const EditorView: React.FC<EditorViewProps> = ({
         }
       }
 
+      // MANDATORY FILENAME RULE: Always starts with aestheticcardgenerator.com
+      const brandedFilename = getBrandedExportFilename(
+        downloadExt,
+        '2d',
+        isUltra ? (format.replace('ultra-', '').toUpperCase() as '4K' | '8K' | '16K') : undefined
+      );
+
       const link = document.createElement('a');
-      link.download = `${filename}.${downloadExt}`;
+      link.download = brandedFilename;
       link.href = downloadUrl;
       link.click();
 
@@ -2690,6 +2737,35 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     <span className="text-[10px] text-[#707a8a]">GPU-accelerated max canvas print</span>
                   </div>
                   <span className="text-[10px] font-mono text-[#0ecb81] font-bold">16K</span>
+                </button>
+                <div className={`px-3 py-1.5 text-[10px] font-bold tracking-wider uppercase border-t ${
+                  isLight ? 'text-[#64748b] bg-[#f8fafc] border-[#e2e8f0]' : 'text-[#707a8a] bg-[#14171d] border-[#262c36]'
+                }`}>
+                  3D Transparent PNG
+                </div>
+                <button
+                  onClick={() => handleExport('3d-4k')}
+                  className={`w-full px-3 py-2 text-left flex items-center justify-between text-xs cursor-pointer ${
+                    isLight ? 'text-[#0f172a] hover:bg-[#f1f5f9]' : 'text-white hover:bg-[#222730]'
+                  }`}
+                >
+                  <div>
+                    <span className="font-semibold block">🧊 3D Card (4K Transparent)</span>
+                    <span className="text-[10px] text-[#707a8a]">PBR surface tilt on 100% alpha</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#0ecb81] font-bold">4K</span>
+                </button>
+                <button
+                  onClick={() => handleExport('3d-8k')}
+                  className={`w-full px-3 py-2 text-left flex items-center justify-between text-xs cursor-pointer ${
+                    isLight ? 'text-[#0f172a] hover:bg-[#f1f5f9]' : 'text-white hover:bg-[#222730]'
+                  }`}
+                >
+                  <div>
+                    <span className="font-semibold block">🧊 3D Card (8K Transparent)</span>
+                    <span className="text-[10px] text-[#707a8a]">Archival 7680px PBR alpha render</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#0ecb81] font-bold">8K</span>
                 </button>
               </div>
             )}

@@ -9,6 +9,8 @@ import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
 import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 import { createThreeCardPreviewScene } from '../engines/threeCardStage';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
+import { LazyTemplateCard } from '../components/LazyTemplateCard';
+import { getBrandedExportFilename } from '../engines/brandedExportAndThreePng';
 
 interface HomeViewProps {
   onOpenEditorWithTemplate?: (template: CardTemplate) => void;
@@ -167,7 +169,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         cacheBust: true,
       });
       const link = document.createElement('a');
-      link.download = heroMode === 'quote' ? 'quote-card-preview.png' : 'aesthetic-id-pass.png';
+      link.download = getBrandedExportFilename('png');
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -607,11 +609,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
                   }`}
                 >
-                  {/* Real Card Visual Artwork Preview (Unified across studio & templates) */}
-                  <UnifiedCardThumbnail
-                    template={template}
-                    isLight={isLight}
-                  />
+                  {/* Real Card Visual Artwork Preview (Unified with Archival Blueprint Lazy-Loading) */}
+                  <LazyTemplateCard aspectRatioClass="aspect-auto">
+                    <UnifiedCardThumbnail
+                      template={template}
+                      isLight={isLight}
+                    />
+                  </LazyTemplateCard>
 
                   {/* Actions Bar */}
                   <div className={`p-4 flex items-center justify-between gap-3 ${isLight ? 'bg-slate-50' : 'bg-[#181d24]'}`}>

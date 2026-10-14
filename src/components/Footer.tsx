@@ -246,6 +246,14 @@ export const Footer: React.FC<FooterProps> = ({ theme = 'dark' }) => {
               </li>
               <li>
                 <a
+                  href="/disclaimer"
+                  className={`hover:underline transition-colors cursor-pointer text-left block ${isLight ? 'hover:text-[#0f172a]' : 'hover:text-white'}`}
+                >
+                  Disclaimer &amp; DMCA
+                </a>
+              </li>
+              <li>
+                <a
                   href="/accessibility"
                   className={`hover:underline transition-colors cursor-pointer text-left block ${isLight ? 'hover:text-[#0f172a]' : 'hover:text-white'}`}
                 >

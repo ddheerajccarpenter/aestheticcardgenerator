@@ -3,6 +3,7 @@ import type { CardTemplate } from './types/card';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { MobileBottomNav } from './components/MobileBottomNav';
+import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { HomeView } from './views/HomeView';
 import { EditorView } from './views/EditorView';
@@ -19,6 +20,7 @@ import {
   PrivacyView,
   TermsView,
   CookieView,
+  DisclaimerView,
   AccessibilityView,
   CreditsView,
   NotFoundView,
@@ -82,6 +84,16 @@ export const App: React.FC = () => {
     }
     localStorage.setItem('aesthetic_card_studio_theme', theme);
   }, [theme]);
+
+  // Apply route-editor class to body for mobile layout fixes (Screenshot 1 & 2)
+  useEffect(() => {
+    const isEditor = currentPath.startsWith('/create') || currentPath.startsWith('/canvas');
+    if (isEditor) {
+      document.body.classList.add('route-editor', 'is-editor-route');
+    } else {
+      document.body.classList.remove('route-editor', 'is-editor-route');
+    }
+  }, [currentPath]);
 
   // Initialize 60fps Scroll Gradient Engine and restore Saved Fonts
   useEffect(() => {
@@ -272,6 +284,9 @@ export const App: React.FC = () => {
     if (path === '/cookies') {
       return <CookieView theme={theme} onNavigate={navigate} />;
     }
+    if (path === '/disclaimer') {
+      return <DisclaimerView theme={theme} onNavigate={navigate} />;
+    }
     if (path === '/accessibility') {
       return <AccessibilityView theme={theme} onNavigate={navigate} />;
     }
@@ -323,6 +338,12 @@ export const App: React.FC = () => {
         theme={theme}
         onNavigate={navigate}
         hideWhenTyping={isEditorSheetOpen}
+      />
+
+      {/* Non-Intrusive Cookie & GDPR Privacy Consent Banner (Part VII.1) */}
+      <CookieConsentBanner
+        theme={theme}
+        onNavigate={navigate}
       />
 
       {/* Command Palette (⌘K) Modal */}

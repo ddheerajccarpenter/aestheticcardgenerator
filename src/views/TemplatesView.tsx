@@ -16,6 +16,7 @@ import {
 import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
 import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
+import { LazyTemplateCard } from '../components/LazyTemplateCard';
 
 interface TemplatesViewProps {
   onNavigate?: (path: string) => void;
@@ -294,11 +295,13 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                     isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
                   }`}
                 >
-                  {/* Real Card Visual Artwork Preview (Bug 2 & 4 Fixed: Unified, Real Thumbnail, No Ratio Badge, No Duplicate Compare Button) */}
-                  <UnifiedCardThumbnail
-                    template={template}
-                    isLight={isLight}
-                  />
+                  {/* Real Card Visual Artwork Preview (Unified with Archival Blueprint Lazy-Loading) */}
+                  <LazyTemplateCard aspectRatioClass="aspect-auto">
+                    <UnifiedCardThumbnail
+                      template={template}
+                      isLight={isLight}
+                    />
+                  </LazyTemplateCard>
 
                   {/* Card Footer Bar with actions */}
                   <div className={`p-4 flex flex-col gap-2.5 ${isLight ? 'bg-[#f8fafc]' : 'bg-[#181d24]'}`}>
