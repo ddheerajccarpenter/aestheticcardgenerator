@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { CardTemplate } from '../types/card';
 import { SquareDuotoneIcon } from './SquareDuotoneIcon';
 import { ASSET_AVATARS } from '../data/canvasAssets';
+import { sanitizeQuote } from '../utils/richText';
 
 interface TemplateComparisonModalProps {
   isOpen: boolean;
@@ -116,7 +117,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                   className="p-6 min-h-[280px] flex flex-col justify-between border-b border-black/10 relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between text-[11px] font-mono opacity-75">
-                    <span>{testTag || tmpl.tag}</span>
+                    <span>{testTag || tmpl.tag || tmpl.categoryLabel}</span>
                     <span className="border border-current/30 px-1.5 py-0.5 rounded text-[9px] font-bold">
                       {tmpl.badge}
                     </span>
@@ -132,14 +133,16 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                         />
                       </div>
                       <div className="flex-1 flex flex-col gap-1 text-xs">
-                        <span className="font-bold text-sm tracking-tight">{testAuthor || tmpl.author}</span>
-                        <span className="opacity-80 text-[11px] line-clamp-2">{testQuote || tmpl.quote}</span>
+                        <span className="font-bold text-sm tracking-tight">{tmpl.title}</span>
+                        <span className="opacity-80 text-[11px] line-clamp-2">
+                          {sanitizeQuote(testQuote || tmpl.quote)}
+                        </span>
                       </div>
                     </div>
                   ) : (
                     <div className="my-6">
                       <blockquote className="text-xl sm:text-2xl font-editorial leading-snug tracking-tight">
-                        “{testQuote || tmpl.quote}”
+                        “{sanitizeQuote(testQuote || tmpl.quote)}”
                       </blockquote>
                     </div>
                   )}

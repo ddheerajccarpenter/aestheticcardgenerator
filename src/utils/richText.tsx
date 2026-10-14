@@ -84,3 +84,12 @@ export function stripRichText(text: string): string {
     .replace(/\*(.*?)\*/g, '$1');
 }
 
+/**
+ * Sanitizes quote strings to prevent double opening quotation marks (““)
+ */
+export function sanitizeQuote(text: string): string {
+  if (!text) return '';
+  return text.replace(/^[“"']+|[”"']+$/g, '').trim();
+}
+
+

@@ -107,26 +107,26 @@
     color: var(--color-ink);
   }
 
-  /* Base Body Rule: SamsungOne in Bold Style */
+  /* Base Body Rule: SamsungOne in Bold Style (font-weight: 700) */
   body, p, span, li, input, textarea, select, button, label {
     font-family: var(--font-body);
-    font-weight: 600;
+    font-weight: 700;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Main & Section Headings: Murecho */
+  /* Main & Section Headings: Murecho (800) */
   h1, h2, .heading-main, .hero-title, .page-title {
-    font-family: var(--font-heading);
-    font-weight: 800;
+    font-family: var(--font-heading) !important;
+    font-weight: 800 !important;
     letter-spacing: -0.025em;
     line-height: 1.15;
   }
 
-  /* Subheadings, Nav & UI Tabs: Funnel Sans */
+  /* Subheadings, Nav & UI Tabs: Funnel Sans (600) */
   h3, h4, h5, h6, nav a, .subheading, .section-eyebrow, .tab-trigger, .pill-badge {
-    font-family: var(--font-subheading);
-    font-weight: 600;
+    font-family: var(--font-subheading) !important;
+    font-weight: 600 !important;
     letter-spacing: -0.005em;
     line-height: 1.3;
   }
@@ -292,4 +292,40 @@ html.light .universal-page-bg,
 [data-theme="light"] .universal-page-bg {
   opacity: 0.85;
 }
+
+/* Tactile UI Interaction Physics — Global Stylesheet */
+button, .btn-interactive, .sq-duotone-icon, .palette-swatch {
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+  will-change: transform;
+}
+
+button:active, .btn-interactive:active, .sq-duotone-icon:active, .palette-swatch:active {
+  transform: scale(0.95) translateY(1.5px) !important;
+  transition: transform 55ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Scroll-Velocity Reactive Template Card Container */
+.template-card-kinetic {
+  transform: perspective(1400px) rotateX(calc(var(--scroll-velocity, 0) * 0.45deg)) rotateY(var(--hover-rot-y, 0deg));
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 280ms ease;
+  transform-style: preserve-3d;
+}
+
+/* Guides 3D Book Page-Turning Engine */
+.guides-book-stage {
+  perspective: 2200px;
+  transform-style: preserve-3d;
+}
+
+.guides-book-leaf {
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: transform 640ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  backface-visibility: hidden;
+}
+
+.guides-book-leaf.is-turning-next {
+  transform: rotateY(-180deg);
+}
+
 

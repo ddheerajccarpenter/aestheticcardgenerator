@@ -60,6 +60,12 @@ import {
   AlignVerticalJustifyEnd,
   Crop,
   Wand2,
+  Sun,
+  Box,
+  Terminal,
+  Folder,
+  FolderOpen,
+  RefreshCw,
 } from 'lucide-react';
 import { processImageFilter } from '../utils/imageFilters';
 import { generateQrCodeSvg, generateBarcodeSvg } from '../utils/qrBarcodeGenerator';
@@ -69,6 +75,8 @@ import {
   autoAlignLayersInGrid,
   normalizeTemplateDimensions,
 } from '../engines/canvasGridAndDimensionEngine';
+import { updateWorkspaceAmbientBackdrop } from '../engines/ambientStageEngine';
+import { createThreeCardPreviewScene } from '../engines/threeCardStage';
 import type { ImageFilterPreset, ImageClipMask } from '../types/card';
 
 interface CanvasEditorViewProps {
@@ -131,10 +139,72 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const [history, setHistory] = useState<CanvasDocument[]>([doc]);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
 
-  // Viewport / Zoom
+  // Viewport / Zoom & Stage Toggles
   const [zoom, setZoom] = useState<number>(1);
   const [showGrid, setShowGrid] = useState<boolean>(false);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<'inspector' | 'layers' | 'templates'>('inspector');
+  const [ambientModeEnabled, setAmbientModeEnabled] = useState<boolean>(true);
+  const [is3DMode, setIs3DMode] = useState<boolean>(false);
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'inspector' | 'layers' | 'recycle' | 'templates'>('inspector');
+  const [layerViewMode, setLayerViewMode] = useState<'folders' | 'flat'>('folders');
+  const [folderOpen, setFolderOpen] = useState({
+    photo: true,
+    text: true,
+    accents: true,
+    frame: true,
+  });
+
+  // Natural-Language Quick Command Bar State (Leftover Item 5)
+  const [quickCommandText, setQuickCommandText] = useState('');
+
+  // Saved Clips & Recycle Drawer (Leftover Item 6)
+  const [savedClips, setSavedClips] = useState<CanvasObject[]>(() => {
+    try {
+      const stored = localStorage.getItem('aesthetic_recycled_clips');
+      if (stored) return JSON.parse(stored);
+    } catch {
+      // Fallback
+    }
+    return [
+      {
+        id: 'clip-star-seal',
+        name: '★ Holographic Pass Seal',
+        type: 'shape',
+        shapeType: 'star',
+        x: 40,
+        y: 40,
+        width: 64,
+        height: 64,
+        rotation: 0,
+        opacity: 0.9,
+        fill: '#fcd535',
+        stroke: '#000000',
+        strokeWidth: 2,
+        borderRadius: 0,
+        zIndex: 20,
+        locked: false,
+        visible: true,
+      },
+      {
+        id: 'clip-barcode',
+        name: 'Verified 90s Barcode Strip',
+        type: 'image',
+        src: generateBarcodeSvg('VERIFIED-ACCESS-2026', { fill: '#ffffff' }),
+        x: 40,
+        y: 40,
+        width: 220,
+        height: 48,
+        naturalWidth: 220,
+        naturalHeight: 48,
+        rotation: 0,
+        opacity: 0.85,
+        objectFit: 'contain',
+        borderRadius: 4,
+        zIndex: 21,
+        locked: false,
+        visible: true,
+      },
+    ];
+  });
 
   // Modals & Drawers
   const [templateDrawerOpen, setTemplateDrawerOpen] = useState(false);
@@ -143,25 +213,28 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     onEditingSheetChange?.(mobileAddSheetOpen || mobileInspectorOpen || templateDrawerOpen);
   }, [mobileAddSheetOpen, mobileInspectorOpen, templateDrawerOpen, onEditingSheetChange]);
 
+  // BUG 8 FIX: Run zoomToFitViewport unconditionally on all devices and window resize
   const handleFitToScreen = useCallback(() => {
     if (!canvasContainerRef.current) return;
     const container = canvasContainerRef.current;
-    const padding = window.innerWidth < 640 ? 28 : 64;
+    const padding = window.innerWidth < 640 ? 32 : 64;
     const availableWidth = container.clientWidth - padding;
     const availableHeight = container.clientHeight - padding;
     if (availableWidth <= 0 || availableHeight <= 0) return;
 
     const scaleX = availableWidth / doc.canvasWidth;
     const scaleY = availableHeight / doc.canvasHeight;
-    const fitScale = Math.min(scaleX, scaleY, 1.2);
+    const fitScale = Math.min(scaleX, scaleY, 1.0);
     setZoom(Number(Math.max(0.18, fitScale).toFixed(2)));
   }, [doc.canvasWidth, doc.canvasHeight]);
 
   useEffect(() => {
-    if (window.innerWidth < 1024) {
-      const timer = setTimeout(handleFitToScreen, 120);
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(handleFitToScreen, 120);
+    window.addEventListener('resize', handleFitToScreen);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleFitToScreen);
+    };
   }, [doc.canvasWidth, doc.canvasHeight, handleFitToScreen]);
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -179,8 +252,53 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // References
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const canvasElementRef = useRef<HTMLDivElement>(null);
+  const threeMountRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync ambient workspace backdrop with card colors (YouTube-style ambient mode - Leftover Item 3)
+  useEffect(() => {
+    updateWorkspaceAmbientBackdrop(
+      canvasElementRef.current,
+      canvasContainerRef.current,
+      ambientModeEnabled,
+      { bg: doc.background || '#18191c', ink: '#ffffff', accent: '#fcd535' }
+    );
+  }, [ambientModeEnabled, doc.background, doc.objects]);
+
+  // Sync 3D physical card stage (Three.js - Leftover Item 2)
+  useEffect(() => {
+    if (!is3DMode || !threeMountRef.current || !canvasElementRef.current) return;
+    let cleanup: (() => void) | undefined;
+    const timer = setTimeout(async () => {
+      try {
+        const rawDataUrl = await toPng(canvasElementRef.current!, { pixelRatio: 2 });
+        const img = new Image();
+        img.onload = () => {
+          const offCanvas = document.createElement('canvas');
+          offCanvas.width = img.width;
+          offCanvas.height = img.height;
+          const ctx = offCanvas.getContext('2d');
+          if (!ctx) return;
+          ctx.drawImage(img, 0, 0);
+          cleanup = createThreeCardPreviewScene(
+            threeMountRef.current!,
+            offCanvas,
+            doc.canvasWidth,
+            doc.canvasHeight,
+            'cotton-rag-300gsm'
+          );
+        };
+        img.src = rawDataUrl;
+      } catch (err) {
+        console.error('Three.js canvas init error', err);
+      }
+    }, 120);
+    return () => {
+      clearTimeout(timer);
+      cleanup?.();
+    };
+  }, [is3DMode, doc.canvasWidth, doc.canvasHeight, doc.objects, doc.background]);
 
   // Offline AI Background Removal state
   const [isRemovingBg, setIsRemovingBg] = useState(false);
@@ -1006,6 +1124,122 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     showToast(`Created new blank canvas (${preset.width}×${preset.height}px)!`);
   };
 
+  // Quick Command Execution (Leftover Item 5)
+  const handleExecuteQuickCommand = useCallback((cmd: string) => {
+    const trimmed = cmd.trim();
+    if (!trimmed) return;
+    const lower = trimmed.toLowerCase();
+
+    // 1. Rename / text update: "change name to Sarah" or "name Alex"
+    const nameMatch = lower.match(/(?:change\s+name\s+to|rename\s+to|name\s+is|name)\s+([^,.;]+)/i);
+    if (nameMatch && nameMatch[1]) {
+      const newName = nameMatch[1].trim();
+      const targetObj = doc.objects.find(
+        (o) => o.type === 'text' && (o.name.toLowerCase().includes('name') || o.name.toLowerCase().includes('title') || o.name.toLowerCase().includes('holder'))
+      ) || doc.objects.find((o) => o.type === 'text');
+
+      if (targetObj) {
+        updateObject(targetObj.id, { text: newName } as any);
+        showToast(`Quick Edit: Set name to "${newName}"`);
+        setQuickCommandText('');
+        return;
+      }
+    }
+
+    // 2. Palette / color updates
+    if (lower.includes('pink') || lower.includes('cyber')) {
+      commitDocumentChange({ ...doc, background: '#1c0f1d' });
+      showToast('Quick Edit: Switched to Cyber Pink palette');
+      setQuickCommandText('');
+      return;
+    }
+    if (lower.includes('dark') || lower.includes('black') || lower.includes('obsidian')) {
+      commitDocumentChange({ ...doc, background: '#121417' });
+      showToast('Quick Edit: Switched to Obsidian Dark palette');
+      setQuickCommandText('');
+      return;
+    }
+    if (lower.includes('vintage') || lower.includes('sepia') || lower.includes('cream')) {
+      commitDocumentChange({ ...doc, background: '#f5eee3' });
+      showToast('Quick Edit: Switched to Vintage Paper palette');
+      setQuickCommandText('');
+      return;
+    }
+
+    // 3. Auto-align
+    if (lower.includes('align') || lower.includes('center') || lower.includes('grid')) {
+      const aligned = autoAlignLayersInGrid(doc.objects as any, doc.canvasWidth, doc.canvasHeight);
+      commitDocumentChange({ ...doc, objects: aligned as any });
+      showToast('Quick Edit: Auto-aligned layers to 8px grid');
+      setQuickCommandText('');
+      return;
+    }
+
+    // 4. Photo mask
+    if (lower.includes('circle') || lower.includes('circular') || lower.includes('round')) {
+      const photoObj = doc.objects.find((o) => o.type === 'image');
+      if (photoObj) {
+        updateObject(photoObj.id, { clipMask: 'circle' } as any);
+        showToast('Quick Edit: Made photo mask circular');
+        setQuickCommandText('');
+        return;
+      }
+    }
+    if (lower.includes('star')) {
+      const photoObj = doc.objects.find((o) => o.type === 'image');
+      if (photoObj) {
+        updateObject(photoObj.id, { clipMask: 'star' } as any);
+        showToast('Quick Edit: Made photo mask star-shaped');
+        setQuickCommandText('');
+        return;
+      }
+    }
+
+    // Fallback: update first text layer
+    const firstText = doc.objects.find((o) => o.type === 'text');
+    if (firstText) {
+      updateObject(firstText.id, { text: trimmed } as any);
+      showToast(`Quick Edit: Updated text to "${trimmed}"`);
+      setQuickCommandText('');
+      return;
+    }
+
+    showToast(`Quick Command executed: "${trimmed}"`);
+    setQuickCommandText('');
+  }, [doc, commitDocumentChange, updateObject]);
+
+  // Saved Clips & Recycle Drawer Handlers (Leftover Item 6)
+  const handleSaveToRecycleClips = useCallback((obj: CanvasObject) => {
+    const newClip: CanvasObject = {
+      ...obj,
+      id: `recycled-${Date.now()}`,
+    };
+    const updated = [newClip, ...savedClips.slice(0, 19)];
+    setSavedClips(updated);
+    try {
+      localStorage.setItem('aesthetic_recycled_clips', JSON.stringify(updated));
+    } catch {
+      // Storage quota
+    }
+    showToast(`Saved "${obj.name}" to Recycle Tray!`);
+  }, [savedClips]);
+
+  const handleInsertRecycledClip = useCallback((clip: CanvasObject) => {
+    const inserted: CanvasObject = {
+      ...clip,
+      id: createObjectId(clip.type),
+      x: Math.round(doc.canvasWidth / 2 - clip.width / 2),
+      y: Math.round(doc.canvasHeight / 2 - clip.height / 2),
+      zIndex: (Math.max(...doc.objects.map((o) => o.zIndex), 0) || 0) + 1,
+    };
+    commitDocumentChange({
+      ...doc,
+      objects: [...doc.objects, inserted],
+    });
+    setSelectedId(inserted.id);
+    showToast(`Recycled "${clip.name}" onto active canvas!`);
+  }, [doc, commitDocumentChange]);
+
   // ───────────────────────────────────────────────────────────────────────────
   // RENDER HELPERS
   // ───────────────────────────────────────────────────────────────────────────
@@ -1180,6 +1414,40 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           >
             <Sparkles className="w-4 h-4 text-[#ec4899]" />
           </button>
+
+          <div className="h-4 w-px bg-[#262c36]/40 mx-1 hidden sm:block" />
+
+          {/* Ambient Lighting Toggle (YouTube-Style - Leftover Item 3) */}
+          <button
+            onClick={() => setAmbientModeEnabled(!ambientModeEnabled)}
+            className={`px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
+              ambientModeEnabled
+                ? isLight
+                  ? 'bg-[#d97706]/15 text-[#d97706]'
+                  : 'bg-[#fcd535]/15 text-[#fcd535]'
+                : 'text-[#707a8a] hover:text-white'
+            }`}
+            title="Toggle YouTube-style Ambient Glow around card stage"
+          >
+            <Sun className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Ambient</span>
+          </button>
+
+          {/* 3D Physical Card View Toggle (Three.js - Leftover Item 2) */}
+          <button
+            onClick={() => setIs3DMode(!is3DMode)}
+            className={`px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
+              is3DMode
+                ? 'bg-[#fcd535] text-black font-bold'
+                : isLight
+                ? 'bg-slate-100 text-slate-700 hover:text-black'
+                : 'bg-[#181d24] text-[#a0a5ad] hover:text-white'
+            }`}
+            title="Toggle Three.js 3D Physical Card Stage with dynamic reflections"
+          >
+            <Box className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">3D View</span>
+          </button>
         </div>
 
         {/* Right: Template Picker, Blank Canvas & Export */}
@@ -1307,6 +1575,49 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           </div>
         </div>
       </header>
+
+      {/* ───────────────────────────────────────────────────────────────────── */}
+      {/* QUICK COMMAND BAR ("TELL STUDIO WHAT TO CHANGE" - Leftover Item 5)    */}
+      {/* ───────────────────────────────────────────────────────────────────── */}
+      <div
+        className={`px-4 py-2 border-b flex items-center gap-3 transition-colors shrink-0 z-20 ${
+          isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#12151b] border-[#222730]'
+        }`}
+      >
+        <div className="flex items-center gap-1.5 text-xs text-[#fcd535] font-mono shrink-0">
+          <Terminal className="w-4 h-4" />
+          <span className="hidden sm:inline font-bold">Quick Command:</span>
+        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleExecuteQuickCommand(quickCommandText);
+          }}
+          className="flex-1 flex items-center gap-2"
+        >
+          <input
+            type="text"
+            value={quickCommandText}
+            onChange={(e) => setQuickCommandText(e.target.value)}
+            placeholder='Type a quick edit: e.g. "Change name to Arya", "Switch to cyber pink", "Auto-align layers", "Make photo circular"...'
+            className={`flex-1 px-3 py-1.5 rounded-lg text-xs border outline-none transition-all ${
+              isLight
+                ? 'bg-slate-50 border-slate-200 text-[#0f172a] focus:border-[#d97706]'
+                : 'bg-[#181d24] border-[#2c3340] text-white focus:border-[#fcd535]'
+            }`}
+          />
+          <button
+            type="submit"
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
+              isLight
+                ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
+                : 'bg-[#fcd535] text-black hover:bg-[#ffe270]'
+            }`}
+          >
+            Apply
+          </button>
+        </form>
+      </div>
 
       {/* ───────────────────────────────────────────────────────────────────── */}
       {/* MAIN WORKSPACE BODY                                                   */}
@@ -1753,7 +2064,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         <main
           ref={canvasContainerRef}
           onClick={() => setSelectedId(null)}
-          className={`flex-1 overflow-auto flex items-center justify-center p-8 select-none relative transition-colors ${
+          className={`editor-ambient-stage flex-1 overflow-auto flex items-center justify-center p-8 select-none relative transition-colors ${
             isLight ? 'bg-[#e2e8f0]' : 'bg-[#080a0d]'
           }`}
           style={{
@@ -1765,19 +2076,29 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             backgroundSize: '24px 24px',
           }}
         >
-          {/* Zoom Wrapper */}
-          <div
-            style={{
-              transform: `scale(${zoom})`,
-              transformOrigin: 'center center',
-              transition: 'transform 0.1s ease-out',
-            }}
-            className="relative"
-          >
-            {/* The Actual Scaled Canvas */}
+          {is3DMode ? (
             <div
-              ref={canvasElementRef}
-              id="aesthetic-card-canvas"
+              ref={threeMountRef}
+              style={{
+                width: `${Math.min(doc.canvasWidth, 680)}px`,
+                height: `${Math.min(doc.canvasHeight, 680)}px`,
+              }}
+              className="flex items-center justify-center"
+            />
+          ) : (
+            /* Zoom Wrapper */
+            <div
+              style={{
+                transform: `scale(${zoom})`,
+                transformOrigin: 'center center',
+                transition: 'transform 0.1s ease-out',
+              }}
+              className="relative"
+            >
+              {/* The Actual Scaled Canvas */}
+              <div
+                ref={canvasElementRef}
+                id="aesthetic-card-canvas"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedId(null);
@@ -2254,6 +2575,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 })}
             </div>
           </div>
+          )}
         </main>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
@@ -2291,6 +2613,20 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             >
               <Layers className="w-3.5 h-3.5" />
               <span>Layers ({doc.objects.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveSidebarTab('recycle')}
+              className={`flex-1 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                activeSidebarTab === 'recycle'
+                  ? isLight
+                    ? 'bg-[#0f172a] text-white shadow-sm'
+                    : 'bg-[#222730] text-white shadow-sm border border-[#444748]'
+                  : 'text-[#707a8a] hover:text-white'
+              }`}
+              title="Saved Clips & Recycle Tray (Notebook Page 3)"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-[#0ecb81]" />
+              <span>Clips</span>
             </button>
           </div>
 
@@ -2668,6 +3004,60 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         </div>
                       </div>
 
+                      {/* Photo Crop, Zoom & Pan (Bug 10 Fix) */}
+                      <div className="flex flex-col gap-2 p-2.5 rounded-xl border border-current/10 bg-black/5 dark:bg-white/5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-[#707a8a]">Crop & Pan Alignment</span>
+                          <span className="text-[10px] font-mono opacity-65">{((selectedObject as any).zoomScale || 1).toFixed(1)}x</span>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <div className="flex justify-between text-[10px] text-[#707a8a]">
+                            <span>Zoom ({((selectedObject as any).zoomScale || 1).toFixed(1)}x)</span>
+                            <button
+                              onClick={() => updateObject(selectedObject.id, { zoomScale: 1, panX: 0, panY: 0 } as any)}
+                              className="text-[#fcd535] hover:underline cursor-pointer"
+                            >
+                              Reset
+                            </button>
+                          </div>
+                          <input
+                            type="range"
+                            min={1}
+                            max={3}
+                            step={0.05}
+                            value={(selectedObject as any).zoomScale || 1}
+                            onChange={(e) => updateObject(selectedObject.id, { zoomScale: Number(e.target.value) } as any)}
+                            className="w-full accent-[#fcd535]"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[10px] text-[#707a8a]">Pan X ({(selectedObject as any).panX || 0}%)</span>
+                            <input
+                              type="range"
+                              min={-50}
+                              max={50}
+                              value={(selectedObject as any).panX || 0}
+                              onChange={(e) => updateObject(selectedObject.id, { panX: Number(e.target.value) } as any)}
+                              className="w-full accent-[#38bdf8]"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[10px] text-[#707a8a]">Pan Y ({(selectedObject as any).panY || 0}%)</span>
+                            <input
+                              type="range"
+                              min={-50}
+                              max={50}
+                              value={(selectedObject as any).panY || 0}
+                              onChange={(e) => updateObject(selectedObject.id, { panY: Number(e.target.value) } as any)}
+                              className="w-full accent-[#38bdf8]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Corner Radius & Opacity */}
                       <div className="flex flex-col gap-1">
                         <label className="text-[11px] text-[#707a8a]">
@@ -2994,24 +3384,260 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             </div>
           )}
 
-          {/* TAB 2: LAYERS PANEL */}
+          {/* TAB 2: LAYERS PANEL (Grouped Folders & Flat View - Leftover Item 5) */}
           {activeSidebarTab === 'layers' && (
-            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1.5">
-              <div className="flex items-center justify-between px-1 py-1 text-xs text-[#707a8a] font-medium">
-                <span>Top to bottom stacking</span>
-                <span>{doc.objects.length} Layers</span>
+            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
+              {/* Header with View Toggle */}
+              <div className="flex items-center justify-between px-1 py-1 text-xs">
+                <div className="flex items-center gap-1 bg-black/10 dark:bg-white/10 p-0.5 rounded-lg">
+                  <button
+                    onClick={() => setLayerViewMode('folders')}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                      layerViewMode === 'folders'
+                        ? 'bg-[#3b82f6] text-white shadow-sm'
+                        : 'text-[#707a8a] hover:text-white'
+                    }`}
+                  >
+                    Folders (4)
+                  </button>
+                  <button
+                    onClick={() => setLayerViewMode('flat')}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                      layerViewMode === 'flat'
+                        ? 'bg-[#3b82f6] text-white shadow-sm'
+                        : 'text-[#707a8a] hover:text-white'
+                    }`}
+                  >
+                    Stacking
+                  </button>
+                </div>
+                <span className="text-[11px] font-mono text-[#707a8a]">
+                  {doc.objects.length} Layers
+                </span>
               </div>
 
               {doc.objects.length === 0 ? (
                 <div className="p-8 text-center text-xs text-[#707a8a]">
                   No layers on canvas yet. Click Text, Photo, or Box on the left toolbar to add your first object.
                 </div>
+              ) : layerViewMode === 'folders' ? (
+                /* Grouped 4-Folder Architecture */
+                <div className="flex flex-col gap-2">
+                  {/* Folder 1: Profile Photo & Avatar */}
+                  {(() => {
+                    const photos = doc.objects.filter(
+                      (o) => o.type === 'image' && !o.name.toLowerCase().includes('barcode') && !o.name.toLowerCase().includes('qr')
+                    );
+                    return (
+                      <div className="border border-current/10 rounded-2xl overflow-hidden bg-black/5 dark:bg-black/20">
+                        <button
+                          onClick={() => setFolderOpen((f) => ({ ...f, photo: !f.photo }))}
+                          className="w-full px-3 py-2 flex items-center justify-between text-xs font-bold text-left cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
+                        >
+                          <div className="flex items-center gap-2">
+                            {folderOpen.photo ? <FolderOpen className="w-4 h-4 text-[#ec4899]" /> : <Folder className="w-4 h-4 text-[#ec4899]" />}
+                            <span>📁 1. Profile Photo & Avatar</span>
+                          </div>
+                          <span className="text-[10px] opacity-60 font-mono">{photos.length}</span>
+                        </button>
+                        {folderOpen.photo && (
+                          <div className="p-2 pt-0 flex flex-col gap-1.5">
+                            {photos.length === 0 ? (
+                              <div className="p-2 text-[11px] opacity-60 italic text-center">No photos on canvas. Click Photo on left toolbar.</div>
+                            ) : (
+                              photos.map((obj) => (
+                                <div
+                                  key={obj.id}
+                                  onClick={() => setSelectedId(obj.id)}
+                                  className={`p-2 rounded-xl border flex flex-col gap-2 cursor-pointer transition-all ${
+                                    obj.id === selectedId
+                                      ? 'border-[#ec4899] bg-[#ec4899]/10'
+                                      : 'border-current/10 hover:bg-black/5 dark:hover:bg-white/5'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="font-semibold truncate max-w-[140px]">{obj.name}</span>
+                                    <div className="flex items-center gap-1.5">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedId(obj.id);
+                                          replaceFileInputRef.current?.click();
+                                        }}
+                                        className="text-[10px] font-bold text-[#ec4899] hover:underline cursor-pointer"
+                                      >
+                                        Replace
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedId(obj.id);
+                                          handleRemoveBackground();
+                                        }}
+                                        className="text-[10px] font-bold text-[#fcd535] hover:underline cursor-pointer"
+                                      >
+                                        Remove BG
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Folder 2: Editable Text Fields */}
+                  {(() => {
+                    const texts = doc.objects.filter((o) => o.type === 'text') as TextCanvasObject[];
+                    return (
+                      <div className="border border-current/10 rounded-2xl overflow-hidden bg-black/5 dark:bg-black/20">
+                        <button
+                          onClick={() => setFolderOpen((f) => ({ ...f, text: !f.text }))}
+                          className="w-full px-3 py-2 flex items-center justify-between text-xs font-bold text-left cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
+                        >
+                          <div className="flex items-center gap-2">
+                            {folderOpen.text ? <FolderOpen className="w-4 h-4 text-[#38bdf8]" /> : <Folder className="w-4 h-4 text-[#38bdf8]" />}
+                            <span>📁 2. Editable Text Fields</span>
+                          </div>
+                          <span className="text-[10px] opacity-60 font-mono">{texts.length}</span>
+                        </button>
+                        {folderOpen.text && (
+                          <div className="p-2 pt-0 flex flex-col gap-2">
+                            {texts.map((obj) => (
+                              <div
+                                key={obj.id}
+                                onClick={() => setSelectedId(obj.id)}
+                                className={`p-2 rounded-xl border flex flex-col gap-1 cursor-pointer transition-all ${
+                                  obj.id === selectedId
+                                    ? 'border-[#38bdf8] bg-[#38bdf8]/10'
+                                    : 'border-current/10 hover:bg-black/5 dark:hover:bg-white/5'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="font-semibold opacity-75">{obj.name}</span>
+                                  <span className="text-[9px] font-mono opacity-50">{obj.fontSize}px</span>
+                                </div>
+                                <input
+                                  type="text"
+                                  value={obj.text}
+                                  onChange={(e) => updateObject(obj.id, { text: e.target.value })}
+                                  className={`w-full px-2 py-1 rounded text-xs border outline-none font-medium ${
+                                    isLight
+                                      ? 'bg-white border-slate-300 text-black focus:border-[#38bdf8]'
+                                      : 'bg-[#181d24] border-[#2c3340] text-white focus:border-[#38bdf8]'
+                                  }`}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Folder 3: Stamps, Barcodes & Accents */}
+                  {(() => {
+                    const accents = doc.objects.filter(
+                      (o) =>
+                        (o.type === 'image' && (o.name.toLowerCase().includes('barcode') || o.name.toLowerCase().includes('qr'))) ||
+                        (o.type === 'shape' && !o.isBackground && o.width < doc.canvasWidth * 0.9)
+                    );
+                    return (
+                      <div className="border border-current/10 rounded-2xl overflow-hidden bg-black/5 dark:bg-black/20">
+                        <button
+                          onClick={() => setFolderOpen((f) => ({ ...f, accents: !f.accents }))}
+                          className="w-full px-3 py-2 flex items-center justify-between text-xs font-bold text-left cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
+                        >
+                          <div className="flex items-center gap-2">
+                            {folderOpen.accents ? <FolderOpen className="w-4 h-4 text-[#fcd535]" /> : <Folder className="w-4 h-4 text-[#fcd535]" />}
+                            <span>📁 3. Stamps, Barcodes & Accents</span>
+                          </div>
+                          <span className="text-[10px] opacity-60 font-mono">{accents.length}</span>
+                        </button>
+                        {folderOpen.accents && (
+                          <div className="p-2 pt-0 flex flex-col gap-1.5">
+                            {accents.map((obj) => (
+                              <div
+                                key={obj.id}
+                                onClick={() => setSelectedId(obj.id)}
+                                className={`p-2 rounded-xl border flex items-center justify-between text-xs cursor-pointer ${
+                                  obj.id === selectedId
+                                    ? 'border-[#fcd535] bg-[#fcd535]/10'
+                                    : 'border-current/10 hover:bg-black/5 dark:hover:bg-white/5'
+                                }`}
+                              >
+                                <span className="font-semibold truncate max-w-[150px]">{obj.name}</span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSaveToRecycleClips(obj);
+                                  }}
+                                  className="text-[10px] font-bold text-[#0ecb81] hover:underline cursor-pointer"
+                                  title="Save to Recycle Tray"
+                                >
+                                  + Save Clip
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Folder 4: Card Frame & Background */}
+                  {(() => {
+                    const frames = doc.objects.filter(
+                      (o) =>
+                        o.isBackground ||
+                        (o.type === 'shape' && o.width >= doc.canvasWidth * 0.9) ||
+                        o.name.toLowerCase().includes('border') ||
+                        o.name.toLowerCase().includes('frame') ||
+                        o.name.toLowerCase().includes('background')
+                    );
+                    return (
+                      <div className="border border-current/10 rounded-2xl overflow-hidden bg-black/5 dark:bg-black/20">
+                        <button
+                          onClick={() => setFolderOpen((f) => ({ ...f, frame: !f.frame }))}
+                          className="w-full px-3 py-2 flex items-center justify-between text-xs font-bold text-left cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
+                        >
+                          <div className="flex items-center gap-2">
+                            {folderOpen.frame ? <FolderOpen className="w-4 h-4 text-[#a855f7]" /> : <Folder className="w-4 h-4 text-[#a855f7]" />}
+                            <span>📁 4. Card Frame & Background</span>
+                          </div>
+                          <span className="text-[10px] opacity-60 font-mono">{frames.length}</span>
+                        </button>
+                        {folderOpen.frame && (
+                          <div className="p-2 pt-0 flex flex-col gap-1.5">
+                            {frames.map((obj) => (
+                              <div
+                                key={obj.id}
+                                onClick={() => setSelectedId(obj.id)}
+                                className={`p-2 rounded-xl border flex items-center justify-between text-xs cursor-pointer ${
+                                  obj.id === selectedId
+                                    ? 'border-[#a855f7] bg-[#a855f7]/10'
+                                    : 'border-current/10 hover:bg-black/5 dark:hover:bg-white/5'
+                                }`}
+                              >
+                                <span className="font-semibold truncate max-w-[150px]">{obj.name}</span>
+                                <span className="text-[10px] opacity-60 font-mono">{obj.width}×{obj.height}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
               ) : (
+                /* Flat Stacking Order */
                 [...doc.objects]
-                  .sort((a, b) => b.zIndex - a.zIndex) // Top layer first
+                  .sort((a, b) => b.zIndex - a.zIndex)
                   .map((obj) => {
                     const isSelected = obj.id === selectedId;
-
                     return (
                       <div
                         key={obj.id}
@@ -3024,16 +3650,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             : 'bg-[#181d24] border-[#262c36] hover:bg-[#222730]'
                         }`}
                       >
-                        {/* Layer icon & name */}
                         <div className="flex items-center gap-2 truncate">
                           {obj.type === 'text' && <Type className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />}
                           {obj.type === 'image' && <ImageIcon className="w-3.5 h-3.5 text-[#ec4899] shrink-0" />}
                           {obj.type === 'shape' && <Square className="w-3.5 h-3.5 text-[#eab308] shrink-0" />}
-
                           <span className="text-xs truncate max-w-[140px]">{obj.name}</span>
                         </div>
-
-                        {/* Visibility, Lock & Delete actions */}
                         <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
                           <button
                             onClick={(e) => {
@@ -3070,6 +3692,77 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     );
                   })
               )}
+            </div>
+          )}
+
+          {/* TAB 3: RECYCLE TRAY & SAVED CLIPS (Leftover Item 6) */}
+          {activeSidebarTab === 'recycle' && (
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-[#0ecb81] uppercase tracking-wider font-mono">
+                    ♻ Recycle Drawer
+                  </span>
+                  <span className="text-[10px] text-[#707a8a]">{savedClips.length} Clips</span>
+                </div>
+                <p className="text-[11px] text-[#707a8a] leading-relaxed">
+                  Recycle any custom-styled text, cutout photo, or stamp across cards.
+                </p>
+              </div>
+
+              {selectedObject && (
+                <button
+                  onClick={() => handleSaveToRecycleClips(selectedObject)}
+                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer ${
+                    isLight
+                      ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
+                      : 'bg-[#0ecb81] text-black hover:bg-[#12e09b]'
+                  }`}
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Save "{selectedObject.name}" to Clips</span>
+                </button>
+              )}
+
+              <div className="flex flex-col gap-2 pt-2">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-[#707a8a]">
+                  Reusable Clips Tray
+                </span>
+                {savedClips.map((clip) => (
+                  <div
+                    key={clip.id}
+                    className={`p-3 rounded-xl border flex items-center justify-between gap-2 shadow-sm ${
+                      isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 truncate">
+                      <div className="w-8 h-8 rounded-lg bg-black/10 dark:bg-white/10 flex items-center justify-center shrink-0">
+                        {clip.type === 'image' ? (
+                          <ImageIcon className="w-4 h-4 text-[#ec4899]" />
+                        ) : clip.type === 'text' ? (
+                          <Type className="w-4 h-4 text-[#38bdf8]" />
+                        ) : (
+                          <Sparkles className="w-4 h-4 text-[#fcd535]" />
+                        )}
+                      </div>
+                      <div className="truncate">
+                        <span className="text-xs font-bold truncate block">{clip.name}</span>
+                        <span className="text-[10px] font-mono text-[#707a8a]">{clip.width}×{clip.height}px</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleInsertRecycledClip(clip)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                        isLight
+                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                          : 'bg-[#222730] hover:bg-[#2c3340] text-[#fcd535]'
+                      }`}
+                    >
+                      + Use
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </aside>

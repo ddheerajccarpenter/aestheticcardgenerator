@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import type { CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
-import { ASSET_AVATARS } from '../data/canvasAssets';
 import { updatePageSEO } from '../utils/seo';
 import { AdSlot } from '../components/AdSlot';
 import {
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
 import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
+import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 
 interface TemplatesViewProps {
   onNavigate?: (path: string) => void;
@@ -285,86 +285,20 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1240px] w-full mx-auto">
             {filteredTemplates.map((template) => {
-              const isIdStyle = template.hasPhotoArea || template.category === 'id-card';
-              const isVertical = template.layoutHint === 'vertical';
               const isSelected = selectedForCompare.some((t) => t.id === template.id);
 
               return (
                 <article
                   key={template.id}
-                  className={`group flex flex-col border rounded-3xl overflow-hidden transition-all duration-200 hover:-translate-y-1 shadow-xl ${
+                  className={`template-card-kinetic group flex flex-col border rounded-3xl overflow-hidden transition-all duration-200 hover:-translate-y-1 shadow-xl ${
                     isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
                   }`}
                 >
-                  {/* Card Visual Artwork Preview */}
-                  <div
-                    style={{ backgroundColor: template.theme.bg, color: template.theme.ink }}
-                    className={`relative p-6 flex flex-col justify-between border-b border-black/10 overflow-hidden ${
-                      isVertical ? 'min-h-[290px]' : 'min-h-[240px]'
-                    }`}
-                  >
-                    {/* Header Strip or Tag */}
-                    <div className="flex items-center justify-between text-[11px] font-mono opacity-80 z-10">
-                      <span className="font-semibold truncate max-w-[170px]">{template.tag}</span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleCompareTemplate(template);
-                          }}
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
-                            isSelected
-                              ? 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535]'
-                              : 'bg-black/10 text-current border-current/30 hover:bg-black/20'
-                          }`}
-                          title="Compare with another style"
-                        >
-                          {isSelected ? '✓ Selected' : '+ Compare'}
-                        </button>
-                        <span className="border border-current/40 px-1.5 py-0.5 rounded font-mono text-[9px] font-bold">
-                          {template.badge}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Content Preview: ID Pass vs Editorial Quote */}
-                    {isIdStyle ? (
-                      <div className="my-4 flex items-center gap-3 z-10">
-                        <div className="w-16 h-20 rounded-lg overflow-hidden border border-current/30 shadow-sm shrink-0 relative bg-black/10">
-                          <img
-                            src={
-                              (template.canvasDoc?.objects?.find((o) => o.type === 'image') as any)?.src ||
-                              (template.id.includes('pretty') || template.id.includes('kawaii') || template.id.includes('soulmate')
-                                ? ASSET_AVATARS.jenniePretty
-                                : template.id.includes('dan') || template.id.includes('delulu') || template.id.includes('cyber') || template.id.includes('acid')
-                                ? ASSET_AVATARS.grungeDan
-                                : template.id.includes('anime') || template.id.includes('travel')
-                                ? ASSET_AVATARS.animeTraveler
-                                : ASSET_AVATARS.studentScholar)
-                            }
-                            alt={template.title}
-                            className="w-full h-full object-cover grayscale contrast-125"
-                          />
-                          <div className="absolute inset-0 bg-current/15 mix-blend-multiply pointer-events-none" />
-                        </div>
-                        <div className="flex-1 flex flex-col gap-1 text-[11px] font-sans">
-                          <span className="font-bold line-clamp-1 text-sm tracking-tight">{template.title}</span>
-                          <span className="opacity-75 line-clamp-2 text-[10px] leading-snug">{template.quote}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <blockquote className="my-4 text-base sm:text-lg leading-snug line-clamp-3 font-editorial z-10">
-                        “{template.quote}”
-                      </blockquote>
-                    )}
-
-                    <div className="flex items-center justify-between text-[11px] font-medium opacity-80 truncate z-10">
-                      <cite className="not-italic truncate max-w-[180px]">— {template.author}</cite>
-                      <span className="font-mono text-[10px] uppercase opacity-70">
-                        {template.categoryLabel}
-                      </span>
-                    </div>
-                  </div>
+                  {/* Real Card Visual Artwork Preview (Bug 2 & 4 Fixed: Unified, Real Thumbnail, No Ratio Badge, No Duplicate Compare Button) */}
+                  <UnifiedCardThumbnail
+                    template={template}
+                    isLight={isLight}
+                  />
 
                   {/* Card Footer Bar with actions */}
                   <div className={`p-4 flex flex-col gap-2.5 ${isLight ? 'bg-[#f8fafc]' : 'bg-[#181d24]'}`}>
