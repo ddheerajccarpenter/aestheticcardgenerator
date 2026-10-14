@@ -19,7 +19,7 @@ interface TrustViewBaseProps {
 }
 
 // --------------------------------------------------------------------------
-// 1. ABOUT PAGE (/about)
+// 1. ABOUT PAGE (/about) — Warm Nano-Textured Colophon Card
 // --------------------------------------------------------------------------
 export const AboutView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
   const isLight = theme === 'light';
@@ -28,76 +28,99 @@ export const AboutView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
     updatePageSEO({
       title: 'About — Aesthetic Card Studio',
       description:
-        'Learn about Aesthetic Card Studio: a browser-native card press and studio designed to format words, poetry, and aesthetic ID cards with tactile dignity.',
+        'Local-first card press and studio designed to format words, poetry, and aesthetic ID cards with tactile dignity.',
       canonicalPath: '/about',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   return (
-    <div className={`w-full pt-20 pb-16 transition-colors duration-200 ${isLight ? 'bg-[#f8fafc] text-[#0f172a]' : 'bg-[#0b0e11] text-[#e1e2e7]'}`}>
-      <div className="max-w-3xl mx-auto px-4 md:px-8 flex flex-col gap-8">
+    <div className={`w-full pt-20 pb-20 transition-colors duration-200 ${isLight ? 'text-[#1a1612]' : 'text-[#efe6d5]'}`}>
+      <div className="max-w-4xl mx-auto px-4 md:px-8 flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#707a8a]">
           <a href="/" className="hover:underline cursor-pointer">Home</a>
           <ChevronRight className="w-3.5 h-3.5" />
-          <span className={`font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>About</span>
+          <span className={`font-semibold ${isLight ? 'text-[#1a1612]' : 'text-white'}`}>About</span>
         </nav>
 
-        <header className="flex flex-col gap-3 border-b pb-6 border-[#262c36]/40">
-          <span className="text-xs uppercase font-semibold tracking-wider text-[#d97706] dark:text-[#fcd535]">
-            Product Philosophy
-          </span>
-          <h1 className={`text-3xl md:text-5xl font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-            About Aesthetic Card Studio
-          </h1>
-          <p className={`text-base leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-            An indie creative tool created for writers, readers, thinkers, and visual curators.
-          </p>
-        </header>
+        {/* Warm Nano-Textured Colophon Card (Part 9.2) */}
+        <div
+          className={`p-6 sm:p-10 rounded-3xl border shadow-2xl relative overflow-hidden ${
+            isLight
+              ? 'bg-[#f2eadc] border-[#d8cbb7] text-[#1a1612]'
+              : 'bg-[#181512] border-[#2e2620] text-[#efe6d5]'
+          }`}
+        >
+          {/* Nano-texture grain overlay */}
+          <div className="absolute inset-0 card-noise opacity-20 pointer-events-none" />
 
-        <div className="flex flex-col gap-6 text-sm leading-relaxed">
-          <section className="flex flex-col gap-2">
-            <h2 className={`text-lg font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-              Why We Built This Studio
-            </h2>
-            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
-              When sharing meaningful thoughts, book excerpts, or personal reflections online, creators often face a frustrating dilemma: post raw plain-text that gets lost in endless feeds, or use bloated graphic design suites that require templates, logins, subscriptions, and dozens of manual adjustment layers.
-            </p>
-            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
-              Aesthetic Card Studio was built to solve this exact bottleneck. It is a focused, single-purpose creative studio running entirely in your browser. Paste your quote, choose an art direction rooted in archival bookmaking or Y2K credentials, and export a 2x Retina PNG in seconds.
-            </p>
-          </section>
-
-          <section className="flex flex-col gap-2">
-            <h2 className={`text-lg font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-              Architecture & Privacy Guarantees
-            </h2>
-            <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
-              Unlike modern web applications that send your data to remote AI servers or cloud databases, this studio operates with zero backend:
-            </p>
-            <ul className="flex flex-col gap-2 pl-4 list-disc text-xs md:text-sm">
-              <li className={isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}>
-                <strong>100% Client-Side Memory:</strong> All card rendering and image generation happens in your local browser memory via HTML5 canvas APIs.
-              </li>
-              <li className={isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}>
-                <strong>Zero Account Lock-in:</strong> No email signups, no tokens, no tracking subscriptions.
-              </li>
-              <li className={isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}>
-                <strong>No Cloud Storage of Your Words:</strong> Your private drafts and thoughts never touch our servers.
-              </li>
-            </ul>
-          </section>
-
-          <section className={`p-5 rounded-2xl border text-xs leading-relaxed ${
-            isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
-          }`}>
-            <span className="font-semibold block text-[#707a8a] uppercase tracking-wider mb-1.5">
-              Colophon & Open Source
+          <header className="flex flex-col gap-3 border-b pb-6 border-current/15 relative z-10">
+            <span className="text-xs uppercase font-bold tracking-widest text-[#d97706] dark:text-[#fcd535] font-subheading">
+              Studio Colophon &amp; Manifesto
             </span>
-            <p className={isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}>
-              Aesthetic Card Studio is an independent, local-first creative tool designed and maintained by Dheeraj Carpenter. Built with React 19, TypeScript, and native HTML5 Canvas & SVG APIs. All card rendering and file exports execute locally on your machine with zero server dependencies. The complete source code is open on <a href="https://github.com/ddheerajccarpenter/aestheticcardgenerator" target="_blank" rel="noreferrer" className="underline text-current font-medium">GitHub</a>.
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
+              Aesthetic Card Studio
+            </h1>
+            <p className="text-sm md:text-base leading-relaxed opacity-90 max-w-2xl font-body">
+              An independent, local-first card press created for writers, readers, visual curators, and designers.
             </p>
-          </section>
+          </header>
+
+          {/* Strict 2-Column Grid Architecture (Part 9.2) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8 relative z-10">
+            {/* Column 1: Local-First Architecture */}
+            <div className={`p-6 rounded-2xl border flex flex-col justify-between ${
+              isLight ? 'bg-white/60 border-black/10' : 'bg-black/30 border-white/10'
+            }`}>
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0ecb81] block mb-2">
+                  01 • LOCAL-FIRST MEMORY
+                </span>
+                <h2 className="text-lg font-bold mb-2 font-heading">
+                  Zero Cloud Uploads
+                </h2>
+                <p className="text-xs leading-relaxed opacity-85">
+                  Your private notes, quotes, and photos never touch a remote server or AI database. All rendering is computed directly inside browser memory via Canvas, SVG, and WebGL.
+                </p>
+              </div>
+              <div className="pt-4 mt-4 border-t border-current/10 text-[11px] font-mono opacity-70">
+                100% Client-Side Privacy
+              </div>
+            </div>
+
+            {/* Column 2: Archival 4K–16K Output */}
+            <div className={`p-6 rounded-2xl border flex flex-col justify-between ${
+              isLight ? 'bg-white/60 border-black/10' : 'bg-black/30 border-white/10'
+            }`}>
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#fcd535] block mb-2">
+                  02 • PRINT-GRADE FIDELITY
+                </span>
+                <h2 className="text-lg font-bold mb-2 font-heading">
+                  4K to 16K Ultra-HD Output
+                </h2>
+                <p className="text-xs leading-relaxed opacity-85">
+                  Over 55 procedural paper surfaces, custom local font uploads, and offline background removal render natively at archival resolutions with zero bitmap blur.
+                </p>
+              </div>
+              <div className="pt-4 mt-4 border-t border-current/10 text-[11px] font-mono opacity-70">
+                True High-DPI Vector Export
+              </div>
+            </div>
+          </div>
+
+          {/* Exact Ownership Notice Replacement (Part 1.2 & 9.2) */}
+          <div className="p-4 rounded-xl border border-current/20 bg-black/5 dark:bg-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs relative z-10">
+            <span className="font-semibold">
+              Crafted independently. Questions or feedback: ddheerajcarpenter@gmail.com
+            </span>
+            <a
+              href="mailto:ddheerajcarpenter@gmail.com?subject=Aesthetic%20Card%20Studio%20Feedback"
+              className="underline font-bold text-current hover:opacity-80 shrink-0"
+            >
+              Contact Owner →
+            </a>
+          </div>
         </div>
 
         <AdSlot slotId="about-bottom-slot" />
@@ -107,108 +130,129 @@ export const AboutView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
 };
 
 // --------------------------------------------------------------------------
-// 2. CONTACT PAGE (/contact)
+// 2. CONTACT PAGE (/contact) — Direct Owner Contact (Part 9.3)
 // --------------------------------------------------------------------------
 export const ContactView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
   const isLight = theme === 'light';
   const [copiedEmail, setCopiedEmail] = React.useState(false);
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText('contact@aestheticcardstudio.com');
+    navigator.clipboard.writeText('ddheerajcarpenter@gmail.com');
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Contact & Support — Aesthetic Card Studio',
+      title: 'Contact & Feedback — Aesthetic Card Studio',
       description:
-        'Get in touch with the Aesthetic Card Studio team. Report bugs, submit template ideas, or request design features.',
+        'Direct contact with the creator of Aesthetic Card Studio. Send questions, feature suggestions, and bug reports.',
       canonicalPath: '/contact',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   return (
-    <div className={`w-full pt-20 pb-16 transition-colors duration-200 ${isLight ? 'bg-[#f8fafc] text-[#0f172a]' : 'bg-[#0b0e11] text-[#e1e2e7]'}`}>
-      <div className="max-w-3xl mx-auto px-4 md:px-8 flex flex-col gap-8">
+    <div className={`w-full pt-20 pb-20 transition-colors duration-200 ${isLight ? 'text-[#0f172a]' : 'text-[#f4f1ea]'}`}>
+      <div className="max-w-4xl mx-auto px-4 md:px-8 flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#707a8a]">
           <a href="/" className="hover:underline cursor-pointer">Home</a>
           <ChevronRight className="w-3.5 h-3.5" />
-          <span className={`font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Contact</span>
+          <span className={`font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>Contact</span>
         </nav>
 
-        <header className="flex flex-col gap-3 border-b pb-6 border-[#262c36]/40">
-          <span className="text-xs uppercase font-semibold tracking-wider text-[#d97706] dark:text-[#fcd535]">
+        <header className="flex flex-col gap-3 border-b pb-6 border-current/15">
+          <span className="text-xs uppercase font-bold tracking-widest text-[#d97706] dark:text-[#fcd535] font-subheading">
             Direct Communication
           </span>
-          <h1 className={`text-3xl md:text-5xl font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-            Contact & Feedback
+          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
+            Contact &amp; Feedback
           </h1>
-          <p className={`text-base leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-            We welcome bug reports, design suggestions, typography inquiries, and accessibility feedback.
+          <p className="text-sm md:text-base leading-relaxed text-[#707a8a]">
+            Connect directly with the independent developer behind Aesthetic Card Studio.
           </p>
         </header>
 
-        <div className="flex flex-col gap-6 text-sm leading-relaxed">
-          <div className={`p-6 rounded-2xl border flex flex-col gap-4 ${
+        {/* 2-Column Contact Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Card 1: Official Email Block */}
+          <div className={`p-6 sm:p-8 rounded-3xl border flex flex-col justify-between shadow-xl ${
             isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
           }`}>
-            <div className="flex items-center gap-2">
-              <Mail className="w-5 h-5 text-[#d97706] dark:text-[#fcd535]" />
-              <h2 className={`text-base font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                Email the Maintainer
-              </h2>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2.5">
+                <Mail className="w-5 h-5 text-[#fcd535]" />
+                <h2 className="text-base font-bold font-heading">Direct Email</h2>
+              </div>
+              <p className="text-xs text-[#707a8a] leading-relaxed">
+                Send feedback, template requests, or bugs directly to the project owner:
+              </p>
+              <div className="p-3 rounded-xl bg-black/5 dark:bg-black/30 border border-current/10 font-mono text-xs font-bold text-current select-all">
+                ddheerajcarpenter@gmail.com
+              </div>
             </div>
-            <p className={`text-xs ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-              Because this studio runs completely client-side without servers or accounts, you can reach out directly via email for feedback, bug reports, and new template requests:
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
+
+            <div className="flex flex-col sm:flex-row gap-2 pt-6">
               <a
-                href="mailto:contact@aestheticcardstudio.com?subject=Aesthetic%20Card%20Studio%20Feedback"
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold cursor-pointer shadow-md ${
-                  isLight ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]' : 'bg-white text-[#0b0e11] hover:bg-[#e2e2e2]'
+                href="mailto:ddheerajcarpenter@gmail.com?subject=Aesthetic%20Card%20Studio%20Feedback"
+                className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold shadow-md cursor-pointer ${
+                  isLight
+                    ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
+                    : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
                 }`}
               >
                 <Mail className="w-4 h-4" />
-                <span>contact@aestheticcardstudio.com</span>
+                <span>Send Direct Email</span>
               </a>
+
               <button
                 onClick={handleCopyEmail}
                 type="button"
-                className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-medium cursor-pointer transition-colors ${
-                  isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-[#f1f5f9]' : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
+                className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-colors ${
+                  isLight
+                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-slate-50'
+                    : 'bg-[#12151b] border-[#323946] text-white hover:bg-[#1c222b]'
                 }`}
               >
                 {copiedEmail ? <Check className="w-3.5 h-3.5 text-[#0ecb81]" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedEmail ? 'Email Copied!' : 'Copy Email'}</span>
+                <span>{copiedEmail ? 'Copied ddheerajcarpenter@gmail.com' : 'Copy Email'}</span>
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-4 text-xs pt-1 text-[#707a8a]">
+          </div>
+
+          {/* Card 2: GitHub & Issue Tracker */}
+          <div className={`p-6 sm:p-8 rounded-3xl border flex flex-col justify-between shadow-xl ${
+            isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+          }`}>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-[#0ecb81]" />
+                <h2 className="text-base font-bold font-heading">Issue Tracking</h2>
+              </div>
+              <p className="text-xs text-[#707a8a] leading-relaxed">
+                Found a rendering bug or have a suggestion? Open an issue on GitHub or browse existing templates:
+              </p>
+              <ul className="text-xs text-[#707a8a] flex flex-col gap-1.5 pl-4 list-disc">
+                <li>Include your browser and operating system.</li>
+                <li>Note the aspect ratio and surface texture active.</li>
+                <li>Free and open-source under MIT license.</li>
+              </ul>
+            </div>
+
+            <div className="pt-6">
               <a
                 href="https://github.com/ddheerajccarpenter/aestheticcardgenerator/issues"
                 target="_blank"
                 rel="noreferrer"
-                className="hover:underline hover:text-current font-medium"
+                className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-colors ${
+                  isLight
+                    ? 'border-[#cbd5e1] hover:bg-slate-50 text-[#0f172a]'
+                    : 'border-[#323946] hover:bg-[#1c222b] text-white'
+                }`}
               >
-                Report Bug on GitHub →
-              </a>
-              <span>•</span>
-              <a href="/templates" className="hover:underline hover:text-current font-medium">
-                Browse Template Library →
+                <span>Open Issue on GitHub →</span>
               </a>
             </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <h3 className={`text-sm font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-              What to Include When Reporting a Bug
-            </h3>
-            <ul className="flex flex-col gap-2 pl-4 list-disc text-xs text-[#707a8a]">
-              <li>Your device and browser version (e.g. Chrome on macOS, Safari on iOS).</li>
-              <li>The template or aspect ratio you were editing when the issue occurred.</li>
-              <li>Whether the issue occurred during text editing, canvas zooming, or image export.</li>
-            </ul>
           </div>
         </div>
       </div>
@@ -404,7 +448,7 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) =>
               6. Contact Information
             </h2>
             <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
-              If you have any questions regarding this Privacy Policy, please contact the site maintainer at <code>contact@aestheticcardstudio.com</code>.
+              If you have any questions regarding this Privacy Policy, please contact the site maintainer at <a href="mailto:ddheerajcarpenter@gmail.com" className="text-[#3b82f6] hover:underline font-mono">ddheerajcarpenter@gmail.com</a>.
             </p>
           </section>
         </div>
@@ -605,7 +649,7 @@ export const AccessibilityView: React.FC<TrustViewBaseProps> = ({ theme = 'dark'
               Reporting Accessibility Barriers
             </h2>
             <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
-              If you encounter any difficulty navigating or operating any control on this website, please email us at <code>contact@aestheticcardstudio.com</code> so we can promptly address the issue.
+              If you encounter any difficulty navigating or operating any control on this website, please email us at <a href="mailto:ddheerajcarpenter@gmail.com" className="text-[#3b82f6] hover:underline font-mono">ddheerajcarpenter@gmail.com</a> so we can promptly address the issue.
             </p>
           </section>
         </div>
@@ -791,7 +835,7 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) =
               </p>
             </div>
 
-            <div className="w-full grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
               {suggestions.map((s) => (
                 <a
                   key={s.path}

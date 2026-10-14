@@ -33,7 +33,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
   );
 
   // Other related guides
-  const otherGuides = GUIDE_ARTICLES.filter((g) => g.slug !== guide.slug).slice(0, 3);
+  const otherGuides = GUIDE_ARTICLES.filter((g) => g.slug !== guide.slug).slice(0, 4);
 
   // Dynamic SEO & Article JSON-LD
   useEffect(() => {
@@ -228,7 +228,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
               Related Typography & Design Guides
             </h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {otherGuides.map((g) => (
               <a
                 key={g.slug}

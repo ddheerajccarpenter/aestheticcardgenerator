@@ -64,6 +64,11 @@ import {
 import { processImageFilter } from '../utils/imageFilters';
 import { generateQrCodeSvg, generateBarcodeSvg } from '../utils/qrBarcodeGenerator';
 import { MediaImportModal, type MediaResult } from '../components/MediaImportModal';
+import { removeLayerBackgroundOffline } from '../engines/canvasPhotoOperations';
+import {
+  autoAlignLayersInGrid,
+  normalizeTemplateDimensions,
+} from '../engines/canvasGridAndDimensionEngine';
 import type { ImageFilterPreset, ImageClipMask } from '../types/card';
 
 interface CanvasEditorViewProps {
@@ -175,6 +180,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const canvasElementRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const replaceFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Offline AI Background Removal state
+  const [isRemovingBg, setIsRemovingBg] = useState(false);
+  const [bgProgress, setBgProgress] = useState(0);
 
   // Drag & Transform Tracking state
   const dragRef = useRef<{
@@ -859,11 +869,67 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     e.target.value = '';
   };
 
+  // In-Place Photo Replacement: Preserves all position coordinates, dimensions, rotation, clip masks, and z-index
+  const handleReplacePhotoInPlace = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedObject || selectedObject.type !== 'image') return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (PNG, JPEG, WebP, SVG).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (!dataUrl) return;
+
+      updateObject(selectedObject.id, {
+        src: dataUrl,
+        filteredSrc: undefined,
+        name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || selectedObject.name,
+      });
+      showToast('Photo replaced in-place while keeping layout intact!');
+    };
+    reader.onerror = () => {
+      showToast('Error reading image file.');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  // Offline AI Background Removal: Runs 100% locally via WASM/WebGPU with client-side chroma fallback
+  const handleRemoveBackground = async () => {
+    if (!selectedObject || selectedObject.type !== 'image') return;
+    try {
+      setIsRemovingBg(true);
+      setBgProgress(10);
+      showToast('Removing background locally in browser...');
+
+      const result = await removeLayerBackgroundOffline(
+        selectedObject.filteredSrc || selectedObject.src,
+        (pct) => setBgProgress(pct)
+      );
+
+      updateObject(selectedObject.id, {
+        src: result.updatedSrc,
+        filteredSrc: undefined,
+      });
+      showToast('Background removed successfully!');
+    } catch (err) {
+      console.error('BG removal failed:', err);
+      showToast('Failed to remove background.');
+    } finally {
+      setIsRemovingBg(false);
+      setBgProgress(0);
+    }
+  };
+
   // ───────────────────────────────────────────────────────────────────────────
-  // EXPORT ENGINE
+  // EXPORT ENGINE (Standard 2x Retina & Ultra-HD 4K / 8K / 16K Pure Card Isolation)
   // ───────────────────────────────────────────────────────────────────────────
 
-  const handleExport = async (format: 'png' | 'jpeg' | 'webp') => {
+  const handleExport = async (format: 'png' | 'jpeg' | 'webp' | '4k' | '8k' | '16k') => {
     if (!canvasElementRef.current) return;
     setExporting(true);
     setExportDropdownOpen(false);
@@ -874,18 +940,29 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
     try {
       const node = canvasElementRef.current;
-      const scale = 2; // 2x Retina sharpness
+      let scale = 2; // Default 2x Retina
+      if (format === '4k') {
+        scale = Math.max(2, Math.round(3840 / doc.canvasWidth));
+      } else if (format === '8k') {
+        scale = Math.max(3, Math.round(7680 / doc.canvasWidth));
+      } else if (format === '16k') {
+        scale = Math.max(4, Math.round(15360 / doc.canvasWidth));
+      }
+
       const options = {
-        quality: 0.95,
+        quality: 0.98,
         pixelRatio: scale,
         canvasWidth: doc.canvasWidth * scale,
         canvasHeight: doc.canvasHeight * scale,
       };
 
       let dataUrl: string;
-      if (format === 'png') {
+      const isUltra = format === '4k' || format === '8k' || format === '16k';
+      const actualFormat = isUltra ? 'png' : format;
+
+      if (actualFormat === 'png') {
         dataUrl = await toPng(node, options);
-      } else if (format === 'jpeg') {
+      } else if (actualFormat === 'jpeg') {
         dataUrl = await toJpeg(node, { ...options, backgroundColor: doc.background || '#ffffff' });
       } else {
         const blob = await toBlob(node, { ...options, type: 'image/webp' });
@@ -893,13 +970,14 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         dataUrl = URL.createObjectURL(blob);
       }
 
-      const filename = `${doc.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'aesthetic-card'}.${format}`;
+      const resolutionSuffix = isUltra ? `-${format}` : '-2x';
+      const filename = `${doc.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'aesthetic-card'}${resolutionSuffix}.${actualFormat}`;
       const link = document.createElement('a');
       link.download = filename;
       link.href = dataUrl;
       link.click();
 
-      showToast(`Exported ${doc.title} (${doc.canvasWidth}×${doc.canvasHeight}px, 2x Retina)!`);
+      showToast(`Exported ${doc.title} (${Math.round(doc.canvasWidth * scale)}×${Math.round(doc.canvasHeight * scale)}px pure card isolate)!`);
     } catch (err) {
       console.error('Export failed:', err);
       showToast('Export failed. Please try again.');
@@ -946,12 +1024,21 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         </div>
       )}
 
-      {/* Hidden File Input */}
+      {/* Hidden File Input (New Image Layer) */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
         onChange={handleImageUpload}
+        className="hidden"
+      />
+
+      {/* Hidden File Input (In-Place Photo Replacement) */}
+      <input
+        ref={replaceFileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleReplacePhotoInPlace}
         className="hidden"
       />
 
@@ -1078,6 +1165,21 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           >
             <Grid className="w-4 h-4" />
           </button>
+
+          {/* Auto-Align in 8px Grid */}
+          <button
+            onClick={() => {
+              const aligned = autoAlignLayersInGrid(doc.objects as any, doc.canvasWidth, doc.canvasHeight);
+              commitDocumentChange({ ...doc, objects: aligned as any });
+              showToast('Auto-aligned all layers to 8px baseline grid');
+            }}
+            className={`p-2 rounded-lg transition-colors cursor-pointer ${
+              isLight ? 'hover:bg-[#f1f3f5] text-[#707a8a]' : 'hover:bg-[#181d24] text-[#707a8a]'
+            }`}
+            title="Auto-align layers to 8px baseline grid & center alignments"
+          >
+            <Sparkles className="w-4 h-4 text-[#ec4899]" />
+          </button>
         </div>
 
         {/* Right: Template Picker, Blank Canvas & Export */}
@@ -1138,7 +1240,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
             {exportDropdownOpen && (
               <div
-                className={`absolute right-0 top-full mt-2 w-48 rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 ${
+                className={`absolute right-0 top-full mt-2 w-52 rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 ${
                   isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
                 }`}
               >
@@ -1168,6 +1270,37 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 >
                   <span>JPEG (Social)</span>
                   <span className="text-[10px] opacity-60 font-mono">Small</span>
+                </button>
+                <div className={`h-px my-1 ${isLight ? 'bg-slate-200' : 'bg-[#262c36]'}`} />
+                <div className="px-3 py-1 text-[10px] font-semibold text-[#707a8a] uppercase tracking-wider">
+                  Ultra-HD Master
+                </div>
+                <button
+                  onClick={() => handleExport('4k')}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                  }`}
+                >
+                  <span>Ultra-HD 4K</span>
+                  <span className="text-[10px] text-[#fcd535] font-mono">3840px</span>
+                </button>
+                <button
+                  onClick={() => handleExport('8k')}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                  }`}
+                >
+                  <span>Ultra-HD 8K</span>
+                  <span className="text-[10px] text-[#ec4899] font-mono">7680px</span>
+                </button>
+                <button
+                  onClick={() => handleExport('16k')}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                  }`}
+                >
+                  <span>Ultra-HD 16K</span>
+                  <span className="text-[10px] text-[#3b82f6] font-mono">15360px</span>
                 </button>
               </div>
             )}
@@ -1975,6 +2108,71 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             zIndex: 9999,
                           }}
                         >
+                          {/* Floating Contextual Quick Actions Toolbar (14px above layer/handles) */}
+                          <div
+                            onMouseDown={(e) => e.stopPropagation()}
+                            className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-0.5 px-2 py-1 rounded-xl bg-[#14171d]/95 backdrop-blur-md border border-[#262c36] shadow-2xl z-[10000] pointer-events-auto select-none"
+                          >
+                            <button
+                              onClick={() => duplicateObject(obj.id)}
+                              title="Duplicate layer"
+                              className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => deleteObject(obj.id)}
+                              title="Delete layer"
+                              className="p-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => updateObject(obj.id, { locked: true })}
+                              title="Lock layer"
+                              className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                              <Lock className="w-3.5 h-3.5" />
+                            </button>
+                            <div className="w-px h-3 bg-white/20 mx-0.5" />
+                            <button
+                              onClick={() => handleAlign('hcenter')}
+                              title="Center horizontally on canvas"
+                              className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                              <AlignCenter className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleAlign('vmiddle')}
+                              title="Center vertically on canvas"
+                              className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                              <AlignVerticalJustifyCenter className="w-3.5 h-3.5" />
+                            </button>
+                            {obj.type === 'image' && (
+                              <>
+                                <div className="w-px h-3 bg-white/20 mx-0.5" />
+                                <button
+                                  onClick={() => replaceFileInputRef.current?.click()}
+                                  title="Replace photo in-place"
+                                  className="p-1 rounded-lg text-[#ec4899] hover:bg-white/10 transition-colors flex items-center gap-1 text-[10px] font-semibold cursor-pointer"
+                                >
+                                  <Upload className="w-3 h-3" />
+                                  <span>Replace</span>
+                                </button>
+                                <button
+                                  onClick={handleRemoveBackground}
+                                  disabled={isRemovingBg}
+                                  title="Offline AI background removal"
+                                  className="p-1 rounded-lg text-[#fcd535] hover:bg-white/10 transition-colors flex items-center gap-1 text-[10px] font-semibold disabled:opacity-50 cursor-pointer"
+                                >
+                                  <Wand2 className="w-3 h-3" />
+                                  <span>{isRemovingBg ? `${bgProgress}%` : 'BG'}</span>
+                                </button>
+                              </>
+                            )}
+                          </div>
+
                           {/* Rotation handle protruding above */}
                           <div
                             onMouseDown={(e) => handleRotateHandleMouseDown(e, obj)}
@@ -2010,11 +2208,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             { pos: 'nw', top: -5, left: -5, cursor: 'nwse-resize' },
                             { pos: 'n', top: -5, left: '50%', cursor: 'ns-resize', transform: 'translateX(-50%)' },
                             { pos: 'ne', top: -5, right: -5, cursor: 'nesw-resize' },
-                            { pos: 'e', top: '50%', right: -5, cursor: 'ew-resize', transform: 'translateY(-50%)' },
+                            { pos: 'e', top: 50 + '%', right: -5, cursor: 'ew-resize', transform: 'translateY(-50%)' },
                             { pos: 'se', bottom: -5, right: -5, cursor: 'nwse-resize' },
                             { pos: 's', bottom: -5, left: '50%', cursor: 'ns-resize', transform: 'translateX(-50%)' },
                             { pos: 'sw', bottom: -5, left: -5, cursor: 'nesw-resize' },
-                            { pos: 'w', top: '50%', left: -5, cursor: 'ew-resize', transform: 'translateY(-50%)' },
+                            { pos: 'w', top: 50 + '%', left: -5, cursor: 'ew-resize', transform: 'translateY(-50%)' },
                           ].map((handle) => (
                             <div
                               key={handle.pos}
@@ -2034,10 +2232,21 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         </div>
                       )}
 
-                      {/* If locked, display subtle lock badge on hover/select */}
+                      {/* If locked, display lock badge & quick unlock button */}
                       {isSelected && obj.locked && (
-                        <div className="absolute top-1 right-1 p-1 rounded bg-black/60 text-white pointer-events-none">
-                          <Lock className="w-3 h-3" />
+                        <div
+                          onMouseDown={(e) => e.stopPropagation()}
+                          className="absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#14171d]/95 backdrop-blur-md border border-[#262c36] shadow-2xl z-[10000] pointer-events-auto select-none"
+                        >
+                          <span className="text-[10px] text-amber-400 font-semibold flex items-center gap-1">
+                            <Lock className="w-3 h-3" /> Locked
+                          </span>
+                          <button
+                            onClick={() => updateObject(obj.id, { locked: false })}
+                            className="ml-1 px-1.5 py-0.5 text-[10px] rounded bg-white/10 hover:bg-white/20 text-white font-semibold cursor-pointer"
+                          >
+                            Unlock
+                          </button>
                         </div>
                       )}
                     </div>
@@ -2353,13 +2562,25 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     <div className="flex flex-col gap-4">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-[#707a8a]">Photo Treatment</span>
-                        <button
-                          onClick={() => fileInputRef.current?.click()}
-                          className="text-[11px] font-semibold text-[#ec4899] hover:underline cursor-pointer flex items-center gap-1"
-                        >
-                          <Upload className="w-3 h-3" />
-                          <span>Replace</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handleRemoveBackground}
+                            disabled={isRemovingBg}
+                            className="text-[11px] font-semibold text-[#fcd535] hover:underline cursor-pointer flex items-center gap-1 disabled:opacity-50"
+                            title="Offline AI background removal"
+                          >
+                            <Wand2 className="w-3 h-3" />
+                            <span>{isRemovingBg ? `${bgProgress}%` : 'Remove BG'}</span>
+                          </button>
+                          <button
+                            onClick={() => replaceFileInputRef.current?.click()}
+                            className="text-[11px] font-semibold text-[#ec4899] hover:underline cursor-pointer flex items-center gap-1"
+                            title="Replace image in-place keeping layout and crop"
+                          >
+                            <Upload className="w-3 h-3" />
+                            <span>Replace</span>
+                          </button>
+                        </div>
                       </div>
 
                       {/* One-Click Aesthetic Filters */}
@@ -2401,7 +2622,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           <span className="font-semibold text-[#707a8a]">Shape Clipping Mask</span>
                           <Crop className="w-3 h-3 text-[#ec4899]" />
                         </div>
-                        <div className="grid grid-cols-3 gap-1">
+                        <div className="grid grid-cols-2 gap-1">
                           {[
                             { id: 'none' as ImageClipMask, label: 'None' },
                             { id: 'circle' as ImageClipMask, label: 'Circle' },
@@ -2428,12 +2649,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                       {/* Fit Mode */}
                       <div className="flex flex-col gap-1">
                         <label className="text-[11px] text-[#707a8a]">Fit Mode</label>
-                        <div className="grid grid-cols-3 gap-1">
+                        <div className="flex gap-1">
                           {(['cover', 'contain', 'fill'] as const).map((fit) => (
                             <button
                               key={fit}
                               onClick={() => updateObject(selectedObject.id, { objectFit: fit })}
-                              className={`py-1.5 rounded-lg text-xs font-semibold capitalize border cursor-pointer ${
+                              className={`flex-1 py-1.5 rounded-lg text-xs font-semibold capitalize border cursor-pointer ${
                                 selectedObject.objectFit === fit
                                   ? 'bg-[#3b82f6] text-white border-[#3b82f6]'
                                   : isLight
@@ -2640,12 +2861,20 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         <button
                           key={preset.id}
                           onClick={() => {
+                            const resizedLayers = normalizeTemplateDimensions(
+                              doc.objects as any,
+                              doc.canvasWidth,
+                              doc.canvasHeight,
+                              preset.width,
+                              preset.height
+                            );
                             commitDocumentChange({
                               ...doc,
                               canvasWidth: preset.width,
                               canvasHeight: preset.height,
+                              objects: resizedLayers as any,
                             });
-                            showToast(`Resized canvas to ${preset.label} (${preset.width}×${preset.height}px)`);
+                            showToast(`Resized canvas to ${preset.label} (${preset.width}×${preset.height}px) with smart reflow!`);
                           }}
                           className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                             doc.canvasWidth === preset.width && doc.canvasHeight === preset.height
@@ -2938,7 +3167,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 py-4 overflow-y-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-4 overflow-y-auto">
               <button
                 onClick={() => {
                   addObject(createTextObject({ text: 'Your text here', fontSize: 24, color: isLight ? '#0f172a' : '#ffffff' }));
@@ -3214,7 +3443,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             </div>
 
             {/* Grid of Templates */}
-            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {PRESET_TEMPLATES.map((tmpl) => (
                 <div
                   key={tmpl.id}

@@ -44,7 +44,30 @@ import {
   AlignVerticalJustifyCenter,
   AlignVerticalJustifyStart,
   AlignVerticalJustifyEnd,
+  Upload,
+  Box,
+  Sun,
+  Maximize2,
 } from 'lucide-react';
+import { updateWorkspaceAmbientBackdrop } from '../engines/ambientStageEngine';
+import {
+  registerAndSaveCustomFont,
+  restoreSavedCustomFonts,
+  type StoredCustomFont,
+} from '../services/customFontManager';
+import {
+  SURFACE_TEXTURES_55,
+  SURFACE_TEXTURE_CATEGORIES,
+  getTextureStyle,
+} from '../data/surfaceTexturesCatalog';
+import {
+  ELEMENTS_55_CATALOG,
+  ELEMENT_CATEGORIES,
+  getElementById,
+} from '../data/elementsCatalog';
+import { extractPaletteFromImage, type ExtractedPalette } from '../utils/paletteExtractor';
+import { createThreeCardPreviewScene } from '../engines/threeCardStage';
+import { TIER_LONG_EDGE } from '../engines/ultraHdExportEngine';
 
 interface EditorViewProps {
   initialTemplate?: CardTemplate;
@@ -157,9 +180,45 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
   // Card element ref for exports
   const cardRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const quoteInputRef = useRef<HTMLTextAreaElement>(null);
   const authorInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<HTMLInputElement>(null);
+
+  // Workspace Ambient Lighting
+  const [ambientModeEnabled, setAmbientModeEnabled] = useState<boolean>(true);
+
+  // 3D Card Stage View
+  const [is3DMode, setIs3DMode] = useState<boolean>(false);
+  const threeMountRef = useRef<HTMLDivElement>(null);
+  const threeCleanupRef = useRef<(() => void) | null>(null);
+
+  // Social Safe-Zones Overlay ('none' | 'print' | 'reels' | 'feed')
+  const [safeZoneMode, setSafeZoneMode] = useState<'none' | 'print' | 'reels' | 'feed'>('none');
+
+  // Custom Font Engine
+  const [customFonts, setCustomFonts] = useState<StoredCustomFont[]>([]);
+  const customFontInputRef = useRef<HTMLInputElement>(null);
+
+  // 55+ Procedural Surface Textures
+  const [selectedTextureId, setSelectedTextureId] = useState<string>(
+    initialTemplate?.surfaceFinish === 'halftone' ? 'halftone-screen-60lpi' :
+    initialTemplate?.surfaceFinish === 'crease' ? 'creased-zine-fold' :
+    initialTemplate?.surfaceFinish === 'lanyard' ? 'pvc-security-id-sheen' :
+    'cotton-rag-300gsm'
+  );
+  const [textureCategory, setTextureCategory] = useState<string>('all');
+  const [textureScale, setTextureScale] = useState<number>(100);
+  const [textureBlendMode, setTextureBlendMode] = useState<'multiply' | 'screen' | 'overlay' | 'soft-light'>('multiply');
+
+  // 55+ Decorative Elements
+  const [selectedElementId, setSelectedElementId] = useState<string>('botanical-olive-branch');
+  const [elementCategory, setElementCategory] = useState<string>('all');
+
+  // Photo Palette Extraction
+  const [extractedPalette, setExtractedPalette] = useState<ExtractedPalette | null>(null);
+  const [isExtractingPalette, setIsExtractingPalette] = useState<boolean>(false);
+  const paletteFileInputRef = useRef<HTMLInputElement>(null);
 
   // Undo / Redo History Stack
   const [history, setHistory] = useState<CardState[]>([]);
@@ -531,6 +590,70 @@ export const EditorView: React.FC<EditorViewProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [historyIndex, history]);
 
+  // Load custom fonts from IndexedDB on mount
+  useEffect(() => {
+    restoreSavedCustomFonts().then((fonts) => {
+      setCustomFonts(fonts);
+    });
+  }, []);
+
+  // Update workspace ambient glow strictly on stage wrapper
+  useEffect(() => {
+    updateWorkspaceAmbientBackdrop(cardRef.current, stageRef.current, ambientModeEnabled, {
+      bg: bgColor,
+      ink: inkColor,
+    });
+  }, [ambientModeEnabled, bgColor, inkColor, aspectRatio, padding, borderRadius, selectedTextureId]);
+
+  // Manage Three.js 3D Card Scene
+  useEffect(() => {
+    if (!is3DMode || !threeMountRef.current || !cardRef.current) {
+      if (threeCleanupRef.current) {
+        threeCleanupRef.current();
+        threeCleanupRef.current = null;
+      }
+      return;
+    }
+
+    let isMounted = true;
+    (async () => {
+      try {
+        const rawUrl = await toPng(cardRef.current!, { pixelRatio: 2 });
+        if (!isMounted) return;
+        const img = new Image();
+        img.src = rawUrl;
+        await new Promise((res) => { img.onload = res; });
+        if (!isMounted || !threeMountRef.current) return;
+
+        const offscreen = document.createElement('canvas');
+        offscreen.width = img.naturalWidth;
+        offscreen.height = img.naturalHeight;
+        const ctx = offscreen.getContext('2d');
+        if (ctx) ctx.drawImage(img, 0, 0);
+
+        if (threeCleanupRef.current) threeCleanupRef.current();
+        const cleanup = createThreeCardPreviewScene(
+          threeMountRef.current,
+          offscreen,
+          cardRef.current!.offsetWidth,
+          cardRef.current!.offsetHeight,
+          selectedTextureId
+        );
+        threeCleanupRef.current = cleanup;
+      } catch (err) {
+        console.error('Failed to initialize 3D scene:', err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+      if (threeCleanupRef.current) {
+        threeCleanupRef.current();
+        threeCleanupRef.current = null;
+      }
+    };
+  }, [is3DMode, bgColor, inkColor, quote, author, tag, fontChoice, selectedTextureId]);
+
   // Current aspect preset
   const currentRatioPreset = ASPECT_RATIOS.find((r) => r.id === aspectRatio) || ASPECT_RATIOS[0];
 
@@ -753,8 +876,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
     }
   };
 
-  // High-Res Export (WebP, PNG 1×, PNG 2×, SVG) with Presentation Backdrop Support
-  const handleExport = async (format: ExportFormat) => {
+  // High-Res & Ultra-HD Export (4K, 8K, 16K, WebP, PNG 1×, PNG 2×, SVG)
+  const handleExport = async (format: ExportFormat | 'ultra-4k' | 'ultra-8k' | 'ultra-16k') => {
     if (!cardRef.current) return;
     prepareCanvasForCapture();
     setIsExporting(true);
@@ -768,7 +891,22 @@ export const EditorView: React.FC<EditorViewProps> = ({
       let downloadUrl = '';
       let downloadExt = 'png';
 
-      if (format === 'png-2x') {
+      if (format.startsWith('ultra-')) {
+        const tier = format === 'ultra-16k' ? '16K' : format === 'ultra-8k' ? '8K' : '4K';
+        const targetLongEdge = TIER_LONG_EDGE[tier];
+        const currentLongEdge = Math.max(cardRef.current.offsetWidth, cardRef.current.offsetHeight) || 520;
+        const pixelRatio = Math.min(16, Math.max(4, Math.round(targetLongEdge / currentLongEdge)));
+
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        downloadUrl = await toPng(cardRef.current, {
+          pixelRatio,
+          cacheBust: true,
+        });
+        downloadExt = 'png';
+      } else if (format === 'png-2x') {
         const rawUrl = await toPng(cardRef.current, { pixelRatio: 2 });
         downloadUrl = backdropSurface !== 'none'
           ? await renderCardWithBackdrop(rawUrl, backdropSurface, backdropRatio, 2, bgColor)
@@ -820,7 +958,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
         colors: ['#fcd535', '#ffffff', '#aa2d00', '#0a2e0e'],
       });
 
-      showToast(`Exported ${downloadExt.toUpperCase()} file successfully!`);
+      showToast(`Exported ${downloadExt.toUpperCase()} (${format.startsWith('ultra-') ? format.toUpperCase() : 'Master'})`);
     } catch (err) {
       console.error('Export failed:', err);
       showToast('Export failed. Please check canvas content and try again.');
@@ -1205,7 +1343,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             {/* Display & Y2K */}
             <div className="flex flex-col gap-1.5 pt-1">
               <span className="text-[10px] uppercase font-mono font-semibold text-[#707a8a]">Display & Y2K</span>
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5">
                 {[
                   { id: 'syne' as FontChoice, name: 'Syne', cls: 'font-syne' },
                   { id: 'space-grotesk' as FontChoice, name: 'Space Grotesk', cls: 'font-space-grotesk' },
@@ -1233,7 +1371,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             {/* Archival Mono & Pixel */}
             <div className="flex flex-col gap-1.5 pt-1">
               <span className="text-[10px] uppercase font-mono font-semibold text-[#707a8a]">Archival Mono & Pixel</span>
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5">
                 {[
                   { id: 'space-mono' as FontChoice, name: 'Space Mono', cls: 'font-space-mono' },
                   { id: 'mono' as FontChoice, name: 'JetBrains', cls: 'font-jetbrains' },
@@ -1283,6 +1421,76 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Custom Uploaded Fonts Engine */}
+            <div className="flex flex-col gap-2 pt-2 border-t border-current/10">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase font-mono font-semibold text-[#707a8a]">
+                  Custom Uploaded Fonts ({customFonts.length})
+                </span>
+                <button
+                  type="button"
+                  onClick={() => customFontInputRef.current?.click()}
+                  className="text-[11px] font-semibold text-[#fcd535] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <Upload className="w-3 h-3" />
+                  <span>+ Upload Font</span>
+                </button>
+              </div>
+
+              <input
+                ref={customFontInputRef}
+                type="file"
+                accept=".ttf,.otf,.woff,.woff2"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  try {
+                    const meta = await registerAndSaveCustomFont(file);
+                    setCustomFonts((prev) => [meta, ...prev.filter((f) => f.familyName !== meta.familyName)]);
+                    setFontChoice(meta.familyName as any);
+                    showToast(`Loaded font "${meta.familyName.replace('Custom_', '').replace(/_/g, ' ')}"`);
+                  } catch (err: any) {
+                    showToast(err?.message || 'Failed to register font');
+                  }
+                  e.target.value = '';
+                }}
+                className="hidden"
+              />
+
+              {customFonts.length > 0 ? (
+                <div className="grid grid-cols-2 gap-1.5">
+                  {customFonts.map((cf) => (
+                    <button
+                      key={cf.id}
+                      onClick={() => setFontChoice(cf.familyName as any)}
+                      className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
+                        fontChoice === cf.familyName
+                          ? isLight
+                            ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
+                            : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                          : isLight
+                          ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                          : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                      }`}
+                    >
+                      <span style={{ fontFamily: cf.familyName }} className="text-sm block leading-tight truncate">
+                        {cf.familyName.replace('Custom_', '').replace(/_/g, ' ')}
+                      </span>
+                      <span className="text-[9px] text-[#707a8a] font-mono uppercase">{cf.fileName.split('.').pop()}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  onClick={() => customFontInputRef.current?.click()}
+                  className="p-3 rounded-xl border border-dashed border-current/20 text-center cursor-pointer hover:border-[#fcd535] transition-colors"
+                >
+                  <span className="text-xs text-[#707a8a] block">Click to upload .ttf, .otf, .woff, or .woff2</span>
+                  <span className="text-[10px] text-[#707a8a]/70">Zero server upload • Saved to browser IndexedDB</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1369,14 +1577,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 Horizontal
               </label>
               <div
-                className={`grid grid-cols-3 border p-1 rounded-xl ${
+                className={`flex gap-1 border p-1 rounded-xl ${
                   isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
                 }`}
               >
                 <button
                   type="button"
                   onClick={() => setAlign('left')}
-                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  className={`flex-1 py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
                     align === 'left'
                       ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
                       : 'text-[#707a8a] hover:text-[#0f172a]'
@@ -1388,7 +1596,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setAlign('center')}
-                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  className={`flex-1 py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
                     align === 'center'
                       ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
                       : 'text-[#707a8a] hover:text-[#0f172a]'
@@ -1400,7 +1608,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setAlign('right')}
-                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  className={`flex-1 py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
                     align === 'right'
                       ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
                       : 'text-[#707a8a] hover:text-[#0f172a]'
@@ -1421,14 +1629,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 Vertical Position
               </label>
               <div
-                className={`grid grid-cols-3 border p-1 rounded-xl ${
+                className={`flex gap-1 border p-1 rounded-xl ${
                   isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
                 }`}
               >
                 <button
                   type="button"
                   onClick={() => setVerticalAlign('top')}
-                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  className={`flex-1 py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
                     verticalAlign === 'top'
                       ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
                       : 'text-[#707a8a] hover:text-[#0f172a]'
@@ -1440,7 +1648,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setVerticalAlign('middle')}
-                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  className={`flex-1 py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
                     verticalAlign === 'middle'
                       ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
                       : 'text-[#707a8a] hover:text-[#0f172a]'
@@ -1452,7 +1660,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setVerticalAlign('bottom')}
-                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                  className={`flex-1 py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
                     verticalAlign === 'bottom'
                       ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
                       : 'text-[#707a8a] hover:text-[#0f172a]'
@@ -1568,6 +1776,91 @@ export const EditorView: React.FC<EditorViewProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Photo Palette Extraction Engine */}
+          <div className={`pt-3 border-t flex flex-col gap-2.5 ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-[#707a8a] uppercase tracking-wider">
+                Photo Palette Matcher
+              </span>
+              <button
+                type="button"
+                onClick={() => paletteFileInputRef.current?.click()}
+                className="text-[11px] font-semibold text-[#fcd535] hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <Upload className="w-3 h-3" />
+                <span>Upload Photo</span>
+              </button>
+            </div>
+
+            <input
+              ref={paletteFileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setIsExtractingPalette(true);
+                try {
+                  const reader = new FileReader();
+                  reader.onload = async (evt) => {
+                    const dataUrl = evt.target?.result as string;
+                    const pal = await extractPaletteFromImage(dataUrl);
+                    setExtractedPalette(pal);
+                    setIsExtractingPalette(false);
+                    showToast('Palette extracted! Click swatches or "Apply".');
+                  };
+                  reader.readAsDataURL(file);
+                } catch {
+                  setIsExtractingPalette(false);
+                  showToast('Failed to extract colors from image');
+                }
+                e.target.value = '';
+              }}
+              className="hidden"
+            />
+
+            {isExtractingPalette && (
+              <div className="p-3 rounded-xl border border-[#fcd535]/40 bg-[#fcd535]/5 text-center text-xs animate-pulse">
+                Extracting 5-color palette from photo...
+              </div>
+            )}
+
+            {extractedPalette && (
+              <div className="flex flex-col gap-2 p-3 rounded-xl border border-current/10 bg-black/5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold">Extracted Swatches</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBgColor(extractedPalette.dominant);
+                      setInkColor(extractedPalette.ink);
+                      showToast('Applied photo palette to card');
+                    }}
+                    className="text-[11px] px-2 py-0.5 rounded bg-[#fcd535] text-black font-semibold cursor-pointer"
+                  >
+                    Apply All
+                  </button>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5 pt-1">
+                  {extractedPalette.swatches.map((color, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setBgColor(color)}
+                      style={{ backgroundColor: color }}
+                      className="h-8 rounded-lg border border-black/20 shadow-inner hover:scale-105 transition-transform cursor-pointer"
+                      title={`Set as Background: ${color}`}
+                    />
+                  ))}
+                </div>
+                <div className="flex justify-between text-[10px] text-[#707a8a]">
+                  <span>Dominant: {extractedPalette.dominant}</span>
+                  <span>Ink: {extractedPalette.ink}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -1624,70 +1917,123 @@ export const EditorView: React.FC<EditorViewProps> = ({
           <div className={`pt-3 border-t flex flex-col gap-3 ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
             <span className="text-[11px] font-semibold text-[#707a8a] uppercase">Editorial Accents</span>
 
-            {/* Surface Finish Selector */}
-            <div className="flex flex-col gap-2">
-              <label
-                className={`text-xs font-semibold uppercase tracking-wider ${
-                  isLight ? 'text-[#0f172a]' : 'text-white'
-                }`}
-              >
-                Surface Finish & Texture
-              </label>
-              <div className="grid grid-cols-1 gap-1.5">
-                {[
-                  { id: 'none' as SurfaceFinish, label: 'None (Flat Digital)', desc: 'Clean vector rendering' },
-                  { id: 'grain' as SurfaceFinish, label: 'Archival Cotton Grain', desc: 'Organic paper noise' },
-                  { id: 'halftone' as SurfaceFinish, label: 'Riso / Photocopy Halftone', desc: 'Subtle dot-screen texture' },
-                  { id: 'crease' as SurfaceFinish, label: 'Folded Zine Crease', desc: 'Paper folds & edge vignette' },
-                  { id: 'lanyard' as SurfaceFinish, label: 'Glossy ID Lanyard Sleeve', desc: 'Specular sheen & punch-hole slot' },
-                ].map((s) => (
+            {/* 55+ Procedural Surface Textures Catalog */}
+            <div className="flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <label className={`text-xs font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                  Surface Textures ({SURFACE_TEXTURES_55.length})
+                </label>
+                <span className="text-[10px] text-[#707a8a] font-mono capitalize">{textureCategory}</span>
+              </div>
+
+              {/* Category Pills */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[10px]">
+                {SURFACE_TEXTURE_CATEGORIES.map((cat) => (
                   <button
-                    key={s.id}
+                    key={cat.id}
                     type="button"
-                    onClick={() => {
-                      setSurfaceFinish(s.id);
-                      setShowGrain(s.id !== 'none');
-                    }}
-                    className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
-                      surfaceFinish === s.id
+                    onClick={() => setTextureCategory(cat.id)}
+                    className={`px-2 py-1 rounded-md capitalize font-medium shrink-0 transition-colors cursor-pointer ${
+                      textureCategory === cat.id
                         ? isLight
-                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
-                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                          ? 'bg-[#0f172a] text-white'
+                          : 'bg-[#fcd535] text-black font-semibold'
                         : isLight
-                        ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                        : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                        ? 'bg-slate-100 text-slate-600 hover:text-slate-900'
+                        : 'bg-black/30 text-slate-400 hover:text-white'
                     }`}
                   >
-                    <div>
-                      <span className="text-xs font-semibold block">{s.label}</span>
-                      <span className="text-[10px] text-[#707a8a]">{s.desc}</span>
-                    </div>
-                    {surfaceFinish === s.id && <Check className="w-3.5 h-3.5 text-[#fcd535]" />}
+                    {cat.name}
                   </button>
                 ))}
               </div>
-            </div>
 
-            {/* Texture Intensity Slider */}
-            {surfaceFinish !== 'none' && (
-              <div className="flex flex-col gap-2 p-2.5 rounded-xl border border-current/10 bg-black/5">
-                <div className="flex justify-between items-center text-xs">
-                  <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                    Texture Intensity
-                  </span>
-                  <span className="font-mono text-[11px] text-[#707a8a] tabular-nums">{textureIntensity}%</span>
-                </div>
-                <input
-                  type="range"
-                  min="10"
-                  max="100"
-                  step="5"
-                  value={textureIntensity}
-                  onChange={(e) => setTextureIntensity(Number(e.target.value))}
-                  className="w-full accent-[#fcd535] cursor-pointer"
-                />
+              {/* Texture Cards (2-column layout) */}
+              <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
+                {SURFACE_TEXTURES_55
+                  .filter((t) => textureCategory === 'all' || t.category === textureCategory)
+                  .map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedTextureId(t.id);
+                        setSurfaceFinish(t.id === 'none' ? 'none' : 'grain');
+                      }}
+                      className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
+                        selectedTextureId === t.id
+                          ? isLight
+                            ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
+                            : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                          : isLight
+                          ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                          : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                      }`}
+                    >
+                      <span className="text-xs font-semibold block truncate">{t.name}</span>
+                      <span className="text-[9px] text-[#707a8a] truncate block">{t.description}</span>
+                    </button>
+                  ))}
               </div>
-            )}
+
+              {/* Texture Sliders & Controls */}
+              {selectedTextureId !== 'none' && (
+                <div className="flex flex-col gap-2.5 p-2.5 rounded-xl border border-current/10 bg-black/5">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-semibold uppercase tracking-wider text-[10px] text-[#707a8a]">
+                      Texture Intensity
+                    </span>
+                    <span className="font-mono text-[11px] text-[#707a8a] tabular-nums">{textureIntensity}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="5"
+                    max="100"
+                    step="5"
+                    value={textureIntensity}
+                    onChange={(e) => setTextureIntensity(Number(e.target.value))}
+                    className="w-full accent-[#fcd535] cursor-pointer"
+                  />
+
+                  <div className="flex justify-between items-center text-xs pt-1">
+                    <span className="font-semibold uppercase tracking-wider text-[10px] text-[#707a8a]">
+                      Pattern Scale
+                    </span>
+                    <span className="font-mono text-[11px] text-[#707a8a] tabular-nums">{textureScale}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="50"
+                    max="200"
+                    step="10"
+                    value={textureScale}
+                    onChange={(e) => setTextureScale(Number(e.target.value))}
+                    className="w-full accent-[#fcd535] cursor-pointer"
+                  />
+
+                  {/* Blend Modes */}
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[10px] font-semibold text-[#707a8a] uppercase">Blend Mode</span>
+                    <div className="flex items-center gap-1">
+                      {(['multiply', 'screen', 'overlay', 'soft-light'] as const).map((bm) => (
+                        <button
+                          key={bm}
+                          type="button"
+                          onClick={() => setTextureBlendMode(bm)}
+                          className={`text-[9px] px-1.5 py-0.5 rounded font-mono uppercase cursor-pointer ${
+                            textureBlendMode === bm
+                              ? 'bg-[#fcd535] text-black font-bold'
+                              : 'bg-black/20 text-[#707a8a] hover:text-white'
+                          }`}
+                        >
+                          {bm.replace('-light', '')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Holographic Foil Toggle */}
             <label
@@ -1741,31 +2087,67 @@ export const EditorView: React.FC<EditorViewProps> = ({
               />
             </label>
 
+            {/* 55+ Elements Catalog */}
             {showIcon && (
-              <div className="flex flex-col gap-1.5 pt-1">
-                <span className="text-[11px] font-semibold text-[#707a8a] uppercase">Ornament Glyph</span>
-                <div
-                  className={`grid grid-cols-6 gap-1.5 p-1.5 rounded-xl border ${
-                    isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
-                  }`}
-                >
-                  {['format_quote', 'auto_awesome', 'terminal', 'edit_note', 'bookmark', 'grid_view', 'stars', 'favorite', 'badge', 'qr_code', 'verified'].map(
-                    (ic) => (
+              <div className="flex flex-col gap-2 pt-1 border-t border-current/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-[#707a8a] uppercase">
+                    Curated Elements ({ELEMENTS_55_CATALOG.length})
+                  </span>
+                  <span className="text-[10px] text-[#707a8a] font-mono capitalize">{elementCategory}</span>
+                </div>
+
+                {/* Element Category Pills */}
+                <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[10px]">
+                  {ELEMENT_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setElementCategory(cat.id)}
+                      className={`px-2 py-0.5 rounded-md capitalize font-medium shrink-0 transition-colors cursor-pointer ${
+                        elementCategory === cat.id
+                          ? isLight
+                            ? 'bg-[#0f172a] text-white'
+                            : 'bg-[#fcd535] text-black font-semibold'
+                          : isLight
+                          ? 'bg-slate-100 text-slate-600 hover:text-slate-900'
+                          : 'bg-black/30 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Elements Grid (4-column layout) */}
+                <div className="grid grid-cols-4 gap-1.5 p-2 rounded-xl border max-h-40 overflow-y-auto bg-black/5">
+                  {ELEMENTS_55_CATALOG
+                    .filter((el) => elementCategory === 'all' || el.category === elementCategory)
+                    .map((el) => (
                       <button
-                        key={ic}
-                        onClick={() => setIconName(ic)}
-                        className={`p-1.5 rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
-                          iconName === ic
-                            ? isLight
-                              ? 'bg-white text-[#d97706] shadow-sm font-bold'
-                              : 'bg-[#222730] text-[#fcd535]'
-                            : 'text-[#707a8a] hover:text-[#0f172a]'
+                        key={el.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedElementId(el.id);
+                          setIconName(el.id);
+                        }}
+                        title={el.name}
+                        className={`p-1.5 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all aspect-square ${
+                          selectedElementId === el.id
+                            ? 'bg-[#fcd535] text-black ring-2 ring-[#fcd535]'
+                            : isLight
+                            ? 'bg-white hover:bg-slate-100 text-slate-800'
+                            : 'bg-[#181d24] hover:bg-[#222730] text-slate-300'
                         }`}
                       >
-                        <span className="material-symbols-outlined text-[16px]">{ic}</span>
+                        <span className="text-base select-none leading-none">
+                          {el.glyph || '✦'}
+                        </span>
+                        <span className="text-[8px] truncate max-w-full block mt-0.5 opacity-70">
+                          {el.name.split(' ')[0]}
+                        </span>
                       </button>
-                    )
-                  )}
+                    ))}
                 </div>
               </div>
             )}
@@ -2206,6 +2588,46 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   </div>
                   <span className="text-[10px] font-mono text-[#d97706]">SVG</span>
                 </button>
+
+                <div className="px-3 py-1 text-[10px] uppercase font-semibold text-[#fcd535] tracking-wider border-t border-current/10 mt-1">
+                  Ultra-HD Master Exporters
+                </div>
+                <button
+                  onClick={() => handleExport('ultra-4k')}
+                  className={`w-full px-3 py-2 text-left flex items-center justify-between text-xs cursor-pointer ${
+                    isLight ? 'text-[#0f172a] hover:bg-[#f1f5f9]' : 'text-white hover:bg-[#222730]'
+                  }`}
+                >
+                  <div>
+                    <span className="font-semibold block">Ultra-HD 4K (3840px)</span>
+                    <span className="text-[10px] text-[#707a8a]">Pure card isolation, zero gradient bleed</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#fcd535] font-bold">4K</span>
+                </button>
+                <button
+                  onClick={() => handleExport('ultra-8k')}
+                  className={`w-full px-3 py-2 text-left flex items-center justify-between text-xs cursor-pointer ${
+                    isLight ? 'text-[#0f172a] hover:bg-[#f1f5f9]' : 'text-white hover:bg-[#222730]'
+                  }`}
+                >
+                  <div>
+                    <span className="font-semibold block">Print Master 8K (7680px)</span>
+                    <span className="text-[10px] text-[#707a8a]">Gallery & offset print archival fidelity</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#fcd535] font-bold">8K</span>
+                </button>
+                <button
+                  onClick={() => handleExport('ultra-16k')}
+                  className={`w-full px-3 py-2 text-left flex items-center justify-between text-xs cursor-pointer ${
+                    isLight ? 'text-[#0f172a] hover:bg-[#f1f5f9]' : 'text-white hover:bg-[#222730]'
+                  }`}
+                >
+                  <div>
+                    <span className="font-semibold block">Studio Extreme 16K (15360px)</span>
+                    <span className="text-[10px] text-[#707a8a]">GPU-accelerated max canvas print</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#0ecb81] font-bold">16K</span>
+                </button>
               </div>
             )}
           </div>
@@ -2262,6 +2684,57 @@ export const EditorView: React.FC<EditorViewProps> = ({
             </button>
           )}
 
+          {/* Ambient Lighting Toggle */}
+          <button
+            onClick={() => setAmbientModeEnabled(!ambientModeEnabled)}
+            className={`px-2 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 cursor-pointer transition-colors ${
+              ambientModeEnabled
+                ? isLight
+                  ? 'bg-[#d97706]/15 text-[#d97706]'
+                  : 'bg-[#fcd535]/15 text-[#fcd535]'
+                : 'text-[#707a8a] hover:text-white'
+            }`}
+            title="Toggle real-time workspace ambient backglow (isolated to stage wrapper, never exported)"
+          >
+            <Sun className="w-3 h-3" />
+            <span className="hidden sm:inline">Ambient</span>
+          </button>
+
+          {/* 3D View Toggle */}
+          <button
+            onClick={() => setIs3DMode(!is3DMode)}
+            className={`px-2 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 cursor-pointer transition-colors ${
+              is3DMode
+                ? 'bg-[#fcd535] text-black font-semibold'
+                : isLight
+                ? 'bg-[#f1f5f9] text-[#475569] hover:text-[#0f172a]'
+                : 'bg-[#181d24] text-[#a0a5ad] hover:text-white'
+            }`}
+            title="Toggle Three.js 3D Physical Card Stage with dynamic reflections"
+          >
+            <Box className="w-3 h-3" />
+            <span>3D View</span>
+          </button>
+
+          {/* Safe Zones Overlay Toggle */}
+          <button
+            onClick={() => {
+              const modes: ('none' | 'print' | 'reels' | 'feed')[] = ['none', 'print', 'reels', 'feed'];
+              const next = modes[(modes.indexOf(safeZoneMode) + 1) % modes.length];
+              setSafeZoneMode(next);
+              showToast(`Safe zone overlay: ${next.toUpperCase()}`);
+            }}
+            className={`px-2 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 cursor-pointer transition-colors ${
+              safeZoneMode !== 'none'
+                ? 'bg-[#0ecb81]/15 text-[#0ecb81] font-semibold'
+                : 'text-[#707a8a] hover:text-white'
+            }`}
+            title="Cycle Safe-Zone Overlays (Print 3mm, 9:16 Reels, 4:5 Feed)"
+          >
+            <Maximize2 className="w-3 h-3" />
+            <span className="capitalize">{safeZoneMode === 'none' ? 'Safe Zone' : safeZoneMode}</span>
+          </button>
+
           <button
             onClick={() => setShowGuidelines(!showGuidelines)}
             className={`w-7 h-7 flex items-center justify-center rounded-md border text-xs cursor-pointer ${
@@ -2294,7 +2767,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
         {/* CENTER / MAIN WORKSPACE CANVAS */}
         <div
-          className={`flex-1 p-3 sm:p-6 md:p-12 flex flex-col items-center justify-center overflow-auto min-h-[300px] sm:min-h-[460px] pb-24 lg:pb-12 transition-colors duration-200 ${
+          ref={stageRef}
+          className={`flex-1 p-3 sm:p-6 md:p-12 flex flex-col items-center justify-center overflow-auto min-h-[300px] sm:min-h-[460px] pb-24 lg:pb-12 transition-colors duration-200 editor-ambient-stage ${
             isLight ? 'bg-[#f1f5f9]' : 'bg-[#0b0e11]'
           }`}
           onClick={(e) => {
@@ -2305,7 +2779,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           }}
         >
           {/* Active Selection Breadcrumb / Quick Control Strip */}
-          {selectedElement && (
+          {selectedElement && !is3DMode && (
             <div
               className={`mb-3 flex items-center gap-2 px-3 py-1 rounded-full text-xs border shadow-sm animate-fade-in ${
                 isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a]' : 'bg-[#181d24] border-[#262c36] text-white'
@@ -2328,160 +2802,195 @@ export const EditorView: React.FC<EditorViewProps> = ({
             </div>
           )}
 
-          <div
-            style={{
-              transform: `scale(${zoomLevel / 100})`,
-              transformOrigin: 'center center',
-              transition: 'transform 0.15s ease-out',
-            }}
-            className="w-full flex items-center justify-center"
-          >
-            {/* The Live Renderable Card Element */}
-            <div
-              ref={cardRef}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedElement('card');
-                if (window.innerWidth < 1024) {
-                  openMobileTab('palette');
-                }
-              }}
-              style={{
-                ...getCardAspectRatioStyle(),
-                backgroundColor: bgColor,
-                color: inkColor,
-                padding: `${padding}px`,
-                borderRadius: `${borderRadius}px`,
-              }}
-              className={`relative w-full shadow-2xl transition-colors duration-200 flex flex-col justify-between overflow-hidden select-text ${
-                showBorder ? 'border border-current/15' : ''
-              } ${selectedElement === 'card' ? 'ring-2 ring-[#fcd535]/80 ring-offset-2' : ''}`}
-            >
-              {/* Tactile Surface Finish Overlay */}
-              {surfaceFinish !== 'none' && (
-                <div
-                  style={{ opacity: textureIntensity / 100 }}
-                  className={`absolute inset-0 pointer-events-none mix-blend-multiply z-20 ${
-                    surfaceFinish === 'grain'
-                      ? 'surface-finish-grain'
-                      : surfaceFinish === 'halftone'
-                      ? 'surface-finish-halftone'
-                      : surfaceFinish === 'crease'
-                      ? 'surface-finish-crease'
-                      : 'surface-finish-lanyard'
-                  }`}
-                  aria-hidden="true"
-                />
-              )}
-
-              {/* Lanyard Punch-Hole Slot */}
-              {surfaceFinish === 'lanyard' && (
-                <div
-                  className="absolute top-2.5 left-1/2 -translate-x-1/2 w-12 h-2.5 rounded-full bg-black/40 border border-white/20 shadow-inner z-30 pointer-events-none"
-                  aria-hidden="true"
-                />
-              )}
-
-              {/* Safe Guidelines Overlay */}
-              {showGuidelines && (
-                <div
-                  className="absolute inset-4 border border-dashed border-[#fcd535]/60 pointer-events-none z-30 flex items-center justify-center"
-                  aria-hidden="true"
-                >
-                  <span className="text-[10px] font-mono bg-[#fcd535] text-black px-1.5 py-0.5 rounded font-bold">
-                    SAFE PRINT AREA
-                  </span>
-                </div>
-              )}
-
-              {/* Header / Folio Ribbon */}
+          {is3DMode ? (
+            /* 3D Physical Three.js Preview Stage */
+            <div className="flex flex-col items-center gap-3">
               <div
+                ref={threeMountRef}
+                className="w-[340px] sm:w-[440px] md:w-[500px] h-[440px] sm:h-[500px] rounded-2xl flex items-center justify-center cursor-grab active:cursor-grabbing"
+              />
+              <span className="text-[11px] font-mono text-[#707a8a]">
+                Drag to rotate card in 3D space • PBR surface reflections active
+              </span>
+            </div>
+          ) : (
+            <div
+              style={{
+                transform: `scale(${zoomLevel / 100})`,
+                transformOrigin: 'center center',
+                transition: 'transform 0.15s ease-out',
+              }}
+              className="w-full flex items-center justify-center"
+            >
+              {/* The Live Renderable Card Element */}
+              <div
+                ref={cardRef}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setSelectedElement('tag');
-                  openMobileTab('content');
-                  tagInputRef.current?.focus();
+                  setSelectedElement('card');
+                  if (window.innerWidth < 1024) {
+                    openMobileTab('palette');
+                  }
                 }}
-                className={`relative z-10 flex items-center justify-between pb-3.5 border-b border-current/15 text-[11px] font-mono tracking-wider opacity-75 cursor-pointer rounded transition-all ${
-                  selectedElement === 'tag' ? 'ring-1 ring-[#fcd535] bg-black/5 p-1' : ''
-                }`}
-                title="Click to edit folio header tag"
+                style={{
+                  ...getCardAspectRatioStyle(),
+                  backgroundColor: bgColor,
+                  color: inkColor,
+                  padding: `${padding}px`,
+                  borderRadius: `${borderRadius}px`,
+                }}
+                className={`relative w-full shadow-2xl transition-colors duration-200 flex flex-col justify-between overflow-hidden select-text ${
+                  showBorder ? 'border border-current/15' : ''
+                } ${selectedElement === 'card' ? 'ring-2 ring-[#fcd535]/80 ring-offset-2' : ''}`}
               >
-                <div className="flex items-center gap-1.5">
-                  {showIcon && (
-                    <span className={`material-symbols-outlined text-[14px] ${isHolographic ? 'holographic-foil' : ''}`}>
-                      {iconName}
+                {/* Procedural Surface Texture Overlay (55+ Textures) */}
+                {selectedTextureId !== 'none' && (
+                  <div
+                    style={getTextureStyle(selectedTextureId, textureIntensity, textureScale, textureBlendMode)}
+                    className="absolute inset-0 pointer-events-none z-20"
+                    aria-hidden="true"
+                  />
+                )}
+
+                {/* Safe Guidelines Overlay */}
+                {showGuidelines && (
+                  <div
+                    className="absolute inset-4 border border-dashed border-[#fcd535]/60 pointer-events-none z-30 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <span className="text-[10px] font-mono bg-[#fcd535] text-black px-1.5 py-0.5 rounded font-bold">
+                      SAFE PRINT AREA
+                    </span>
+                  </div>
+                )}
+
+                {/* Social Safe Zones Overlay (Visual only, not exported) */}
+                {safeZoneMode === 'print' && (
+                  <div className="absolute inset-3 border-2 border-dashed border-[#0ecb81]/70 pointer-events-none z-30 flex items-center justify-center">
+                    <span className="text-[9px] font-mono bg-[#0ecb81] text-black px-1.5 py-0.5 rounded font-bold">
+                      3MM PRINT SAFE ZONE
+                    </span>
+                  </div>
+                )}
+                {safeZoneMode === 'reels' && (
+                  <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between">
+                    <div className="h-[18%] bg-red-500/15 border-b border-red-500/40 flex items-center justify-center">
+                      <span className="text-[9px] font-mono text-red-300 font-bold bg-black/60 px-1 rounded">
+                        REELS TOP HUD (220PX)
+                      </span>
+                    </div>
+                    <div className="h-[25%] bg-red-500/15 border-t border-red-500/40 flex items-center justify-center">
+                      <span className="text-[9px] font-mono text-red-300 font-bold bg-black/60 px-1 rounded">
+                        REELS CAPTION DANGER ZONE (340PX)
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {safeZoneMode === 'feed' && (
+                  <div className="absolute inset-4 border border-dashed border-[#3b82f6]/70 pointer-events-none z-30 flex items-center justify-center">
+                    <span className="text-[9px] font-mono bg-[#3b82f6] text-white px-1.5 py-0.5 rounded font-bold">
+                      4:5 FEED SAFE CROPLINE
+                    </span>
+                  </div>
+                )}
+
+                {/* Header / Folio Ribbon */}
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedElement('tag');
+                    openMobileTab('content');
+                    tagInputRef.current?.focus();
+                  }}
+                  className={`relative z-10 flex items-center justify-between pb-3.5 border-b border-current/15 text-[11px] font-mono tracking-wider opacity-75 cursor-pointer rounded transition-all ${
+                    selectedElement === 'tag' ? 'ring-1 ring-[#fcd535] bg-black/5 p-1' : ''
+                  }`}
+                  title="Click to edit folio header tag"
+                >
+                  <div className="flex items-center gap-1.5">
+                    {showIcon && (() => {
+                      const elDef = getElementById(selectedElementId);
+                      if (elDef) {
+                        return (
+                          <span className={`text-[13px] leading-none ${isHolographic ? 'holographic-foil' : ''}`}>
+                            {elDef.glyph || '✦'}
+                          </span>
+                        );
+                      }
+                      return (
+                        <span className={`material-symbols-outlined text-[14px] ${isHolographic ? 'holographic-foil' : ''}`}>
+                          {iconName}
+                        </span>
+                      );
+                    })()}
+                    <span className="uppercase font-semibold">{tag}</span>
+                  </div>
+                  {badge && (
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedElement('badge');
+                        openMobileTab('content');
+                      }}
+                      className={`px-1.5 py-0.5 rounded text-[10px] cursor-pointer ${
+                        isHolographic
+                          ? 'holographic-foil shadow-sm border border-transparent font-bold'
+                          : 'border border-current/25'
+                      } ${selectedElement === 'badge' ? 'ring-1 ring-[#fcd535] bg-black/10' : ''}`}
+                      title="Click to edit corner badge"
+                    >
+                      {badge}
                     </span>
                   )}
-                  <span className="uppercase font-semibold">{tag}</span>
                 </div>
-                {badge && (
-                  <span
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedElement('badge');
-                      openMobileTab('content');
-                    }}
-                    className={`px-1.5 py-0.5 rounded text-[10px] cursor-pointer ${
-                      isHolographic
-                        ? 'holographic-foil shadow-sm border border-transparent font-bold'
-                        : 'border border-current/25'
-                    } ${selectedElement === 'badge' ? 'ring-1 ring-[#fcd535] bg-black/10' : ''}`}
-                    title="Click to edit corner badge"
-                  >
-                    {badge}
-                  </span>
-                )}
-              </div>
 
-              {/* Main Body Quote / Prose */}
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedElement('quote');
-                  openMobileTab('content');
-                  quoteInputRef.current?.focus();
-                }}
-                className={`relative z-10 py-4 cursor-pointer rounded transition-all ${
-                  verticalAlign === 'top' ? 'my-0 mb-auto' : verticalAlign === 'bottom' ? 'my-0 mt-auto' : 'my-auto'
-                } ${selectedElement === 'quote' ? 'ring-1 ring-[#fcd535] bg-black/5 p-2' : ''}`}
-                title="Click to edit quote text and typography"
-              >
-                <blockquote
-                  style={{
-                    fontSize: `${fontSize}px`,
-                    textAlign: align,
-                    lineHeight: lineHeight,
-                    letterSpacing: `${letterSpacing}em`,
+                {/* Main Body Quote / Prose */}
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedElement('quote');
+                    openMobileTab('content');
+                    quoteInputRef.current?.focus();
                   }}
-                  className={`${getFontFamilyClass(fontChoice)} transition-all`}
+                  className={`relative z-10 py-4 cursor-pointer rounded transition-all ${
+                    verticalAlign === 'top' ? 'my-0 mb-auto' : verticalAlign === 'bottom' ? 'my-0 mt-auto' : 'my-auto'
+                  } ${selectedElement === 'quote' ? 'ring-1 ring-[#fcd535] bg-black/5 p-2' : ''}`}
+                  title="Click to edit quote text and typography"
                 >
-                  “{parseRichText(quote, inkColor)}”
-                </blockquote>
-              </div>
+                  <blockquote
+                    style={{
+                      fontSize: `${fontSize}px`,
+                      textAlign: align,
+                      lineHeight: lineHeight,
+                      letterSpacing: `${letterSpacing}em`,
+                      fontFamily: fontChoice.startsWith('custom-') ? fontChoice : undefined,
+                    }}
+                    className={`${getFontFamilyClass(fontChoice)} transition-all`}
+                  >
+                    “{parseRichText(quote, inkColor)}”
+                  </blockquote>
+                </div>
 
-              {/* Footer Citation & Signature */}
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedElement('author');
-                  openMobileTab('content');
-                  authorInputRef.current?.focus();
-                }}
-                className={`relative z-10 pt-3.5 border-t border-current/15 flex items-center justify-between cursor-pointer rounded transition-all ${
-                  selectedElement === 'author' ? 'ring-1 ring-[#fcd535] bg-black/5 p-1' : ''
-                }`}
-                title="Click to edit author and citation"
-              >
-                <cite className="not-italic text-xs font-medium opacity-80 truncate max-w-[80%]">
-                  — {author}
-                </cite>
-                <span className="text-[10px] font-mono opacity-50 uppercase">
-                  {aspectRatio}
-                </span>
+                {/* Footer Citation & Signature — Aspect ratio badge removed per fix.md */}
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedElement('author');
+                    openMobileTab('content');
+                    authorInputRef.current?.focus();
+                  }}
+                  className={`relative z-10 pt-3.5 border-t border-current/15 flex items-center justify-between cursor-pointer rounded transition-all ${
+                    selectedElement === 'author' ? 'ring-1 ring-[#fcd535] bg-black/5 p-1' : ''
+                  }`}
+                  title="Click to edit author and citation"
+                >
+                  <cite className="not-italic text-xs font-medium opacity-80 truncate max-w-[90%]">
+                    — {author}
+                  </cite>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -2784,7 +3293,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             </div>
 
             {/* Template Selection Grid */}
-            <div className="p-4 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="p-4 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {PRESET_TEMPLATES.map((tmpl) => (
                 <button
                   key={tmpl.id}

@@ -14,6 +14,8 @@ import {
   Layers,
   FilePlus,
 } from 'lucide-react';
+import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
+import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 
 interface TemplatesViewProps {
   onNavigate?: (path: string) => void;
@@ -34,10 +36,26 @@ const CATEGORY_TABS = [
 
 export const TemplatesView: React.FC<TemplatesViewProps> = ({
   theme = 'dark',
+  onOpenEditorWithTemplate,
 }) => {
   const isLight = theme === 'light';
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [selectedForCompare, setSelectedForCompare] = useState<CardTemplate[]>([]);
+  const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
+
+  const toggleCompareTemplate = (tmpl: CardTemplate) => {
+    setSelectedForCompare((prev) => {
+      const exists = prev.some((t) => t.id === tmpl.id);
+      if (exists) {
+        return prev.filter((t) => t.id !== tmpl.id);
+      }
+      if (prev.length >= 4) {
+        return [prev[1], prev[2], prev[3], tmpl];
+      }
+      return [...prev, tmpl];
+    });
+  };
 
   useEffect(() => {
     updatePageSEO({
@@ -263,37 +281,53 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1240px] w-full mx-auto">
             {filteredTemplates.map((template) => {
               const isIdStyle = template.hasPhotoArea || template.category === 'id-card';
               const isVertical = template.layoutHint === 'vertical';
+              const isSelected = selectedForCompare.some((t) => t.id === template.id);
 
               return (
                 <article
                   key={template.id}
-                  className={`group flex flex-col border rounded-3xl overflow-hidden transition-all duration-200 hover:-translate-y-1 shadow-lg ${
+                  className={`group flex flex-col border rounded-3xl overflow-hidden transition-all duration-200 hover:-translate-y-1 shadow-xl ${
                     isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
                   }`}
                 >
                   {/* Card Visual Artwork Preview */}
                   <div
                     style={{ backgroundColor: template.theme.bg, color: template.theme.ink }}
-                    className={`relative p-5 flex flex-col justify-between border-b border-black/10 overflow-hidden ${
-                      isVertical ? 'min-h-[280px]' : 'min-h-[220px]'
+                    className={`relative p-6 flex flex-col justify-between border-b border-black/10 overflow-hidden ${
+                      isVertical ? 'min-h-[290px]' : 'min-h-[240px]'
                     }`}
                   >
                     {/* Header Strip or Tag */}
-                    <div className="flex items-center justify-between text-[10px] font-mono opacity-80 z-10">
+                    <div className="flex items-center justify-between text-[11px] font-mono opacity-80 z-10">
                       <span className="font-semibold truncate max-w-[170px]">{template.tag}</span>
-                      <span className="border border-current/40 px-1.5 py-0.5 rounded font-mono text-[9px]">
-                        {template.badge}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleCompareTemplate(template);
+                          }}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535]'
+                              : 'bg-black/10 text-current border-current/30 hover:bg-black/20'
+                          }`}
+                          title="Compare with another style"
+                        >
+                          {isSelected ? '✓ Selected' : '+ Compare'}
+                        </button>
+                        <span className="border border-current/40 px-1.5 py-0.5 rounded font-mono text-[9px] font-bold">
+                          {template.badge}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Content Preview: ID Pass vs Editorial Quote */}
                     {isIdStyle ? (
-                      /* ID Card layout preview with stylized halftone/duotone portrait */
-                      <div className="my-3 flex items-center gap-3 z-10">
+                      <div className="my-4 flex items-center gap-3 z-10">
                         <div className="w-16 h-20 rounded-lg overflow-hidden border border-current/30 shadow-sm shrink-0 relative bg-black/10">
                           <img
                             src={
@@ -317,24 +351,20 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                         </div>
                       </div>
                     ) : (
-                      /* Quote layout preview */
-                      <blockquote className="my-3 text-sm leading-snug line-clamp-3 font-editorial z-10">
+                      <blockquote className="my-4 text-base sm:text-lg leading-snug line-clamp-3 font-editorial z-10">
                         “{template.quote}”
                       </blockquote>
                     )}
 
-                    {/* Bottom Metadata & Star / Barcode indication */}
-                    <div className="flex items-center justify-between text-[10px] font-medium opacity-80 truncate z-10">
+                    <div className="flex items-center justify-between text-[11px] font-medium opacity-80 truncate z-10">
                       <cite className="not-italic truncate max-w-[180px]">— {template.author}</cite>
-                      {template.layoutHint && (
-                        <span className="font-mono text-[9px] uppercase opacity-70">
-                          {template.layoutHint}
-                        </span>
-                      )}
+                      <span className="font-mono text-[10px] uppercase opacity-70">
+                        {template.categoryLabel}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Card Footer Bar with dual actions */}
+                  {/* Card Footer Bar with actions */}
                   <div className={`p-4 flex flex-col gap-2.5 ${isLight ? 'bg-[#f8fafc]' : 'bg-[#181d24]'}`}>
                     <div className="flex items-center justify-between">
                       <div>
@@ -343,9 +373,20 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                         </h3>
                         <span className="text-[10px] text-[#707a8a]">{template.categoryLabel}</span>
                       </div>
+                      <button
+                        onClick={() => toggleCompareTemplate(template)}
+                        className={`px-2.5 py-1 rounded-lg border text-xs font-semibold cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535]'
+                            : isLight
+                            ? 'border-slate-300 hover:bg-slate-100 text-[#475569]'
+                            : 'border-[#323946] hover:bg-[#20252e] text-[#c4c7c8]'
+                        }`}
+                      >
+                        {isSelected ? 'Remove Compare' : '+ Compare'}
+                      </button>
                     </div>
 
-                    {/* Action buttons */}
                     <div className="grid grid-cols-2 gap-2 pt-1">
                       <a
                         href={`/canvas?template=${template.id}`}
@@ -354,14 +395,20 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                             ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
                             : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
                         }`}
-                        title="Open in Freeform Canvas Studio with separate editable layers"
+                        title="Open in Freeform Canvas Studio"
                       >
                         <Layers className="w-3.5 h-3.5" />
-                        <span>Canvas</span>
+                        <span>Canvas Studio</span>
                       </a>
 
                       <a
                         href={`/create?template=${template.id}`}
+                        onClick={(e) => {
+                          if (onOpenEditorWithTemplate) {
+                            e.preventDefault();
+                            onOpenEditorWithTemplate(template);
+                          }
+                        }}
                         className={`inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                           isLight
                             ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-[#f1f5f9]'
@@ -369,7 +416,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                         }`}
                         title="Open in classic text typesetting editor"
                       >
-                        <span>Text Edit</span>
+                        <span>Card Creator</span>
                         <ArrowRight className="w-3 h-3" />
                       </a>
                     </div>
@@ -389,11 +436,11 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
             isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
           }`}
         >
-          <h2 className={`text-xl font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+          <h2 className={`text-xl font-bold font-heading ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
             How Our Freeform Canvas & ID Pass System Works
           </h2>
           <p className={`text-xs md:text-sm leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-            Every template in the Studio library is stored as an editable document object model rather than a flattened image. When you open any card in the Canvas Studio, every component—from the profile photo and typewriter citation to the star borders and barcode stickers—becomes an independent, selectable layer. You can drag elements across the canvas, resize them using handles, change fonts and palettes, or delete all decorations to create a pure Swiss minimal layout.
+            Every template in the Studio library is stored as an editable document object model rather than a flattened image. When you open any card in the Canvas Studio, every component—from profile photos to barcodes—becomes an independent selectable layer.
           </p>
           <div className="pt-2 flex flex-wrap gap-3">
             <a
@@ -418,6 +465,31 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           </div>
         </section>
       </div>
+
+      {/* Floating Comparison Dock */}
+      <TemplateComparisonDock
+        selectedTemplates={selectedForCompare}
+        onRemoveTemplate={(id) => setSelectedForCompare((prev) => prev.filter((t) => t.id !== id))}
+        onClear={() => setSelectedForCompare([])}
+        onOpenModal={() => setComparisonModalOpen(true)}
+        theme={theme}
+      />
+
+      {/* Side-by-Side Comparison Modal */}
+      <TemplateComparisonModal
+        isOpen={comparisonModalOpen}
+        onClose={() => setComparisonModalOpen(false)}
+        templates={selectedForCompare}
+        onOpenTemplate={(tmpl) => {
+          if (onOpenEditorWithTemplate) {
+            onOpenEditorWithTemplate(tmpl);
+          } else {
+            window.location.href = `/create?template=${tmpl.id}`;
+          }
+        }}
+        theme={theme}
+      />
     </div>
   );
 };
+

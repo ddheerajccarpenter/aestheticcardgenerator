@@ -37,6 +37,8 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
+import { initScrollGradientEngine } from './utils/scrollGradientEngine';
+import { restoreSavedCustomFonts } from './services/customFontManager';
 
 export const App: React.FC = () => {
   // Current route path
@@ -63,8 +65,9 @@ export const App: React.FC = () => {
     return saved === 'light' ? 'light' : 'dark';
   });
 
-  // Apply theme class to <html>
+  // Apply theme class and data-theme to <html>
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
     if (theme === 'light') {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
@@ -74,6 +77,15 @@ export const App: React.FC = () => {
     }
     localStorage.setItem('aesthetic_card_studio_theme', theme);
   }, [theme]);
+
+  // Initialize 60fps Scroll Gradient Engine and restore Saved Fonts
+  useEffect(() => {
+    const cleanupGradient = initScrollGradientEngine();
+    restoreSavedCustomFonts();
+    return () => {
+      cleanupGradient();
+    };
+  }, []);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -271,10 +283,13 @@ export const App: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
-        isLight ? 'bg-[#f6f8fa] text-[#181a20]' : 'bg-[#0b0e11] text-[#e1e2e7]'
+      data-theme={theme}
+      className={`min-h-screen flex flex-col font-sans transition-colors duration-200 relative ${
+        isLight ? 'text-[#181a20]' : 'text-[#f4f1ea]'
       }`}
     >
+      {/* Universal 60:30:10 Scroll-Reactive Background Field */}
+      <div className="universal-page-bg" />
       {/* Global Header */}
       <Header
         currentPath={currentPath}
