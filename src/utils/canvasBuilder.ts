@@ -37,7 +37,7 @@ export const createBlankCanvas = (
   width = 960,
   height = 600,
   background = '#ffffff',
-  title = 'Untitled Aesthetic Card'
+  title = 'Untitled Card'
 ): CanvasDocument => {
   return {
     id: createObjectId('doc'),

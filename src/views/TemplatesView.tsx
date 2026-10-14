@@ -116,13 +116,13 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           <div className="flex flex-col gap-2 max-w-xl z-10">
             <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#d97706] dark:text-[#fcd535]">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Full Freeform Freedom</span>
+              <span>Create from Scratch</span>
             </div>
             <h2 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-              Start from a Blank Canvas
+              Start with a Blank Canvas
             </h2>
             <p className={`text-xs sm:text-sm leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-              Prefer to create your own original card from scratch? Choose your canvas dimensions (Landscape ID, Vertical Lanyard, or Square), upload photos, and arrange independent text and shape layers freely.
+              Want to design your own layout? Choose your dimensions (ID card, vertical lanyard, or square post), upload photos, and arrange text and stickers freely.
             </p>
           </div>
 
@@ -136,7 +136,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
               }`}
             >
               <FilePlus className="w-4 h-4" />
-              <span>Create from Blank Canvas</span>
+              <span>Open Blank Canvas</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -146,13 +146,13 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
         <header className="flex flex-col gap-3 text-left border-b pb-6 border-[#262c36]/40">
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#d97706] dark:text-[#fcd535]">
             <Layers className="w-3.5 h-3.5" />
-            <span>56 Distinct Art Directions</span>
+            <span>56 Curated Templates</span>
           </div>
           <h1 className={`text-3xl md:text-5xl font-bold tracking-tight leading-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-            Template Library & Composition Gallery
+            Explore Card Templates
           </h1>
           <p className={`text-sm md:text-base max-w-2xl leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-            Every template is an editable multi-layer document with individual text fields, photo placeholders, badges, and decorative elements that you can rearrange or dismantle.
+            Pick a style to jump into the editor. You can customize the words, swap fonts and paper colors, or open any design in Canvas Studio to move layers around.
           </p>
         </header>
 

@@ -405,12 +405,16 @@ export const PRESET_TEMPLATES: CardTemplate[] = [
 ];
 
 export const SAMPLE_QUOTES = [
-  { q: "Design is thinking made visual.", a: "Saul Bass — Title Sequences", t: "VISUAL WISDOM" },
-  { q: "Content precedes design. Design in the absence of content is not design, it’s decoration.", a: "Jeffrey Zeldman — Web Standards", t: "FOUNDATIONS" },
-  { q: "Whitespace is to design what silence is to music.", a: "Mark Boulton — Five Simple Steps", t: "CADENCE & RHYTHM" },
-  { q: "Styles come and go. Good design is a language, not a style.", a: "Massimo Vignelli — Canon", t: "TIMELESSNESS" },
-  { q: "Simplicity is about subtracting the obvious and adding the meaningful.", a: "John Maeda — Laws of Simplicity", t: "ESSENCE" },
-  { q: "Have nothing in your houses that you do not know to be useful or believe to be beautiful.", a: "William Morris — Arts & Crafts", t: "LIVING WELL" },
-  { q: "An idea that is developed and put into action is more important than an idea that exists only as an idea.", a: "Edward de Bono", t: "CREATIVE ACTION" },
-  { q: "The mind is everything. What you think you become.", a: "Buddha — Dhammapada", t: "MEDITATION" },
+  { q: "In the depth of winter, I finally learned that within me there lay an invincible summer.", a: "Albert Camus — Return to Tipasa", t: "LITERATURE" },
+  { q: "Mind over matter is that magic. I do it everyday.", a: "Frank Ocean — White Ferrari", t: "SONG LYRIC" },
+  { q: "If you only read the books that everyone else is reading, you can only think what everyone else is thinking.", a: "Haruki Murakami — Norwegian Wood", t: "BOOK NOTE" },
+  { q: "Life changes in the instant. The ordinary instant.", a: "Joan Didion — The Year of Magical Thinking", t: "MEMORY" },
+  { q: "Lock up your libraries if you like; but there is no gate, no lock, no bolt that you can set upon the freedom of my mind.", a: "Virginia Woolf — A Room of One's Own", t: "THOUGHT" },
+  { q: "Once you meet someone, you never really forget them. It just takes a while for your memory to come back.", a: "Hayao Miyazaki — Spirited Away", t: "CINEMA" },
+  { q: "Tell me we’d make it. Tell me the world won't cave in.", a: "Richard Siken — Crush", t: "POETRY" },
+  { q: "You don't need to have it all figured out right now. You just need to take the next gentle step.", a: "Studio Note — Late Night Thoughts", t: "REMINDER" },
+  { q: "Remember, the loneliness must be made into music.", a: "Ocean Vuong — On Earth We're Briefly Gorgeous", t: "LITERATURE" },
+  { q: "Isn't everything we do in life a way to be loved a little more?", a: "Richard Linklater — Before Sunrise", t: "CINEMA" },
+  { q: "Either way, we're not alone. I'll find a new place to be from.", a: "Phoebe Bridgers — I Know the End", t: "SONG LYRIC" },
+  { q: "Drink some water, look up from your screen, and notice how pretty the sky is today.", a: "Daily Gentle Reminder", t: "DAILY NOTE" },
 ];
