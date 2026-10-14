@@ -2967,7 +2967,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     openMobileTab('content');
                     tagInputRef.current?.focus();
                   }}
-                  className={`relative z-10 flex items-center justify-between pb-3.5 border-b border-current/15 text-[11px] font-mono tracking-wider opacity-75 cursor-pointer rounded transition-all ${
+                  className={`relative z-10 flex items-center justify-between pb-3.5 border-b border-current/15 text-[11px] font-mono tracking-wider opacity-75 cursor-pointer rounded transition-all shrink-0 ${
                     selectedElement === 'tag' ? 'ring-1 ring-[#fcd535] bg-black/5 p-1' : ''
                   }`}
                   title="Click to edit folio header tag"
@@ -2995,7 +2995,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   )}
                 </div>
 
-                {/* Main Body Quote / Prose */}
+                {/* Main Body Quote / Prose with Auto-Fit Safe Bounding Box Solver (Bug 7) */}
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
@@ -3003,18 +3003,31 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     openMobileTab('content');
                     quoteInputRef.current?.focus();
                   }}
-                  className={`relative z-10 py-4 cursor-pointer rounded transition-all ${
+                  className={`relative z-10 py-4 cursor-pointer rounded transition-all min-h-0 overflow-hidden ${
                     verticalAlign === 'top' ? 'my-0 mb-auto' : verticalAlign === 'bottom' ? 'my-0 mt-auto' : 'my-auto'
                   } ${selectedElement === 'quote' ? 'ring-1 ring-[#fcd535] bg-black/5 p-2' : ''}`}
                   title="Click to edit quote text and typography"
                 >
                   <blockquote
                     style={{
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${(() => {
+                        const textLen = (quote || '').length;
+                        if (textLen === 0) return fontSize;
+                        let maxSafe = aspectRatio === '9:16' ? 240 : aspectRatio === '4:5' ? 180 : aspectRatio === '16:9' ? 110 : 140;
+                        const sizeRatio = fontSize / 24;
+                        const cap = maxSafe / Math.max(0.6, sizeRatio * 1.2);
+                        if (textLen > cap) {
+                          const scale = Math.min(0.7, Math.sqrt(cap / textLen));
+                          return Math.max(13, Math.round(fontSize * scale));
+                        }
+                        return fontSize;
+                      })()}px`,
                       textAlign: align,
                       lineHeight: lineHeight,
                       letterSpacing: `${letterSpacing}em`,
                       fontFamily: fontChoice.startsWith('custom-') ? fontChoice : undefined,
+                      wordBreak: 'break-word',
+                      overflowWrap: 'break-word',
                     }}
                     className={`${getFontFamilyClass(fontChoice)} transition-all`}
                   >
@@ -3022,7 +3035,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   </blockquote>
                 </div>
 
-                {/* Footer Citation & Signature — Aspect ratio badge removed per fix.md */}
+                {/* Footer Citation & Signature (shrink-0 to prevent clipping) */}
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
@@ -3030,7 +3043,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     openMobileTab('content');
                     authorInputRef.current?.focus();
                   }}
-                  className={`relative z-10 pt-3.5 border-t border-current/15 flex items-center justify-between cursor-pointer rounded transition-all ${
+                  className={`relative z-10 pt-3.5 border-t border-current/15 flex items-center justify-between cursor-pointer rounded transition-all shrink-0 ${
                     selectedElement === 'author' ? 'ring-1 ring-[#fcd535] bg-black/5 p-1' : ''
                   }`}
                   title="Click to edit author and citation"
@@ -3342,7 +3355,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   Preserve my current quote and author text (recommended)
                 </span>
               </label>
-              <span className="text-[11px] text-[#707a8a]">12 Styles</span>
+              <span className="text-[11px] text-[#707a8a]">{PRESET_TEMPLATES.length} Styles</span>
             </div>
 
             {/* Template Selection Grid */}

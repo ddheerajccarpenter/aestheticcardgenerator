@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import type { BlogPost, CardTemplate } from '../types/card';
 import { BLOG_POSTS } from '../data/blog';
 import { PRESET_TEMPLATES } from '../data/templates';
@@ -40,12 +40,14 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
 
   const categories = ['all', 'Design Trends', 'Typography Craft', 'Color Theory', 'Social Formats', 'Philosophy & Tech'];
 
-  const filteredPosts =
-    selectedCategory === 'all'
-      ? BLOG_POSTS
-      : BLOG_POSTS.filter((p) => p.category === selectedCategory);
-
   const featuredPost = BLOG_POSTS[0];
+
+  const gridPosts = useMemo(() => {
+    if (selectedCategory === 'all') {
+      return BLOG_POSTS.filter((p) => p.slug !== featuredPost.slug);
+    }
+    return BLOG_POSTS.filter((p) => p.category === selectedCategory);
+  }, [selectedCategory, featuredPost.slug]);
 
   return (
     <div
@@ -167,10 +169,10 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
 
         {/* Articles Grid: Strict 2-Column Rule */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1240px] w-full mx-auto">
-          {filteredPosts.map((post) => (
+          {gridPosts.map((post: BlogPost) => (
             <article
               key={post.slug}
-              className={`flex flex-col justify-between p-6 rounded-2xl border transition-all duration-200 group hover:-translate-y-1 shadow-sm ${
+              className={`template-card-kinetic flex flex-col justify-between p-6 rounded-2xl border transition-all duration-200 group hover:-translate-y-1 shadow-sm ${
                 isLight
                   ? 'bg-white border-[#e2e8f0] hover:border-[#cbd5e1]'
                   : 'bg-[#181d24] border-[#262c36] hover:border-[#3a4250]'

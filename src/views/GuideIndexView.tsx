@@ -160,22 +160,22 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
   const spread = BOOK_SPREADS[currentSpreadIndex];
 
   const handleNext = () => {
-    if (currentSpreadIndex < totalSpreads - 1) {
+    if (currentSpreadIndex < totalSpreads - 1 && !isFlipping) {
       setIsFlipping(true);
       setTimeout(() => {
         setCurrentSpreadIndex((prev) => prev + 1);
         setIsFlipping(false);
-      }, 260);
+      }, 500);
     }
   };
 
   const handlePrev = () => {
-    if (currentSpreadIndex > 0) {
+    if (currentSpreadIndex > 0 && !isFlipping) {
       setIsFlipping(true);
       setTimeout(() => {
         setCurrentSpreadIndex((prev) => prev - 1);
         setIsFlipping(false);
-      }, 260);
+      }, 500);
     }
   };
 
@@ -234,22 +234,23 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
         {/* ─────────────────────────────────────────────────────────────────── */}
         {/* PHYSICAL TWO-PAGE OPEN BOOK SPREAD                                 */}
         {/* ─────────────────────────────────────────────────────────────────── */}
-        <div
-          className={`w-full max-w-5xl rounded-3xl border shadow-2xl overflow-hidden relative transition-all duration-300 ${
-            isFlipping ? 'scale-[0.985] opacity-80' : 'scale-100 opacity-100'
-          } ${
-            isLight
-              ? 'bg-[#f7f2e7] border-[#d8cfbe] text-[#1c1815]'
-              : 'bg-[#161412] border-[#2e2822] text-[#ede4d3]'
-          }`}
-          style={{
-            boxShadow: isLight
-              ? '0 25px 50px -12px rgba(90, 70, 50, 0.25), inset 0 0 100px rgba(0,0,0,0.03)'
-              : '0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 0 100px rgba(0,0,0,0.3)',
-          }}
-        >
-          {/* Subtle tactile paper micro-grain texture */}
-          <div className="absolute inset-0 card-noise opacity-25 pointer-events-none" />
+        <div className="guides-book-stage w-full max-w-5xl">
+          <div
+            className={`guides-book-leaf w-full rounded-3xl border shadow-2xl overflow-hidden relative transition-all duration-300 ${
+              isFlipping ? 'is-turning-next scale-[0.985] opacity-85' : 'scale-100 opacity-100'
+            } ${
+              isLight
+                ? 'bg-[#f7f2e7] border-[#d8cfbe] text-[#1c1815]'
+                : 'bg-[#161412] border-[#2e2822] text-[#ede4d3]'
+            }`}
+            style={{
+              boxShadow: isLight
+                ? '0 25px 50px -12px rgba(90, 70, 50, 0.25), inset 0 0 100px rgba(0,0,0,0.03)'
+                : '0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 0 100px rgba(0,0,0,0.3)',
+            }}
+          >
+            {/* Subtle tactile paper micro-grain texture */}
+            <div className="absolute inset-0 card-noise opacity-25 pointer-events-none" />
 
           {/* Center Spine Crease Shadow */}
           <div
@@ -379,6 +380,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
             </div>
           </div>
         </div>
+      </div>
 
         {/* Spread Navigation Controls */}
         <div className="flex items-center gap-4">

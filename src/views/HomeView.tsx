@@ -8,6 +8,7 @@ import { SquareDuotoneIcon } from '../components/SquareDuotoneIcon';
 import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
 import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 import { createThreeCardPreviewScene } from '../engines/threeCardStage';
+import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 
 interface HomeViewProps {
   onOpenEditorWithTemplate?: (template: CardTemplate) => void;
@@ -602,53 +603,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
               return (
                 <div
                   key={template.id}
-                  className={`group flex flex-col border rounded-3xl overflow-hidden transition-all duration-200 hover:-translate-y-1 shadow-xl ${
+                  className={`template-card-kinetic group flex flex-col border rounded-3xl overflow-hidden transition-all duration-200 hover:-translate-y-1 shadow-xl ${
                     isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
                   }`}
                 >
-                  {/* Visual Preview Box */}
-                  <div
-                    style={{ backgroundColor: template.theme.bg, color: template.theme.ink }}
-                    className="relative p-7 min-h-[260px] flex flex-col justify-between border-b border-black/10"
-                  >
-                    <div className="flex items-center justify-between text-xs font-mono opacity-75">
-                      <span className="font-semibold">{template.tag}</span>
-                      <div className="flex items-center gap-2">
-                        {/* Compare toggle button (Part 4.4) */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleCompareTemplate(template);
-                          }}
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
-                            isSelected
-                              ? 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535]'
-                              : 'bg-black/10 text-current border-current/30 hover:bg-black/20'
-                          }`}
-                          title="Compare with another style"
-                        >
-                          {isSelected ? '✓ Selected' : '+ Compare'}
-                        </button>
-                        <span className="border border-current/30 px-1.5 py-0.5 rounded font-bold text-[10px]">
-                          {template.badge}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="my-5">
-                      <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-2">
-                        {template.title}
-                      </h3>
-                      <blockquote className="font-editorial text-base sm:text-lg opacity-85 line-clamp-3">
-                        “{template.quote}”
-                      </blockquote>
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs pt-3 border-t border-current/15">
-                      <span className="font-semibold opacity-85">— {template.author}</span>
-                      <span className="text-[10px] uppercase font-mono opacity-50">{template.categoryLabel}</span>
-                    </div>
-                  </div>
+                  {/* Real Card Visual Artwork Preview (Unified across studio & templates) */}
+                  <UnifiedCardThumbnail
+                    template={template}
+                    isLight={isLight}
+                  />
 
                   {/* Actions Bar */}
                   <div className={`p-4 flex items-center justify-between gap-3 ${isLight ? 'bg-slate-50' : 'bg-[#181d24]'}`}>

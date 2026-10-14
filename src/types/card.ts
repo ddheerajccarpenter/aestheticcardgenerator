@@ -204,6 +204,7 @@ export interface BaseCanvasObject {
   locked: boolean;
   visible: boolean;
   zIndex: number;
+  isBackground?: boolean;
 }
 
 export interface TextCanvasObject extends BaseCanvasObject {
