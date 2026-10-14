@@ -32,6 +32,7 @@ interface SquareDuotoneIconProps {
   name?: DuotoneIconName;
   boxicon?: string;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'dark' | 'light' | 'inherit';
   className?: string;
   title?: string;
   onClick?: (e: React.MouseEvent) => void;
@@ -41,6 +42,7 @@ export const SquareDuotoneIcon: React.FC<SquareDuotoneIconProps> = ({
   name,
   boxicon,
   size = 'md',
+  variant = 'default',
   className = '',
   title,
   onClick,
@@ -50,6 +52,8 @@ export const SquareDuotoneIcon: React.FC<SquareDuotoneIconProps> = ({
     md: 'w-9 h-9 text-sm',
     lg: 'w-10 h-10 text-base',
   }[size];
+
+  const variantClass = variant === 'dark' ? 'sq-icon-dark' : variant === 'light' ? 'sq-icon-light' : '';
 
   const svgSize = size === 'sm' ? 16 : size === 'lg' ? 22 : 18;
 
@@ -225,7 +229,7 @@ export const SquareDuotoneIcon: React.FC<SquareDuotoneIconProps> = ({
 
   return (
     <span
-      className={`sq-duotone-icon ${sizeClasses} shrink-0 cursor-pointer ${className}`}
+      className={`sq-duotone-icon ${sizeClasses} ${variantClass} shrink-0 cursor-pointer ${className}`}
       title={title}
       onClick={onClick}
     >

@@ -59,10 +59,10 @@ export const Header: React.FC<HeaderProps> = ({
                 currentPath === '/'
                   ? isLight
                     ? 'bg-[#e2e8f0] text-[#181a20]'
-                    : 'bg-[#222730] text-white'
+                    : 'bg-[#222730] text-white font-bold'
                   : isLight
-                  ? 'text-[#64748b] hover:bg-slate-100'
-                  : 'text-[#9ca3af] hover:bg-[#181d24]'
+                  ? 'text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]'
+                  : 'text-[#cbd5e1] hover:bg-[#1f242c] hover:text-white'
               }`}
             >
               Home
@@ -73,10 +73,10 @@ export const Header: React.FC<HeaderProps> = ({
                 currentPath.startsWith('/templates')
                   ? isLight
                     ? 'bg-[#e2e8f0] text-[#181a20]'
-                    : 'bg-[#222730] text-white'
+                    : 'bg-[#222730] text-white font-bold'
                   : isLight
-                  ? 'text-[#64748b] hover:bg-slate-100'
-                  : 'text-[#9ca3af] hover:bg-[#181d24]'
+                  ? 'text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]'
+                  : 'text-[#cbd5e1] hover:bg-[#1f242c] hover:text-white'
               }`}
             >
               Templates
@@ -87,10 +87,10 @@ export const Header: React.FC<HeaderProps> = ({
                 currentPath.startsWith('/blog')
                   ? isLight
                     ? 'bg-[#e2e8f0] text-[#181a20]'
-                    : 'bg-[#222730] text-white'
+                    : 'bg-[#222730] text-white font-bold'
                   : isLight
-                  ? 'text-[#64748b] hover:bg-slate-100'
-                  : 'text-[#9ca3af] hover:bg-[#181d24]'
+                  ? 'text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]'
+                  : 'text-[#cbd5e1] hover:bg-[#1f242c] hover:text-white'
               }`}
             >
               Blog
@@ -101,10 +101,10 @@ export const Header: React.FC<HeaderProps> = ({
                 currentPath === '/create'
                   ? isLight
                     ? 'bg-[#e2e8f0] text-[#181a20]'
-                    : 'bg-[#222730] text-white'
+                    : 'bg-[#222730] text-white font-bold'
                   : isLight
-                  ? 'text-[#64748b] hover:bg-slate-100'
-                  : 'text-[#9ca3af] hover:bg-[#181d24]'
+                  ? 'text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]'
+                  : 'text-[#cbd5e1] hover:bg-[#1f242c] hover:text-white'
               }`}
             >
               Card Creator
@@ -115,10 +115,10 @@ export const Header: React.FC<HeaderProps> = ({
                 currentPath === '/canvas'
                   ? isLight
                     ? 'bg-[#e2e8f0] text-[#181a20]'
-                    : 'bg-[#222730] text-white'
+                    : 'bg-[#222730] text-white font-bold'
                   : isLight
-                  ? 'text-[#64748b] hover:bg-slate-100'
-                  : 'text-[#9ca3af] hover:bg-[#181d24]'
+                  ? 'text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]'
+                  : 'text-[#cbd5e1] hover:bg-[#1f242c] hover:text-white'
               }`}
             >
               Canvas Studio
@@ -138,7 +138,7 @@ export const Header: React.FC<HeaderProps> = ({
                   : 'bg-[#222730] border-[#384152] text-white'
                 : isLight
                 ? 'border-slate-200 hover:bg-slate-50 text-[#475569]'
-                : 'border-[#262c36] hover:bg-[#181d24] text-[#c4c7c8]'
+                : 'border-[#384152] bg-[#181d24] hover:bg-[#222730] text-[#e2e8f0]'
             }`}
           >
             <SquareDuotoneIcon name="book" size="sm" />
@@ -150,13 +150,13 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={onOpenShortcuts}
             className={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
               isLight
-                ? 'border-slate-200 hover:bg-slate-50 text-[#64748b]'
-                : 'border-[#262c36] hover:bg-[#181d24] text-[#9ca3af]'
+                ? 'border-slate-200 hover:bg-slate-50 text-[#475569]'
+                : 'border-[#384152] bg-[#181d24] hover:bg-[#222730] text-[#e2e8f0]'
             }`}
             title="Search styles and commands (⌘K)"
           >
             <SquareDuotoneIcon name="search" size="sm" />
-            <kbd className={`hidden md:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono border ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-black/30 border-white/10'}`}>
+            <kbd className={`hidden md:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono border ${isLight ? 'bg-slate-100 border-slate-200 text-[#475569]' : 'bg-black/40 border-white/20 text-[#cbd5e1]'}`}>
               ⌘K
             </kbd>
           </button>

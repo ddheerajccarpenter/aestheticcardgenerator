@@ -19,13 +19,16 @@ export default defineConfig({
           if (id.includes('node_modules/lucide-react/')) {
             return 'vendor-icons';
           }
+          if (id.includes('node_modules/three/')) {
+            return 'vendor-three';
+          }
           if (id.includes('node_modules/html-to-image/') || id.includes('node_modules/canvas-confetti/')) {
             return 'vendor-canvas';
           }
         },
       },
     },
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 1500,
   },
   server: {
     port: 3000,
