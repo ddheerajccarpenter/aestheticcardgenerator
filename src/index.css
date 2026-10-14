@@ -2,7 +2,26 @@
 
 @layer base {
   :root {
-    /* Airtable + Binance Design System Tokens from DESIGN.md */
+    /* Global Typography System (Part II) */
+    --font-heading: 'Murecho', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-subheading: 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'SamsungOne', 'One UI Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Universal 60:30:10 Gradient Tokens - Dark Mode Default */
+    --c60-dominant: #111216;   /* 60% Top Dominant: Deep Matte Obsidian */
+    --c30-secondary: #1b1e26;  /* 30% Middle Shade: Warm Slate Charcoal */
+    --c10-accent: #2c241d;     /* 10% Bottom Shade: Umber Espresso Tint */
+    --ui-accent-solid: #e5b84b;
+    --text-primary: #f4f1ea;
+    --text-secondary: #b5b0a6;
+
+    /* Dark Mode Duotone Icon Tokens */
+    --icon-frame-bg: rgba(255, 255, 255, 0.05);
+    --icon-frame-border: rgba(255, 255, 255, 0.14);
+    --icon-duotone-primary: #f5c451;
+    --icon-duotone-secondary: rgba(245, 196, 81, 0.3);
+
+    /* Airtable + Binance Design System Tokens */
     --color-canvas: #0b0e11;
     --color-canvas-light: #f8fafc;
     --color-surface-card: #181d24;
@@ -27,7 +46,7 @@
     --color-trading-up: #0ecb81;
     --color-trading-down: #f6465d;
 
-    /* Signature Card Palettes from DESIGN.md */
+    /* Card Signature Colors */
     --color-signature-coral: #aa2d00;
     --color-signature-forest: #0a2e0e;
     --color-signature-cream: #f5e9d4;
@@ -43,7 +62,21 @@
     --color-card-pastel-ink: #1e293b;
   }
 
-  html.light {
+  html.light,
+  [data-theme="light"],
+  :root[data-theme="light"] {
+    --c60-dominant: #f5f0e6;   /* 60% Top Dominant: Warm Archival Cream */
+    --c30-secondary: #e8dfd1;  /* 30% Middle Shade: Pressed Oat Linen */
+    --c10-accent: #d8c6b0;     /* 10% Bottom Shade: Warm Sand Kraft */
+    --ui-accent-solid: #9e472a;
+    --text-primary: #181715;
+    --text-secondary: #524e48;
+
+    --icon-frame-bg: rgba(18, 19, 24, 0.05);
+    --icon-frame-border: rgba(18, 19, 24, 0.16);
+    --icon-duotone-primary: #18191e;
+    --icon-duotone-secondary: rgba(184, 93, 59, 0.32);
+
     --color-canvas: #f6f8fa;
     --color-surface-card: #ffffff;
     --color-surface-soft: #f1f3f5;
@@ -60,40 +93,121 @@
     scroll-behavior: smooth;
   }
 
-  body {
-    background-color: var(--color-canvas);
-    color: var(--color-ink);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    overscroll-behavior: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
+  /* Base Body Rule: SamsungOne in Bold Style */
+  body, p, span, li, input, textarea, select, button, label {
+    font-family: var(--font-body);
+    font-weight: 600;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Main & Section Headings: Murecho */
+  h1, h2, .heading-main, .hero-title, .page-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+
+  /* Subheadings, Nav & UI Tabs: Funnel Sans */
+  h3, h4, h5, h6, nav a, .subheading, .section-eyebrow, .tab-trigger, .pill-badge {
+    font-family: var(--font-subheading);
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+
+  /* Numeric Readouts (Sliders, Coordinates, Dimensions) */
+  .numeric-readout, input[type="number"] {
+    font-family: var(--font-subheading);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
   }
 }
 
-/* Custom font utilities for 12 curated fonts across 4 categories */
-/* 1. Editorial Serif */
+/* Universal 60:30:10 Scroll-Reactive Background Layer */
+.universal-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--grad-angle, 180deg),
+    var(--c60-dominant) 0%,
+    var(--c60-dominant) var(--stop-60, 60%),
+    var(--c30-secondary) var(--stop-30, 90%),
+    var(--c10-accent) 100%
+  );
+  transition: background 150ms ease-out;
+}
+
+/* Square Duotone Icon System */
+.sq-duotone-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  background: var(--icon-frame-bg);
+  border: 1px solid var(--icon-frame-border);
+  transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms ease, background-color 140ms ease;
+}
+
+.sq-duotone-icon:hover {
+  transform: translateY(-1px);
+  border-color: var(--icon-duotone-primary);
+}
+
+.sq-duotone-icon .bx-duotone-primary {
+  fill: var(--icon-duotone-primary);
+  stroke: var(--icon-duotone-primary);
+  color: var(--icon-duotone-primary);
+  stroke-width: 0.4px;
+}
+
+.sq-duotone-icon .bx-duotone-secondary {
+  fill: var(--icon-duotone-secondary);
+  color: var(--icon-duotone-secondary);
+}
+
+/* YouTube-Style Ambient Stage (Workspace editor only, never export) */
+.editor-ambient-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.editor-ambient-stage::before {
+  content: '';
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--ambient-opacity, 0.42);
+  transition: opacity 320ms ease, background 400ms ease;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(var(--ambient-c1, 229, 184, 75), 0.38) 0%, transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(var(--ambient-c2, 244, 237, 228), 0.26) 0%, transparent 60%),
+    radial-gradient(circle at 75% 75%, rgba(var(--ambient-c3, 184, 93, 59), 0.34) 0%, transparent 55%);
+  filter: blur(48px);
+}
+
+/* Custom font utilities for internal card canvas */
 .font-newsreader { font-family: 'Newsreader', Georgia, serif; }
 .font-editorial { font-family: 'Newsreader', Georgia, serif; }
 .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
 .font-display-serif { font-family: 'Playfair Display', Georgia, serif; }
 .font-instrument { font-family: 'Instrument Serif', Georgia, serif; }
 .font-cormorant { font-family: 'Cormorant Garamond', Georgia, serif; }
-
-/* 2. Display & Y2K */
 .font-syne { font-family: 'Syne', sans-serif; }
 .font-space-grotesk { font-family: 'Space Grotesk', sans-serif; }
 .font-unbounded { font-family: 'Unbounded', sans-serif; }
-
-/* 3. Archival Mono & Pixel */
 .font-space-mono { font-family: 'Space Mono', monospace; }
 .font-jetbrains { font-family: 'JetBrains Mono', monospace; }
 .font-mono-code { font-family: 'JetBrains Mono', monospace; }
 .font-vt323 { font-family: 'VT323', monospace; }
-
-/* 4. Handwritten & Zine */
 .font-caveat { font-family: 'Caveat', cursive; }
 .font-reenie { font-family: 'Reenie Beanie', cursive; }
-
-/* Clean Sans */
 .font-modern-sans { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
 .font-sans-clean { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
 

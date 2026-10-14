@@ -7,7 +7,6 @@ import { AdSlot } from '../components/AdSlot';
 import {
   Calendar,
   Clock,
-  User,
   ChevronRight,
   ArrowRight,
   PenTool,
@@ -113,8 +112,9 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
 
                 <div className="flex flex-wrap items-center gap-4 text-xs text-[#707a8a] pt-2">
                   <div className="flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5" />
-                    <span>{featuredPost.author}</span>
+                    <span className="font-semibold text-[11px] text-[#fcd535] uppercase tracking-wider">
+                      Studio Design Note
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" />
@@ -165,8 +165,8 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
           ))}
         </div>
 
-        {/* Articles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Articles Grid: Strict 2-Column Rule */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1240px] w-full mx-auto">
           {filteredPosts.map((post) => (
             <article
               key={post.slug}
@@ -265,7 +265,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
     ? PRESET_TEMPLATES.find((t) => t.id === blog.featuredTemplateId)
     : undefined;
 
-  const otherPosts = BLOG_POSTS.filter((p) => p.slug !== blog.slug).slice(0, 3);
+  const otherPosts = BLOG_POSTS.filter((p) => p.slug !== blog.slug).slice(0, 4);
 
   return (
     <div
@@ -307,8 +307,9 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
 
           <div className="flex flex-wrap items-center gap-4 text-xs text-[#707a8a] pt-2 border-t border-current/10">
             <div className="flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5" />
-              <span className="font-medium text-current">{blog.author}</span>
+              <span className="font-semibold text-[11px] text-[#fcd535] uppercase tracking-wider">
+                Studio Design Note
+              </span>
             </div>
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
@@ -464,7 +465,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
               </a>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {otherPosts.map((post) => (
                 <a
                   key={post.slug}

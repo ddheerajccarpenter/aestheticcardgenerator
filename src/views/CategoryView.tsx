@@ -120,8 +120,8 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
         </header>
 
         {/* Deep Narrative & Use Case Section */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 flex flex-col gap-4">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 flex flex-col gap-4">
             <h2 className={`text-xl font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
               About This Art Direction
             </h2>
@@ -139,7 +139,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
           </div>
 
           {/* Design Tips Card */}
-          <div className={`p-5 rounded-2xl border flex flex-col gap-3 ${isLight ? 'bg-[#f1f5f9] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'}`}>
+          <div className={`lg:col-span-4 p-5 rounded-2xl border flex flex-col gap-3 ${isLight ? 'bg-[#f1f5f9] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'}`}>
             <h3 className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
               Typesetting Best Practices
             </h3>
@@ -170,7 +170,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {displayTemplates.map((template) => (
               <article
                 key={template.id}
