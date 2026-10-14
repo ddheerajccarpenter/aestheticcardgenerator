@@ -241,20 +241,26 @@
   color: rgba(255, 255, 255, 0.45) !important;
 }
 
-/* Universal Dark Mode High Contrast for Muted Text */
-html:not(.light) .text-\[\#707a8a\],
-[data-theme="dark"] .text-\[\#707a8a\] {
+/* Universal Dark Mode High Contrast for Muted Text & Borders */
+html:not(.light) .text-\[\#707a8a\]:not(:hover),
+[data-theme="dark"] .text-\[\#707a8a\]:not(:hover) {
   color: #94a3b8 !important;
 }
 
-html:not(.light) .text-\[\#64748b\],
-[data-theme="dark"] .text-\[\#64748b\] {
+html:not(.light) .text-\[\#64748b\]:not(:hover),
+[data-theme="dark"] .text-\[\#64748b\]:not(:hover) {
   color: #cbd5e1 !important;
 }
 
-html:not(.light) .text-\[\#475569\],
-[data-theme="dark"] .text-\[\#475569\] {
+html:not(.light) .text-\[\#475569\]:not(:hover),
+[data-theme="dark"] .text-\[\#475569\]:not(:hover) {
   color: #cbd5e1 !important;
+}
+
+/* Enhanced dark mode border visibility */
+html:not(.light) .border-\[\#1f242c\],
+[data-theme="dark"] .border-\[\#1f242c\] {
+  border-color: #2b3340 !important;
 }
 
 /* YouTube-Style Ambient Stage (Workspace editor only, never export) */
