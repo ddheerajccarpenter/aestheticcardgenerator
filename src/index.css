@@ -65,32 +65,46 @@
   html.light,
   [data-theme="light"],
   :root[data-theme="light"] {
-    --c60-dominant: #f5f0e6;   /* 60% Top Dominant: Warm Archival Cream */
-    --c30-secondary: #e8dfd1;  /* 30% Middle Shade: Pressed Oat Linen */
-    --c10-accent: #d8c6b0;     /* 10% Bottom Shade: Warm Sand Kraft */
-    --ui-accent-solid: #9e472a;
-    --text-primary: #181715;
-    --text-secondary: #524e48;
+    --c60-dominant: #f6f8fa;   /* 60% Top Dominant: Clean daylight white */
+    --c30-secondary: #edf2f7;  /* 30% Middle Shade: Cool slate pearl */
+    --c10-accent: #e2e8f0;     /* 10% Bottom Shade: Muted border accent */
+    --ui-accent-solid: #d97706;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
 
-    --icon-frame-bg: rgba(18, 19, 24, 0.05);
-    --icon-frame-border: rgba(18, 19, 24, 0.16);
-    --icon-duotone-primary: #18191e;
-    --icon-duotone-secondary: rgba(184, 93, 59, 0.32);
+    --icon-frame-bg: rgba(15, 23, 42, 0.04);
+    --icon-frame-border: rgba(15, 23, 42, 0.12);
+    --icon-duotone-primary: #0f172a;
+    --icon-duotone-secondary: rgba(217, 119, 6, 0.4);
 
-    --color-canvas: #f6f8fa;
+    --color-canvas: #f8fafc;
     --color-surface-card: #ffffff;
-    --color-surface-soft: #f1f3f5;
-    --color-surface-elevated: #e9ecef;
-    --color-hairline: #e1e4e8;
-    --color-hairline-light: #d1d5da;
-    --color-border-subtle: #eaecef;
-    --color-ink: #181a20;
-    --color-body: #57606a;
-    --color-muted: #6a737d;
+    --color-surface-soft: #f1f5f9;
+    --color-surface-elevated: #e2e8f0;
+    --color-hairline: #e2e8f0;
+    --color-hairline-light: #cbd5e1;
+    --color-border-subtle: #e2e8f0;
+    --color-ink: #0f172a;
+    --color-body: #475569;
+    --color-muted: #64748b;
   }
 
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Body Theme Foundation */
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    min-height: 100vh;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  html.light body,
+  [data-theme="light"] body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
   }
 
   /* Base Body Rule: SamsungOne in Bold Style */
@@ -259,3 +273,23 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #37393d;
 }
+
+html.light ::-webkit-scrollbar-thumb,
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+html.light ::-webkit-scrollbar-thumb:hover,
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+html.light .editor-ambient-stage::before,
+[data-theme="light"] .editor-ambient-stage::before {
+  opacity: 0.18;
+}
+
+html.light .universal-page-bg,
+[data-theme="light"] .universal-page-bg {
+  opacity: 0.85;
+}
+

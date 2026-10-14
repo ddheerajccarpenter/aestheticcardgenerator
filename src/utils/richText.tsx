@@ -8,13 +8,29 @@ import React from 'react';
  */
 export function parseRichText(
   text: string,
-  accentColor: string = '#facc15'
+  accentColor: string = '#fcd535'
 ): React.ReactNode[] {
   if (!text) return [];
 
   // Match token pairs: **bold**, *italic*, ==highlight==
   const regex = /(\*\*[\s\S]*?\*\*|\*[^*\s][\s\S]*?\*|==[\s\S]*?==)/g;
   const parts = text.split(regex);
+
+  // If accentColor is dark (e.g. #000 or #181a20 or #2c2825), fall back to luminous warm amber #fcd535
+  const isDarkColor = (hex: string) => {
+    if (!hex || !hex.startsWith('#') || hex.length < 7) return false;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness < 120;
+  };
+
+  const highlightBg = isDarkColor(accentColor)
+    ? 'rgba(252, 213, 53, 0.35)'
+    : accentColor.startsWith('#') && accentColor.length === 7
+    ? `${accentColor}40`
+    : accentColor || 'rgba(252, 213, 53, 0.35)';
 
   return parts.map((part, index) => {
     if (!part) return null;
@@ -34,7 +50,7 @@ export function parseRichText(
         <mark
           key={index}
           style={{
-            backgroundColor: `${accentColor}40`,
+            backgroundColor: highlightBg,
             boxDecorationBreak: 'clone',
             WebkitBoxDecorationBreak: 'clone',
           }}
@@ -64,7 +80,7 @@ export function parseRichText(
 export function stripRichText(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/==(.*? bureaucracy)?==/g, '$1')
-    .replace(/==(.*?)==/g, '$1')
+    .replace(/==([\s\S]*?)==/g, '$1')
     .replace(/\*(.*?)\*/g, '$1');
 }
+

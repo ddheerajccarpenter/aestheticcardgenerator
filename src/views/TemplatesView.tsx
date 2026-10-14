@@ -197,7 +197,9 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-[#707a8a] hover:text-white cursor-pointer"
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 p-0.5 cursor-pointer ${
+                    isLight ? 'text-[#64748b] hover:text-[#0f172a]' : 'text-[#707a8a] hover:text-white'
+                  }`}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
