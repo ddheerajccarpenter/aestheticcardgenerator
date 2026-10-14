@@ -183,6 +183,7 @@ export const App: React.FC = () => {
           theme={theme}
           onNavigateHome={() => navigate('/')}
           onEditingSheetChange={setIsEditorSheetOpen}
+          onToggleTheme={toggleTheme}
         />
       );
     }
@@ -310,14 +311,16 @@ export const App: React.FC = () => {
     >
       {/* Universal 60:30:10 Scroll-Reactive Background Field */}
       <div className="universal-page-bg" />
-      {/* Global Header */}
-      <Header
-        currentPath={currentPath}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        onNavigate={navigate}
-        onOpenShortcuts={() => setShortcutsOpen(true)}
-      />
+      {/* Global Header (shown across public marketing pages, hidden on standalone fullscreen studio) */}
+      {currentPath !== '/canvas' && (
+        <Header
+          currentPath={currentPath}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onNavigate={navigate}
+          onOpenShortcuts={() => setShortcutsOpen(true)}
+        />
+      )}
 
       {/* Main Content Area */}
       <main className={`flex-1 ${currentPath !== '/create' && currentPath !== '/canvas' ? 'pb-24 md:pb-0' : ''}`}>
@@ -333,12 +336,14 @@ export const App: React.FC = () => {
       )}
 
       {/* 4-Item Mobile Bottom Navigation */}
-      <MobileBottomNav
-        currentPath={currentPath}
-        theme={theme}
-        onNavigate={navigate}
-        hideWhenTyping={isEditorSheetOpen}
-      />
+      {currentPath !== '/canvas' && currentPath !== '/create' && (
+        <MobileBottomNav
+          currentPath={currentPath}
+          theme={theme}
+          onNavigate={navigate}
+          hideWhenTyping={isEditorSheetOpen}
+        />
+      )}
 
       {/* Non-Intrusive Cookie & GDPR Privacy Consent Banner (Part VII.1) */}
       <CookieConsentBanner

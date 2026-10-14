@@ -61,6 +61,7 @@ import {
   Crop,
   Wand2,
   Sun,
+  Moon,
   Box,
   Terminal,
   Folder,
@@ -87,6 +88,7 @@ interface CanvasEditorViewProps {
   theme?: 'dark' | 'light';
   onNavigateHome?: () => void;
   onEditingSheetChange?: (isOpen: boolean) => void;
+  onToggleTheme?: () => void;
 }
 
 const STORAGE_KEY = 'aesthetic_canvas_editor_draft_v1';
@@ -94,7 +96,9 @@ const MAX_HISTORY = 40;
 
 export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   theme = 'dark',
+  onNavigateHome,
   onEditingSheetChange,
+  onToggleTheme,
 }) => {
   const [mobileAddSheetOpen, setMobileAddSheetOpen] = useState(false);
   const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false);
@@ -221,9 +225,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const handleFitToScreen = useCallback(() => {
     if (!canvasContainerRef.current) return;
     const container = canvasContainerRef.current;
-    const padding = window.innerWidth < 640 ? 32 : 64;
-    const availableWidth = container.clientWidth - padding;
-    const availableHeight = container.clientHeight - padding;
+    const paddingX = window.innerWidth < 640 ? 20 : 64;
+    const paddingY = window.innerWidth < 640 ? 36 : 64;
+    const availableWidth = container.clientWidth - paddingX;
+    const availableHeight = container.clientHeight - paddingY;
     if (availableWidth <= 0 || availableHeight <= 0) return;
 
     const scaleX = availableWidth / doc.canvasWidth;
@@ -1286,7 +1291,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   return (
     <div
-      className={`w-full min-h-screen flex flex-col pt-16 transition-colors duration-200 ${
+      className={`w-full min-h-screen flex flex-col pt-0 transition-colors duration-200 ${
         isLight ? 'bg-[#f1f3f5] text-[#181a20]' : 'bg-[#0b0e11] text-[#e1e2e7]'
       }`}
     >
@@ -1320,29 +1325,32 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* TOP STUDIO TOOLBAR                                                    */}
       {/* ───────────────────────────────────────────────────────────────────── */}
       <header
-        className={`h-14 border-b px-4 flex items-center justify-between shrink-0 transition-colors z-30 ${
+        className={`editor-top-toolbar h-13 sm:h-14 border-b px-2 sm:px-4 flex items-center justify-between shrink-0 transition-colors z-30 pt-[env(safe-area-inset-top,0px)] ${
           isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#222730]'
         }`}
       >
         {/* Left: Back & Title */}
-        <div className="flex items-center gap-3">
-          <a
-            href="/templates"
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <button
+            onClick={() => {
+              if (onNavigateHome) onNavigateHome();
+              else window.location.href = '/templates';
+            }}
             className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-              isLight ? 'border-[#e2e8f0] hover:bg-[#f8fafc]' : 'border-[#262c36] hover:bg-[#181d24]'
+              isLight ? 'border-[#e2e8f0] hover:bg-[#f8fafc] text-slate-700' : 'border-[#262c36] hover:bg-[#181d24] text-slate-200'
             }`}
-            title="Browse all templates"
+            title="Return to Studio Home / Templates"
           >
             <ArrowLeft className="w-4 h-4" />
-          </a>
+          </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <input
               type="text"
               value={doc.title}
               onChange={(e) => setDoc((prev) => ({ ...prev, title: e.target.value }))}
               onBlur={(e) => commitDocumentChange({ ...doc, title: e.target.value })}
-              className={`text-sm font-semibold tracking-tight bg-transparent border-b border-transparent hover:border-[#707a8a] focus:border-[#fcd535] focus:outline-none px-1 py-0.5 rounded transition-all max-w-[200px] sm:max-w-xs ${
+              className={`doc-title-input text-xs sm:text-sm font-semibold tracking-tight bg-transparent border-b border-transparent hover:border-[#707a8a] focus:border-[#fcd535] focus:outline-none px-1 py-0.5 rounded transition-all max-w-[90px] sm:max-w-[160px] md:max-w-xs ${
                 isLight ? 'text-[#0f172a]' : 'text-white'
               }`}
               title="Click to rename document"
@@ -1354,12 +1362,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         </div>
 
         {/* Center: Undo/Redo & Zoom Controls */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           <button
             onClick={handleUndo}
             disabled={historyIndex <= 0}
-            className={`p-2 rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-              isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#181d24]'
+            className={`p-1.5 sm:p-2 rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+              isLight ? 'hover:bg-[#f1f3f5] text-slate-700' : 'hover:bg-[#181d24] text-slate-300'
             }`}
             title="Undo (⌘Z)"
           >
@@ -1368,8 +1376,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           <button
             onClick={handleRedo}
             disabled={historyIndex >= history.length - 1}
-            className={`p-2 rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-              isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#181d24]'
+            className={`p-1.5 sm:p-2 rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+              isLight ? 'hover:bg-[#f1f3f5] text-slate-700' : 'hover:bg-[#181d24] text-slate-300'
             }`}
             title="Redo (⌘⇧Z)"
           >
@@ -1423,10 +1431,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
           <div className="h-4 w-px bg-[#262c36]/40 mx-1 hidden sm:block" />
 
-          {/* Grid Toggle */}
+          {/* Grid Toggle (Desktop/Tablet) */}
           <button
             onClick={() => setShowGrid(!showGrid)}
-            className={`p-2 rounded-lg transition-colors cursor-pointer ${
+            className={`hidden sm:inline-flex p-2 rounded-lg transition-colors cursor-pointer ${
               showGrid
                 ? isLight
                   ? 'bg-[#0f172a] text-white'
@@ -1440,14 +1448,14 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <Grid className="w-4 h-4" />
           </button>
 
-          {/* Auto-Align in 8px Grid */}
+          {/* Auto-Align in 8px Grid (Desktop/Tablet) */}
           <button
             onClick={() => {
               const aligned = autoAlignLayersInGrid(doc.objects as any, doc.canvasWidth, doc.canvasHeight);
               commitDocumentChange({ ...doc, objects: aligned as any });
               showToast('Auto-aligned all layers to 8px baseline grid');
             }}
-            className={`p-2 rounded-lg transition-colors cursor-pointer ${
+            className={`hidden sm:inline-flex p-2 rounded-lg transition-colors cursor-pointer ${
               isLight ? 'hover:bg-[#f1f3f5] text-[#707a8a]' : 'hover:bg-[#181d24] text-[#707a8a]'
             }`}
             title="Auto-align layers to 8px baseline grid & center alignments"
@@ -1455,12 +1463,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <Sparkles className="w-4 h-4 text-[#ec4899]" />
           </button>
 
-          <div className="h-4 w-px bg-[#262c36]/40 mx-1 hidden sm:block" />
+          <div className="h-4 w-px bg-[#262c36]/40 mx-0.5 sm:mx-1" />
 
           {/* Ambient Lighting Toggle (YouTube-Style - Leftover Item 3) */}
           <button
             onClick={() => setAmbientModeEnabled(!ambientModeEnabled)}
-            className={`px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
+            className={`p-1.5 sm:px-2 sm:py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
               ambientModeEnabled
                 ? isLight
                   ? 'bg-[#d97706]/15 text-[#d97706]'
@@ -1470,13 +1478,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             title="Toggle YouTube-style Ambient Glow around card stage"
           >
             <Sun className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Ambient</span>
+            <span className="hidden md:inline">Ambient</span>
           </button>
 
           {/* 3D Physical Card View Toggle (Three.js - Leftover Item 2) */}
           <button
             onClick={() => setIs3DMode(!is3DMode)}
-            className={`px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
+            className={`p-1.5 sm:px-2 sm:py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
               is3DMode
                 ? 'bg-[#fcd535] text-black font-bold'
                 : isLight
@@ -1486,12 +1494,28 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             title="Toggle Three.js 3D Physical Card Stage with dynamic reflections"
           >
             <Box className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">3D View</span>
+            <span className="hidden md:inline">3D View</span>
           </button>
         </div>
 
-        {/* Right: Template Picker, Blank Canvas & Export */}
-        <div className="flex items-center gap-2">
+        {/* Right: Theme Toggle, Template Picker, Blank Canvas & Export */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Studio Theme Toggle Button */}
+          {onToggleTheme && (
+            <button
+              onClick={onToggleTheme}
+              className={`p-1.5 sm:p-2 rounded-lg border transition-colors cursor-pointer ${
+                isLight
+                  ? 'bg-white border-[#e2e8f0] text-amber-500 hover:bg-[#f8fafc]'
+                  : 'bg-[#181d24] border-[#262c36] text-[#fcd535] hover:bg-[#222730]'
+              }`}
+              title={`Switch to ${isLight ? 'Dark' : 'Light'} Mode`}
+              aria-label="Toggle Theme"
+            >
+              {isLight ? <Moon className="w-3.5 h-3.5 text-slate-700" /> : <Sun className="w-3.5 h-3.5 text-[#fcd535]" />}
+            </button>
+          )}
+
           <button
             onClick={() => setTemplateDrawerOpen(true)}
             className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
@@ -1506,7 +1530,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
           <button
             onClick={() => setMediaModalOpen(true)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
+            className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
               isLight
                 ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
                 : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
@@ -1514,12 +1538,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             title="Search and import book or song cover & metadata"
           >
             <BookOpen className="w-3.5 h-3.5 text-[#fcd535]" />
-            <span className="hidden sm:inline">Import Book / Song</span>
+            <span>Import Book / Song</span>
           </button>
 
           <button
             onClick={() => handleCreateBlank()}
-            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
+            className={`hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
               isLight
                 ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
                 : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
@@ -1535,7 +1559,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <button
               onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
               disabled={exporting}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer ${
+              className={`inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer ${
                 isLight
                   ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
                   : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
@@ -2126,7 +2150,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         <main
           ref={canvasContainerRef}
           onClick={() => setSelectedId(null)}
-          className={`editor-ambient-stage flex-1 overflow-auto flex items-center justify-center p-8 select-none relative transition-colors ${
+          className={`editor-ambient-stage editor-canvas-stage-mobile flex-1 overflow-auto flex items-center justify-center p-3 pb-16 sm:p-8 select-none relative transition-colors ${
             isLight ? 'bg-[#e2e8f0]' : 'bg-[#080a0d]'
           }`}
           style={{
@@ -3834,7 +3858,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* MOBILE BOTTOM DOCKED CANVAS ACTION BAR (< lg)                         */}
       {/* ───────────────────────────────────────────────────────────────────── */}
       <div
-        className={`lg:hidden fixed bottom-14 left-0 right-0 z-30 border-t backdrop-blur-lg px-2 py-1.5 transition-colors ${
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t backdrop-blur-lg px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] transition-colors ${
           isLight ? 'bg-white/95 border-[#e2e8f0]' : 'bg-[#111417]/95 border-[#262c36]'
         }`}
       >
@@ -3923,6 +3947,28 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-4 overflow-y-auto">
+              <button
+                onClick={() => {
+                  setTemplateDrawerOpen(true);
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <LayoutTemplate className="w-5 h-5 text-[#fcd535]" />
+                <span className="text-xs font-medium">Templates</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setMediaModalOpen(true);
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#fcd535]"
+              >
+                <BookOpen className="w-5 h-5 text-[#fcd535]" />
+                <span className="text-xs font-medium">Book / Song</span>
+              </button>
+
               <button
                 onClick={() => {
                   addObject(createTextObject({ text: 'Your text here', fontSize: 24, color: isLight ? '#0f172a' : '#ffffff' }));
