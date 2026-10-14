@@ -267,7 +267,7 @@ export const Footer: React.FC<FooterProps> = ({ theme = 'dark' }) => {
         {/* Bottom bar */}
         <div className={`pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs ${isLight ? 'text-[#64748b]' : 'text-[#707a8a]'}`}>
           <div>
-            © 2026 Aesthetic Card Studio. Client-side typesetting press for writers, readers, and visual curators.
+            © 2026 Aesthetic Card Studio. Client-side card &amp; ID press for writers, curators, and creative thinkers.
           </div>
           <div className={`flex items-center gap-2 ${isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}`}>
             <span className="w-2 h-2 rounded-full bg-[#0ecb81] animate-pulse"></span>

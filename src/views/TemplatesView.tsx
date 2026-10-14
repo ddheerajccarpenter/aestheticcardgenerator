@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import type { CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
+import { ASSET_AVATARS } from '../data/canvasAssets';
 import { updatePageSEO } from '../utils/seo';
 import { AdSlot } from '../components/AdSlot';
 import {
@@ -291,11 +292,24 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
 
                     {/* Content Preview: ID Pass vs Editorial Quote */}
                     {isIdStyle ? (
-                      /* ID Card layout preview */
+                      /* ID Card layout preview with stylized halftone/duotone portrait */
                       <div className="my-3 flex items-center gap-3 z-10">
-                        {/* Avatar box representation */}
-                        <div className="w-16 h-20 rounded-lg bg-black/10 border border-current/20 flex flex-col items-center justify-center text-[9px] font-mono opacity-70 shrink-0">
-                          <span>PHOTO</span>
+                        <div className="w-16 h-20 rounded-lg overflow-hidden border border-current/30 shadow-sm shrink-0 relative bg-black/10">
+                          <img
+                            src={
+                              (template.canvasDoc?.objects?.find((o) => o.type === 'image') as any)?.src ||
+                              (template.id.includes('pretty') || template.id.includes('kawaii') || template.id.includes('soulmate')
+                                ? ASSET_AVATARS.jenniePretty
+                                : template.id.includes('dan') || template.id.includes('delulu') || template.id.includes('cyber') || template.id.includes('acid')
+                                ? ASSET_AVATARS.grungeDan
+                                : template.id.includes('anime') || template.id.includes('travel')
+                                ? ASSET_AVATARS.animeTraveler
+                                : ASSET_AVATARS.studentScholar)
+                            }
+                            alt={template.title}
+                            className="w-full h-full object-cover grayscale contrast-125"
+                          />
+                          <div className="absolute inset-0 bg-current/15 mix-blend-multiply pointer-events-none" />
                         </div>
                         <div className="flex-1 flex flex-col gap-1 text-[11px] font-sans">
                           <span className="font-bold line-clamp-1 text-sm tracking-tight">{template.title}</span>

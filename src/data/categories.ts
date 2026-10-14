@@ -63,7 +63,7 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     matchedTemplateIds: ['oxford-navy-journal', 'st-germain-editorial', 'coral-statement'],
     metaTitle: 'Editorial Quote Card Generator — Timeless Typography & Citations',
     metaDescription:
-      'Typeset literary and philosophical quotes into elegant editorial cards. Features folio metadata, optical kerning, and lossless export.',
+      'Typeset literary and philosophical quotes into elegant editorial cards. Features folio metadata, custom typography, and lossless export.',
     keywords: [
       'quote card creator',
       'literary quote maker',

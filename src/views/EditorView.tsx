@@ -1,9 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { CardTemplate, AspectRatioId, FontChoice, ExportFormat, CardState } from '../types/card';
+import type { CardTemplate, AspectRatioId, FontChoice, ExportFormat, CardState, VerticalAlign, SurfaceFinish } from '../types/card';
 import { ASPECT_RATIOS, PALETTE_PRESETS, SAMPLE_QUOTES, PRESET_TEMPLATES } from '../data/templates';
 import { toPng, toBlob, toSvg } from 'html-to-image';
 import confetti from 'canvas-confetti';
 import { updatePageSEO } from '../utils/seo';
+import { parseRichText } from '../utils/richText';
+import { MediaImportModal, type MediaResult } from '../components/MediaImportModal';
+import { renderCardWithBackdrop, type BackdropSurface, type BackdropRatio } from '../utils/backdropExport';
 import {
   RotateCcw,
   Undo2,
@@ -33,6 +36,14 @@ import {
   X,
   Layers,
   MoreHorizontal,
+  Share2,
+  Bold,
+  Italic,
+  Highlighter,
+  BookOpen,
+  AlignVerticalJustifyCenter,
+  AlignVerticalJustifyStart,
+  AlignVerticalJustifyEnd,
 } from 'lucide-react';
 
 interface EditorViewProps {
@@ -98,6 +109,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
   const [inkColor, setInkColor] = useState(initialTemplate?.theme.ink || '#2c2825');
   const [fontChoice, setFontChoice] = useState<FontChoice>(initialTemplate?.font || 'editorial');
   const [fontSize, setFontSize] = useState<number>(initialTemplate?.fontSize || 26);
+  const [lineHeight, setLineHeight] = useState<number>(initialTemplate?.lineHeight || 1.45);
+  const [letterSpacing, setLetterSpacing] = useState<number>(initialTemplate?.letterSpacing || 0);
+  const [verticalAlign, setVerticalAlign] = useState<VerticalAlign>(initialTemplate?.verticalAlign || 'middle');
+  const [surfaceFinish, setSurfaceFinish] = useState<SurfaceFinish>(
+    initialTemplate?.surfaceFinish || (initialTemplate?.showGrain ? 'grain' : 'none')
+  );
+  const [textureIntensity, setTextureIntensity] = useState<number>(initialTemplate?.textureIntensity ?? 50);
+  const [isHolographic, setIsHolographic] = useState<boolean>(initialTemplate?.isHolographic || false);
   const [align, setAlign] = useState<'left' | 'center' | 'right'>(initialTemplate?.align || 'left');
   const [padding, setPadding] = useState<number>(initialTemplate?.padding || 36);
   const [borderRadius, setBorderRadius] = useState<number>(initialTemplate?.borderRadius || 12);
@@ -105,6 +124,13 @@ export const EditorView: React.FC<EditorViewProps> = ({
   const [showBorder, setShowBorder] = useState(initialTemplate?.showBorder ?? true);
   const [showIcon, setShowIcon] = useState(initialTemplate?.showIcon ?? true);
   const [iconName, setIconName] = useState(initialTemplate?.iconName || 'format_quote');
+
+  // Presentation Backdrop Export Mode
+  const [backdropSurface, setBackdropSurface] = useState<BackdropSurface>('none');
+  const [backdropRatio, setBackdropRatio] = useState<BackdropRatio>('4:5');
+
+  // Media auto-fill modal
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
 
   // UI Modals & Popovers
   const [aspectMenuOpen, setAspectMenuOpen] = useState(false);
@@ -152,6 +178,12 @@ export const EditorView: React.FC<EditorViewProps> = ({
       inkColor,
       fontChoice,
       fontSize,
+      lineHeight,
+      letterSpacing,
+      verticalAlign,
+      surfaceFinish,
+      textureIntensity,
+      isHolographic,
       align,
       padding,
       borderRadius,
@@ -171,6 +203,12 @@ export const EditorView: React.FC<EditorViewProps> = ({
     inkColor,
     fontChoice,
     fontSize,
+    lineHeight,
+    letterSpacing,
+    verticalAlign,
+    surfaceFinish,
+    textureIntensity,
+    isHolographic,
     align,
     padding,
     borderRadius,
@@ -203,13 +241,79 @@ export const EditorView: React.FC<EditorViewProps> = ({
   );
 
   // Initialize history with initial state or restored draft on mount
+  // Initialize history with initial state or restored draft on mount, plus URL param & hero hydration
   useEffect(() => {
-    // Check local draft
+    // 1. Check local session storage from homepage mini studio
+    const heroImport = sessionStorage.getItem('aesthetic_card_studio_hero_quote');
+    if (heroImport) {
+      try {
+        const data = JSON.parse(heroImport);
+        if (data.quote) setQuote(data.quote);
+        if (data.author) setAuthor(data.author);
+        if (data.tag) setTag(data.tag);
+        if (data.bg) setBgColor(data.bg);
+        if (data.ink) setInkColor(data.ink);
+        sessionStorage.removeItem('aesthetic_card_studio_hero_quote');
+        showToast('Loaded custom quote from homepage mini-studio!');
+        const snap = getCurrentSnapshot();
+        setHistory([snap]);
+        setHistoryIndex(0);
+        return;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 2. Check shareable URL parameters
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('share') || params.has('q')) {
+      const q = params.get('q') || params.get('quote');
+      const a = params.get('a') || params.get('author');
+      const t = params.get('t') || params.get('tag');
+      const b = params.get('b') || params.get('badge');
+      const f = params.get('font') as FontChoice;
+      const fs = params.get('size');
+      const lh = params.get('lh');
+      const ls = params.get('ls');
+      const va = params.get('va') as VerticalAlign;
+      const bg = params.get('bg');
+      const ink = params.get('ink');
+      const pad = params.get('pad');
+      const rad = params.get('rad');
+      const surf = params.get('surf') as SurfaceFinish;
+      const tint = params.get('int');
+      const holo = params.get('holo');
+
+      if (q) setQuote(decodeURIComponent(q));
+      if (a) setAuthor(decodeURIComponent(a));
+      if (t) setTag(decodeURIComponent(t));
+      if (b) setBadge(decodeURIComponent(b));
+      if (f) setFontChoice(f);
+      if (fs) setFontSize(Number(fs));
+      if (lh) setLineHeight(Number(lh));
+      if (ls) setLetterSpacing(Number(ls));
+      if (va) setVerticalAlign(va);
+      if (bg) setBgColor(bg.startsWith('#') ? bg : `#${bg}`);
+      if (ink) setInkColor(ink.startsWith('#') ? ink : `#${ink}`);
+      if (pad) setPadding(Number(pad));
+      if (rad) setBorderRadius(Number(rad));
+      if (surf) setSurfaceFinish(surf);
+      if (tint) setTextureIntensity(Number(tint));
+      if (holo) setIsHolographic(holo === '1' || holo === 'true');
+
+      showToast('Loaded shared card template from link!');
+      const snap = getCurrentSnapshot();
+      setHistory([snap]);
+      setHistoryIndex(0);
+      return;
+    }
+
+    // 3. Check local draft
     const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
     if (!initialTemplate && savedDraft) {
       try {
         const parsed: CardState = JSON.parse(savedDraft);
-        setDocTitle(parsed.docTitle || 'Reflections on Design — Vol. 04');
+        setDocTitle(parsed.docTitle || 'My Card');
         setQuote(parsed.quote);
         setAuthor(parsed.author);
         setTag(parsed.tag);
@@ -218,6 +322,12 @@ export const EditorView: React.FC<EditorViewProps> = ({
         setInkColor(parsed.inkColor);
         setFontChoice(parsed.fontChoice);
         setFontSize(parsed.fontSize);
+        if (parsed.lineHeight !== undefined) setLineHeight(parsed.lineHeight);
+        if (parsed.letterSpacing !== undefined) setLetterSpacing(parsed.letterSpacing);
+        if (parsed.verticalAlign !== undefined) setVerticalAlign(parsed.verticalAlign);
+        if (parsed.surfaceFinish !== undefined) setSurfaceFinish(parsed.surfaceFinish);
+        if (parsed.textureIntensity !== undefined) setTextureIntensity(parsed.textureIntensity);
+        if (parsed.isHolographic !== undefined) setIsHolographic(parsed.isHolographic);
         setAlign(parsed.align);
         setPadding(parsed.padding);
         setBorderRadius(parsed.borderRadius);
@@ -258,7 +368,12 @@ export const EditorView: React.FC<EditorViewProps> = ({
       setShowGrain(initialTemplate.showGrain);
       setShowBorder(initialTemplate.showBorder);
       setShowIcon(initialTemplate.showIcon);
-      setIconName(initialTemplate.iconName);
+      if (initialTemplate.lineHeight !== undefined) setLineHeight(initialTemplate.lineHeight);
+      if (initialTemplate.letterSpacing !== undefined) setLetterSpacing(initialTemplate.letterSpacing);
+      if (initialTemplate.verticalAlign !== undefined) setVerticalAlign(initialTemplate.verticalAlign);
+      if (initialTemplate.surfaceFinish !== undefined) setSurfaceFinish(initialTemplate.surfaceFinish);
+      if (initialTemplate.textureIntensity !== undefined) setTextureIntensity(initialTemplate.textureIntensity);
+      if (initialTemplate.isHolographic !== undefined) setIsHolographic(initialTemplate.isHolographic);
 
       const snapshot: CardState = {
         docTitle,
@@ -270,6 +385,12 @@ export const EditorView: React.FC<EditorViewProps> = ({
         inkColor: initialTemplate.theme.ink,
         fontChoice: initialTemplate.font,
         fontSize: initialTemplate.fontSize,
+        lineHeight: initialTemplate.lineHeight || 1.45,
+        letterSpacing: initialTemplate.letterSpacing || 0,
+        verticalAlign: initialTemplate.verticalAlign || 'middle',
+        surfaceFinish: initialTemplate.surfaceFinish || (initialTemplate.showGrain ? 'grain' : 'none'),
+        textureIntensity: initialTemplate.textureIntensity ?? 50,
+        isHolographic: initialTemplate.isHolographic || false,
         align: initialTemplate.align,
         padding: initialTemplate.padding,
         borderRadius: initialTemplate.borderRadius,
@@ -368,6 +489,12 @@ export const EditorView: React.FC<EditorViewProps> = ({
     setInkColor(s.inkColor);
     setFontChoice(s.fontChoice);
     setFontSize(s.fontSize);
+    if (s.lineHeight !== undefined) setLineHeight(s.lineHeight);
+    if (s.letterSpacing !== undefined) setLetterSpacing(s.letterSpacing);
+    if (s.verticalAlign !== undefined) setVerticalAlign(s.verticalAlign);
+    if (s.surfaceFinish !== undefined) setSurfaceFinish(s.surfaceFinish);
+    if (s.textureIntensity !== undefined) setTextureIntensity(s.textureIntensity);
+    if (s.isHolographic !== undefined) setIsHolographic(s.isHolographic);
     setAlign(s.align);
     setPadding(s.padding);
     setBorderRadius(s.borderRadius);
@@ -407,19 +534,97 @@ export const EditorView: React.FC<EditorViewProps> = ({
   // Current aspect preset
   const currentRatioPreset = ASPECT_RATIOS.find((r) => r.id === aspectRatio) || ASPECT_RATIOS[0];
 
-  // Font class resolver
+  // Font class resolver for 12 curated fonts
   const getFontFamilyClass = (f: FontChoice) => {
     switch (f) {
       case 'editorial':
-        return 'font-editorial';
+        return 'font-newsreader';
       case 'serif':
-        return 'font-display-serif';
-      case 'sans':
-        return 'font-modern-sans';
+        return 'font-playfair';
+      case 'instrument':
+        return 'font-instrument';
+      case 'cormorant':
+        return 'font-cormorant';
+      case 'syne':
+        return 'font-syne';
+      case 'space-grotesk':
+        return 'font-space-grotesk';
+      case 'unbounded':
+        return 'font-unbounded';
+      case 'space-mono':
+        return 'font-space-mono';
       case 'mono':
-        return 'font-mono-code';
+        return 'font-jetbrains';
+      case 'pixel':
+        return 'font-vt323';
+      case 'caveat':
+        return 'font-caveat';
+      case 'reenie':
+        return 'font-reenie';
+      case 'sans':
       default:
-        return 'font-editorial';
+        return 'font-modern-sans';
+    }
+  };
+
+  // Quick rich-text formatter for quote textarea
+  const insertFormat = (prefix: string, suffix: string = prefix) => {
+    if (!quoteInputRef.current) return;
+    const textarea = quoteInputRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = quote.substring(start, end);
+    const replacement = selected ? `${prefix}${selected}${suffix}` : `${prefix}text${suffix}`;
+    const newQuote = quote.substring(0, start) + replacement + quote.substring(end);
+    setQuote(newQuote);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + replacement.length - suffix.length);
+    }, 0);
+  };
+
+  // Share style link generator
+  const handleShareStyleLink = () => {
+    const url = new URL(window.location.origin + '/create');
+    url.searchParams.set('share', '1');
+    url.searchParams.set('q', encodeURIComponent(quote));
+    url.searchParams.set('a', encodeURIComponent(author));
+    url.searchParams.set('t', encodeURIComponent(tag));
+    url.searchParams.set('b', encodeURIComponent(badge));
+    url.searchParams.set('font', fontChoice);
+    url.searchParams.set('size', String(fontSize));
+    url.searchParams.set('lh', String(lineHeight));
+    url.searchParams.set('ls', String(letterSpacing));
+    url.searchParams.set('va', verticalAlign);
+    url.searchParams.set('bg', bgColor.replace('#', ''));
+    url.searchParams.set('ink', inkColor.replace('#', ''));
+    url.searchParams.set('pad', String(padding));
+    url.searchParams.set('rad', String(borderRadius));
+    url.searchParams.set('surf', surfaceFinish);
+    url.searchParams.set('int', String(textureIntensity));
+    if (isHolographic) url.searchParams.set('holo', '1');
+
+    navigator.clipboard.writeText(url.toString());
+    setCopied(true);
+    showToast('Shareable style link copied to clipboard!');
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  // Handle Book / Song auto-fill
+  const handleMediaSelect = (item: MediaResult) => {
+    if (item.type === 'book') {
+      setAuthor(item.author);
+      setTag(item.title.toUpperCase());
+      if (item.year) setBadge(`EST. ${item.year}`);
+      if (item.firstSentence) {
+        setQuote(`“${item.firstSentence}”`);
+      }
+      showToast(`Imported book: ${item.title}`);
+    } else {
+      setAuthor(item.artist);
+      setTag(item.title.toUpperCase());
+      if (item.year) setBadge(`RELEASED ${item.year}`);
+      showToast(`Imported track: ${item.title}`);
     }
   };
 
@@ -548,7 +753,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
     }
   };
 
-  // High-Res Export (WebP, PNG 1×, PNG 2×, SVG)
+  // High-Res Export (WebP, PNG 1×, PNG 2×, SVG) with Presentation Backdrop Support
   const handleExport = async (format: ExportFormat) => {
     if (!cardRef.current) return;
     prepareCanvasForCapture();
@@ -564,19 +769,27 @@ export const EditorView: React.FC<EditorViewProps> = ({
       let downloadExt = 'png';
 
       if (format === 'png-2x') {
-        downloadUrl = await toPng(cardRef.current, { pixelRatio: 2 });
+        const rawUrl = await toPng(cardRef.current, { pixelRatio: 2 });
+        downloadUrl = backdropSurface !== 'none'
+          ? await renderCardWithBackdrop(rawUrl, backdropSurface, backdropRatio, 2, bgColor)
+          : rawUrl;
         downloadExt = 'png';
       } else if (format === 'png-1x') {
-        downloadUrl = await toPng(cardRef.current, { pixelRatio: 1 });
+        const rawUrl = await toPng(cardRef.current, { pixelRatio: 1 });
+        downloadUrl = backdropSurface !== 'none'
+          ? await renderCardWithBackdrop(rawUrl, backdropSurface, backdropRatio, 1, bgColor)
+          : rawUrl;
         downloadExt = 'png';
       } else if (format === 'svg') {
         downloadUrl = await toSvg(cardRef.current);
         downloadExt = 'svg';
       } else if (format === 'webp') {
-        // Convert to WebP via canvas blob
-        const pngUrl = await toPng(cardRef.current, { pixelRatio: 2 });
+        const rawUrl = await toPng(cardRef.current, { pixelRatio: 2 });
+        const backdropProcessed = backdropSurface !== 'none'
+          ? await renderCardWithBackdrop(rawUrl, backdropSurface, backdropRatio, 2, bgColor)
+          : rawUrl;
         const img = new Image();
-        img.src = pngUrl;
+        img.src = backdropProcessed;
         await new Promise((resolve) => {
           img.onload = resolve;
         });
@@ -589,7 +802,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           downloadUrl = canvas.toDataURL('image/webp', 0.95);
           downloadExt = 'webp';
         } else {
-          downloadUrl = pngUrl;
+          downloadUrl = backdropProcessed;
           downloadExt = 'png';
         }
       }
@@ -725,14 +938,64 @@ export const EditorView: React.FC<EditorViewProps> = ({
             >
               Quote / Main Body
             </label>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setMediaModalOpen(true)}
+                className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md border cursor-pointer transition-colors ${
+                  isLight
+                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-[#f1f5f9]'
+                    : 'bg-[#181d24] border-[#262c36] text-[#c4c7c8] hover:text-white hover:border-[#444748]'
+                }`}
+                title="Search book or track metadata"
+              >
+                <BookOpen className="w-3 h-3 text-[#fcd535]" />
+                <span>Import Book / Song</span>
+              </button>
+              <button
+                onClick={handleRandomQuote}
+                className={`inline-flex items-center gap-1 text-[11px] hover:underline cursor-pointer ${
+                  isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
+                }`}
+              >
+                <Shuffle className="w-3 h-3" />
+                <span>Inspiration</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Inline Format Toolbar */}
+          <div className="flex items-center gap-1.5 -mb-2">
+            <span className="text-[10px] text-[#707a8a] uppercase font-mono mr-1">Format:</span>
             <button
-              onClick={handleRandomQuote}
-              className={`inline-flex items-center gap-1 text-[11px] hover:underline cursor-pointer ${
-                isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
+              type="button"
+              onClick={() => insertFormat('**')}
+              className={`px-2 py-1 rounded text-xs font-bold border transition-colors cursor-pointer ${
+                isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]' : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
               }`}
+              title="Bold: **bold text**"
             >
-              <Shuffle className="w-3 h-3" />
-              <span>Inspiration</span>
+              <Bold className="w-3 h-3" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertFormat('*')}
+              className={`px-2 py-1 rounded text-xs italic border transition-colors cursor-pointer ${
+                isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]' : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
+              }`}
+              title="Italic: *italic text*"
+            >
+              <Italic className="w-3 h-3" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertFormat('==')}
+              className={`px-2 py-1 rounded text-xs border flex items-center gap-1 transition-colors cursor-pointer ${
+                isLight ? 'bg-amber-100 border-amber-300 text-amber-900 hover:bg-amber-200' : 'bg-amber-400/20 border-amber-400/40 text-amber-200 hover:bg-amber-400/30'
+              }`}
+              title="Highlight: ==highlighted words=="
+            >
+              <Highlighter className="w-3 h-3" />
+              <span className="text-[10px] font-mono">==Highlight==</span>
             </button>
           </div>
 
@@ -895,78 +1158,131 @@ export const EditorView: React.FC<EditorViewProps> = ({
         </div>
       )}
 
-      {/* TAB 2: TYPOGRAPHY */}
+      {/* TAB 2: TYPOGRAPHY (12 Curated Fonts in 4 Categories) */}
       {activeTab === 'type' && (
         <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <label
-              className={`text-xs font-semibold uppercase tracking-wider ${
-                isLight ? 'text-[#0f172a]' : 'text-white'
-              }`}
-            >
-              Font Family Stack
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setFontChoice('editorial')}
-                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                  fontChoice === 'editorial'
-                    ? isLight
-                      ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
-                      : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
-                    : isLight
-                    ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                    : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <label
+                className={`text-xs font-semibold uppercase tracking-wider ${
+                  isLight ? 'text-[#0f172a]' : 'text-white'
                 }`}
               >
-                <span className="font-editorial text-lg block leading-none">Newsreader</span>
-                <span className="text-[10px] text-[#707a8a]">Editorial Serif</span>
-              </button>
-              <button
-                onClick={() => setFontChoice('serif')}
-                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                  fontChoice === 'serif'
-                    ? isLight
-                      ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
-                      : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
-                    : isLight
-                    ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                    : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
-                }`}
-              >
-                <span className="font-serif text-lg block leading-none">Playfair</span>
-                <span className="text-[10px] text-[#707a8a]">High-Contrast Classic</span>
-              </button>
-              <button
-                onClick={() => setFontChoice('sans')}
-                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                  fontChoice === 'sans'
-                    ? isLight
-                      ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
-                      : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
-                    : isLight
-                    ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                    : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
-                }`}
-              >
-                <span className="font-sans text-lg block leading-none">Inter</span>
-                <span className="text-[10px] text-[#707a8a]">Modern Minimalist</span>
-              </button>
-              <button
-                onClick={() => setFontChoice('mono')}
-                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                  fontChoice === 'mono'
-                    ? isLight
-                      ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-2 ring-[#d97706]/40'
-                      : 'border-[#fcd535] bg-[#181d24] text-white shadow-sm ring-1 ring-[#fcd535]'
-                    : isLight
-                    ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
-                    : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
-                }`}
-              >
-                <span className="font-mono text-lg block leading-none">Space Mono</span>
-                <span className="text-[10px] text-[#707a8a]">Archival Code</span>
-              </button>
+                Curated Font Stacks (12)
+              </label>
+              <span className="text-[10px] text-[#707a8a] font-mono">4 Categories</span>
+            </div>
+
+            {/* Editorial Serif */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] uppercase font-mono font-semibold text-[#707a8a]">Editorial Serif</span>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { id: 'editorial' as FontChoice, name: 'Newsreader', cls: 'font-newsreader' },
+                  { id: 'serif' as FontChoice, name: 'Playfair Display', cls: 'font-playfair' },
+                  { id: 'instrument' as FontChoice, name: 'Instrument Serif', cls: 'font-instrument' },
+                  { id: 'cormorant' as FontChoice, name: 'Cormorant Garamond', cls: 'font-cormorant' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFontChoice(f.id)}
+                    className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
+                      fontChoice === f.id
+                        ? isLight
+                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
+                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                        : isLight
+                        ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                        : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                    }`}
+                  >
+                    <span className={`${f.cls} text-sm block leading-tight truncate`}>{f.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Display & Y2K */}
+            <div className="flex flex-col gap-1.5 pt-1">
+              <span className="text-[10px] uppercase font-mono font-semibold text-[#707a8a]">Display & Y2K</span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { id: 'syne' as FontChoice, name: 'Syne', cls: 'font-syne' },
+                  { id: 'space-grotesk' as FontChoice, name: 'Space Grotesk', cls: 'font-space-grotesk' },
+                  { id: 'unbounded' as FontChoice, name: 'Unbounded', cls: 'font-unbounded' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFontChoice(f.id)}
+                    className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
+                      fontChoice === f.id
+                        ? isLight
+                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
+                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                        : isLight
+                        ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                        : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                    }`}
+                  >
+                    <span className={`${f.cls} text-xs block leading-tight truncate font-bold`}>{f.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Archival Mono & Pixel */}
+            <div className="flex flex-col gap-1.5 pt-1">
+              <span className="text-[10px] uppercase font-mono font-semibold text-[#707a8a]">Archival Mono & Pixel</span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { id: 'space-mono' as FontChoice, name: 'Space Mono', cls: 'font-space-mono' },
+                  { id: 'mono' as FontChoice, name: 'JetBrains', cls: 'font-jetbrains' },
+                  { id: 'pixel' as FontChoice, name: 'VT323 Pixel', cls: 'font-vt323' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFontChoice(f.id)}
+                    className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
+                      fontChoice === f.id
+                        ? isLight
+                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
+                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                        : isLight
+                        ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                        : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                    }`}
+                  >
+                    <span className={`${f.cls} text-xs block leading-tight truncate`}>{f.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Handwritten & Zine */}
+            <div className="flex flex-col gap-1.5 pt-1">
+              <span className="text-[10px] uppercase font-mono font-semibold text-[#707a8a]">Handwritten & Zine</span>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { id: 'caveat' as FontChoice, name: 'Caveat Script', cls: 'font-caveat' },
+                  { id: 'reenie' as FontChoice, name: 'Reenie Beanie', cls: 'font-reenie' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFontChoice(f.id)}
+                    className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
+                      fontChoice === f.id
+                        ? isLight
+                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
+                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                        : isLight
+                        ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                        : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                    }`}
+                  >
+                    <span className={`${f.cls} text-sm block leading-tight truncate`}>{f.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -994,56 +1310,158 @@ export const EditorView: React.FC<EditorViewProps> = ({
             </div>
           </div>
 
-          {/* Alignment */}
+          {/* Line Height (Leading) Slider */}
           <div className="flex flex-col gap-2">
-            <label
-              className={`text-xs font-semibold uppercase tracking-wider ${
-                isLight ? 'text-[#0f172a]' : 'text-white'
-              }`}
-            >
-              Text Alignment
-            </label>
-            <div
-              className={`grid grid-cols-3 border p-1 rounded-xl ${
-                isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-              }`}
-            >
-              <button
-                onClick={() => setAlign('left')}
-                className={`py-2 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
-                  align === 'left'
-                    ? isLight
-                      ? 'bg-white shadow-sm text-[#0f172a]'
-                      : 'bg-[#222730] text-white'
-                    : 'text-[#707a8a] hover:text-[#0f172a]'
+            <div className="flex justify-between items-center text-xs">
+              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                Line Height (Leading)
+              </span>
+              <span className="font-mono text-[11px] text-[#707a8a] tabular-nums">{lineHeight.toFixed(2)}</span>
+            </div>
+            <input
+              type="range"
+              min="1.0"
+              max="2.0"
+              step="0.05"
+              value={lineHeight}
+              onChange={(e) => setLineHeight(Number(e.target.value))}
+              className="w-full accent-[#fcd535] cursor-pointer"
+            />
+            <div className="flex justify-between text-[10px] text-[#707a8a]">
+              <span>Tight 1.0</span>
+              <span>Default 1.45</span>
+              <span>Loose 2.0</span>
+            </div>
+          </div>
+
+          {/* Letter Spacing (Tracking) Slider */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center text-xs">
+              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                Letter Spacing (Tracking)
+              </span>
+              <span className="font-mono text-[11px] text-[#707a8a] tabular-nums">{letterSpacing.toFixed(2)}em</span>
+            </div>
+            <input
+              type="range"
+              min="-0.04"
+              max="0.20"
+              step="0.01"
+              value={letterSpacing}
+              onChange={(e) => setLetterSpacing(Number(e.target.value))}
+              className="w-full accent-[#fcd535] cursor-pointer"
+            />
+            <div className="flex justify-between text-[10px] text-[#707a8a]">
+              <span>Compact -0.04em</span>
+              <span>Normal 0.00em</span>
+              <span>Spaced 0.20em</span>
+            </div>
+          </div>
+
+          {/* Alignment & Vertical Alignment Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label
+                className={`text-xs font-semibold uppercase tracking-wider ${
+                  isLight ? 'text-[#0f172a]' : 'text-white'
                 }`}
               >
-                <AlignLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setAlign('center')}
-                className={`py-2 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
-                  align === 'center'
-                    ? isLight
-                      ? 'bg-white shadow-sm text-[#0f172a]'
-                      : 'bg-[#222730] text-white'
-                    : 'text-[#707a8a] hover:text-[#0f172a]'
+                Horizontal
+              </label>
+              <div
+                className={`grid grid-cols-3 border p-1 rounded-xl ${
+                  isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
                 }`}
               >
-                <AlignCenter className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setAlign('right')}
-                className={`py-2 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
-                  align === 'right'
-                    ? isLight
-                      ? 'bg-white shadow-sm text-[#0f172a]'
-                      : 'bg-[#222730] text-white'
-                    : 'text-[#707a8a] hover:text-[#0f172a]'
+                <button
+                  type="button"
+                  onClick={() => setAlign('left')}
+                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                    align === 'left'
+                      ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
+                      : 'text-[#707a8a] hover:text-[#0f172a]'
+                  }`}
+                  title="Align left"
+                >
+                  <AlignLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAlign('center')}
+                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                    align === 'center'
+                      ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
+                      : 'text-[#707a8a] hover:text-[#0f172a]'
+                  }`}
+                  title="Align center"
+                >
+                  <AlignCenter className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAlign('right')}
+                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                    align === 'right'
+                      ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
+                      : 'text-[#707a8a] hover:text-[#0f172a]'
+                  }`}
+                  title="Align right"
+                >
+                  <AlignRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label
+                className={`text-xs font-semibold uppercase tracking-wider ${
+                  isLight ? 'text-[#0f172a]' : 'text-white'
                 }`}
               >
-                <AlignRight className="w-4 h-4" />
-              </button>
+                Vertical Position
+              </label>
+              <div
+                className={`grid grid-cols-3 border p-1 rounded-xl ${
+                  isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setVerticalAlign('top')}
+                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                    verticalAlign === 'top'
+                      ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
+                      : 'text-[#707a8a] hover:text-[#0f172a]'
+                  }`}
+                  title="Top alignment"
+                >
+                  <AlignVerticalJustifyStart className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVerticalAlign('middle')}
+                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                    verticalAlign === 'middle'
+                      ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
+                      : 'text-[#707a8a] hover:text-[#0f172a]'
+                  }`}
+                  title="Middle alignment"
+                >
+                  <AlignVerticalJustifyCenter className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVerticalAlign('bottom')}
+                  className={`py-1.5 flex justify-center items-center rounded-lg transition-colors cursor-pointer ${
+                    verticalAlign === 'bottom'
+                      ? isLight ? 'bg-white shadow-sm text-[#0f172a]' : 'bg-[#222730] text-white'
+                      : 'text-[#707a8a] hover:text-[#0f172a]'
+                  }`}
+                  title="Bottom alignment"
+                >
+                  <AlignVerticalJustifyEnd className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1206,18 +1624,87 @@ export const EditorView: React.FC<EditorViewProps> = ({
           <div className={`pt-3 border-t flex flex-col gap-3 ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
             <span className="text-[11px] font-semibold text-[#707a8a] uppercase">Editorial Accents</span>
 
+            {/* Surface Finish Selector */}
+            <div className="flex flex-col gap-2">
+              <label
+                className={`text-xs font-semibold uppercase tracking-wider ${
+                  isLight ? 'text-[#0f172a]' : 'text-white'
+                }`}
+              >
+                Surface Finish & Texture
+              </label>
+              <div className="grid grid-cols-1 gap-1.5">
+                {[
+                  { id: 'none' as SurfaceFinish, label: 'None (Flat Digital)', desc: 'Clean vector rendering' },
+                  { id: 'grain' as SurfaceFinish, label: 'Archival Cotton Grain', desc: 'Organic paper noise' },
+                  { id: 'halftone' as SurfaceFinish, label: 'Riso / Photocopy Halftone', desc: 'Subtle dot-screen texture' },
+                  { id: 'crease' as SurfaceFinish, label: 'Folded Zine Crease', desc: 'Paper folds & edge vignette' },
+                  { id: 'lanyard' as SurfaceFinish, label: 'Glossy ID Lanyard Sleeve', desc: 'Specular sheen & punch-hole slot' },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => {
+                      setSurfaceFinish(s.id);
+                      setShowGrain(s.id !== 'none');
+                    }}
+                    className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                      surfaceFinish === s.id
+                        ? isLight
+                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
+                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                        : isLight
+                        ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
+                        : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
+                    }`}
+                  >
+                    <div>
+                      <span className="text-xs font-semibold block">{s.label}</span>
+                      <span className="text-[10px] text-[#707a8a]">{s.desc}</span>
+                    </div>
+                    {surfaceFinish === s.id && <Check className="w-3.5 h-3.5 text-[#fcd535]" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Texture Intensity Slider */}
+            {surfaceFinish !== 'none' && (
+              <div className="flex flex-col gap-2 p-2.5 rounded-xl border border-current/10 bg-black/5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                    Texture Intensity
+                  </span>
+                  <span className="font-mono text-[11px] text-[#707a8a] tabular-nums">{textureIntensity}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="10"
+                  max="100"
+                  step="5"
+                  value={textureIntensity}
+                  onChange={(e) => setTextureIntensity(Number(e.target.value))}
+                  className="w-full accent-[#fcd535] cursor-pointer"
+                />
+              </div>
+            )}
+
+            {/* Holographic Foil Toggle */}
             <label
               className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer ${
                 isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
               }`}
             >
-              <span className={`text-xs font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                Archival Paper Grain Texture
-              </span>
+              <div className="flex flex-col">
+                <span className={`text-xs font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                  Holographic Metallic Foil
+                </span>
+                <span className="text-[10px] text-[#707a8a]">Iridescent foil gradient on badges & glyphs</span>
+              </div>
               <input
                 type="checkbox"
-                checked={showGrain}
-                onChange={(e) => setShowGrain(e.target.checked)}
+                checked={isHolographic}
+                onChange={(e) => setIsHolographic(e.target.checked)}
                 className="accent-[#fcd535] w-4 h-4 cursor-pointer"
               />
             </label>
@@ -1575,6 +2062,21 @@ export const EditorView: React.FC<EditorViewProps> = ({
             <MoreHorizontal className="w-4 h-4" />
           </button>
 
+          {/* Share Style Link Button */}
+          <button
+            type="button"
+            onClick={handleShareStyleLink}
+            className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
+              isLight
+                ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
+                : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
+            }`}
+            title="Share customized card URL with friends"
+          >
+            <Share2 className="w-3.5 h-3.5 text-[#fcd535]" />
+            <span>Share Link</span>
+          </button>
+
           {/* Desktop Copy Button */}
           <button
             onClick={handleCopyImage}
@@ -1616,6 +2118,43 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#1d2023] border-[#262c36]'
                 }`}
               >
+                {/* Presentation Backdrop Toggle */}
+                <div className="px-3 py-1.5 border-b border-current/10 flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between text-[10px] uppercase font-semibold text-[#707a8a] tracking-wider">
+                    <span>Backdrop Frame</span>
+                    <button
+                      type="button"
+                      onClick={() => setBackdropRatio(backdropRatio === '4:5' ? '1:1' : '4:5')}
+                      className="text-[9px] font-mono px-1 rounded border border-current/20 cursor-pointer"
+                    >
+                      {backdropRatio}
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1">
+                    {[
+                      { id: 'none' as BackdropSurface, label: 'Card' },
+                      { id: 'obsidian' as BackdropSurface, label: 'Obsidian' },
+                      { id: 'linen' as BackdropSurface, label: 'Linen' },
+                      { id: 'mesh' as BackdropSurface, label: 'Mesh' },
+                    ].map((b) => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => setBackdropSurface(b.id)}
+                        className={`py-1 text-[10px] rounded border text-center transition-all cursor-pointer ${
+                          backdropSurface === b.id
+                            ? 'bg-[#fcd535] text-black font-bold border-[#fcd535]'
+                            : isLight
+                            ? 'bg-slate-100 text-slate-700 border-slate-200'
+                            : 'bg-black/30 text-slate-300 border-white/10'
+                        }`}
+                      >
+                        {b.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="px-3 py-1 text-[10px] uppercase font-semibold text-[#707a8a] tracking-wider">
                   Download Formats
                 </div>
@@ -1818,12 +2357,29 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 showBorder ? 'border border-current/15' : ''
               } ${selectedElement === 'card' ? 'ring-2 ring-[#fcd535]/80 ring-offset-2' : ''}`}
             >
-              {/* Optional Analog Grain Texture Layer */}
-              {showGrain && (
+              {/* Tactile Surface Finish Overlay */}
+              {surfaceFinish !== 'none' && (
                 <div
-                  className="card-noise absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply"
+                  style={{ opacity: textureIntensity / 100 }}
+                  className={`absolute inset-0 pointer-events-none mix-blend-multiply z-20 ${
+                    surfaceFinish === 'grain'
+                      ? 'surface-finish-grain'
+                      : surfaceFinish === 'halftone'
+                      ? 'surface-finish-halftone'
+                      : surfaceFinish === 'crease'
+                      ? 'surface-finish-crease'
+                      : 'surface-finish-lanyard'
+                  }`}
                   aria-hidden="true"
-                ></div>
+                />
+              )}
+
+              {/* Lanyard Punch-Hole Slot */}
+              {surfaceFinish === 'lanyard' && (
+                <div
+                  className="absolute top-2.5 left-1/2 -translate-x-1/2 w-12 h-2.5 rounded-full bg-black/40 border border-white/20 shadow-inner z-30 pointer-events-none"
+                  aria-hidden="true"
+                />
               )}
 
               {/* Safe Guidelines Overlay */}
@@ -1853,7 +2409,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
               >
                 <div className="flex items-center gap-1.5">
                   {showIcon && (
-                    <span className="material-symbols-outlined text-[14px]">{iconName}</span>
+                    <span className={`material-symbols-outlined text-[14px] ${isHolographic ? 'holographic-foil' : ''}`}>
+                      {iconName}
+                    </span>
                   )}
                   <span className="uppercase font-semibold">{tag}</span>
                 </div>
@@ -1864,9 +2422,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       setSelectedElement('badge');
                       openMobileTab('content');
                     }}
-                    className={`px-1.5 py-0.5 rounded border border-current/25 text-[10px] cursor-pointer ${
-                      selectedElement === 'badge' ? 'ring-1 ring-[#fcd535] bg-black/10' : ''
-                    }`}
+                    className={`px-1.5 py-0.5 rounded text-[10px] cursor-pointer ${
+                      isHolographic
+                        ? 'holographic-foil shadow-sm border border-transparent font-bold'
+                        : 'border border-current/25'
+                    } ${selectedElement === 'badge' ? 'ring-1 ring-[#fcd535] bg-black/10' : ''}`}
                     title="Click to edit corner badge"
                   >
                     {badge}
@@ -1882,19 +2442,21 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   openMobileTab('content');
                   quoteInputRef.current?.focus();
                 }}
-                className={`relative z-10 my-auto py-4 cursor-pointer rounded transition-all ${
-                  selectedElement === 'quote' ? 'ring-1 ring-[#fcd535] bg-black/5 p-2' : ''
-                }`}
+                className={`relative z-10 py-4 cursor-pointer rounded transition-all ${
+                  verticalAlign === 'top' ? 'my-0 mb-auto' : verticalAlign === 'bottom' ? 'my-0 mt-auto' : 'my-auto'
+                } ${selectedElement === 'quote' ? 'ring-1 ring-[#fcd535] bg-black/5 p-2' : ''}`}
                 title="Click to edit quote text and typography"
               >
                 <blockquote
                   style={{
                     fontSize: `${fontSize}px`,
                     textAlign: align,
+                    lineHeight: lineHeight,
+                    letterSpacing: `${letterSpacing}em`,
                   }}
-                  className={`${getFontFamilyClass(fontChoice)} leading-relaxed tracking-tight`}
+                  className={`${getFontFamilyClass(fontChoice)} transition-all`}
                 >
-                  “{quote}”
+                  “{parseRichText(quote, inkColor)}”
                 </blockquote>
               </div>
 
@@ -2166,7 +2728,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
         </>
       )}
 
-{/* QUICK STYLE SWITCHER MODAL / DRAWER */}
+{/* Book & Music Metadata Auto-Fill Modal */}
+      <MediaImportModal
+        isOpen={mediaModalOpen}
+        onClose={() => setMediaModalOpen(false)}
+        onSelect={handleMediaSelect}
+      />
+
+      {/* QUICK STYLE SWITCHER MODAL / DRAWER */}
       {templateDrawerOpen && (
         <div
           className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"

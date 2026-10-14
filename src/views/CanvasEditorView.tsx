@@ -49,7 +49,22 @@ import {
   HelpCircle,
   QrCode,
   Barcode,
+  Award,
+  BookOpen,
+  Volume2,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignVerticalJustifyStart,
+  AlignVerticalJustifyCenter,
+  AlignVerticalJustifyEnd,
+  Crop,
+  Wand2,
 } from 'lucide-react';
+import { processImageFilter } from '../utils/imageFilters';
+import { generateQrCodeSvg, generateBarcodeSvg } from '../utils/qrBarcodeGenerator';
+import { MediaImportModal, type MediaResult } from '../components/MediaImportModal';
+import type { ImageFilterPreset, ImageClipMask } from '../types/card';
 
 interface CanvasEditorViewProps {
   theme?: 'dark' | 'light';
@@ -146,6 +161,15 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Snap guides overlay state
+  const [snapGuides, setSnapGuides] = useState<Array<{ orientation: 'x' | 'y'; pos: number }>>([]);
+
+  // Stamps & Accents drawer state
+  const [stampsDrawerOpen, setStampsDrawerOpen] = useState(false);
+
+  // Book & Music import modal
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
 
   // References
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -492,7 +516,113 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     };
   };
 
-  // Global mouse move & up handlers
+  // 6-Button Quick Alignment Handlers
+  const handleAlign = (alignment: 'left' | 'hcenter' | 'right' | 'top' | 'vmiddle' | 'bottom') => {
+    if (!selectedId || !selectedObject) return;
+    const w = selectedObject.width;
+    const h = selectedObject.height;
+
+    switch (alignment) {
+      case 'left':
+        updateObject(selectedId, { x: 0 });
+        showToast('Aligned layer left');
+        break;
+      case 'hcenter':
+        updateObject(selectedId, { x: Math.round((doc.canvasWidth - w) / 2) });
+        showToast('Centered layer horizontally');
+        break;
+      case 'right':
+        updateObject(selectedId, { x: doc.canvasWidth - w });
+        showToast('Aligned layer right');
+        break;
+      case 'top':
+        updateObject(selectedId, { y: 0 });
+        showToast('Aligned layer top');
+        break;
+      case 'vmiddle':
+        updateObject(selectedId, { y: Math.round((doc.canvasHeight - h) / 2) });
+        showToast('Centered layer vertically');
+        break;
+      case 'bottom':
+        updateObject(selectedId, { y: doc.canvasHeight - h });
+        showToast('Aligned layer bottom');
+        break;
+    }
+  };
+
+  // Media auto-fill handler for /canvas
+  const handleMediaImport = (item: MediaResult) => {
+    const imgUrl = item.type === 'book' ? item.coverUrl : item.artworkUrl;
+    if (imgUrl) {
+      addObject(
+        createImageObject(imgUrl, {
+          name: `${item.title} Cover`,
+          width: 220,
+          height: 220,
+          x: Math.round(doc.canvasWidth / 2 - 240),
+          y: Math.round(doc.canvasHeight / 2 - 110),
+          borderRadius: 12,
+        })
+      );
+    }
+
+    addObject(
+      createTextObject({
+        text: item.title,
+        fontSize: 26,
+        fontWeight: '700',
+        x: Math.round(doc.canvasWidth / 2),
+        y: Math.round(doc.canvasHeight / 2 - 80),
+        width: 360,
+        height: 60,
+        color: isLight ? '#0f172a' : '#ffffff',
+      })
+    );
+
+    addObject(
+      createTextObject({
+        text: item.type === 'book' ? item.author : item.artist,
+        fontSize: 16,
+        fontWeight: '500',
+        x: Math.round(doc.canvasWidth / 2),
+        y: Math.round(doc.canvasHeight / 2 - 20),
+        width: 360,
+        height: 40,
+        color: '#707a8a',
+      })
+    );
+
+    if (item.year) {
+      addObject(
+        createShapeObject('rounded-rect', {
+          name: 'Year Pill',
+          fill: '#fcd535',
+          x: Math.round(doc.canvasWidth / 2),
+          y: Math.round(doc.canvasHeight / 2 + 30),
+          width: 90,
+          height: 26,
+          borderRadius: 13,
+        })
+      );
+      addObject(
+        createTextObject({
+          text: `EST. ${item.year}`,
+          fontSize: 11,
+          fontWeight: '700',
+          x: Math.round(doc.canvasWidth / 2),
+          y: Math.round(doc.canvasHeight / 2 + 30),
+          width: 90,
+          height: 26,
+          align: 'center',
+          color: '#000000',
+        })
+      );
+    }
+
+    showToast(`Imported ${item.title} onto canvas!`);
+  };
+
+    // Global mouse move & up handlers
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const drag = dragRef.current;
@@ -513,6 +643,55 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           newY = Math.round(newY / 20) * 20;
         }
 
+        // Magnetic Smart Snapping (Proximity <= 5px to canvas center & bounding edges)
+        const SNAP_PROXIMITY = 5;
+        const guides: Array<{ orientation: 'x' | 'y'; pos: number }> = [];
+
+        const objW = drag.startWidth;
+        const objH = drag.startHeight;
+
+        // Proximity to Canvas Centers
+        const canvasCenterX = Math.round(doc.canvasWidth / 2);
+        const canvasCenterY = Math.round(doc.canvasHeight / 2);
+        const objCenterX = newX + objW / 2;
+        const objCenterY = newY + objH / 2;
+
+        if (Math.abs(objCenterX - canvasCenterX) <= SNAP_PROXIMITY) {
+          newX = canvasCenterX - objW / 2;
+          guides.push({ orientation: 'x', pos: canvasCenterX });
+        }
+        if (Math.abs(objCenterY - canvasCenterY) <= SNAP_PROXIMITY) {
+          newY = canvasCenterY - objH / 2;
+          guides.push({ orientation: 'y', pos: canvasCenterY });
+        }
+
+        // Proximity to other visible layers
+        for (const other of doc.objects) {
+          if (other.id === selectedId || !other.visible) continue;
+
+          // Align Left-to-Left
+          if (Math.abs(newX - other.x) <= SNAP_PROXIMITY) {
+            newX = other.x;
+            guides.push({ orientation: 'x', pos: other.x });
+          }
+          // Align Right-to-Right
+          if (Math.abs((newX + objW) - (other.x + other.width)) <= SNAP_PROXIMITY) {
+            newX = other.x + other.width - objW;
+            guides.push({ orientation: 'x', pos: other.x + other.width });
+          }
+          // Align Top-to-Top
+          if (Math.abs(newY - other.y) <= SNAP_PROXIMITY) {
+            newY = other.y;
+            guides.push({ orientation: 'y', pos: other.y });
+          }
+          // Align Bottom-to-Bottom
+          if (Math.abs((newY + objH) - (other.y + other.height)) <= SNAP_PROXIMITY) {
+            newY = other.y + other.height - objH;
+            guides.push({ orientation: 'y', pos: other.y + other.height });
+          }
+        }
+
+        setSnapGuides(guides);
         updateObject(selectedId, { x: Math.round(newX), y: Math.round(newY) }, false);
       } else if (drag.isResizing && drag.handle) {
         let newWidth = drag.startWidth;
@@ -563,6 +742,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         drag.isResizing = false;
         drag.isRotating = false;
         drag.handle = null;
+        setSnapGuides([]);
         // Commit change to history stack
         commitDocumentChange(doc);
       }
@@ -915,6 +1095,19 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           </button>
 
           <button
+            onClick={() => setMediaModalOpen(true)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
+              isLight
+                ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
+                : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
+            }`}
+            title="Search and import book or song cover & metadata"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-[#fcd535]" />
+            <span className="hidden sm:inline">Import Book / Song</span>
+          </button>
+
+          <button
             onClick={() => handleCreateBlank()}
             className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
               isLight
@@ -1188,52 +1381,237 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
           <div className="w-8 h-px bg-[#262c36]/40" />
 
-          {/* Quick Badges: Barcode / QR / Seal */}
-          <button
-            onClick={() =>
-              addObject(
-                createImageObject(ASSET_STICKERS.barcode, {
-                  name: 'Barcode Sticker',
-                  width: 240,
-                  height: 60,
-                  x: Math.round(doc.canvasWidth / 2 - 120),
-                  y: doc.canvasHeight - 100,
-                })
-              )
-            }
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
-              isLight
-                ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
-                : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
-            }`}
-            title="Add Barcode Sticker"
-          >
-            <Barcode className="w-4 h-4 text-[#f97316]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Barcode</span>
-          </button>
+          {/* Stamps & Accents Popover Drawer Trigger */}
+          <div className="relative">
+            <button
+              onClick={() => setStampsDrawerOpen(!stampsDrawerOpen)}
+              className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+                stampsDrawerOpen
+                  ? 'bg-[#fcd535] text-black border-[#fcd535] font-bold shadow-md'
+                  : isLight
+                  ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
+                  : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
+              }`}
+              title="Open Curated Stamps, Badges & Accents Drawer"
+            >
+              <Award className="w-4 h-4 text-[#ec4899]" />
+              <span className="text-[9px] font-medium">Stamps</span>
+            </button>
 
-          <button
-            onClick={() =>
-              addObject(
-                createImageObject(ASSET_STICKERS.qrCode, {
-                  name: 'QR Code Sticker',
-                  width: 100,
-                  height: 100,
-                  x: Math.round(doc.canvasWidth / 2 - 50),
-                  y: Math.round(doc.canvasHeight / 2 - 50),
-                })
-              )
-            }
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
-              isLight
-                ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
-                : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
-            }`}
-            title="Add QR Code"
-          >
-            <QrCode className="w-4 h-4 text-[#06b6d4]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">QR</span>
-          </button>
+            {/* Stamps Popover Menu */}
+            {stampsDrawerOpen && (
+              <div
+                className={`absolute left-14 top-0 w-64 rounded-2xl border p-2.5 shadow-2xl z-50 flex flex-col gap-2 ${
+                  isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+                }`}
+              >
+                <div className="flex items-center justify-between pb-1.5 border-b border-current/10">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#707a8a]">
+                    Stamps & Accents
+                  </span>
+                  <button
+                    onClick={() => setStampsDrawerOpen(false)}
+                    className="text-[10px] text-[#707a8a] hover:text-white"
+                  >
+                    Close
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-1.5 max-h-72 overflow-y-auto pr-1">
+                  {/* Rubber Stamp */}
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createShapeObject('rubber-stamp', {
+                          name: 'Rubber Stamp',
+                          fill: '#dc2626',
+                          stampText: 'APPROVED',
+                          width: 140,
+                          height: 48,
+                          x: Math.round(doc.canvasWidth / 2 - 70),
+                          y: Math.round(doc.canvasHeight / 2 - 24),
+                          rotation: -8,
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#222730] border-[#262c36]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-red-500 font-mono tracking-wider">APPROVED</span>
+                      <span className="text-[10px] text-[#707a8a]">Distressed Rubber Ink</span>
+                    </div>
+                    <span className="text-xs font-mono opacity-50">STAMP</span>
+                  </button>
+
+                  {/* Holographic Security Seal */}
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createShapeObject('security-seal', {
+                          name: 'Security Rosette Seal',
+                          fill: '#fcd535',
+                          width: 90,
+                          height: 90,
+                          x: Math.round(doc.canvasWidth / 2 - 45),
+                          y: Math.round(doc.canvasHeight / 2 - 45),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#222730] border-[#262c36]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-amber-400">Security Rosette</span>
+                      <span className="text-[10px] text-[#707a8a]">Holographic metallic seal</span>
+                    </div>
+                    <span className="text-xs font-mono opacity-50">FOIL</span>
+                  </button>
+
+                  {/* Washi Masking Tape */}
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createShapeObject('washi-tape', {
+                          name: 'Washi Tape',
+                          fill: '#fef08a',
+                          opacity: 0.8,
+                          width: 180,
+                          height: 34,
+                          x: Math.round(doc.canvasWidth / 2 - 90),
+                          y: Math.round(doc.canvasHeight / 2 - 80),
+                          rotation: -4,
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#222730] border-[#262c36]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-yellow-600">Washi Tape Strip</span>
+                      <span className="text-[10px] text-[#707a8a]">Translucent torn-edge tape</span>
+                    </div>
+                    <span className="text-xs font-mono opacity-50">TAPE</span>
+                  </button>
+
+                  {/* 5-Star Rating Bar */}
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createShapeObject('rating-stars', {
+                          name: '5-Star Rating',
+                          fill: '#fcd535',
+                          starRating: 5.0,
+                          width: 140,
+                          height: 32,
+                          x: Math.round(doc.canvasWidth / 2 - 70),
+                          y: Math.round(doc.canvasHeight / 2 + 60),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#222730] border-[#262c36]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-amber-500">★★★★★ Review Bar</span>
+                      <span className="text-[10px] text-[#707a8a]">0.5 to 5.0 star selector</span>
+                    </div>
+                    <span className="text-xs font-mono opacity-50">STARS</span>
+                  </button>
+
+                  {/* Audio Waveform */}
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createShapeObject('audio-waveform', {
+                          name: 'Music Waveform',
+                          fill: '#10b981',
+                          width: 220,
+                          height: 48,
+                          x: Math.round(doc.canvasWidth / 2 - 110),
+                          y: Math.round(doc.canvasHeight / 2 + 100),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#222730] border-[#262c36]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-emerald-500">Audio Track Player</span>
+                      <span className="text-[10px] text-[#707a8a]">Scannable waveform bars</span>
+                    </div>
+                    <Volume2 className="w-4 h-4 text-emerald-500" />
+                  </button>
+
+                  {/* Dynamic Code-128 Barcode */}
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createShapeObject('barcode', {
+                          name: 'Dynamic Barcode',
+                          fill: '#111417',
+                          payload: 'ACS-98420',
+                          showTextLabel: true,
+                          width: 240,
+                          height: 60,
+                          x: Math.round(doc.canvasWidth / 2 - 120),
+                          y: doc.canvasHeight - 90,
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#222730] border-[#262c36]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-orange-500">Dynamic Barcode</span>
+                      <span className="text-[10px] text-[#707a8a]">Code-128 SVG with live payload</span>
+                    </div>
+                    <Barcode className="w-4 h-4 text-orange-500" />
+                  </button>
+
+                  {/* Dynamic QR Code */}
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createShapeObject('qr-code', {
+                          name: 'Dynamic QR Code',
+                          fill: '#111417',
+                          payload: 'https://aestheticcardgenerator.pages.dev',
+                          showTextLabel: false,
+                          width: 90,
+                          height: 90,
+                          x: Math.round(doc.canvasWidth / 2 - 45),
+                          y: Math.round(doc.canvasHeight / 2 - 45),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#222730] border-[#262c36]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-cyan-500">Dynamic QR Matrix</span>
+                      <span className="text-[10px] text-[#707a8a]">Live URL / Spotify binding</span>
+                    </div>
+                    <QrCode className="w-4 h-4 text-cyan-500" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </aside>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
@@ -1280,6 +1658,23 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               }}
               className="relative overflow-hidden shrink-0 transition-colors"
             >
+              {/* Magnetic Smart Snap Guide Lines */}
+              {snapGuides.map((guide, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    position: 'absolute',
+                    ...(guide.orientation === 'x'
+                      ? { left: `${guide.pos}px`, top: 0, bottom: 0, width: 1 }
+                      : { top: `${guide.pos}px`, left: 0, right: 0, height: 1 }),
+                    backgroundColor: guide.orientation === 'x' ? '#ec4899' : '#fcd535',
+                    zIndex: 99999,
+                    pointerEvents: 'none',
+                    boxShadow: '0 0 3px rgba(236,72,153,0.8)',
+                  }}
+                />
+              ))}
+
               {/* Objects in Z-order */}
               {[...doc.objects]
                 .sort((a, b) => a.zIndex - b.zIndex)
@@ -1332,19 +1727,34 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         </div>
                       )}
 
-                      {/* 2. IMAGE OBJECT */}
+                      {/* 2. IMAGE OBJECT WITH PHOTO TREATMENT & CLIPPING MASKS */}
                       {obj.type === 'image' && (
                         <div
                           style={{
                             width: '100%',
                             height: '100%',
                             opacity: obj.opacity,
-                            borderRadius: `${obj.borderRadius}px`,
+                            borderRadius: obj.clipMask === 'circle' ? '50%' : `${obj.borderRadius}px`,
                             overflow: 'hidden',
+                            ...(obj.clipMask === 'circle'
+                              ? { clipPath: 'circle(50% at 50% 50%)' }
+                              : obj.clipMask === 'oval'
+                              ? { clipPath: 'ellipse(50% 50% at 50% 50%)' }
+                              : obj.clipMask === 'star'
+                              ? { clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }
+                              : obj.clipMask === 'heart'
+                              ? { clipPath: 'polygon(50% 15%, 65% 0%, 85% 0%, 100% 15%, 100% 35%, 50% 85%, 0% 35%, 0% 15%, 15% 0%, 35% 0%)' }
+                              : obj.clipMask === 'id-frame'
+                              ? {
+                                  border: '1px solid rgba(0,0,0,0.3)',
+                                  borderRadius: '6px',
+                                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.25), 0 2px 5px rgba(0,0,0,0.15)',
+                                }
+                              : {}),
                           }}
                         >
                           <img
-                            src={obj.src}
+                            src={obj.filteredSrc || obj.src}
                             alt={obj.name}
                             style={{
                               width: '100%',
@@ -1356,7 +1766,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         </div>
                       )}
 
-                      {/* 3. SHAPE OBJECT */}
+                      {/* 3. SHAPE & ACCENT STAMP OBJECTS */}
                       {obj.type === 'shape' && (
                         <div
                           style={{
@@ -1431,6 +1841,123 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                 strokeWidth={obj.strokeWidth}
                               />
                             </svg>
+                          )}
+
+                          {/* Rubber Stamp */}
+                          {obj.shape === 'rubber-stamp' && (
+                            <div
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                color: obj.fill || '#dc2626',
+                                border: '3px dashed currentColor',
+                                borderRadius: `${obj.borderRadius || 8}px`,
+                              }}
+                              className="flex items-center justify-center p-1.5 select-none"
+                            >
+                              <span className="font-mono font-black text-xs uppercase tracking-widest border-2 border-current px-2 py-0.5 text-center truncate">
+                                {obj.stampText || 'APPROVED'}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Holographic Security Seal */}
+                          {obj.shape === 'security-seal' && (
+                            <div className="w-full h-full relative flex items-center justify-center select-none holographic-foil rounded-full shadow-lg p-2">
+                              <svg viewBox="0 0 100 100" className="w-full h-full">
+                                <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3 2" />
+                                <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" strokeWidth="1" />
+                                <text x="50" y="44" textAnchor="middle" fontSize="8" fontWeight="bold" fill="currentColor">
+                                  OFFICIAL
+                                </text>
+                                <text x="50" y="56" textAnchor="middle" fontSize="6" fontWeight="600" fill="currentColor" letterSpacing="1">
+                                  SECURE PASS
+                                </text>
+                                <circle cx="50" cy="50" r="49" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                              </svg>
+                            </div>
+                          )}
+
+                          {/* Washi Masking Tape */}
+                          {obj.shape === 'washi-tape' && (
+                            <div
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                backgroundColor: obj.fill || '#fef08a',
+                                opacity: obj.opacity ?? 0.8,
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                                clipPath: 'polygon(0% 12%, 3% 0%, 6% 14%, 9% 0%, 91% 0%, 94% 12%, 97% 0%, 100% 12%, 100% 88%, 97% 100%, 94% 86%, 91% 100%, 9% 100%, 6% 86%, 3% 100%, 0% 88%)',
+                              }}
+                            />
+                          )}
+
+                          {/* 5-Star Rating Bar */}
+                          {obj.shape === 'rating-stars' && (
+                            <div className="w-full h-full flex items-center justify-center gap-1 select-none">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <svg
+                                  key={star}
+                                  viewBox="0 0 24 24"
+                                  className="w-5 h-5"
+                                  fill={(obj.starRating ?? 5) >= star ? (obj.fill || '#fcd535') : 'none'}
+                                  stroke={obj.fill || '#fcd535'}
+                                  strokeWidth="2"
+                                >
+                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                </svg>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Audio Waveform Bar */}
+                          {obj.shape === 'audio-waveform' && (
+                            <div
+                              style={{ color: obj.fill || '#10b981' }}
+                              className="w-full h-full p-2 rounded-xl bg-black/10 border border-current/20 flex items-center gap-2 select-none"
+                            >
+                              <div className="w-6 h-6 rounded-full bg-current/20 flex items-center justify-center shrink-0">
+                                <div className="w-0 h-0 border-y-4 border-y-transparent border-l-6 border-l-current ml-0.5" />
+                              </div>
+                              <div className="flex-1 flex items-center gap-1 h-6">
+                                {[12, 18, 8, 22, 14, 20, 10, 24, 16, 22, 12, 18, 8, 16, 22, 14, 10, 20, 16].map((h, i) => (
+                                  <div
+                                    key={i}
+                                    style={{ height: `${h}px` }}
+                                    className="w-1 bg-current rounded-full"
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-[10px] font-mono opacity-80 shrink-0">02:40</span>
+                            </div>
+                          )}
+
+                          {/* Live Dynamic Barcode */}
+                          {obj.shape === 'barcode' && (
+                            <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                              <img
+                                src={generateBarcodeSvg(obj.payload || 'ACS-94820', {
+                                  fill: obj.fill,
+                                  showLabel: obj.showTextLabel !== false,
+                                })}
+                                alt="Dynamic Barcode"
+                                className="w-full h-full object-contain pointer-events-none"
+                              />
+                            </div>
+                          )}
+
+                          {/* Live Dynamic QR Code */}
+                          {obj.shape === 'qr-code' && (
+                            <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                              <img
+                                src={generateQrCodeSvg(obj.payload || 'https://aestheticcardgenerator.pages.dev', {
+                                  fill: obj.fill,
+                                  showLabel: obj.showTextLabel,
+                                })}
+                                alt="Dynamic QR Code"
+                                className="w-full h-full object-contain pointer-events-none"
+                              />
+                            </div>
                           )}
                         </div>
                       )}
@@ -1610,6 +2137,22 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
+                    </div>
+                  </div>
+
+                  {/* Quick Alignment Toolbar */}
+                  <div className="flex flex-col gap-1.5 pb-2 border-b border-[#262c36]/20">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-[#707a8a]">Alignment</span>
+                      <span className="text-[10px] font-mono opacity-50">Canvas Snap</span>
+                    </div>
+                    <div className={`grid grid-cols-6 gap-1 p-1 rounded-xl border ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-black/20 border-white/10'}`}>
+                      <button onClick={() => handleAlign('left')} title="Align Left" className="p-1.5 rounded-lg flex items-center justify-center hover:bg-black/10 text-[#707a8a] hover:text-white cursor-pointer"><AlignLeft className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleAlign('hcenter')} title="Align Horizontal Center" className="p-1.5 rounded-lg flex items-center justify-center hover:bg-black/10 text-[#707a8a] hover:text-white cursor-pointer"><AlignCenter className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleAlign('right')} title="Align Right" className="p-1.5 rounded-lg flex items-center justify-center hover:bg-black/10 text-[#707a8a] hover:text-white cursor-pointer"><AlignRight className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleAlign('top')} title="Align Top" className="p-1.5 rounded-lg flex items-center justify-center hover:bg-black/10 text-[#707a8a] hover:text-white cursor-pointer"><AlignVerticalJustifyStart className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleAlign('vmiddle')} title="Align Vertical Middle" className="p-1.5 rounded-lg flex items-center justify-center hover:bg-black/10 text-[#707a8a] hover:text-white cursor-pointer"><AlignVerticalJustifyCenter className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleAlign('bottom')} title="Align Bottom" className="p-1.5 rounded-lg flex items-center justify-center hover:bg-black/10 text-[#707a8a] hover:text-white cursor-pointer"><AlignVerticalJustifyEnd className="w-3.5 h-3.5" /></button>
                     </div>
                   </div>
 
@@ -1807,19 +2350,80 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                   {/* IMAGE INSPECTOR */}
                   {selectedObject.type === 'image' && (
-                    <div className="flex flex-col gap-3">
-                      <span className="text-xs font-semibold text-[#707a8a]">Photo Properties</span>
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className={`w-full py-2 rounded-xl text-xs font-semibold border flex items-center justify-center gap-2 transition-colors cursor-pointer ${
-                          isLight
-                            ? 'bg-[#f8fafc] border-[#cbd5e1] hover:bg-[#f1f5f9]'
-                            : 'bg-[#181d24] border-[#262c36] hover:bg-[#222730]'
-                        }`}
-                      >
-                        <Upload className="w-3.5 h-3.5 text-[#ec4899]" />
-                        <span>Replace Photo</span>
-                      </button>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-[#707a8a]">Photo Treatment</span>
+                        <button
+                          onClick={() => fileInputRef.current?.click()}
+                          className="text-[11px] font-semibold text-[#ec4899] hover:underline cursor-pointer flex items-center gap-1"
+                        >
+                          <Upload className="w-3 h-3" />
+                          <span>Replace</span>
+                        </button>
+                      </div>
+
+                      {/* One-Click Aesthetic Filters */}
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-[#707a8a]">Aesthetic Filters</span>
+                          <Wand2 className="w-3 h-3 text-[#fcd535]" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {[
+                            { id: 'original' as ImageFilterPreset, name: 'Original' },
+                            { id: 'dither' as ImageFilterPreset, name: '1-Bit Dither' },
+                            { id: 'photocopy' as ImageFilterPreset, name: 'Photocopy' },
+                            { id: 'duotone' as ImageFilterPreset, name: 'Duotone' },
+                            { id: 'warm90s' as ImageFilterPreset, name: 'Warm 90s Film' },
+                          ].map((f) => (
+                            <button
+                              key={f.id}
+                              onClick={async () => {
+                                const processed = await processImageFilter(selectedObject.src, f.id);
+                                updateObject(selectedObject.id, { filterPreset: f.id, filteredSrc: processed });
+                                showToast(`Applied ${f.name} filter`);
+                              }}
+                              className={`p-2 rounded-xl text-left border text-xs font-semibold cursor-pointer transition-all ${
+                                selectedObject.filterPreset === f.id || (!selectedObject.filterPreset && f.id === 'original')
+                                  ? 'border-[#3b82f6] bg-[#3b82f6]/10 text-white ring-1 ring-[#3b82f6]'
+                                  : isLight ? 'border-slate-200 hover:bg-slate-50' : 'border-[#262c36] hover:bg-[#181d24]'
+                              }`}
+                            >
+                              <span className="truncate block">{f.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Shape Clipping Masks */}
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-[#707a8a]">Shape Clipping Mask</span>
+                          <Crop className="w-3 h-3 text-[#ec4899]" />
+                        </div>
+                        <div className="grid grid-cols-3 gap-1">
+                          {[
+                            { id: 'none' as ImageClipMask, label: 'None' },
+                            { id: 'circle' as ImageClipMask, label: 'Circle' },
+                            { id: 'oval' as ImageClipMask, label: 'Oval' },
+                            { id: 'star' as ImageClipMask, label: 'Star' },
+                            { id: 'heart' as ImageClipMask, label: 'Heart' },
+                            { id: 'id-frame' as ImageClipMask, label: 'ID Frame' },
+                          ].map((mask) => (
+                            <button
+                              key={mask.id}
+                              onClick={() => updateObject(selectedObject.id, { clipMask: mask.id })}
+                              className={`py-1.5 px-1 rounded-lg text-[11px] font-semibold border text-center cursor-pointer transition-all ${
+                                (selectedObject.clipMask || 'none') === mask.id
+                                  ? 'border-[#ec4899] bg-[#ec4899]/15 text-white ring-1 ring-[#ec4899]'
+                                  : isLight ? 'border-slate-200 text-slate-700 hover:bg-slate-50' : 'border-[#262c36] text-[#707a8a] hover:bg-[#181d24]'
+                              }`}
+                            >
+                              {mask.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
 
                       {/* Fit Mode */}
                       <div className="flex flex-col gap-1">
@@ -1928,6 +2532,68 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             onChange={(e) => updateObject(selectedObject.id, { borderRadius: Number(e.target.value) })}
                             className="w-full accent-[#3b82f6]"
                           />
+                        </div>
+                      )}
+
+                      {/* Rubber Stamp Text Control */}
+                      {selectedObject.shape === 'rubber-stamp' && (
+                        <div className="flex flex-col gap-1 pt-1">
+                          <label className="text-[11px] text-[#707a8a]">Rubber Stamp Text</label>
+                          <input
+                            type="text"
+                            value={selectedObject.stampText || 'APPROVED'}
+                            onChange={(e) => updateObject(selectedObject.id, { stampText: e.target.value.toUpperCase() })}
+                            className={`w-full px-2.5 py-1.5 text-xs font-mono font-bold rounded-lg border focus:outline-none ${
+                              isLight ? 'bg-white border-[#cbd5e1]' : 'bg-[#181d24] border-[#262c36]'
+                            }`}
+                            placeholder="e.g. APPROVED / VIP / REJECTED"
+                          />
+                        </div>
+                      )}
+
+                      {/* 5-Star Rating Control */}
+                      {selectedObject.shape === 'rating-stars' && (
+                        <div className="flex flex-col gap-1 pt-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-[#707a8a]">Star Rating ({selectedObject.starRating ?? 5.0} / 5.0)</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.5"
+                            max="5.0"
+                            step="0.5"
+                            value={selectedObject.starRating ?? 5.0}
+                            onChange={(e) => updateObject(selectedObject.id, { starRating: Number(e.target.value) })}
+                            className="w-full accent-[#fcd535] cursor-pointer"
+                          />
+                        </div>
+                      )}
+
+                      {/* Live Barcode / QR Code Payload Binding */}
+                      {(selectedObject.shape === 'barcode' || selectedObject.shape === 'qr-code') && (
+                        <div className="flex flex-col gap-2 p-2.5 rounded-xl border border-current/15 bg-black/10 pt-2">
+                          <div className="flex items-center justify-between text-xs font-semibold">
+                            <span>{selectedObject.shape === 'qr-code' ? 'Live QR Payload' : 'Live Barcode Payload'}</span>
+                            <span className="text-[10px] text-[#fcd535] font-mono">Real-time SVG</span>
+                          </div>
+                          <input
+                            type="text"
+                            value={selectedObject.payload || ''}
+                            onChange={(e) => updateObject(selectedObject.id, { payload: e.target.value })}
+                            className={`w-full px-2.5 py-1.5 text-xs font-mono rounded-lg border focus:outline-none ${
+                              isLight ? 'bg-white border-[#cbd5e1]' : 'bg-[#181d24] border-[#262c36]'
+                            }`}
+                            placeholder={selectedObject.shape === 'qr-code' ? 'Enter URL or text...' : 'e.g. ACS-94820'}
+                          />
+                          <label className="flex items-center gap-2 cursor-pointer pt-1">
+                            <input
+                              type="checkbox"
+                              checked={selectedObject.showTextLabel ?? (selectedObject.shape === 'barcode')}
+                              onChange={(e) => updateObject(selectedObject.id, { showTextLabel: e.target.checked })}
+                              className="accent-[#fcd535] w-3.5 h-3.5 cursor-pointer"
+                            />
+                            <span className="text-[11px] text-[#707a8a]">Show human-readable text label underneath</span>
+                          </label>
                         </div>
                       )}
                     </div>
@@ -2515,6 +3181,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       )}
 
       {/* ───────────────────────────────────────────────────────────────────── */}
+      {/* Book & Music Metadata Auto-Fill Modal */}
+      <MediaImportModal
+        isOpen={mediaModalOpen}
+        onClose={() => setMediaModalOpen(false)}
+        onSelect={handleMediaImport}
+      />
+
       {/* TEMPLATE PICKER DRAWER / MODAL                                        */}
       {/* ───────────────────────────────────────────────────────────────────── */}
       {templateDrawerOpen && (

@@ -60,7 +60,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({ theme = 'dark' }
             Typesetting & Card Design Guides
           </h1>
           <p className={`text-sm md:text-base max-w-2xl leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-            Clear, step-by-step design essays on line measures, optical kerning, social aspect ratios, and tactile digital cards. Written for writers, readers, and visual curators.
+            Clear, step-by-step design essays on line measures, letter spacing, social aspect ratios, and tactile digital cards. Written for writers, readers, and visual curators.
           </p>
         </header>
 

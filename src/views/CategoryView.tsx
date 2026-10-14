@@ -260,7 +260,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
               Want deeper typesetting advice?
             </span>
             <span className="text-[11px] text-[#707a8a]">
-              Read our educational articles on optical kerning and social card sizing.
+              Read our educational articles on typography, letter spacing, and card layout.
             </span>
           </div>
           <a
