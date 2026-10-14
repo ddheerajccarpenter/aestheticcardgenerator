@@ -9,7 +9,23 @@ export interface AspectRatioPreset {
   icon: string;
 }
 
-export type FontChoice = 'editorial' | 'serif' | 'sans' | 'mono';
+export type FontChoice =
+  | 'editorial'      // Newsreader (Editorial Serif)
+  | 'serif'          // Playfair Display (Editorial Serif)
+  | 'instrument'     // Instrument Serif (Editorial Serif)
+  | 'cormorant'      // Cormorant Garamond (Editorial Serif)
+  | 'syne'           // Syne (Display & Y2K)
+  | 'space-grotesk'  // Space Grotesk (Display & Y2K)
+  | 'unbounded'      // Unbounded (Display & Y2K)
+  | 'mono'           // JetBrains Mono (Archival Mono & Pixel)
+  | 'space-mono'     // Space Mono (Archival Mono & Pixel)
+  | 'pixel'          // VT323 (Archival Mono & Pixel)
+  | 'caveat'         // Caveat (Handwritten & Zine)
+  | 'reenie'         // Reenie Beanie (Handwritten & Zine)
+  | 'sans';          // Plus Jakarta Sans / Inter
+
+export type VerticalAlign = 'top' | 'middle' | 'bottom';
+export type SurfaceFinish = 'none' | 'grain' | 'halftone' | 'crease' | 'lanyard';
 
 export interface CardTheme {
   id: string;
@@ -46,6 +62,12 @@ export interface CardTemplate {
   accentColor?: string;
   description?: string;
   canvasDoc?: CanvasDocument;
+  lineHeight?: number;
+  letterSpacing?: number;
+  verticalAlign?: VerticalAlign;
+  surfaceFinish?: SurfaceFinish;
+  textureIntensity?: number;
+  isHolographic?: boolean;
 }
 
 export interface CardState {
@@ -58,6 +80,12 @@ export interface CardState {
   inkColor: string;
   fontChoice: FontChoice;
   fontSize: number;
+  lineHeight?: number;
+  letterSpacing?: number;
+  verticalAlign?: VerticalAlign;
+  surfaceFinish?: SurfaceFinish;
+  textureIntensity?: number;
+  isHolographic?: boolean;
   align: 'left' | 'center' | 'right';
   padding: number;
   borderRadius: number;
@@ -95,6 +123,7 @@ export interface GuideSection {
   body: string;
   bullets?: string[];
   callout?: { title: string; text: string };
+  templateId?: string;
 }
 
 export interface GuideArticle {
@@ -132,6 +161,8 @@ export interface BlogPost {
     body: string;
     bullets?: string[];
     callout?: { title: string; text: string };
+    templateId?: string;
+    actionPrompt?: string;
   }[];
 }
 
@@ -149,7 +180,17 @@ export type ShapeKind =
   | 'line'
   | 'star'
   | 'heart'
-  | 'diamond';
+  | 'diamond'
+  | 'rubber-stamp'
+  | 'security-seal'
+  | 'washi-tape'
+  | 'rating-stars'
+  | 'audio-waveform'
+  | 'qr-code'
+  | 'barcode';
+
+export type ImageFilterPreset = 'original' | 'dither' | 'photocopy' | 'duotone' | 'warm90s';
+export type ImageClipMask = 'none' | 'rect' | 'circle' | 'oval' | 'star' | 'heart' | 'id-frame';
 
 export interface BaseCanvasObject {
   id: string;
@@ -184,6 +225,9 @@ export interface ImageCanvasObject extends BaseCanvasObject {
   objectFit: 'contain' | 'cover' | 'fill';
   opacity: number;      // 0–1
   borderRadius: number; // px
+  filterPreset?: ImageFilterPreset;
+  clipMask?: ImageClipMask;
+  filteredSrc?: string; // cached processed canvas dataUrl
 }
 
 export interface ShapeCanvasObject extends BaseCanvasObject {
@@ -194,6 +238,10 @@ export interface ShapeCanvasObject extends BaseCanvasObject {
   strokeWidth: number;
   opacity: number;
   borderRadius: number; // for rounded-rect
+  payload?: string;     // URL or data for QR / Barcode
+  showTextLabel?: boolean; // Label underneath barcode/QR
+  stampText?: string;   // APPROVED, VIP, etc.
+  starRating?: number;  // 0.5 to 5.0
 }
 
 export type CanvasObject = TextCanvasObject | ImageCanvasObject | ShapeCanvasObject;

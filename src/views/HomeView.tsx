@@ -1,17 +1,21 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import type { CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
 import { updatePageSEO } from '../utils/seo';
+import { toPng } from 'html-to-image';
+import { ASSET_AVATARS } from '../data/canvasAssets';
 import {
   ArrowRight,
   Copy,
   Check,
   ChevronDown,
-  Sparkles,
   Search,
   X,
   FileQuestion,
-  BookOpen,
+  Download,
+  Quote,
+  BadgeAlert,
+  ExternalLink,
 } from 'lucide-react';
 
 interface HomeViewProps {
@@ -24,21 +28,20 @@ interface HomeViewProps {
 
 export const HomeView: React.FC<HomeViewProps> = ({
   theme = 'dark',
-  onOpenGuide,
 }) => {
   const isLight = theme === 'light';
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Aesthetic Text-to-Card Generator — Typesetting Studio',
+      title: 'Aesthetic Card Studio — Make tactile quote cards and aesthetic ID passes',
       description:
-        'Turn words into tactile editorial cards. Browser-native typesetting press with archival paper palettes, optical kerning, and instant 2x Retina download.',
+        'Format book excerpts on warm archival paper or build multi-layer Y2K credentials, club passes, and music cards—rendered locally in crisp 2x PNG, WebP, or SVG.',
       canonicalPath: '/',
       ogType: 'website',
       jsonLd: {
         '@context': 'https://schema.org',
         '@type': 'SoftwareApplication',
-        name: 'Aesthetic Text-to-Card Studio',
+        name: 'Aesthetic Card Studio',
         applicationCategory: 'DesignApplication',
         operatingSystem: 'All web browsers',
         offers: {
@@ -50,58 +53,120 @@ export const HomeView: React.FC<HomeViewProps> = ({
     });
   }, []);
 
-  // Live hero card interactive state
+  // Live hero interactive mini-studio state
+  const heroCardRef = useRef<HTMLDivElement>(null);
+  const [heroMode, setHeroMode] = useState<'quote' | 'id'>('quote');
   const [heroPaletteIndex, setHeroPaletteIndex] = useState(0);
   const [copiedHero, setCopiedHero] = useState(false);
+  const [isDownloadingHero, setIsDownloadingHero] = useState(false);
+
+  // Directly editable hero content
+  const [heroQuote, setHeroQuote] = useState(
+    '“In the depth of winter, I finally learned that within me there lay an invincible summer.”'
+  );
+  const [heroAuthor, setHeroAuthor] = useState('Albert Camus — Return to Tipasa');
+  const [heroTag, setHeroTag] = useState('FAVORITE LINES • NO. 04');
+
+  // ID Mode editable fields
+  const [heroIdName, setHeroIdName] = useState('Dan Valentini');
+  const [heroIdRole, setHeroIdRole] = useState('Vision Architect & Producer');
+  const [heroIdClearance, setHeroIdClearance] = useState('ALL-ACCESS CREW • TIER 01');
+
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
-  const heroThemes = [
+  const heroPalettes = [
+    {
+      id: 'st-germain',
+      name: 'St. Germain',
+      bg: '#f4ede4',
+      ink: '#2c2825',
+      badge: 'EST. 1997',
+      accent: '#2c2825',
+    },
     {
       id: 'warm-linen',
-      name: 'Kraft Book Page',
+      name: 'Warm Linen',
       bg: '#fce7cf',
       ink: '#451a03',
-      tag: 'FAVORITE LINES • NO. 04',
-      quote: '“In the depth of winter, I finally learned that within me there lay an invincible summer.”',
-      author: 'Albert Camus',
+      badge: 'ARCHIVAL',
+      accent: '#451a03',
     },
     {
       id: 'obsidian',
-      name: 'Midnight Black',
+      name: 'Obsidian Dark',
       bg: '#18191c',
       ink: '#f5f5f7',
-      tag: 'SONG LYRIC • BLONDE',
-      quote: '“Mind over matter is that magic. I do it everyday.”',
-      author: 'Frank Ocean — White Ferrari',
+      badge: 'MIDNIGHT',
+      accent: '#f5f5f7',
     },
     {
-      id: 'pastel',
-      name: 'Morning Sky',
+      id: 'soft-celadon',
+      name: 'Soft Celadon',
       bg: '#e2ecf9',
       ink: '#1e293b',
-      tag: 'LATE NIGHT THOUGHTS',
-      quote: '“You don’t have to have everything figured out right now. You just have to take the next gentle step.”',
-      author: 'Daily Note',
+      badge: 'CELADON',
+      accent: '#1e293b',
     },
     {
-      id: 'st-germain',
-      name: 'Vintage Cream',
-      bg: '#f4ede4',
-      ink: '#2c2825',
-      tag: 'BOOK REFLECTION • NO. 12',
-      quote: '“If you only read the books that everyone else is reading, you can only think what everyone else is thinking.”',
-      author: 'Haruki Murakami',
+      id: 'y2k-cyber',
+      name: 'Y2K Acid Studio',
+      bg: '#e0e722',
+      ink: '#111417',
+      badge: 'ACID 90s',
+      accent: '#ff007f',
     },
   ];
 
-  const currentHeroTheme = heroThemes[heroPaletteIndex];
+  const currentHeroPalette = heroPalettes[heroPaletteIndex];
 
   const handleCopyHero = () => {
-    navigator.clipboard.writeText(currentHeroTheme.quote);
+    const textToCopy =
+      heroMode === 'quote'
+        ? `${heroQuote}\n— ${heroAuthor}`
+        : `${heroIdName} • ${heroIdRole} • ${heroIdClearance}`;
+    navigator.clipboard.writeText(textToCopy);
     setCopiedHero(true);
     setTimeout(() => setCopiedHero(false), 2000);
+  };
+
+  const handleDownloadHeroPng = async () => {
+    if (!heroCardRef.current) return;
+    setIsDownloadingHero(true);
+    try {
+      const dataUrl = await toPng(heroCardRef.current, {
+        pixelRatio: 2,
+        cacheBust: true,
+      });
+      const link = document.createElement('a');
+      link.download = heroMode === 'quote' ? 'quote-card-preview.png' : 'aesthetic-id-pass.png';
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to export hero preview card', err);
+    } finally {
+      setIsDownloadingHero(false);
+    }
+  };
+
+  const handleOpenInFullStudio = () => {
+    if (heroMode === 'quote') {
+      sessionStorage.setItem(
+        'aesthetic_card_studio_hero_quote',
+        JSON.stringify({
+          quote: heroQuote,
+          author: heroAuthor,
+          tag: heroTag,
+          paletteId: currentHeroPalette.id,
+          bg: currentHeroPalette.bg,
+          ink: currentHeroPalette.ink,
+        })
+      );
+      window.location.href = `/create?palette=${currentHeroPalette.id}`;
+    } else {
+      window.location.href = `/canvas?template=pass-creative-studio`;
+    }
   };
 
   const categories = [
@@ -135,7 +200,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const faqs = [
     {
       q: 'Is Aesthetic Card Studio really free?',
-      a: 'Yes, 100% free forever. There are no subscriptions, no paywalls, and no watermarks on your exported cards.',
+      a: 'Yes, 100% free. There are no subscriptions, paywalls, or watermarks on your exported cards.',
     },
     {
       q: 'Does this app save or track what I write?',
@@ -155,7 +220,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
     <div className={`w-full pt-16 transition-colors duration-200 ${isLight ? 'bg-[#f8fafc] text-[#0f172a]' : 'bg-[#0b0e11] text-[#e1e2e7]'}`}>
       {/* SECTION 1: HERO */}
       <section className="relative w-full px-4 md:px-8 py-12 md:py-20 flex flex-col items-center text-center overflow-hidden">
-        {/* Subtle pill */}
+        {/* Anti-slop clean pill badge */}
         <div
           className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-medium mb-6 ${
             isLight
@@ -163,71 +228,41 @@ export const HomeView: React.FC<HomeViewProps> = ({
               : 'bg-[#181d24] border-[#262c36] text-[#c4c7c8]'
           }`}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#f5cf2e]"></span>
-          <span>Free online card maker • No sign-up required</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#facc15]"></span>
+          <span>Browser-Based Card &amp; ID Press — Free, Local, No Sign-Up</span>
         </div>
 
         <h1 className={`text-4xl md:text-6xl font-bold max-w-4xl tracking-tight mb-4 leading-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-          Turn words into cards people actually want to save.
+          Make tactile quote cards and aesthetic ID passes.
         </h1>
         
         <p className={`text-sm md:text-base max-w-2xl mx-auto mb-8 leading-relaxed ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-          Make beautiful quote cards, song lyrics, book notes, and aesthetic ID badges in seconds. Tweak fonts, choose archival paper palettes, and export 2× Retina images ready for Instagram, Pinterest, or your lockscreen.
+          Format book excerpts on warm archival paper or build multi-layer Y2K credentials, club passes, and music cards—rendered locally in crisp 2x PNG, WebP, or SVG.
         </p>
 
-        {/* CTA Buttons */}
+        {/* 2 Clear Action CTAs */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
           <a
-            href="/canvas"
-            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm active:scale-[0.98] transition-all cursor-pointer shadow-lg ${
-              isLight
-                ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
-            }`}
+            href="/create"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm active:scale-[0.98] transition-all cursor-pointer shadow-lg bg-[#facc15] text-[#0b0e11] hover:bg-[#ffe270]"
           >
-            <span>Design on Canvas Studio</span>
+            <span>Open Card Creator</span>
             <ArrowRight className="w-4 h-4" />
           </a>
 
           <a
-            href="/create"
-            className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl border font-semibold text-sm transition-colors cursor-pointer ${
+            href="/canvas"
+            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl border font-semibold text-sm transition-colors cursor-pointer ${
               isLight
                 ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-[#f1f5f9]'
                 : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
             }`}
           >
-            <span>Quick Text Card</span>
+            <span>Launch Freeform Canvas →</span>
           </a>
-
-          <a
-            href="/templates"
-            className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl border font-medium text-sm transition-colors cursor-pointer ${
-              isLight
-                ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f1f5f9]'
-                : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
-            }`}
-          >
-            <Sparkles className={`w-4 h-4 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
-            <span>Browse 56 Templates</span>
-          </a>
-
-          {onOpenGuide && (
-            <button
-              onClick={onOpenGuide}
-              className={`inline-flex items-center gap-2 px-4 py-3 rounded-lg border font-medium text-sm transition-colors cursor-pointer ${
-                isLight
-                  ? 'bg-white border-[#e2e8f0] text-[#475569] hover:text-[#0f172a]'
-                  : 'bg-[#14171d] border-[#262c36] text-[#9ca3af] hover:text-white'
-              }`}
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Typography Guide</span>
-            </button>
-          )}
         </div>
 
-        {/* Studio Live Preview Frame */}
+        {/* Interactive Mini-Studio Frame */}
         <div
           className={`w-full max-w-4xl border p-3 md:p-6 rounded-2xl shadow-2xl flex flex-col gap-3 text-left ${
             isLight
@@ -235,110 +270,256 @@ export const HomeView: React.FC<HomeViewProps> = ({
               : 'bg-[#14171d] border-[#262c36]'
           }`}
         >
-          {/* Toolbar strip */}
+          {/* Mini-Studio Toolbar: Mode Switcher + Palettes + Quick Actions */}
           <div
-            className={`flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-lg border ${
+            className={`flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 rounded-xl border ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0]'
                 : 'bg-[#181d24] border-[#1f242c]'
             }`}
           >
+            {/* Mode Toggle Buttons */}
+            <div className="flex items-center gap-1 bg-black/10 dark:bg-black/30 p-1 rounded-lg">
+              <button
+                onClick={() => setHeroMode('quote')}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  heroMode === 'quote'
+                    ? isLight
+                      ? 'bg-white text-[#0f172a] shadow-sm'
+                      : 'bg-[#facc15] text-[#0b0e11] shadow-sm'
+                    : isLight
+                    ? 'text-[#64748b] hover:text-[#0f172a]'
+                    : 'text-[#9ca3af] hover:text-white'
+                }`}
+              >
+                <Quote className="w-3.5 h-3.5" />
+                <span>Quote Mode</span>
+              </button>
+
+              <button
+                onClick={() => setHeroMode('id')}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  heroMode === 'id'
+                    ? isLight
+                      ? 'bg-white text-[#0f172a] shadow-sm'
+                      : 'bg-[#facc15] text-[#0b0e11] shadow-sm'
+                    : isLight
+                    ? 'text-[#64748b] hover:text-[#0f172a]'
+                    : 'text-[#9ca3af] hover:text-white'
+                }`}
+              >
+                <BadgeAlert className="w-3.5 h-3.5" />
+                <span>ID Card Mode</span>
+              </button>
+            </div>
+
+            {/* Palettes */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
-              <span className={`text-xs px-1 font-medium ${isLight ? 'text-[#64748b]' : 'text-[#707a8a]'}`}>
+              <span className={`text-[11px] px-1 font-medium ${isLight ? 'text-[#64748b]' : 'text-[#707a8a]'}`}>
                 Palette:
               </span>
-              {heroThemes.map((theme, idx) => (
+              {heroPalettes.map((p, idx) => (
                 <button
-                  key={theme.id}
+                  key={p.id}
                   onClick={() => setHeroPaletteIndex(idx)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                     heroPaletteIndex === idx
                       ? isLight
                         ? 'bg-[#0f172a] text-white shadow-sm'
-                        : 'bg-white text-[#0b0e11] shadow-sm'
+                        : 'bg-white text-[#0b0e11] shadow-sm font-semibold'
                       : isLight
                       ? 'bg-white text-[#475569] hover:text-[#0f172a] border border-[#e2e8f0]'
-                      : 'bg-[#14171d] text-[#c4c7c8] hover:text-white'
+                      : 'bg-[#14171d] text-[#c4c7c8] hover:text-white border border-[#262c36]'
                   }`}
                 >
-                  {theme.name}
+                  <span
+                    className="w-2.5 h-2.5 rounded-full border border-black/20"
+                    style={{ backgroundColor: p.bg }}
+                  />
+                  <span>{p.name}</span>
                 </button>
               ))}
             </div>
 
+            {/* Actions: Download PNG & Open Studio */}
             <div className="flex items-center gap-2 ml-auto">
-              <span className={`text-xs px-1 ${isLight ? 'text-[#64748b]' : 'text-[#707a8a]'}`}>Ratio:</span>
-              <span
-                className={`px-2 py-0.5 rounded border text-xs font-medium ${
-                  isLight
-                    ? 'bg-white border-[#e2e8f0] text-[#0f172a]'
-                    : 'bg-[#14171d] border-[#1f242c] text-white'
-                }`}
-              >
-                4 : 5 Portrait
-              </span>
               <button
                 onClick={handleCopyHero}
-                className={`p-1.5 rounded border transition-colors cursor-pointer ${
+                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
                   isLight
                     ? 'bg-white border-[#e2e8f0] text-[#475569] hover:text-[#0f172a]'
                     : 'bg-[#14171d] border-[#1f242c] text-[#c4c7c8] hover:text-white'
                 }`}
-                title="Copy quote to clipboard"
-                aria-label="Copy hero quote text"
+                title="Copy text to clipboard"
+                aria-label="Copy text to clipboard"
               >
                 {copiedHero ? <Check className="w-3.5 h-3.5 text-[#0ecb81]" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
+
+              <button
+                onClick={handleDownloadHeroPng}
+                disabled={isDownloadingHero}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                  isLight
+                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-[#f1f5f9]'
+                    : 'bg-[#222730] border-[#333a46] text-white hover:bg-[#2b323e]'
+                }`}
+                title="Download 2x PNG of this live preview"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{isDownloadingHero ? 'Exporting...' : 'Download PNG'}</span>
+              </button>
+
+              <button
+                onClick={handleOpenInFullStudio}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-sm bg-[#facc15] text-[#0b0e11] hover:bg-[#ffe270]"
+                title="Open this card in the full studio with all controls"
+              >
+                <span>Open in Full Studio</span>
+                <ExternalLink className="w-3 h-3" />
               </button>
             </div>
           </div>
 
-          {/* Live Card Canvas */}
+          {/* Interactive Editable Card Canvas */}
           <div
-            className={`relative w-full min-h-[340px] md:min-h-[440px] flex items-center justify-center p-3 sm:p-6 md:p-10 rounded-xl overflow-hidden border ${
+            className={`relative w-full min-h-[360px] md:min-h-[440px] flex items-center justify-center p-4 sm:p-6 md:p-10 rounded-xl overflow-hidden border ${
               isLight
                 ? 'bg-[#f1f5f9] border-[#e2e8f0]'
                 : 'bg-[#0b0e11] border-[#1f242c]'
             }`}
           >
-            <article
+            {/* The actual exportable card container */}
+            <div
+              ref={heroCardRef}
               style={{
-                backgroundColor: currentHeroTheme.bg,
-                color: currentHeroTheme.ink,
+                backgroundColor: currentHeroPalette.bg,
+                color: currentHeroPalette.ink,
               }}
-              className="relative w-full max-w-lg min-h-[280px] p-5 sm:p-8 md:p-10 rounded-xl transition-all duration-300 shadow-2xl flex flex-col justify-between border border-black/10"
+              className="relative w-full max-w-lg min-h-[300px] p-6 sm:p-8 md:p-10 rounded-2xl transition-colors duration-200 shadow-2xl flex flex-col justify-between border border-black/10 overflow-hidden"
             >
-              {/* Top Folio Bar */}
-              <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-current/15 text-[10px] sm:text-[11px] font-mono tracking-wider opacity-75">
-                <span className="truncate max-w-[200px]">{currentHeroTheme.tag}</span>
-                <span className="px-1.5 py-0.5 rounded border border-current/20 shrink-0">EST. 1997</span>
-              </div>
+              {/* Subtle tactile grain overlay */}
+              <div className="absolute inset-0 card-noise opacity-30 pointer-events-none" />
 
-              {/* Main Body Quote */}
-              <div className="my-4 sm:my-6">
-                <blockquote className="font-editorial text-xl sm:text-2xl md:text-3xl leading-relaxed tracking-tight">
-                  {currentHeroTheme.quote}
-                </blockquote>
-              </div>
+              {heroMode === 'quote' ? (
+                /* ─────────────────────────────────────────────────────────────
+                   QUOTE MODE: Click and type directly inline
+                   ───────────────────────────────────────────────────────────── */
+                <>
+                  {/* Top Folio Bar */}
+                  <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-current/15 text-[10px] sm:text-[11px] font-mono tracking-wider opacity-75 relative z-10">
+                    <input
+                      type="text"
+                      value={heroTag}
+                      onChange={(e) => setHeroTag(e.target.value)}
+                      className="bg-transparent border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none max-w-[200px] font-mono"
+                      title="Click to edit folio tag"
+                    />
+                    <span className="px-1.5 py-0.5 rounded border border-current/25 shrink-0 font-mono text-[9px]">
+                      {currentHeroPalette.badge}
+                    </span>
+                  </div>
 
-              {/* Footer Author & Action */}
-              <div className="pt-4 border-t border-current/15 flex items-center justify-between">
-                <cite className="not-italic text-xs font-medium opacity-80">
-                  {currentHeroTheme.author}
-                </cite>
-                <button
-                  onClick={() => {
-                    const matchedTemplate =
-                      PRESET_TEMPLATES.find((t) => t.theme.id === currentHeroTheme.id) || PRESET_TEMPLATES[0];
-                    sessionStorage.setItem('aesthetic_card_studio_selected_template', matchedTemplate.id);
-                    window.location.href = `/create?template=${matchedTemplate.id}`;
-                  }}
-                  className="text-xs font-semibold underline underline-offset-4 hover:opacity-75 transition-opacity cursor-pointer flex items-center gap-1"
-                >
-                  <span>Edit in Studio</span>
-                  <ArrowRight className="w-3 h-3" />
-                </button>
-              </div>
-            </article>
+                  {/* Main Body Quote: directly editable inline textarea */}
+                  <div className="my-5 sm:my-7 relative z-10">
+                    <textarea
+                      value={heroQuote}
+                      onChange={(e) => setHeroQuote(e.target.value)}
+                      rows={3}
+                      className="w-full bg-transparent resize-none border-b border-dashed border-transparent hover:border-current/25 focus:border-current/50 outline-none font-editorial text-xl sm:text-2xl md:text-3xl leading-relaxed tracking-tight text-inherit"
+                      title="Click and type your words directly"
+                    />
+                    <span className="text-[10px] opacity-40 font-mono tracking-wide block mt-1">
+                      ✎ Click text to edit inline
+                    </span>
+                  </div>
+
+                  {/* Footer Author & Folio */}
+                  <div className="pt-4 border-t border-current/15 flex items-center justify-between relative z-10">
+                    <div className="flex items-center gap-1.5">
+                      <span className="opacity-60 text-xs">—</span>
+                      <input
+                        type="text"
+                        value={heroAuthor}
+                        onChange={(e) => setHeroAuthor(e.target.value)}
+                        className="bg-transparent border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-xs font-medium opacity-85 text-inherit max-w-[240px]"
+                        title="Click to edit author attribution"
+                      />
+                    </div>
+                    <span className="text-[10px] font-mono opacity-50">4:5 SOCIAL</span>
+                  </div>
+                </>
+              ) : (
+                /* ─────────────────────────────────────────────────────────────
+                   ID CARD MODE: Tactical credential layout with photo
+                   ───────────────────────────────────────────────────────────── */
+                <>
+                  {/* Lanyard Top Punch Hole & Badge Bar */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="w-10 h-2.5 rounded-full bg-black/30 border border-current/40 mb-3" />
+                    <div className="w-full flex items-center justify-between pb-2.5 border-b border-current/15 text-[10px] font-mono tracking-wider opacity-85">
+                      <span className="font-bold tracking-widest uppercase">★ OFFICIAL CREATIVE PASS ★</span>
+                      <span className="px-1.5 py-0.5 rounded bg-black/10 border border-current/30 font-bold">
+                        {currentHeroPalette.badge}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Dual Column Content: Halftone Photo + Editable Attributes */}
+                  <div className="my-4 flex items-center gap-4 relative z-10">
+                    {/* Halftone / Duotone Portrait */}
+                    <div className="w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden border border-current/30 shadow-md shrink-0 relative bg-black/10">
+                      <img
+                        src={ASSET_AVATARS.grungeDan}
+                        alt="Profile Portrait"
+                        className="w-full h-full object-cover grayscale contrast-125"
+                      />
+                      <div className="absolute inset-0 bg-current/10 mix-blend-multiply pointer-events-none" />
+                    </div>
+
+                    {/* Metadata fields */}
+                    <div className="flex-1 flex flex-col gap-2 font-mono text-xs">
+                      <div>
+                        <span className="text-[9px] uppercase tracking-wider opacity-60 block">HOLDER NAME</span>
+                        <input
+                          type="text"
+                          value={heroIdName}
+                          onChange={(e) => setHeroIdName(e.target.value)}
+                          className="w-full bg-transparent font-bold text-sm border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-inherit"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[9px] uppercase tracking-wider opacity-60 block">ROLE / SPECIALTY</span>
+                        <input
+                          type="text"
+                          value={heroIdRole}
+                          onChange={(e) => setHeroIdRole(e.target.value)}
+                          className="w-full bg-transparent text-xs border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none opacity-85 text-inherit"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[9px] uppercase tracking-wider opacity-60 block">CLEARANCE STATUS</span>
+                        <input
+                          type="text"
+                          value={heroIdClearance}
+                          onChange={(e) => setHeroIdClearance(e.target.value)}
+                          className="w-full bg-transparent font-semibold text-[11px] border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-inherit"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Barcode Strip & Document Serial */}
+                  <div className="pt-3 border-t border-current/15 flex items-center justify-between text-[10px] font-mono opacity-80 relative z-10">
+                    <div className="flex items-center gap-1.5">
+                      <span className="tracking-tight text-[11px] font-bold">||||| | |||| ||| |||||||</span>
+                      <span>NO. TTC6253021</span>
+                    </div>
+                    <span className="text-[9px] uppercase font-bold tracking-wider">VERIFIED ACCESS</span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -484,19 +665,45 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       <span className="border border-current/30 px-1 rounded">{template.badge}</span>
                     </div>
 
-                    <p
-                      className={`my-3 text-base leading-snug line-clamp-3 ${
-                        template.font === 'editorial'
-                          ? 'font-editorial text-lg'
-                          : template.font === 'serif'
-                          ? 'font-display-serif'
-                          : template.font === 'mono'
-                          ? 'font-mono-code text-sm'
-                          : 'font-sans'
-                      }`}
-                    >
-                      “{template.quote}”
-                    </p>
+                    {template.category === 'id-card' ? (
+                      <div className="my-3 flex items-center gap-3">
+                        <div className="w-14 h-18 rounded-lg overflow-hidden border border-current/30 shadow-sm shrink-0 relative bg-black/10">
+                          <img
+                            src={
+                              (template.canvasDoc?.objects?.find((o) => o.type === 'image') as any)?.src ||
+                              (template.id.includes('pretty') || template.id.includes('kawaii') || template.id.includes('soulmate')
+                                ? ASSET_AVATARS.jenniePretty
+                                : template.id.includes('dan') || template.id.includes('delulu') || template.id.includes('cyber') || template.id.includes('acid')
+                                ? ASSET_AVATARS.grungeDan
+                                : template.id.includes('anime') || template.id.includes('travel')
+                                ? ASSET_AVATARS.animeTraveler
+                                : ASSET_AVATARS.studentScholar)
+                            }
+                            alt={template.title}
+                            className="w-full h-full object-cover grayscale contrast-125"
+                          />
+                          <div className="absolute inset-0 bg-current/15 mix-blend-multiply pointer-events-none" />
+                        </div>
+                        <div className="flex-1 flex flex-col gap-1 text-[11px] font-sans">
+                          <span className="font-bold line-clamp-1 text-sm tracking-tight">{template.title}</span>
+                          <span className="opacity-75 line-clamp-2 text-[10px] leading-snug">{template.quote}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p
+                        className={`my-3 text-base leading-snug line-clamp-3 ${
+                          template.font === 'editorial'
+                            ? 'font-editorial text-lg'
+                            : template.font === 'serif'
+                            ? 'font-display-serif'
+                            : template.font === 'mono'
+                            ? 'font-mono-code text-sm'
+                            : 'font-sans'
+                        }`}
+                      >
+                        “{template.quote}”
+                      </p>
+                    )}
 
                     <div className="text-[11px] font-medium opacity-80 truncate">
                       — {template.author}

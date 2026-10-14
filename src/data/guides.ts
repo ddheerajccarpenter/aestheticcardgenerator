@@ -35,7 +35,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         bullets: [
           'Optical Negative Space: Maintain at least 36px to 44px of internal margin on all sides. The text block should occupy no more than 40-50% of the total card area.',
           'Archival Paper Palettes: Ground your design in real print tones. Substitute pure white with French cream (#f4ede4), warm linen (#fce7cf), or celadon mist (#e2ecf9).',
-          'Curated Serif Pairing: Employ classical serifs like Newsreader or Playfair Display with optical kerning to elevate philosophical and literary reflections.',
+          'Curated Serif Pairing: Employ classical serifs like Newsreader or Playfair Display with refined tracking and leading to elevate philosophical and literary reflections.',
         ],
         callout: {
           title: 'Typesetting Rule of Thumb',

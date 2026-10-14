@@ -214,7 +214,7 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
           ))}
         </div>
 
-        {/* Bottom Ad Placeholder */}
+        {/* Studio Promotion Banner */}
         <AdSlot slotId="blog-index-bottom" />
       </div>
     </div>
@@ -411,6 +411,22 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {section.templateId && (
+                <div className="pt-2">
+                  <a
+                    href={`/create?template=${section.templateId}`}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs transition-all shadow-sm cursor-pointer ${
+                      isLight
+                        ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
+                        : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
+                    }`}
+                  >
+                    <PenTool className="w-3.5 h-3.5" />
+                    <span>{section.actionPrompt || 'Load This Preset in Studio →'}</span>
+                  </a>
+                </div>
               )}
             </section>
           ))}

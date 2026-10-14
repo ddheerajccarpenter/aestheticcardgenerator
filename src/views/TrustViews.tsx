@@ -9,6 +9,8 @@ import {
   ChevronRight,
   AlertTriangle,
   Lock,
+  Check,
+  Copy,
 } from 'lucide-react';
 
 interface TrustViewBaseProps {
@@ -24,9 +26,9 @@ export const AboutView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'About — Aesthetic Text-to-Card Studio',
+      title: 'About — Aesthetic Card Studio',
       description:
-        'Learn about Aesthetic Card Studio: a browser-native typesetting press designed to format words, poetry, and book reflections with physical dignity.',
+        'Learn about Aesthetic Card Studio: a browser-native card press and studio designed to format words, poetry, and aesthetic ID cards with tactile dignity.',
       canonicalPath: '/about',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -49,7 +51,7 @@ export const AboutView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
             About Aesthetic Card Studio
           </h1>
           <p className={`text-base leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-            A browser-native typesetting press created for writers, readers, thinkers, and visual curators.
+            An indie creative tool created for writers, readers, thinkers, and visual curators.
           </p>
         </header>
 
@@ -62,7 +64,7 @@ export const AboutView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
               When sharing meaningful thoughts, book excerpts, or personal reflections online, creators often face a frustrating dilemma: post raw plain-text that gets lost in endless feeds, or use bloated graphic design suites that require templates, logins, subscriptions, and dozens of manual adjustment layers.
             </p>
             <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
-              Aesthetic Card Studio was built to solve this exact bottleneck. It is a focused, single-purpose typesetting press running entirely in your browser. Paste your quote, choose an art direction rooted in archival bookmaking, and export a 2x Retina PNG in seconds.
+              Aesthetic Card Studio was built to solve this exact bottleneck. It is a focused, single-purpose creative studio running entirely in your browser. Paste your quote, choose an art direction rooted in archival bookmaking or Y2K credentials, and export a 2x Retina PNG in seconds.
             </p>
           </section>
 
@@ -86,14 +88,14 @@ export const AboutView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
             </ul>
           </section>
 
-          <section className={`p-4 rounded-xl border text-xs leading-relaxed ${
+          <section className={`p-5 rounded-2xl border text-xs leading-relaxed ${
             isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
           }`}>
-            <span className="font-semibold block text-[#707a8a] uppercase mb-1">
-              Project Ownership Notice
+            <span className="font-semibold block text-[#707a8a] uppercase tracking-wider mb-1.5">
+              Colophon & Open Source
             </span>
             <p className={isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}>
-              This open-source web application is maintained by <em>[Project Maintainer / Organization Placeholder]</em>. For bug reports, design feedback, or feature contributions, please refer to our <a href="/contact" className="underline text-current">Contact Page</a>.
+              Aesthetic Card Studio is an independent, local-first creative tool designed and maintained by Dheeraj Carpenter. Built with React 19, TypeScript, and native HTML5 Canvas & SVG APIs. All card rendering and file exports execute locally on your machine with zero server dependencies. The complete source code is open on <a href="https://github.com/ddheerajccarpenter/aestheticcardgenerator" target="_blank" rel="noreferrer" className="underline text-current font-medium">GitHub</a>.
             </p>
           </section>
         </div>
@@ -109,6 +111,13 @@ export const AboutView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
 // --------------------------------------------------------------------------
 export const ContactView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) => {
   const isLight = theme === 'light';
+  const [copiedEmail, setCopiedEmail] = React.useState(false);
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText('contact@aestheticcardstudio.com');
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
 
   useEffect(() => {
     updatePageSEO({
@@ -152,22 +161,43 @@ export const ContactView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) =>
               </h2>
             </div>
             <p className={`text-xs ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-              Because this website runs completely client-side without a database backend, we do not provide a decorative webform that simulates submission. You can reach out directly via standard email:
+              Because this studio runs completely client-side without servers or accounts, you can reach out directly via email for feedback, bug reports, and new template requests:
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <a
                 href="mailto:contact@aestheticcardstudio.com?subject=Aesthetic%20Card%20Studio%20Feedback"
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold cursor-pointer shadow-md ${
+                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold cursor-pointer shadow-md ${
                   isLight ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]' : 'bg-white text-[#0b0e11] hover:bg-[#e2e2e2]'
                 }`}
               >
                 <Mail className="w-4 h-4" />
                 <span>contact@aestheticcardstudio.com</span>
               </a>
+              <button
+                onClick={handleCopyEmail}
+                type="button"
+                className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-medium cursor-pointer transition-colors ${
+                  isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-[#f1f5f9]' : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
+                }`}
+              >
+                {copiedEmail ? <Check className="w-3.5 h-3.5 text-[#0ecb81]" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedEmail ? 'Email Copied!' : 'Copy Email'}</span>
+              </button>
             </div>
-            <span className="text-[11px] text-[#707a8a]">
-              [Configurable placeholder email for domain owner]
-            </span>
+            <div className="flex flex-wrap items-center gap-4 text-xs pt-1 text-[#707a8a]">
+              <a
+                href="https://github.com/ddheerajccarpenter/aestheticcardgenerator/issues"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline hover:text-current font-medium"
+              >
+                Report Bug on GitHub →
+              </a>
+              <span>•</span>
+              <a href="/templates" className="hover:underline hover:text-current font-medium">
+                Browse Template Library →
+              </a>
+            </div>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -374,7 +404,7 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = ({ theme = 'dark' }) =>
               6. Contact Information
             </h2>
             <p className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
-              If you have any questions regarding this Privacy Policy, please contact the site maintainer at <code>contact@aestheticcardstudio.com</code> [Configurable owner placeholder].
+              If you have any questions regarding this Privacy Policy, please contact the site maintainer at <code>contact@aestheticcardstudio.com</code>.
             </p>
           </section>
         </div>
