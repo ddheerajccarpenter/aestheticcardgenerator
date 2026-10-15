@@ -69,6 +69,7 @@ import {
   RefreshCw,
   Search,
   X,
+  Maximize2,
 } from 'lucide-react';
 import { processImageFilter } from '../utils/imageFilters';
 import { generateQrCodeSvg, generateBarcodeSvg } from '../utils/qrBarcodeGenerator';
@@ -93,8 +94,32 @@ interface CanvasEditorViewProps {
   onToggleTheme?: () => void;
 }
 
-const STORAGE_KEY = 'aesthetic_canvas_editor_draft_v1';
+const STORAGE_KEY = 'aesthetic_canvas_editor_draft_v2';
+const LEGACY_STORAGE_KEY = 'aesthetic_canvas_editor_draft_v1';
 const MAX_HISTORY = 40;
+
+const isDocumentCollapsed = (d: CanvasDocument): boolean => {
+  if (!d || !d.objects || d.objects.length === 0) return false;
+  const nonBg = d.objects.filter(
+    (o) =>
+      !(o.width >= d.canvasWidth * 0.85 && o.height >= d.canvasHeight * 0.85) &&
+      !/paper|card base|card outline|parchment|background frame/i.test(o.name)
+  );
+  if (nonBg.length === 0) return false;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const o of nonBg) {
+    minX = Math.min(minX, o.x);
+    minY = Math.min(minY, o.y);
+    maxX = Math.max(maxX, o.x + o.width);
+    maxY = Math.max(maxY, o.y + o.height);
+  }
+  const spanW = maxX - minX;
+  const spanH = maxY - minY;
+  return spanW < d.canvasWidth * 0.35 || spanH < d.canvasHeight * 0.35;
+};
 
 export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   theme = 'dark',
@@ -124,11 +149,32 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     }
 
     if (!isBlank) {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (parsed && Array.isArray(parsed.objects)) {
+          if (parsed && Array.isArray(parsed.objects) && parsed.objects.length > 0) {
+            // Check if draft was collapsed by the previous dimension compounding bug
+            if (isDocumentCollapsed(parsed)) {
+              // Try to find the original template and restore it cleanly
+              const matchedTemplate = PRESET_TEMPLATES.find(
+                (t) =>
+                  t.title.toLowerCase().trim() === parsed.title?.toLowerCase().trim() ||
+                  t.id === parsed.id
+              );
+              if (matchedTemplate) {
+                return templateToCanvasDoc(matchedTemplate);
+              }
+              // Or expand collapsed objects to properly fill the canvas
+              const expanded = normalizeTemplateDimensions(
+                parsed.objects as any,
+                parsed.canvasWidth,
+                parsed.canvasHeight,
+                parsed.canvasWidth,
+                parsed.canvasHeight
+              );
+              return { ...parsed, objects: expanded as any };
+            }
             return parsed;
           }
         } catch {
@@ -137,7 +183,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       }
     }
 
-    // Default to the Jennie Pretty ID Pass or blank
+    // Default to the first preset template or blank
     const defaultTmpl = PRESET_TEMPLATES[0];
     return defaultTmpl ? templateToCanvasDoc(defaultTmpl) : createBlankCanvas();
   });
@@ -1348,6 +1394,30 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     showToast(`Created new blank canvas (${preset.width}×${preset.height}px)!`);
   };
 
+  // Smart "Fit Card Content to Canvas" - scales and reflows elements to fill canvas with clean margins
+  const handleFitCardToCanvas = useCallback(() => {
+    const currentDoc = docRef.current;
+    const expanded = normalizeTemplateDimensions(
+      currentDoc.objects as any,
+      currentDoc.canvasWidth,
+      currentDoc.canvasHeight,
+      currentDoc.canvasWidth,
+      currentDoc.canvasHeight
+    );
+    commitDocumentChange({
+      ...currentDoc,
+      objects: expanded as any,
+    });
+    showToast('Fitted card elements to canvas!');
+  }, [commitDocumentChange]);
+
+  // Self-heal: If document was loaded in a collapsed state from the previous preset compounding bug, auto-fit to canvas immediately
+  useEffect(() => {
+    if (isDocumentCollapsed(docRef.current)) {
+      handleFitCardToCanvas();
+    }
+  }, [handleFitCardToCanvas]);
+
   // Quick Command Execution (Leftover Item 5)
   const handleExecuteQuickCommand = useCallback((cmd: string) => {
     const trimmed = cmd.trim();
@@ -1602,9 +1672,19 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               className={`p-1.5 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
                 isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#181d24]'
               }`}
-              title="Fit to Screen"
+              title="Fit Viewport to Screen"
             >
               Fit
+            </button>
+            <button
+              onClick={handleFitCardToCanvas}
+              className={`p-1.5 rounded-lg text-xs font-mono transition-colors cursor-pointer flex items-center gap-1 ${
+                isLight ? 'hover:bg-[#f1f3f5] text-[#2563eb]' : 'hover:bg-[#181d24] text-[#38bdf8]'
+              }`}
+              title="Fit Card Content: Scales and reflows all card elements to fill the canvas"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span className="hidden md:inline text-[11px] font-sans font-medium">Fit Card</span>
             </button>
           </div>
 
@@ -3641,6 +3721,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           </span>
                         </button>
                       ))}
+                      <button
+                        onClick={handleFitCardToCanvas}
+                        className={`w-full mt-2 p-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                          isLight
+                            ? 'border-[#3b82f6]/40 bg-[#3b82f6]/10 text-[#2563eb] hover:bg-[#3b82f6]/20'
+                            : 'border-[#38bdf8]/40 bg-[#38bdf8]/10 text-[#38bdf8] hover:bg-[#38bdf8]/20'
+                        }`}
+                        title="Fit all card elements to fill current canvas dimensions"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                        <span>Fit Content to Canvas</span>
+                      </button>
                     </div>
                   </div>
 

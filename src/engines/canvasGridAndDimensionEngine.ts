@@ -72,6 +72,7 @@ export function normalizeTemplateDimensions<T extends {
   height: number;
   fontSize?: number;
   isBackground?: boolean;
+  name?: string;
 }>(
   layers: T[],
   fromWidth: number,
@@ -79,30 +80,105 @@ export function normalizeTemplateDimensions<T extends {
   toWidth: number,
   toHeight: number
 ): T[] {
-  if (fromWidth === toWidth && fromHeight === toHeight) return layers;
+  if (!layers || layers.length === 0) return layers;
 
-  const uniformScale = Math.min(toWidth / fromWidth, toHeight / fromHeight);
-  const offsetX = (toWidth - fromWidth * uniformScale) / 2;
-  const offsetY = (toHeight - fromHeight * uniformScale) / 2;
+  const isBgLayer = (layer: T): boolean => {
+    if (layer.isBackground) return true;
+    if (layer.width >= fromWidth - 80 && layer.height >= fromHeight - 80) return true;
+    if (typeof layer.name === 'string') {
+      const lower = layer.name.toLowerCase();
+      if (
+        lower.includes('paper') ||
+        lower.includes('card base') ||
+        lower.includes('card outline') ||
+        lower.includes('parchment') ||
+        lower.includes('background frame')
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const contentLayers = layers.filter((l) => !isBgLayer(l));
+
+  if (contentLayers.length === 0) {
+    return layers.map((l) => ({
+      ...l,
+      x: 20,
+      y: 20,
+      width: Math.max(20, toWidth - 40),
+      height: Math.max(20, toHeight - 40),
+    }));
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const l of contentLayers) {
+    minX = Math.min(minX, l.x);
+    minY = Math.min(minY, l.y);
+    maxX = Math.max(maxX, l.x + l.width);
+    maxY = Math.max(maxY, l.y + l.height);
+  }
+
+  const contentW = maxX - minX;
+  const contentH = maxY - minY;
+
+  // If content bounding box is invalid, fallback to uniform direct scaling
+  if (contentW <= 0 || contentH <= 0) {
+    const fallbackScale = Math.min(toWidth / fromWidth, toHeight / fromHeight);
+    return layers.map((l) => ({
+      ...l,
+      x: Math.round(l.x * fallbackScale),
+      y: Math.round(l.y * fallbackScale),
+      width: Math.max(4, Math.round(l.width * fallbackScale)),
+      height: Math.max(4, Math.round(l.height * fallbackScale)),
+      fontSize: l.fontSize ? Math.round(l.fontSize * fallbackScale * 10) / 10 : undefined,
+    }));
+  }
+
+  // Margin for content elements inside card base
+  const marginX = Math.max(32, Math.round(toWidth * 0.05));
+  const marginY = Math.max(32, Math.round(toHeight * 0.07));
+  const availW = Math.max(100, toWidth - marginX * 2);
+  const availH = Math.max(100, toHeight - marginY * 2);
+
+  // If same canvas size and content is already properly filling the canvas, no need to touch it
+  if (fromWidth === toWidth && fromHeight === toHeight && contentW >= availW * 0.75) {
+    return layers;
+  }
+
+  const scale = Math.min(availW / contentW, availH / contentH);
+  const targetW = contentW * scale;
+  const targetH = contentH * scale;
+
+  const targetMinX = Math.round((toWidth - targetW) / 2);
+  const targetMinY = Math.round((toHeight - targetH) / 2);
 
   return layers.map((layer) => {
-    if (layer.isBackground) {
+    if (isBgLayer(layer)) {
       return {
         ...layer,
-        x: 0,
-        y: 0,
-        width: toWidth,
-        height: toHeight,
+        x: 20,
+        y: 20,
+        width: Math.max(20, toWidth - 40),
+        height: Math.max(20, toHeight - 40),
       };
     }
 
+    const relX = (layer.x - minX) / contentW;
+    const relY = (layer.y - minY) / contentH;
+
     return {
       ...layer,
-      x: Math.round(layer.x * uniformScale + offsetX),
-      y: Math.round(layer.y * uniformScale + offsetY),
-      width: Math.round(layer.width * uniformScale),
-      height: Math.round(layer.height * uniformScale),
-      fontSize: layer.fontSize ? Math.round(layer.fontSize * uniformScale * 10) / 10 : undefined,
+      x: Math.round(targetMinX + relX * targetW),
+      y: Math.round(targetMinY + relY * targetH),
+      width: Math.max(4, Math.round(layer.width * scale)),
+      height: Math.max(4, Math.round(layer.height * scale)),
+      fontSize: layer.fontSize ? Math.round(layer.fontSize * scale * 10) / 10 : undefined,
     };
   });
 }
