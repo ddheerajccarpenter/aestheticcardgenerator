@@ -269,13 +269,15 @@ html:not(.light) .border-\[\#1f242c\],
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  background-color: var(--workspace-backdrop, #0c0e12);
+  transition: background-color 360ms ease;
 }
 
 .editor-ambient-stage::before {
   content: '';
   position: absolute;
   inset: -12%;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   opacity: var(--ambient-opacity, 0.42);
   transition: opacity 320ms ease;
@@ -283,7 +285,7 @@ html:not(.light) .border-\[\#1f242c\],
     radial-gradient(circle at 25% 25%, rgba(var(--ambient-c1, 229, 184, 75), 0.38) 0%, transparent 55%),
     radial-gradient(circle at 50% 50%, rgba(var(--ambient-c2, 244, 237, 228), 0.26) 0%, transparent 60%),
     radial-gradient(circle at 75% 75%, rgba(var(--ambient-c3, 184, 93, 59), 0.34) 0%, transparent 55%);
-  filter: blur(24px);
+  filter: blur(28px);
   contain: strict;
   transform: translateZ(0);
 }
