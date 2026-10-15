@@ -229,6 +229,8 @@ export interface ImageCanvasObject extends BaseCanvasObject {
   filterPreset?: ImageFilterPreset;
   clipMask?: ImageClipMask;
   filteredSrc?: string; // cached processed canvas dataUrl
+  naturalWidth?: number;
+  naturalHeight?: number;
 }
 
 export interface ShapeCanvasObject extends BaseCanvasObject {

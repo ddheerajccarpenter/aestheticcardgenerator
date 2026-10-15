@@ -67,6 +67,8 @@ import {
   Folder,
   FolderOpen,
   RefreshCw,
+  Search,
+  X,
 } from 'lucide-react';
 import { processImageFilter } from '../utils/imageFilters';
 import { generateQrCodeSvg, generateBarcodeSvg } from '../utils/qrBarcodeGenerator';
@@ -248,6 +250,88 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Template Picker Search & Filter State
+  const [templateSearchQuery, setTemplateSearchQuery] = useState('');
+  const [templateCategoryFilter, setTemplateCategoryFilter] = useState<
+    'all' | 'pinterest' | 'id-card' | 'poster' | 'vintage' | 'minimal'
+  >('all');
+
+  // Filtered Templates for Template Library Modal
+  const isPinterestTemplate = useCallback((tmpl: CardTemplate) => {
+    return Boolean(
+      tmpl.tags?.includes('pinterest') ||
+      tmpl.id.includes('pinterest') ||
+      tmpl.tag?.toLowerCase().includes('pinterest') ||
+      tmpl.categoryLabel?.toLowerCase().includes('pinterest')
+    );
+  }, []);
+
+  const templateCategoryCounts = useMemo(() => {
+    let pinterest = 0;
+    let idCard = 0;
+    let poster = 0;
+    let vintage = 0;
+    let minimal = 0;
+
+    for (const tmpl of PRESET_TEMPLATES) {
+      if (isPinterestTemplate(tmpl)) pinterest++;
+      if (tmpl.category === 'id-card' || tmpl.tags?.includes('id-card') || tmpl.tags?.includes('badge') || tmpl.tags?.includes('passport')) idCard++;
+      if (tmpl.category === 'poster' || tmpl.tags?.includes('poster')) poster++;
+      if (tmpl.category === 'vintage' || tmpl.theme.category === 'vintage' || tmpl.tags?.includes('vintage') || tmpl.tags?.includes('retro')) vintage++;
+      if (tmpl.theme.category === 'minimal' || tmpl.tags?.includes('minimal') || tmpl.tags?.includes('modern')) minimal++;
+    }
+
+    return { all: PRESET_TEMPLATES.length, pinterest, idCard, poster, vintage, minimal };
+  }, [isPinterestTemplate]);
+
+  const filteredTemplates = useMemo(() => {
+    return PRESET_TEMPLATES.filter((tmpl) => {
+      if (templateCategoryFilter === 'pinterest' && !isPinterestTemplate(tmpl)) return false;
+      if (templateCategoryFilter === 'id-card') {
+        const isId = tmpl.category === 'id-card' || tmpl.tags?.includes('id-card') || tmpl.tags?.includes('badge') || tmpl.tags?.includes('passport');
+        if (!isId) return false;
+      }
+      if (templateCategoryFilter === 'poster') {
+        const isPoster = tmpl.category === 'poster' || tmpl.tags?.includes('poster');
+        if (!isPoster) return false;
+      }
+      if (templateCategoryFilter === 'vintage') {
+        const isVintage = tmpl.category === 'vintage' || tmpl.theme.category === 'vintage' || tmpl.tags?.includes('vintage') || tmpl.tags?.includes('retro');
+        if (!isVintage) return false;
+      }
+      if (templateCategoryFilter === 'minimal') {
+        const isMinimal = tmpl.theme.category === 'minimal' || tmpl.tags?.includes('minimal') || tmpl.tags?.includes('modern');
+        if (!isMinimal) return false;
+      }
+
+      if (templateSearchQuery.trim()) {
+        const q = templateSearchQuery.toLowerCase().trim();
+        const matchTitle = tmpl.title.toLowerCase().includes(q);
+        const matchTag = tmpl.tag.toLowerCase().includes(q);
+        const matchBadge = tmpl.badge.toLowerCase().includes(q);
+        const matchCategory = tmpl.categoryLabel.toLowerCase().includes(q);
+        const matchQuote = tmpl.quote?.toLowerCase().includes(q);
+        const matchTags = tmpl.tags?.some((t) => t.toLowerCase().includes(q));
+        const matchDesc = tmpl.description?.toLowerCase().includes(q);
+        if (!matchTitle && !matchTag && !matchBadge && !matchCategory && !matchQuote && !matchTags && !matchDesc) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [templateCategoryFilter, templateSearchQuery, isPinterestTemplate]);
+
+  // Direct Inline Text Editing state (Canva-style)
+  const [editingTextId, setEditingTextId] = useState<string | null>(null);
+  const pendingReplaceLayerIdRef = useRef<string | null>(null);
+
+  // Synchronous document ref to eradicate stale closures and coordinate drift during drag
+  const docRef = useRef<CanvasDocument>(doc);
+  useEffect(() => {
+    docRef.current = doc;
+  }, [doc]);
 
   // Snap guides overlay state
   const [snapGuides, setSnapGuides] = useState<Array<{ orientation: 'x' | 'y'; pos: number }>>([]);
@@ -432,6 +516,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const commitDocumentChange = useCallback((newDoc: CanvasDocument) => {
     setDoc(newDoc);
+    docRef.current = newDoc;
     setHistory((prev) => {
       const nextHistory = prev.slice(0, historyIndex + 1);
       if (nextHistory.length >= MAX_HISTORY) {
@@ -447,6 +532,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       const nextIndex = historyIndex - 1;
       setHistoryIndex(nextIndex);
       setDoc(history[nextIndex]);
+      docRef.current = history[nextIndex];
     }
   }, [history, historyIndex]);
 
@@ -455,6 +541,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       const nextIndex = historyIndex + 1;
       setHistoryIndex(nextIndex);
       setDoc(history[nextIndex]);
+      docRef.current = history[nextIndex];
     }
   }, [history, historyIndex]);
 
@@ -464,16 +551,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const updateObject = useCallback(
     (id: string, updates: Partial<CanvasObject>, commit = true) => {
+      const currentDoc = docRef.current;
       const nextDoc: CanvasDocument = {
-        ...doc,
+        ...currentDoc,
         updatedAt: new Date().toISOString(),
-        objects: doc.objects.map((obj) => {
+        objects: currentDoc.objects.map((obj) => {
           if (obj.id === id) {
             return { ...obj, ...updates } as CanvasObject;
           }
           return obj;
         }),
       };
+      docRef.current = nextDoc;
 
       if (commit) {
         commitDocumentChange(nextDoc);
@@ -481,7 +570,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         setDoc(nextDoc); // intermediate drag update
       }
     },
-    [doc, commitDocumentChange]
+    [commitDocumentChange]
   );
 
   const addObject = useCallback(
@@ -786,9 +875,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     showToast(`Imported ${item.title} onto canvas!`);
   };
 
-    // Global mouse move & up handlers
+  // Global pointer move & up handlers (Supports mouse, touch, and stylus)
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    let animFrameId: number | null = null;
+
+    const handlePointerMove = (e: PointerEvent | MouseEvent) => {
       const drag = dragRef.current;
       if (!drag.isDragging && !drag.isResizing && !drag.isRotating) return;
       if (!selectedId) return;
@@ -797,109 +888,136 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       const deltaX = coords.x - drag.startX;
       const deltaY = coords.y - drag.startY;
 
-      if (drag.isDragging) {
-        let newX = drag.startObjX + deltaX;
-        let newY = drag.startObjY + deltaY;
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      animFrameId = requestAnimationFrame(() => {
+        if (drag.isDragging) {
+          let newX = drag.startObjX + deltaX;
+          let newY = drag.startObjY + deltaY;
 
-        // Snapping if grid enabled
-        if (showGrid) {
-          newX = Math.round(newX / 20) * 20;
-          newY = Math.round(newY / 20) * 20;
-        }
-
-        // Magnetic Smart Snapping (Proximity <= 5px to canvas center & bounding edges)
-        const SNAP_PROXIMITY = 5;
-        const guides: Array<{ orientation: 'x' | 'y'; pos: number }> = [];
-
-        const objW = drag.startWidth;
-        const objH = drag.startHeight;
-
-        // Proximity to Canvas Centers
-        const canvasCenterX = Math.round(doc.canvasWidth / 2);
-        const canvasCenterY = Math.round(doc.canvasHeight / 2);
-        const objCenterX = newX + objW / 2;
-        const objCenterY = newY + objH / 2;
-
-        if (Math.abs(objCenterX - canvasCenterX) <= SNAP_PROXIMITY) {
-          newX = canvasCenterX - objW / 2;
-          guides.push({ orientation: 'x', pos: canvasCenterX });
-        }
-        if (Math.abs(objCenterY - canvasCenterY) <= SNAP_PROXIMITY) {
-          newY = canvasCenterY - objH / 2;
-          guides.push({ orientation: 'y', pos: canvasCenterY });
-        }
-
-        // Proximity to other visible layers
-        for (const other of doc.objects) {
-          if (other.id === selectedId || !other.visible) continue;
-
-          // Align Left-to-Left
-          if (Math.abs(newX - other.x) <= SNAP_PROXIMITY) {
-            newX = other.x;
-            guides.push({ orientation: 'x', pos: other.x });
+          // Snapping if grid enabled
+          if (showGrid) {
+            newX = Math.round(newX / 20) * 20;
+            newY = Math.round(newY / 20) * 20;
           }
-          // Align Right-to-Right
-          if (Math.abs((newX + objW) - (other.x + other.width)) <= SNAP_PROXIMITY) {
-            newX = other.x + other.width - objW;
-            guides.push({ orientation: 'x', pos: other.x + other.width });
-          }
-          // Align Top-to-Top
-          if (Math.abs(newY - other.y) <= SNAP_PROXIMITY) {
-            newY = other.y;
-            guides.push({ orientation: 'y', pos: other.y });
-          }
-          // Align Bottom-to-Bottom
-          if (Math.abs((newY + objH) - (other.y + other.height)) <= SNAP_PROXIMITY) {
-            newY = other.y + other.height - objH;
-            guides.push({ orientation: 'y', pos: other.y + other.height });
-          }
-        }
 
-        setSnapGuides(guides);
-        updateObject(selectedId, { x: Math.round(newX), y: Math.round(newY) }, false);
-      } else if (drag.isResizing && drag.handle) {
-        let newWidth = drag.startWidth;
-        let newHeight = drag.startHeight;
-        let newX = drag.startObjX;
-        let newY = drag.startObjY;
+          // Magnetic Smart Snapping (Proximity <= 6px to canvas center & bounding edges)
+          const SNAP_PROXIMITY = 6;
+          const guides: Array<{ orientation: 'x' | 'y'; pos: number }> = [];
 
-        const h = drag.handle;
-        if (h.includes('e')) newWidth = Math.max(20, drag.startWidth + deltaX);
-        if (h.includes('s')) newHeight = Math.max(20, drag.startHeight + deltaY);
-        if (h.includes('w')) {
-          const w = Math.max(20, drag.startWidth - deltaX);
-          newX = drag.startObjX + (drag.startWidth - w);
-          newWidth = w;
-        }
-        if (h.includes('n')) {
-          const hgt = Math.max(20, drag.startHeight - deltaY);
-          newY = drag.startObjY + (drag.startHeight - hgt);
-          newHeight = hgt;
-        }
+          const objW = drag.startWidth;
+          const objH = drag.startHeight;
 
-        updateObject(
-          selectedId,
-          {
-            x: Math.round(newX),
-            y: Math.round(newY),
-            width: Math.round(newWidth),
-            height: Math.round(newHeight),
-          },
-          false
-        );
-      } else if (drag.isRotating) {
-        const rad = Math.atan2(coords.y - drag.centerY, coords.x - drag.centerX);
-        let deg = Math.round((rad * 180) / Math.PI) - 90;
-        if (deg < 0) deg += 360;
-        // Snap to 15 degrees if shift key pressed
-        if (e.shiftKey) {
-          deg = Math.round(deg / 15) * 15;
+          // Proximity to Canvas Centers
+          const canvasCenterX = Math.round(docRef.current.canvasWidth / 2);
+          const canvasCenterY = Math.round(docRef.current.canvasHeight / 2);
+          const objCenterX = newX + objW / 2;
+          const objCenterY = newY + objH / 2;
+
+          if (Math.abs(objCenterX - canvasCenterX) <= SNAP_PROXIMITY) {
+            newX = canvasCenterX - objW / 2;
+            guides.push({ orientation: 'x', pos: canvasCenterX });
+          }
+          if (Math.abs(objCenterY - canvasCenterY) <= SNAP_PROXIMITY) {
+            newY = canvasCenterY - objH / 2;
+            guides.push({ orientation: 'y', pos: canvasCenterY });
+          }
+
+          // Proximity to other visible layers
+          for (const other of docRef.current.objects) {
+            if (other.id === selectedId || !other.visible) continue;
+
+            if (Math.abs(newX - other.x) <= SNAP_PROXIMITY) {
+              newX = other.x;
+              guides.push({ orientation: 'x', pos: other.x });
+            }
+            if (Math.abs((newX + objW) - (other.x + other.width)) <= SNAP_PROXIMITY) {
+              newX = other.x + other.width - objW;
+              guides.push({ orientation: 'x', pos: other.x + other.width });
+            }
+            if (Math.abs(newY - other.y) <= SNAP_PROXIMITY) {
+              newY = other.y;
+              guides.push({ orientation: 'y', pos: other.y });
+            }
+            if (Math.abs((newY + objH) - (other.y + other.height)) <= SNAP_PROXIMITY) {
+              newY = other.y + other.height - objH;
+              guides.push({ orientation: 'y', pos: other.y + other.height });
+            }
+          }
+
+          setSnapGuides(guides);
+          updateObject(selectedId, { x: Math.round(newX), y: Math.round(newY) }, false);
+        } else if (drag.isResizing && drag.handle) {
+          const h = drag.handle;
+          const isCorner = h.length === 2;
+          const currentObj = docRef.current.objects.find((o) => o.id === selectedId);
+          const isImage = currentObj?.type === 'image';
+          const isShift = e.shiftKey;
+
+          // Rotation-aware local transform
+          const rad = ((drag.startRotation || 0) * Math.PI) / 180;
+          const cos = Math.cos(-rad);
+          const sin = Math.sin(-rad);
+          const localDx = deltaX * cos - deltaY * sin;
+          const localDy = deltaX * sin + deltaY * cos;
+
+          let newWidth = drag.startWidth;
+          let newHeight = drag.startHeight;
+
+          if (h.includes('e')) newWidth = Math.max(20, drag.startWidth + localDx);
+          if (h.includes('w')) newWidth = Math.max(20, drag.startWidth - localDx);
+          if (h.includes('s')) newHeight = Math.max(20, drag.startHeight + localDy);
+          if (h.includes('n')) newHeight = Math.max(20, drag.startHeight - localDy);
+
+          // Lock aspect ratio for images or if shift is held on corner handle
+          if (isCorner && (isImage || isShift)) {
+            const origRatio = drag.startWidth / drag.startHeight;
+            if (Math.abs(localDx) > Math.abs(localDy)) {
+              newHeight = Math.max(20, Math.round(newWidth / origRatio));
+            } else {
+              newWidth = Math.max(20, Math.round(newHeight * origRatio));
+            }
+          }
+
+          // Center anchor shift in local coordinates
+          const localCenterDx = (newWidth - drag.startWidth) * (h.includes('w') ? -0.5 : h.includes('e') ? 0.5 : 0);
+          const localCenterDy = (newHeight - drag.startHeight) * (h.includes('n') ? -0.5 : h.includes('s') ? 0.5 : 0);
+
+          // Transform center shift back to world space
+          const cosW = Math.cos(rad);
+          const sinW = Math.sin(rad);
+          const worldCenterDx = localCenterDx * cosW - localCenterDy * sinW;
+          const worldCenterDy = localCenterDx * sinW + localCenterDy * cosW;
+
+          const newCenterX = drag.centerX + worldCenterDx;
+          const newCenterY = drag.centerY + worldCenterDy;
+          const newX = newCenterX - newWidth / 2;
+          const newY = newCenterY - newHeight / 2;
+
+          updateObject(
+            selectedId,
+            {
+              x: Math.round(newX),
+              y: Math.round(newY),
+              width: Math.round(newWidth),
+              height: Math.round(newHeight),
+            },
+            false
+          );
+        } else if (drag.isRotating) {
+          const rad = Math.atan2(coords.y - drag.centerY, coords.x - drag.centerX);
+          let deg = Math.round((rad * 180) / Math.PI) - 90;
+          if (deg < 0) deg += 360;
+          // Snap to 15 degrees if shift key pressed
+          if (e.shiftKey) {
+            deg = Math.round(deg / 15) * 15;
+          }
+          updateObject(selectedId, { rotation: deg }, false);
         }
-        updateObject(selectedId, { rotation: deg }, false);
-      }
+      });
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
       const drag = dragRef.current;
       if (drag.isDragging || drag.isResizing || drag.isRotating) {
         drag.isDragging = false;
@@ -907,25 +1025,40 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         drag.isRotating = false;
         drag.handle = null;
         setSnapGuides([]);
-        // Commit change to history stack
-        commitDocumentChange(doc);
+        // Commit change to history stack with the latest synchronized docRef
+        commitDocumentChange(docRef.current);
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('mouseup', handlePointerUp);
     };
-  }, [selectedId, doc, showGrid, getCanvasCoords, updateObject, commitDocumentChange]);
+  }, [selectedId, showGrid, getCanvasCoords, updateObject, commitDocumentChange]);
 
   // Global Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isCmd = e.metaKey || e.ctrlKey;
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+      if (
+        editingTextId ||
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable ||
+        Boolean(target.closest('input, textarea, [contenteditable="true"]'))
+      ) {
+        return;
+      }
 
       if (isCmd && e.key.toLowerCase() === 'z') {
         e.preventDefault();
@@ -1026,7 +1159,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // In-Place Photo Replacement: Preserves all position coordinates, dimensions, rotation, clip masks, and z-index
   const handleReplacePhotoInPlace = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !selectedObject || selectedObject.type !== 'image') return;
+    const targetId = pendingReplaceLayerIdRef.current || selectedId;
+    if (!file || !targetId) return;
+
+    const currentObj = docRef.current.objects.find((o) => o.id === targetId);
+    if (!currentObj || currentObj.type !== 'image') return;
 
     if (!file.type.startsWith('image/')) {
       showToast('Please select a valid image file (PNG, JPEG, WebP, SVG).');
@@ -1038,18 +1175,33 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       const dataUrl = event.target?.result as string;
       if (!dataUrl) return;
 
-      updateObject(selectedObject.id, {
-        src: dataUrl,
-        filteredSrc: undefined,
-        name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || selectedObject.name,
-      });
-      showToast('Photo replaced in-place while keeping layout intact!');
+      const img = new Image();
+      img.onload = () => {
+        updateObject(targetId, {
+          src: dataUrl,
+          filteredSrc: undefined,
+          naturalWidth: img.naturalWidth || img.width,
+          naturalHeight: img.naturalHeight || img.height,
+          name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || currentObj.name,
+        });
+        showToast('Photo replaced in-place while keeping layout intact!');
+      };
+      img.onerror = () => {
+        updateObject(targetId, {
+          src: dataUrl,
+          filteredSrc: undefined,
+          name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || currentObj.name,
+        });
+        showToast('Photo replaced in-place!');
+      };
+      img.src = dataUrl;
     };
     reader.onerror = () => {
       showToast('Error reading image file.');
     };
     reader.readAsDataURL(file);
     e.target.value = '';
+    pendingReplaceLayerIdRef.current = null;
   };
 
   // Offline AI Background Removal: Runs 100% locally via WASM/WebGPU with client-side chroma fallback
@@ -2256,6 +2408,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         e.stopPropagation();
                         setSelectedId(obj.id);
                       }}
+                      onPointerDown={(e) => handleObjectMouseDown(e, obj)}
                       onMouseDown={(e) => handleObjectMouseDown(e, obj)}
                       style={{
                         position: 'absolute',
@@ -2266,37 +2419,93 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         transform: `rotate(${obj.rotation || 0}deg)`,
                         transformOrigin: 'center center',
                         zIndex: obj.zIndex,
-                        cursor: obj.locked ? 'default' : 'move',
+                        cursor: obj.locked ? 'default' : editingTextId === obj.id ? 'text' : 'move',
+                        touchAction: 'none',
                       }}
                       className="group"
                     >
                       {/* 1. TEXT OBJECT */}
                       {obj.type === 'text' && (
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            fontFamily: obj.fontFamily,
-                            fontSize: `${obj.fontSize}px`,
-                            fontWeight: obj.fontWeight,
-                            fontStyle: obj.fontStyle,
-                            color: obj.color,
-                            textAlign: obj.align,
-                            lineHeight: obj.lineHeight,
-                            letterSpacing: `${obj.letterSpacing}px`,
-                            whiteSpace: 'pre-wrap',
-                            wordBreak: 'break-word',
-                            userSelect: 'none',
-                          }}
-                          className="flex items-center"
-                        >
-                          {obj.text}
-                        </div>
+                        editingTextId === obj.id ? (
+                          <textarea
+                            autoFocus
+                            value={obj.text}
+                            onChange={(e) => updateObject(obj.id, { text: e.target.value }, false)}
+                            onBlur={() => {
+                              setEditingTextId(null);
+                              commitDocumentChange(docRef.current);
+                            }}
+                            onKeyDown={(e) => {
+                              e.stopPropagation();
+                              if (e.key === 'Escape') {
+                                setEditingTextId(null);
+                              } else if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                setEditingTextId(null);
+                                commitDocumentChange(docRef.current);
+                              }
+                            }}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              fontFamily: obj.fontFamily,
+                              fontSize: `${obj.fontSize}px`,
+                              fontWeight: obj.fontWeight,
+                              fontStyle: obj.fontStyle,
+                              color: obj.color,
+                              textAlign: obj.align,
+                              lineHeight: obj.lineHeight,
+                              letterSpacing: `${obj.letterSpacing}px`,
+                              background: 'rgba(59, 130, 246, 0.08)',
+                              border: '2px dashed #3b82f6',
+                              borderRadius: '4px',
+                              outline: 'none',
+                              resize: 'none',
+                              padding: '2px 4px',
+                              margin: 0,
+                              boxSizing: 'border-box',
+                            }}
+                          />
+                        ) : (
+                          <div
+                            onDoubleClick={(e) => {
+                              e.stopPropagation();
+                              if (!obj.locked) setEditingTextId(obj.id);
+                            }}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              fontFamily: obj.fontFamily,
+                              fontSize: `${obj.fontSize}px`,
+                              fontWeight: obj.fontWeight,
+                              fontStyle: obj.fontStyle,
+                              color: obj.color,
+                              textAlign: obj.align,
+                              lineHeight: obj.lineHeight,
+                              letterSpacing: `${obj.letterSpacing}px`,
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-word',
+                              userSelect: 'none',
+                            }}
+                            className="flex items-center"
+                            title="Double-click to edit text"
+                          >
+                            {obj.text}
+                          </div>
+                        )
                       )}
 
                       {/* 2. IMAGE OBJECT WITH PHOTO TREATMENT & CLIPPING MASKS */}
                       {obj.type === 'image' && (
                         <div
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            if (!obj.locked) {
+                              pendingReplaceLayerIdRef.current = obj.id;
+                              replaceFileInputRef.current?.click();
+                            }
+                          }}
+                          title="Double-click to replace photo in-place"
                           style={{
                             width: '100%',
                             height: '100%',
@@ -2545,8 +2754,22 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           {/* Floating Contextual Quick Actions Toolbar (14px above layer/handles) */}
                           <div
                             onMouseDown={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}
                             className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-0.5 px-2 py-1 rounded-xl bg-[#14171d]/95 backdrop-blur-md border border-[#262c36] shadow-2xl z-[10000] pointer-events-auto select-none"
                           >
+                            {obj.type === 'text' && (
+                              <>
+                                <button
+                                  onClick={() => setEditingTextId(obj.id)}
+                                  title="Edit text inline (or double-click text)"
+                                  className="p-1 rounded-lg text-blue-400 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1 text-[10px] font-semibold cursor-pointer"
+                                >
+                                  <Type className="w-3.5 h-3.5" />
+                                  <span>Edit</span>
+                                </button>
+                                <div className="w-px h-3 bg-white/20 mx-0.5" />
+                              </>
+                            )}
                             <button
                               onClick={() => duplicateObject(obj.id)}
                               title="Duplicate layer"
@@ -2570,6 +2793,21 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             </button>
                             <div className="w-px h-3 bg-white/20 mx-0.5" />
                             <button
+                              onClick={() => reorderObject(obj.id, 'up')}
+                              title="Bring layer forward"
+                              className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                              <ChevronDown className="w-3.5 h-3.5 rotate-180" />
+                            </button>
+                            <button
+                              onClick={() => reorderObject(obj.id, 'down')}
+                              title="Send layer backward"
+                              className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                              <ChevronDown className="w-3.5 h-3.5" />
+                            </button>
+                            <div className="w-px h-3 bg-white/20 mx-0.5" />
+                            <button
                               onClick={() => handleAlign('hcenter')}
                               title="Center horizontally on canvas"
                               className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
@@ -2587,7 +2825,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               <>
                                 <div className="w-px h-3 bg-white/20 mx-0.5" />
                                 <button
-                                  onClick={() => replaceFileInputRef.current?.click()}
+                                  onClick={() => {
+                                    pendingReplaceLayerIdRef.current = obj.id;
+                                    replaceFileInputRef.current?.click();
+                                  }}
                                   title="Replace photo in-place"
                                   className="p-1 rounded-lg text-[#ec4899] hover:bg-white/10 transition-colors flex items-center gap-1 text-[10px] font-semibold cursor-pointer"
                                 >
@@ -2609,6 +2850,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                           {/* Rotation handle protruding above */}
                           <div
+                            onPointerDown={(e) => handleRotateHandleMouseDown(e, obj)}
                             onMouseDown={(e) => handleRotateHandleMouseDown(e, obj)}
                             style={{
                               position: 'absolute',
@@ -2622,8 +2864,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               border: '2px solid #3b82f6',
                               pointerEvents: 'auto',
                               cursor: 'grab',
+                              touchAction: 'none',
                             }}
-                            title="Rotate"
+                            title="Rotate layer"
                           />
                           <div
                             style={{
@@ -2650,6 +2893,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           ].map((handle) => (
                             <div
                               key={handle.pos}
+                              onPointerDown={(e) => handleResizeHandleMouseDown(e, handle.pos, obj)}
                               onMouseDown={(e) => handleResizeHandleMouseDown(e, handle.pos, obj)}
                               style={{
                                 position: 'absolute',
@@ -2659,6 +2903,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                 border: '2px solid #3b82f6',
                                 borderRadius: 2,
                                 pointerEvents: 'auto',
+                                touchAction: 'none',
                                 ...handle,
                               }}
                             />
@@ -4248,55 +4493,268 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* TEMPLATE PICKER DRAWER / MODAL                                        */}
       {/* ───────────────────────────────────────────────────────────────────── */}
       {templateDrawerOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in"
+          onClick={() => setTemplateDrawerOpen(false)}
+        >
           <div
-            className={`w-full max-w-4xl max-h-[85vh] rounded-2xl border flex flex-col overflow-hidden shadow-2xl ${
-              isLight ? 'bg-white border-[#cbd5e1]' : 'bg-[#14171d] border-[#262c36]'
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-5xl max-h-[90vh] rounded-3xl border flex flex-col overflow-hidden shadow-2xl transition-colors ${
+              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#262c36] text-[#e1e2e7]'
             }`}
           >
-            {/* Header */}
-            <div className="p-5 border-b border-[#262c36]/40 flex items-center justify-between">
+            {/* Modal Header */}
+            <div className={`p-5 sm:p-6 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 ${
+              isLight ? 'border-[#e2e8f0] bg-[#f8fafc]' : 'border-[#262c36]/70 bg-[#161a22]'
+            }`}>
               <div>
-                <h3 className="text-lg font-bold">Aesthetic Template Library</h3>
-                <p className="text-xs text-[#707a8a]">
-                  Select a template to load its editable layers directly into your canvas.
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg sm:text-xl font-bold tracking-tight">Aesthetic Template Library</h3>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    isLight ? 'bg-amber-100 text-amber-800' : 'bg-[#fcd535]/15 text-[#fcd535] border border-[#fcd535]/30'
+                  }`}>
+                    {filteredTemplates.length} {filteredTemplates.length === 1 ? 'Template' : 'Templates'}
+                  </span>
+                </div>
+                <p className="text-xs text-[#707a8a] mt-1">
+                  Choose from trending Pinterest moodboards, vinyl records, aesthetic ID passes, receipts & posters.
                 </p>
               </div>
-              <button
-                onClick={() => setTemplateDrawerOpen(false)}
-                className="px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer"
-              >
-                Close
-              </button>
+
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <button
+                  onClick={() => setTemplateDrawerOpen(false)}
+                  className={`p-2 rounded-xl border flex items-center gap-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+                    isLight
+                      ? 'border-[#cbd5e1] hover:bg-slate-200 text-[#475569]'
+                      : 'border-[#262c36] hover:bg-white/10 text-[#a0aec0]'
+                  }`}
+                  title="Close library (Esc)"
+                >
+                  <X className="w-4 h-4" />
+                  <span className="hidden sm:inline">Close</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Search Bar & Category Filters Bar */}
+            <div className={`p-4 sm:px-6 border-b flex flex-col gap-3 shrink-0 ${
+              isLight ? 'border-[#e2e8f0] bg-white' : 'border-[#262c36]/50 bg-[#14171e]'
+            }`}>
+              {/* Search Bar */}
+              <div className="relative w-full">
+                <Search className="w-4 h-4 text-[#707a8a] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={templateSearchQuery}
+                  onChange={(e) => setTemplateSearchQuery(e.target.value)}
+                  placeholder="Search templates (e.g. Pinterest, Polaroid, Vinyl, Matcha, Y2K, Boarding Pass, Jennie)..."
+                  className={`w-full pl-10 pr-9 py-2.5 rounded-xl text-xs sm:text-sm border transition-all focus:outline-none ${
+                    isLight
+                      ? 'bg-[#f1f5f9] border-[#cbd5e1] text-[#0f172a] focus:border-[#f59e0b] focus:bg-white'
+                      : 'bg-[#181d26] border-[#262c36] text-white focus:border-[#fcd535] focus:bg-[#1c222c]'
+                  }`}
+                />
+                {templateSearchQuery && (
+                  <button
+                    onClick={() => setTemplateSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#707a8a] hover:text-white"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Category Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+                <button
+                  onClick={() => setTemplateCategoryFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                    templateCategoryFilter === 'all'
+                      ? isLight ? 'bg-[#0f172a] text-white shadow-sm' : 'bg-[#fcd535] text-black font-bold shadow-sm'
+                      : isLight ? 'bg-slate-100 text-[#475569] hover:bg-slate-200' : 'bg-[#1b2029] text-[#8e98a8] hover:text-white hover:bg-[#222834]'
+                  }`}
+                >
+                  All ({templateCategoryCounts.all})
+                </button>
+
+                <button
+                  onClick={() => setTemplateCategoryFilter('pinterest')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all flex items-center gap-1.5 ${
+                    templateCategoryFilter === 'pinterest'
+                      ? 'bg-gradient-to-r from-[#ff006e] to-[#fcd535] text-black font-bold shadow-sm'
+                      : isLight ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/50' : 'bg-[#251522] text-[#ff70a6] hover:bg-[#341b30] border border-[#ff006e]/25'
+                  }`}
+                >
+                  <Sparkles className="w-3 h-3" />
+                  <span>Pinterest Trending ({templateCategoryCounts.pinterest})</span>
+                </button>
+
+                <button
+                  onClick={() => setTemplateCategoryFilter('id-card')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                    templateCategoryFilter === 'id-card'
+                      ? isLight ? 'bg-[#0f172a] text-white shadow-sm' : 'bg-[#fcd535] text-black font-bold shadow-sm'
+                      : isLight ? 'bg-slate-100 text-[#475569] hover:bg-slate-200' : 'bg-[#1b2029] text-[#8e98a8] hover:text-white hover:bg-[#222834]'
+                  }`}
+                >
+                  Aesthetic IDs & Badges ({templateCategoryCounts.idCard})
+                </button>
+
+                <button
+                  onClick={() => setTemplateCategoryFilter('poster')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                    templateCategoryFilter === 'poster'
+                      ? isLight ? 'bg-[#0f172a] text-white shadow-sm' : 'bg-[#fcd535] text-black font-bold shadow-sm'
+                      : isLight ? 'bg-slate-100 text-[#475569] hover:bg-slate-200' : 'bg-[#1b2029] text-[#8e98a8] hover:text-white hover:bg-[#222834]'
+                  }`}
+                >
+                  Wall Art & Posters ({templateCategoryCounts.poster})
+                </button>
+
+                <button
+                  onClick={() => setTemplateCategoryFilter('vintage')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                    templateCategoryFilter === 'vintage'
+                      ? isLight ? 'bg-[#0f172a] text-white shadow-sm' : 'bg-[#fcd535] text-black font-bold shadow-sm'
+                      : isLight ? 'bg-slate-100 text-[#475569] hover:bg-slate-200' : 'bg-[#1b2029] text-[#8e98a8] hover:text-white hover:bg-[#222834]'
+                  }`}
+                >
+                  Vintage & Receipts ({templateCategoryCounts.vintage})
+                </button>
+
+                <button
+                  onClick={() => setTemplateCategoryFilter('minimal')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                    templateCategoryFilter === 'minimal'
+                      ? isLight ? 'bg-[#0f172a] text-white shadow-sm' : 'bg-[#fcd535] text-black font-bold shadow-sm'
+                      : isLight ? 'bg-slate-100 text-[#475569] hover:bg-slate-200' : 'bg-[#1b2029] text-[#8e98a8] hover:text-white hover:bg-[#222834]'
+                  }`}
+                >
+                  Minimalist ({templateCategoryCounts.minimal})
+                </button>
+              </div>
             </div>
 
             {/* Grid of Templates */}
-            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {PRESET_TEMPLATES.map((tmpl) => (
-                <div
-                  key={tmpl.id}
-                  onClick={() => handleApplyTemplate(tmpl)}
-                  className={`border rounded-xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer ${
-                    isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-                  }`}
-                >
-                  <div
-                    style={{ backgroundColor: tmpl.theme.bg, color: tmpl.theme.ink }}
-                    className="h-28 rounded-lg p-3 flex flex-col justify-between mb-3 border border-black/10 text-[11px]"
-                  >
-                    <div className="flex justify-between font-mono text-[9px] opacity-75">
-                      <span>{tmpl.tag}</span>
-                      <span>{tmpl.badge}</span>
-                    </div>
-                    <div className="font-semibold line-clamp-2">{tmpl.title}</div>
-                  </div>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {filteredTemplates.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredTemplates.map((tmpl) => {
+                    const isPinterest = isPinterestTemplate(tmpl);
+                    return (
+                      <div
+                        key={tmpl.id}
+                        onClick={() => handleApplyTemplate(tmpl)}
+                        className={`group rounded-2xl p-4 flex flex-col justify-between border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl cursor-pointer relative overflow-hidden ${
+                          isLight
+                            ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1] hover:bg-white'
+                            : 'bg-[#171b23] border-[#262c36] hover:border-[#384152] hover:bg-[#1a1f29]'
+                        }`}
+                      >
+                        {/* Top Preview Card */}
+                        <div
+                          style={{ backgroundColor: tmpl.theme.bg, color: tmpl.theme.ink }}
+                          className="h-36 rounded-xl p-3.5 flex flex-col justify-between mb-3.5 border border-black/10 relative overflow-hidden shadow-inner select-none"
+                        >
+                          {/* Pinterest Pick Floating Badge */}
+                          {isPinterest && (
+                            <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black/70 text-[#fcd535] border border-[#fcd535]/40 backdrop-blur-xs flex items-center gap-1 shadow-sm">
+                              <Sparkles className="w-2.5 h-2.5 text-[#ff006e]" />
+                              <span>Pinterest</span>
+                            </div>
+                          )}
 
-                  <div>
-                    <h5 className="text-xs font-bold truncate">{tmpl.title}</h5>
-                    <span className="text-[10px] text-[#707a8a]">{tmpl.categoryLabel}</span>
-                  </div>
+                          <div className="flex items-center gap-2 font-mono text-[9px] opacity-75 max-w-[70%] truncate">
+                            <span className="font-semibold">{tmpl.tag}</span>
+                          </div>
+
+                          <div className="my-auto">
+                            <h4 className="font-bold text-xs sm:text-sm line-clamp-2 leading-tight">
+                              {tmpl.title}
+                            </h4>
+                            {tmpl.quote && (
+                              <p className="text-[10px] opacity-75 line-clamp-2 mt-1 italic font-serif leading-snug">
+                                “{tmpl.quote.slice(0, 80)}…”
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between font-mono text-[9px] opacity-75 border-t border-current/10 pt-1.5">
+                            <span>{tmpl.badge}</span>
+                            <span className="uppercase text-[8px] tracking-wider">{tmpl.categoryLabel}</span>
+                          </div>
+
+                          {/* Hover Overlay Button */}
+                          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="px-3.5 py-1.5 rounded-xl bg-[#fcd535] text-black font-bold text-xs shadow-lg flex items-center gap-1.5 transform group-hover:scale-105 transition-transform">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              <span>Load Template</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Bottom Metadata & Description */}
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <h5 className="text-xs sm:text-sm font-bold truncate">{tmpl.title}</h5>
+                            <span className="text-[10px] font-mono text-[#707a8a] shrink-0">
+                              {tmpl.layoutHint === 'square'
+                                ? '1080×1080'
+                                : tmpl.layoutHint === 'vertical'
+                                ? '640×960'
+                                : '960×600'}
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-[#707a8a] line-clamp-2 leading-relaxed">
+                            {tmpl.description || `High-resolution ${tmpl.categoryLabel.toLowerCase()} with pre-configured editable layers.`}
+                          </p>
+
+                          {/* Tag chips */}
+                          {tmpl.tags && tmpl.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1 pt-1.5 border-t border-current/10">
+                              {tmpl.tags.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className={`px-1.5 py-0.5 rounded text-[9px] font-mono ${
+                                    isLight ? 'bg-slate-200/60 text-[#475569]' : 'bg-[#222834] text-[#8e98a8]'
+                                  }`}
+                                >
+                                  #{tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 ${
+                    isLight ? 'bg-slate-100 text-slate-400' : 'bg-[#1b2029] text-[#707a8a]'
+                  }`}>
+                    <Search className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-sm font-bold mb-1">No templates found</h4>
+                  <p className="text-xs text-[#707a8a] max-w-sm mb-4">
+                    We couldn't find any templates matching "{templateSearchQuery}". Try searching for "polaroid", "vinyl", or "matcha".
+                  </p>
+                  <button
+                    onClick={() => {
+                      setTemplateSearchQuery('');
+                      setTemplateCategoryFilter('all');
+                    }}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer ${
+                      isLight ? 'bg-[#0f172a] text-white' : 'bg-[#fcd535] text-black'
+                    }`}
+                  >
+                    Reset Search & Filters
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
