@@ -400,4 +400,138 @@ export const ASSET_POSTER_ART = {
     <text x="300" y="538" font-family="'Newsreader', Georgia, serif" font-style="italic" font-size="16" font-weight="bold" fill="%23283618" text-anchor="middle">Ginkgo Biloba L.</text>
     <text x="300" y="558" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700" fill="%23606c38" text-anchor="middle" letter-spacing="2">HERBARIUM NORDICUM • NO. 1892</text>
   </svg>`,
+
+  polaroidSummerPhoto: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+    <defs>
+      <linearGradient id="polaroidSky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="%23fca311" />
+        <stop offset="45%" stop-color="%23f77f00" />
+        <stop offset="75%" stop-color="%23d62828" />
+        <stop offset="100%" stop-color="%23003049" />
+      </linearGradient>
+    </defs>
+    <rect width="500" height="500" fill="url(%23polaroidSky)" />
+    <!-- Sun glow -->
+    <circle cx="250" cy="220" r="90" fill="%23ffe49e" opacity="0.9" />
+    <circle cx="250" cy="220" r="130" fill="%23fff2cc" opacity="0.3" />
+    <!-- Gentle ocean waves -->
+    <path d="M0 340 Q125 325 250 340 Q375 355 500 340 L500 500 L0 500 Z" fill="%23001e2e" />
+    <path d="M0 380 Q140 370 280 380 Q400 390 500 380 L500 500 L0 500 Z" fill="%23001420" />
+    <!-- Distant sailboats -->
+    <polygon points="160,310 180,280 180,310" fill="%23ffffff" opacity="0.8" />
+    <polygon points="183,310 193,290 193,310" fill="%23ffffff" opacity="0.8" />
+    <polygon points="340,320 355,295 355,320" fill="%23ffffff" opacity="0.75" />
+    <!-- Grain overlay -->
+    <circle cx="90" cy="80" r="2" fill="%23ffffff" opacity="0.4" />
+    <circle cx="420" cy="110" r="2" fill="%23ffffff" opacity="0.4" />
+    <circle cx="310" cy="40" r="1.5" fill="%23ffffff" opacity="0.4" />
+  </svg>`,
+
+  vinylRecordSleeve: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+    <rect width="500" height="500" fill="%230e1013" />
+    <!-- Outer Vinyl Disc -->
+    <circle cx="250" cy="250" r="230" fill="%2314161a" stroke="%2322262d" stroke-width="4" />
+    <!-- Vinyl Grooves -->
+    <circle cx="250" cy="250" r="210" fill="none" stroke="%23262a33" stroke-width="2" opacity="0.7" />
+    <circle cx="250" cy="250" r="190" fill="none" stroke="%231a1d24" stroke-width="3" opacity="0.8" />
+    <circle cx="250" cy="250" r="170" fill="none" stroke="%232c313c" stroke-width="1.5" opacity="0.6" />
+    <circle cx="250" cy="250" r="150" fill="none" stroke="%231a1d24" stroke-width="2.5" opacity="0.8" />
+    <circle cx="250" cy="250" r="130" fill="none" stroke="%23262a33" stroke-width="1.5" opacity="0.6" />
+    <circle cx="250" cy="250" r="110" fill="none" stroke="%231a1d24" stroke-width="2" opacity="0.7" />
+    <!-- Center Label (Pastel Butter Yellow) -->
+    <circle cx="250" cy="250" r="85" fill="%23ffe8b6" stroke="%23e6c88b" stroke-width="2" />
+    <circle cx="250" cy="250" r="80" fill="none" stroke="%23c49a45" stroke-width="1" stroke-dasharray="3 3" />
+    <!-- Center Spindle Hole -->
+    <circle cx="250" cy="250" r="18" fill="%230e1013" stroke="%23444b58" stroke-width="2" />
+    <!-- Vinyl Label Typography -->
+    <text x="250" y="205" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold" fill="%236e4b1f" text-anchor="middle" letter-spacing="3">SIDE A • 33 RPM</text>
+    <text x="250" y="226" font-family="'Newsreader', Georgia, serif" font-size="16" font-weight="bold" font-style="italic" fill="%232b1a09" text-anchor="middle">Aesthetic Card Studio</text>
+    <text x="250" y="295" font-family="'Funnel Sans', sans-serif" font-size="10" font-weight="600" fill="%236e4b1f" text-anchor="middle" letter-spacing="1">STEREO HIGH FIDELITY</text>
+    <text x="250" y="312" font-family="'JetBrains Mono', monospace" font-size="8" fill="%239c7a45" text-anchor="middle">RECORD NO. 2026-PINTEREST</text>
+  </svg>`,
+
+  matchaCupArt: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+    <rect width="400" height="500" fill="%23f4f6f0" />
+    <!-- Straw -->
+    <line x1="220" y1="30" x2="190" y2="220" stroke="%23588157" stroke-width="14" stroke-linecap="round" />
+    <!-- Cup Rim & Lid -->
+    <ellipse cx="200" cy="120" rx="100" ry="24" fill="%23ffffff" stroke="%23cad2c5" stroke-width="3" />
+    <ellipse cx="200" cy="116" rx="90" ry="18" fill="%23f4f6f0" />
+    <!-- Cup Glass Body -->
+    <path d="M110 120 L135 420 Q138 450 170 450 L230 450 Q262 450 265 420 L290 120 Z" fill="%23ffffff" stroke="%23cad2c5" stroke-width="3" opacity="0.9" />
+    <!-- Oat Milk Layer (bottom) -->
+    <path d="M132 380 L135 420 Q138 450 170 450 L230 450 Q262 450 265 420 L268 380 Q200 400 132 380 Z" fill="%23fefae0" />
+    <!-- Matcha Marbling Liquid Layer -->
+    <path d="M120 220 L132 380 Q200 400 268 380 L280 220 Q240 260 200 230 Q160 200 120 220 Z" fill="%23606c38" opacity="0.9" />
+    <!-- Frothy Matcha Foam (top) -->
+    <path d="M112 140 L120 220 Q160 200 200 230 Q240 260 280 220 L288 140 Q200 160 112 140 Z" fill="%2385944d" />
+    <!-- Ice Cubes in Glass -->
+    <rect x="150" y="180" width="45" height="45" rx="8" fill="%23ffffff" opacity="0.6" stroke="%23cad2c5" stroke-width="1.5" transform="rotate(12 172 202)" />
+    <rect x="210" y="240" width="42" height="42" rx="8" fill="%23ffffff" opacity="0.6" stroke="%23cad2c5" stroke-width="1.5" transform="rotate(-15 231 261)" />
+    <!-- Minimalist Japanese Label on Glass -->
+    <rect x="160" y="310" width="80" height="40" rx="4" fill="%23ffffff" stroke="%233a5a40" stroke-width="1.5" />
+    <text x="200" y="328" font-family="'Murecho', sans-serif" font-size="12" font-weight="900" fill="%233a5a40" text-anchor="middle">抹茶ラテ</text>
+    <text x="200" y="342" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700" fill="%23588157" text-anchor="middle">MATCHA STUDIO</text>
+  </svg>`,
+
+  frenchRivieraVilla: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" width="500" height="600">
+    <rect width="500" height="600" fill="%23fcf8f2" />
+    <!-- Terracotta Archway -->
+    <path d="M100 550 L100 260 C100 160 170 100 250 100 C330 100 400 160 400 260 L400 550 Z" fill="%23e07a5f" opacity="0.25" />
+    <path d="M120 550 L120 270 C120 180 180 125 250 125 C320 125 380 180 380 270 L380 550 Z" fill="%23f4ede4" />
+    <!-- Golden Mediterranean Sun -->
+    <circle cx="250" cy="240" r="70" fill="%23f2cc8f" />
+    <circle cx="250" cy="240" r="95" fill="%23f2cc8f" opacity="0.3" />
+    <!-- Riviera Sea Horizon -->
+    <rect x="120" y="340" width="260" height="210" fill="%233d5a80" opacity="0.85" />
+    <path d="M120 370 Q185 365 250 370 Q315 375 380 370 L380 550 L120 550 Z" fill="%232b4162" />
+    <!-- Lemon branch accent -->
+    <path d="M210 110 Q260 85 320 105" stroke="%23588157" stroke-width="4" fill="none" stroke-linecap="round" />
+    <ellipse cx="270" cy="90" rx="20" ry="12" fill="%233a5a40" transform="rotate(-15 270 90)" />
+    <ellipse cx="310" cy="115" rx="18" ry="11" fill="%23588157" transform="rotate(25 310 115)" />
+    <ellipse cx="240" cy="110" rx="16" ry="20" fill="%23ffdd00" stroke="%23e0a900" stroke-width="1.5" transform="rotate(10 240 110)" />
+    <!-- Typography -->
+    <text x="250" y="470" font-family="'Newsreader', Georgia, serif" font-size="28" font-style="italic" font-weight="bold" fill="%23ffffff" text-anchor="middle">Saint-Tropez</text>
+    <text x="250" y="500" font-family="'Funnel Sans', sans-serif" font-size="10" font-weight="700" fill="%23f4ede4" text-anchor="middle" letter-spacing="4">CÔTE D'AZUR // ÉTÉ 1976</text>
+  </svg>`,
+
+  y2kAuraGlow: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+    <defs>
+      <radialGradient id="auraGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="%23ffbe0b" stop-opacity="1" />
+        <stop offset="35%" stop-color="%23fb5607" stop-opacity="0.8" />
+        <stop offset="65%" stop-color="%23ff006e" stop-opacity="0.75" />
+        <stop offset="85%" stop-color="%238338ec" stop-opacity="0.5" />
+        <stop offset="100%" stop-color="%233a86ff" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+    <rect width="500" height="500" fill="%23120d1c" />
+    <!-- Main Aura Orb -->
+    <circle cx="250" cy="250" r="190" fill="url(%23auraGlow)" />
+    <circle cx="250" cy="250" r="130" fill="%23ffffff" opacity="0.25" />
+    <circle cx="250" cy="250" r="80" fill="%23fff275" opacity="0.7" />
+    <!-- Cyber 4-Point Chrome Starbursts -->
+    <g transform="translate(250 250)">
+      <polygon points="0,-70 12,-12 70,0 12,12 0,70 -12,12 -70,0 -12,-12" fill="%23ffffff" />
+      <polygon points="0,-40 7,-7 40,0 7,7 0,40 -7,7 -40,0 -7,-7" fill="%23ffd6ff" />
+    </g>
+    <!-- Little Orbiting Starlets -->
+    <polygon points="120,110 124,125 139,129 124,133 120,148 116,133 101,129 116,125" fill="%23ffffff" opacity="0.9" />
+    <polygon points="380,360 384,375 399,379 384,383 380,398 376,383 361,379 376,375" fill="%23ffbe0b" opacity="0.9" />
+    <polygon points="370,120 373,131 384,134 373,137 370,148 367,137 356,134 367,131" fill="%23ffffff" opacity="0.8" />
+  </svg>`,
+
+  tokyoBoardingPassLogo: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200">
+    <rect width="300" height="200" fill="none" />
+    <!-- Jetliner Silhouette -->
+    <path d="M150 40 L165 95 L245 130 L245 145 L165 125 L165 160 L185 175 L185 185 L150 178 L115 185 L115 175 L135 160 L135 125 L55 145 L55 130 L135 95 Z" fill="%23c1121f" />
+    <!-- Global Route Orbit Arc -->
+    <ellipse cx="150" cy="115" rx="120" ry="45" fill="none" stroke="%23003049" stroke-width="2.5" stroke-dasharray="6 4" transform="rotate(-15 150 115)" />
+    <!-- Airport Code Badges -->
+    <rect x="25" y="145" width="60" height="26" rx="4" fill="%23003049" />
+    <text x="55" y="162" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="900" fill="%23ffffff" text-anchor="middle">HND</text>
+    <rect x="215" y="145" width="60" height="26" rx="4" fill="%23c1121f" />
+    <text x="245" y="162" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="900" fill="%23ffffff" text-anchor="middle">CDG</text>
+  </svg>`,
 };
+
