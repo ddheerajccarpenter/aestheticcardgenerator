@@ -244,7 +244,7 @@ export const templateToCanvasDoc = (template: CardTemplate): CanvasDocument => {
     title: template.title,
     canvasWidth: width,
     canvasHeight: height,
-    background: '#111417',
+    background: template.theme.bg || '#ffffff',
     objects,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

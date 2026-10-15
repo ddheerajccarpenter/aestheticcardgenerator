@@ -79,7 +79,10 @@ import {
   autoAlignLayersInGrid,
   normalizeTemplateDimensions,
 } from '../engines/canvasGridAndDimensionEngine';
-import { updateWorkspaceAmbientBackdrop } from '../engines/ambientStageEngine';
+import {
+  updateWorkspaceAmbientBackdrop,
+  getDarkerColor,
+} from '../engines/ambientStageEngine';
 import { createThreeCardPreviewScene } from '../engines/threeCardStage';
 import {
   getBrandedExportFilename,
@@ -396,15 +399,34 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
 
+  // Synchronized workspace backdrop color: harmoniously matches template color, tuned slightly darker
+  const workspaceBackdropColor = useMemo(() => {
+    // If card has an inner background shape with fill, use that as the primary card look color
+    const baseShape = doc.objects.find(
+      (o) =>
+        o.type === 'shape' &&
+        (o.name.toLowerCase().includes('paper') ||
+          o.name.toLowerCase().includes('base') ||
+          o.name.toLowerCase().includes('outline') ||
+          o.name.toLowerCase().includes('parchment') ||
+          o.name.toLowerCase().includes('board')) &&
+        Boolean((o as any).fill) &&
+        (o as any).fill !== 'transparent'
+    );
+    const primaryColor = (baseShape as any)?.fill || doc.background || '#f5eee3';
+    return getDarkerColor(primaryColor, isLight ? 'light' : 'dark', isLight ? 0.16 : 0.28);
+  }, [doc.background, doc.objects, isLight]);
+
   // Sync ambient workspace backdrop with card colors (YouTube-style ambient mode - Leftover Item 3)
   useEffect(() => {
     updateWorkspaceAmbientBackdrop(
       canvasElementRef.current,
       canvasContainerRef.current,
       ambientModeEnabled,
-      { bg: doc.background || '#18191c', ink: '#ffffff', accent: '#fcd535' }
+      { bg: doc.background || '#18191c', ink: '#ffffff', accent: '#fcd535' },
+      isLight
     );
-  }, [ambientModeEnabled, doc.background, doc.objects]);
+  }, [ambientModeEnabled, doc.background, doc.objects, isLight]);
 
   // Sync 3D physical card stage (Three.js) with debouncing and in-place texture reuse
   useEffect(() => {
@@ -1380,6 +1402,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const handleApplyTemplate = (template: CardTemplate) => {
     const nextDoc = templateToCanvasDoc(template);
+    if (template.theme?.bg && (!nextDoc.background || nextDoc.background === '#ffffff')) {
+      nextDoc.background = template.theme.bg;
+    }
     commitDocumentChange(nextDoc);
     setTemplateDrawerOpen(false);
     setSelectedId(null);
@@ -2407,16 +2432,16 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         {/* CENTER: THE INTERACTIVE CANVAS VIEWPORT                             */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         <main
+          id="canvas-scroll-container"
           ref={canvasContainerRef}
           onClick={() => setSelectedId(null)}
-          className={`editor-ambient-stage editor-canvas-stage-mobile flex-1 overflow-auto flex items-center justify-center p-3 pb-16 sm:p-8 select-none relative transition-colors ${
-            isLight ? 'bg-[#e2e8f0]' : 'bg-[#080a0d]'
-          }`}
+          className="editor-ambient-stage editor-canvas-stage-mobile flex-1 overflow-auto flex items-center justify-center p-3 pb-16 sm:p-8 select-none relative transition-colors duration-300"
           style={{
+            backgroundColor: workspaceBackdropColor,
             backgroundImage: showGrid
               ? isLight
-                ? 'radial-gradient(#94a3b8 1px, transparent 0)'
-                : 'radial-gradient(#262c36 1px, transparent 0)'
+                ? 'radial-gradient(rgba(0,0,0,0.18) 1px, transparent 0)'
+                : 'radial-gradient(rgba(255,255,255,0.15) 1px, transparent 0)'
               : 'none',
             backgroundSize: '24px 24px',
           }}
