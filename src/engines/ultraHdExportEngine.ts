@@ -9,7 +9,10 @@ export const TIER_LONG_EDGE: Record<ExportResolutionTier, number> = {
   '16K': 15360, // Studio Extreme
 };
 
+let cachedMaxDim: number | null = null;
+
 export function detectMaxCanvasDimension(): number {
+  if (cachedMaxDim !== null) return cachedMaxDim;
   const testSizes = [16384, 12288, 8192, 4096];
   for (const size of testSizes) {
     try {
@@ -17,11 +20,15 @@ export function detectMaxCanvasDimension(): number {
       c.width = size;
       c.height = 64;
       const ctx = c.getContext('2d');
-      if (ctx) return size;
+      if (ctx) {
+        cachedMaxDim = size;
+        return size;
+      }
     } catch {
       // Try next smaller size
     }
   }
+  cachedMaxDim = 4096;
   return 4096;
 }
 

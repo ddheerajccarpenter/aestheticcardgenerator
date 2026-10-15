@@ -152,7 +152,8 @@
     var(--c30-secondary) var(--stop-30, 90%),
     var(--c10-accent) 100%
   );
-  transition: background 150ms ease-out;
+  contain: strict;
+  transform: translateZ(0);
 }
 
 /* Square Duotone Icon System */
@@ -277,12 +278,14 @@ html:not(.light) .border-\[\#1f242c\],
   z-index: -1;
   pointer-events: none;
   opacity: var(--ambient-opacity, 0.42);
-  transition: opacity 320ms ease, background 400ms ease;
+  transition: opacity 320ms ease;
   background:
     radial-gradient(circle at 25% 25%, rgba(var(--ambient-c1, 229, 184, 75), 0.38) 0%, transparent 55%),
     radial-gradient(circle at 50% 50%, rgba(var(--ambient-c2, 244, 237, 228), 0.26) 0%, transparent 60%),
     radial-gradient(circle at 75% 75%, rgba(var(--ambient-c3, 184, 93, 59), 0.34) 0%, transparent 55%);
-  filter: blur(48px);
+  filter: blur(24px);
+  contain: strict;
+  transform: translateZ(0);
 }
 
 /* Custom font utilities for internal card canvas */
@@ -375,7 +378,6 @@ html.light .universal-page-bg,
 /* Tactile UI Interaction Physics — Global Stylesheet */
 button, .btn-interactive, .sq-duotone-icon, .palette-swatch {
   transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
-  will-change: transform;
 }
 
 button:active, .btn-interactive:active, .sq-duotone-icon:active, .palette-swatch:active {
