@@ -24,13 +24,18 @@ export function getThreeMaterialForSurface(surfaceId: string): ThreeCardMaterial
   return { roughness: 0.86, metalness: 0.0, clearcoat: 0.0, clearcoatRoughness: 0.9, iridescence: 0.0 };
 }
 
+export type ThreeCardPreviewController = (() => void) & {
+  updateTexture: (newCanvas: HTMLCanvasElement, newSurfaceId?: string) => void;
+  requestRender: () => void;
+};
+
 export function createThreeCardPreviewScene(
   mountEl: HTMLElement,
   sourceCardCanvas: HTMLCanvasElement,
   aspectRatioWidth: number,
   aspectRatioHeight: number,
   surfaceId: string = 'cotton-rag-300gsm'
-): () => void {
+): ThreeCardPreviewController {
   const width = mountEl.clientWidth || 360;
   const height = mountEl.clientHeight || 360;
 
@@ -38,16 +43,27 @@ export function createThreeCardPreviewScene(
   const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 100);
   camera.position.set(0, 0, 4.2);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // Use low-power preference to avoid waking discrete GPUs, cap pixel ratio to 1.5
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true,
+    powerPreference: 'low-power',
+    stencil: false,
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(width, height);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   mountEl.innerHTML = '';
   mountEl.appendChild(renderer.domElement);
 
+  // Disable mipmaps to eliminate gl.generateMipmap overhead and memory bandwidth
   const cardTexture = new THREE.CanvasTexture(sourceCardCanvas);
   cardTexture.colorSpace = THREE.SRGBColorSpace;
-  cardTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  cardTexture.generateMipmaps = false;
+  cardTexture.minFilter = THREE.LinearFilter;
+  cardTexture.magFilter = THREE.LinearFilter;
+  cardTexture.anisotropy = Math.min(2, renderer.capabilities.getMaxAnisotropy());
+  cardTexture.needsUpdate = true;
 
   const maxAspect = Math.max(aspectRatioWidth, aspectRatioHeight) || 1;
   const normW = 1.8 * (aspectRatioWidth / maxAspect);
@@ -85,42 +101,131 @@ export function createThreeCardPreviewScene(
 
   let targetRotX = 0;
   let targetRotY = 0;
+  let isPointerOver = false;
+  let isVisible = true;
+  let isLoopRunning = false;
+  let animId = 0;
+
+  const renderFrame = () => {
+    renderer.render(scene, camera);
+  };
+
+  // On-demand physics loop: sleeps at rest (0% GPU when stationary)
+  const tick = () => {
+    if (!isVisible) {
+      isLoopRunning = false;
+      animId = 0;
+      return;
+    }
+
+    const deltaX = targetRotX - cardMesh.rotation.x;
+    const deltaY = targetRotY - cardMesh.rotation.y;
+
+    cardMesh.rotation.x += deltaX * 0.12;
+    cardMesh.rotation.y += deltaY * 0.12;
+    renderFrame();
+
+    const isMoving = Math.abs(deltaX) > 0.0004 || Math.abs(deltaY) > 0.0004;
+    if (isMoving || isPointerOver) {
+      animId = requestAnimationFrame(tick);
+    } else {
+      cardMesh.rotation.x = targetRotX;
+      cardMesh.rotation.y = targetRotY;
+      renderFrame();
+      isLoopRunning = false;
+      animId = 0;
+    }
+  };
+
+  const wakeRenderLoop = () => {
+    if (!isLoopRunning && isVisible) {
+      isLoopRunning = true;
+      animId = requestAnimationFrame(tick);
+    }
+  };
 
   const onPointerMove = (e: PointerEvent) => {
+    isPointerOver = true;
     const rect = mountEl.getBoundingClientRect();
     const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
     targetRotY = nx * 0.32;
     targetRotX = -ny * 0.26;
+    wakeRenderLoop();
   };
 
   const onPointerLeave = () => {
+    isPointerOver = false;
     targetRotX = 0;
     targetRotY = 0;
+    wakeRenderLoop();
   };
 
   mountEl.addEventListener('pointermove', onPointerMove);
   mountEl.addEventListener('pointerleave', onPointerLeave);
 
-  let animId = 0;
-  const animate = () => {
-    animId = requestAnimationFrame(animate);
-    cardMesh.rotation.x += (targetRotX - cardMesh.rotation.x) * 0.1;
-    cardMesh.rotation.y += (targetRotY - cardMesh.rotation.y) * 0.1;
-    cardTexture.needsUpdate = true;
-    renderer.render(scene, camera);
-  };
-  animate();
+  // Pause rendering when scrolled off-screen or tab is backgrounded
+  const observer = new IntersectionObserver(([entry]) => {
+    isVisible = entry.isIntersecting && !document.hidden;
+    if (isVisible) {
+      wakeRenderLoop();
+    } else if (animId) {
+      cancelAnimationFrame(animId);
+      animId = 0;
+      isLoopRunning = false;
+    }
+  }, { threshold: 0.05 });
+  observer.observe(mountEl);
 
-  return () => {
-    cancelAnimationFrame(animId);
-    mountEl.removeEventListener('pointermove', onPointerMove);
-    mountEl.removeEventListener('pointerleave', onPointerLeave);
-    geometry.dispose();
-    frontMaterial.dispose();
-    edgeMaterial.dispose();
-    cardTexture.dispose();
-    renderer.dispose();
-    mountEl.innerHTML = '';
+  const onVisibilityChange = () => {
+    if (document.hidden) {
+      isVisible = false;
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = 0;
+        isLoopRunning = false;
+      }
+    } else {
+      isVisible = true;
+      wakeRenderLoop();
+    }
   };
+  document.addEventListener('visibilitychange', onVisibilityChange);
+
+  // Render initial static frame immediately
+  renderFrame();
+
+  const updateTexture = (newCanvas: HTMLCanvasElement, newSurfaceId?: string) => {
+    cardTexture.image = newCanvas;
+    cardTexture.needsUpdate = true;
+    if (newSurfaceId) {
+      const updatedProps = getThreeMaterialForSurface(newSurfaceId);
+      Object.assign(frontMaterial, updatedProps);
+      frontMaterial.needsUpdate = true;
+    }
+    renderFrame();
+  };
+
+  const cleanup: ThreeCardPreviewController = Object.assign(
+    () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      mountEl.removeEventListener('pointermove', onPointerMove);
+      mountEl.removeEventListener('pointerleave', onPointerLeave);
+      if (animId) cancelAnimationFrame(animId);
+      geometry.dispose();
+      frontMaterial.dispose();
+      edgeMaterial.dispose();
+      cardTexture.dispose();
+      renderer.forceContextLoss();
+      renderer.dispose();
+      mountEl.innerHTML = '';
+    },
+    {
+      updateTexture,
+      requestRender: wakeRenderLoop,
+    }
+  );
+
+  return cleanup;
 }

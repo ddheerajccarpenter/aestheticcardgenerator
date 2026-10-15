@@ -55,7 +55,7 @@ export async function exportThreeDimensionalCardPNG(
     antialias: true,
     alpha: true,
     preserveDrawingBuffer: true,
-    powerPreference: 'high-performance',
+    powerPreference: 'default',
   });
 
   const aspect = aspectWidth / aspectHeight;
@@ -76,7 +76,10 @@ export async function exportThreeDimensionalCardPNG(
 
   const cardTex = new THREE.CanvasTexture(source2DCanvas);
   cardTex.colorSpace = THREE.SRGBColorSpace;
-  cardTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  cardTex.generateMipmaps = false;
+  cardTex.minFilter = THREE.LinearFilter;
+  cardTex.magFilter = THREE.LinearFilter;
+  cardTex.anisotropy = Math.min(2, renderer.capabilities.getMaxAnisotropy());
   cardTex.needsUpdate = true;
 
   const maxDim = Math.max(aspectWidth, aspectHeight);
@@ -120,6 +123,12 @@ export async function exportThreeDimensionalCardPNG(
     );
   });
 
+  // Thoroughly release all WebGL resources and GPU memory buffers
+  geom.dispose();
+  frontMat.dispose();
+  edgeMat.dispose();
+  cardTex.dispose();
+  renderer.forceContextLoss();
   renderer.dispose();
   offscreenContainer.remove();
   triggerBrandedBlobDownload(blob, getBrandedExportFilename('png', '3d'));

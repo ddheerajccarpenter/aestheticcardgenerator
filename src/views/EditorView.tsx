@@ -609,7 +609,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
     });
   }, [ambientModeEnabled, bgColor, inkColor, aspectRatio, padding, borderRadius, selectedTextureId]);
 
-  // Manage Three.js 3D Card Scene
+  // Manage Three.js 3D Card Scene with debouncing and GPU texture reuse
   useEffect(() => {
     if (!is3DMode || !threeMountRef.current || !cardRef.current) {
       if (threeCleanupRef.current) {
@@ -620,9 +620,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
     }
 
     let isMounted = true;
-    (async () => {
+    const timer = setTimeout(async () => {
       try {
-        const rawUrl = await toPng(cardRef.current!, { pixelRatio: 2 });
+        if (!cardRef.current) return;
+        const rawUrl = await toPng(cardRef.current, { pixelRatio: 1.5 });
         if (!isMounted) return;
         const img = new Image();
         img.src = rawUrl;
@@ -635,28 +636,38 @@ export const EditorView: React.FC<EditorViewProps> = ({
         const ctx = offscreen.getContext('2d');
         if (ctx) ctx.drawImage(img, 0, 0);
 
-        if (threeCleanupRef.current) threeCleanupRef.current();
-        const cleanup = createThreeCardPreviewScene(
-          threeMountRef.current,
-          offscreen,
-          cardRef.current!.offsetWidth,
-          cardRef.current!.offsetHeight,
-          selectedTextureId
-        );
-        threeCleanupRef.current = cleanup;
+        if (threeCleanupRef.current && (threeCleanupRef.current as any).updateTexture) {
+          (threeCleanupRef.current as any).updateTexture(offscreen, selectedTextureId);
+        } else {
+          if (threeCleanupRef.current) threeCleanupRef.current();
+          const cleanup = createThreeCardPreviewScene(
+            threeMountRef.current,
+            offscreen,
+            cardRef.current.offsetWidth,
+            cardRef.current.offsetHeight,
+            selectedTextureId
+          );
+          threeCleanupRef.current = cleanup;
+        }
       } catch (err) {
         console.error('Failed to initialize 3D scene:', err);
       }
-    })();
+    }, 180);
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [is3DMode, bgColor, inkColor, quote, author, tag, fontChoice, selectedTextureId, aspectRatio]);
+
+  useEffect(() => {
+    return () => {
       if (threeCleanupRef.current) {
         threeCleanupRef.current();
         threeCleanupRef.current = null;
       }
     };
-  }, [is3DMode, bgColor, inkColor, quote, author, tag, fontChoice, selectedTextureId]);
+  }, []);
 
   // Current aspect preset
   const currentRatioPreset = ASPECT_RATIOS.find((r) => r.id === aspectRatio) || ASPECT_RATIOS[0];

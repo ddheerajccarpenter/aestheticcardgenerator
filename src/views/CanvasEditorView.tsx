@@ -262,6 +262,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const canvasElementRef = useRef<HTMLDivElement>(null);
   const threeMountRef = useRef<HTMLDivElement>(null);
+  const threeCleanupRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -275,39 +276,65 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     );
   }, [ambientModeEnabled, doc.background, doc.objects]);
 
-  // Sync 3D physical card stage (Three.js - Leftover Item 2)
+  // Sync 3D physical card stage (Three.js) with debouncing and in-place texture reuse
   useEffect(() => {
-    if (!is3DMode || !threeMountRef.current || !canvasElementRef.current) return;
-    let cleanup: (() => void) | undefined;
+    if (!is3DMode || !threeMountRef.current || !canvasElementRef.current) {
+      if (threeCleanupRef.current) {
+        threeCleanupRef.current();
+        threeCleanupRef.current = null;
+      }
+      return;
+    }
+
+    let isMounted = true;
     const timer = setTimeout(async () => {
       try {
-        const rawDataUrl = await toPng(canvasElementRef.current!, { pixelRatio: 2 });
+        if (!canvasElementRef.current) return;
+        const rawDataUrl = await toPng(canvasElementRef.current, { pixelRatio: 1.5 });
+        if (!isMounted) return;
         const img = new Image();
         img.onload = () => {
+          if (!isMounted || !threeMountRef.current) return;
           const offCanvas = document.createElement('canvas');
           offCanvas.width = img.width;
           offCanvas.height = img.height;
           const ctx = offCanvas.getContext('2d');
           if (!ctx) return;
           ctx.drawImage(img, 0, 0);
-          cleanup = createThreeCardPreviewScene(
-            threeMountRef.current!,
-            offCanvas,
-            doc.canvasWidth,
-            doc.canvasHeight,
-            'cotton-rag-300gsm'
-          );
+
+          if (threeCleanupRef.current && (threeCleanupRef.current as any).updateTexture) {
+            (threeCleanupRef.current as any).updateTexture(offCanvas, 'cotton-rag-300gsm');
+          } else {
+            if (threeCleanupRef.current) threeCleanupRef.current();
+            threeCleanupRef.current = createThreeCardPreviewScene(
+              threeMountRef.current,
+              offCanvas,
+              doc.canvasWidth,
+              doc.canvasHeight,
+              'cotton-rag-300gsm'
+            );
+          }
         };
         img.src = rawDataUrl;
       } catch (err) {
         console.error('Three.js canvas init error', err);
       }
-    }, 120);
+    }, 180);
+
     return () => {
+      isMounted = false;
       clearTimeout(timer);
-      cleanup?.();
     };
   }, [is3DMode, doc.canvasWidth, doc.canvasHeight, doc.objects, doc.background]);
+
+  useEffect(() => {
+    return () => {
+      if (threeCleanupRef.current) {
+        threeCleanupRef.current();
+        threeCleanupRef.current = null;
+      }
+    };
+  }, []);
 
   // Offline AI Background Removal state
   const [isRemovingBg, setIsRemovingBg] = useState(false);

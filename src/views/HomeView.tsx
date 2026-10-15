@@ -39,6 +39,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   // Live hero interactive mini-studio state
   const heroCardRef = useRef<HTMLDivElement>(null);
   const threeMountRef = useRef<HTMLDivElement>(null);
+  const threeStageRef = useRef<any>(null);
+  const lastHeroModeRef = useRef<string>('quote');
   const [heroMode, setHeroMode] = useState<'quote' | 'id'>('quote');
   const [heroPaletteIndex, setHeroPaletteIndex] = useState(0);
   const [copiedHero, setCopiedHero] = useState(false);
@@ -117,38 +119,65 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const currentHeroPalette = heroPalettes[heroPaletteIndex];
 
-  // Three.js 3D View mounting
+  // Three.js 3D View mounting with debouncing and texture reuse
   useEffect(() => {
-    if (!is3DMode || !threeMountRef.current || !heroCardRef.current) return;
+    if (!is3DMode || !threeMountRef.current || !heroCardRef.current) {
+      if (threeStageRef.current) {
+        threeStageRef.current();
+        threeStageRef.current = null;
+      }
+      return;
+    }
 
-    let cleanup: (() => void) | undefined;
-    toPng(heroCardRef.current, { pixelRatio: 2 }).then((dataUrl) => {
-      const img = new Image();
-      img.onload = () => {
-        const off = document.createElement('canvas');
-        off.width = img.width;
-        off.height = img.height;
-        const ctx = off.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0);
-          if (threeMountRef.current) {
-            cleanup = createThreeCardPreviewScene(
-              threeMountRef.current,
-              off,
-              heroMode === 'quote' ? 4 : 2,
-              heroMode === 'quote' ? 5 : 3,
-              currentHeroPalette.surface
-            );
+    let isMounted = true;
+    const timer = setTimeout(() => {
+      if (!heroCardRef.current) return;
+      toPng(heroCardRef.current, { pixelRatio: 1.5 }).then((dataUrl) => {
+        if (!isMounted) return;
+        const img = new Image();
+        img.onload = () => {
+          if (!isMounted || !threeMountRef.current) return;
+          const off = document.createElement('canvas');
+          off.width = img.width;
+          off.height = img.height;
+          const ctx = off.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            if (threeStageRef.current && lastHeroModeRef.current === heroMode) {
+              // Efficiently update existing GPU texture without rebuilding WebGL context
+              threeStageRef.current.updateTexture(off, currentHeroPalette.surface);
+            } else {
+              if (threeStageRef.current) threeStageRef.current();
+              lastHeroModeRef.current = heroMode;
+              threeStageRef.current = createThreeCardPreviewScene(
+                threeMountRef.current,
+                off,
+                heroMode === 'quote' ? 4 : 2,
+                heroMode === 'quote' ? 5 : 3,
+                currentHeroPalette.surface
+              );
+            }
           }
-        }
-      };
-      img.src = dataUrl;
-    });
+        };
+        img.src = dataUrl;
+      });
+    }, 180);
 
     return () => {
-      if (cleanup) cleanup();
+      isMounted = false;
+      clearTimeout(timer);
     };
   }, [is3DMode, heroMode, currentHeroPalette, heroQuote, heroAuthor, heroTag, heroIdName, heroIdRole]);
+
+  // Clean up 3D scene on unmount
+  useEffect(() => {
+    return () => {
+      if (threeStageRef.current) {
+        threeStageRef.current();
+        threeStageRef.current = null;
+      }
+    };
+  }, []);
 
   const handleCopyHero = () => {
     const textToCopy =
