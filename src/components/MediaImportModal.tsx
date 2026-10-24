@@ -101,7 +101,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
         {/* Header */}
         <div className={`p-4 border-b flex items-center justify-between ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#fcd535]" />
+            <span className="w-2 h-2 rounded-full bg-[#E2D9C8]" />
             <h2 className={`text-sm font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
               Import Book / Song Metadata
             </h2>
@@ -129,7 +129,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
                 : 'text-[#707a8a] hover:text-current'
             }`}
           >
-            <Book className="w-3.5 h-3.5 text-[#d97706] dark:text-[#fcd535]" />
+            <Book className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
             <span>Open Library Books</span>
           </button>
           <button
@@ -145,7 +145,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
                 : 'text-[#707a8a] hover:text-current'
             }`}
           >
-            <Music className="w-3.5 h-3.5 text-[#d97706] dark:text-[#fcd535]" />
+            <Music className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
             <span>iTunes Songs &amp; Albums</span>
           </button>
         </div>
@@ -161,15 +161,19 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
               placeholder={activeTab === 'book' ? 'Search title or author (e.g. Albert Camus, Dune)...' : 'Search song or artist (e.g. Frank Ocean, Blonde)...'}
               className={`w-full pl-9 pr-20 py-2 rounded-xl text-xs border outline-none transition-all ${
                 isLight
-                  ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                  : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+                  ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#111417]'
+                  : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#E2D9C8]'
               }`}
               autoFocus
             />
             <button
               type="submit"
               disabled={isLoading || !query.trim()}
-              className="absolute right-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270] disabled:opacity-40 transition-all cursor-pointer"
+              className={`absolute right-1.5 px-3 py-1 rounded-lg text-xs font-semibold ${
+                isLight
+                  ? 'bg-[#111417] text-white hover:bg-[#222731]'
+                  : 'bg-[#E2D9C8] text-[#111417] hover:bg-[#d5cbba]'
+              } disabled:opacity-40 transition-all cursor-pointer`}
             >
               {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Search'}
             </button>
@@ -236,7 +240,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
                   {item.type === 'book' ? item.author : `${item.artist} ${item.album ? `• ${item.album}` : ''}`}
                 </span>
                 {item.year && (
-                  <span className="text-[10px] font-mono text-[#d97706] dark:text-[#fcd535] mt-0.5">
+                  <span className="text-[10px] font-mono text-[#111417] dark:text-[#E2D9C8] mt-0.5">
                     {item.year}
                   </span>
                 )}
@@ -244,7 +248,9 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
 
               <button
                 type="button"
-                className="opacity-0 group-hover:opacity-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#fcd535] text-[#0b0e11] shrink-0 transition-opacity flex items-center gap-1"
+                className={`opacity-0 group-hover:opacity-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold ${
+                  isLight ? 'bg-[#111417] text-white' : 'bg-[#E2D9C8] text-[#111417]'
+                } shrink-0 transition-opacity flex items-center gap-1`}
               >
                 <span>Apply</span>
                 <ArrowRight className="w-3 h-3" />

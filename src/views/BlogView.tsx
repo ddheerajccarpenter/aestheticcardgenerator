@@ -21,10 +21,7 @@ interface BlogViewBaseProps {
 // --------------------------------------------------------------------------
 // 1. BLOG INDEX VIEW (/blog)
 // --------------------------------------------------------------------------
-export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
-  theme = 'dark',
-}) => {
-  const isLight = theme === 'light';
+export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   useEffect(() => {
@@ -50,71 +47,61 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
   }, [selectedCategory, featuredPost.slug]);
 
   return (
-    <div
-      className={`w-full min-h-screen pt-20 pb-20 transition-colors duration-200 ${
-        isLight ? 'bg-[#f8fafc] text-[#0f172a]' : 'bg-[#0b0e11] text-[#e1e2e7]'
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-4 md:px-8 flex flex-col gap-12">
+    <div className="w-full min-h-screen pt-24 pb-20 bg-[var(--app-bg)] text-[var(--app-text)] transition-colors duration-200">
+      <div className="studio-container flex flex-col gap-10">
         {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#707a8a]">
-          <a href="/" className="hover:underline cursor-pointer">
+        <nav aria-label="Breadcrumb" className="studio-breadcrumb">
+          <a href="/" className="hover:text-[var(--app-text)] transition-colors">
             Home
           </a>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className={`font-medium ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+          <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+          <span className="text-[var(--app-text)] font-semibold">
             Blog
           </span>
         </nav>
 
         {/* Hero Section */}
-        <header className="flex flex-col gap-4 border-b pb-8 border-current/10">
+        <header className="flex flex-col gap-4 border-b pb-8 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#0ecb81]"></span>
-            <span className="text-xs uppercase font-semibold tracking-wider text-[#d97706] dark:text-[#fcd535]">
-              Editorial Press & Insights
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-xs font-subheading font-bold uppercase tracking-wider text-[var(--app-text-muted)]">
+              Editorial Press &amp; Insights
             </span>
           </div>
-          <h1 className={`text-3xl md:text-5xl font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-            Studio Blog & Typesetting Essays
+          <h1 className="font-heading text-3xl md:text-5xl font-extrabold tracking-tight text-[var(--app-text)]">
+            Studio Blog &amp; Typesetting Essays
           </h1>
-          <p className={`text-base md:text-lg max-w-3xl leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
+          <p className="font-body text-base md:text-lg max-w-3xl leading-relaxed text-[var(--app-text-muted)]">
             Deep explorations of aesthetic ID cards, vintage passport passes, literary typesetting, paper texture psychology, and the future of client-side creative tools.
           </p>
         </header>
 
         {/* Featured Post Spotlight Banner */}
         {featuredPost && (
-          <article
-            className={`p-6 md:p-8 rounded-3xl border transition-all duration-300 relative overflow-hidden group shadow-xl ${
-              isLight
-                ? 'bg-white border-[#e2e8f0] hover:border-[#cbd5e1]'
-                : 'bg-gradient-to-br from-[#181d24] to-[#12151b] border-[#262c36] hover:border-[#3a4250]'
-            }`}
-          >
+          <article className="studio-panel p-6 md:p-8 rounded-3xl relative overflow-hidden group">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex-1 flex flex-col gap-4">
                 <div className="flex items-center gap-2.5 text-xs">
-                  <span className="px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider text-[10px] bg-[#d97706]/10 text-[#d97706] dark:bg-[#fcd535]/15 dark:text-[#fcd535]">
+                  <span className="px-2.5 py-1 rounded-full font-subheading font-bold uppercase tracking-wider text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-accent)] border border-[var(--app-border-subtle)]">
                     Featured Article
                   </span>
-                  <span className="text-[#707a8a]">•</span>
-                  <span className="text-[#707a8a] font-medium">{featuredPost.category}</span>
+                  <span className="text-[var(--app-text-muted)] opacity-50">•</span>
+                  <span className="text-[var(--app-text-muted)] font-medium">{featuredPost.category}</span>
                 </div>
 
-                <a href={featuredPost.path} className="group-hover:text-[#d97706] dark:group-hover:text-[#fcd535] transition-colors">
-                  <h2 className={`text-2xl md:text-3xl font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                <a href={featuredPost.path} className="group-hover:text-[var(--app-accent)] transition-colors">
+                  <h2 className="font-heading text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--app-text)]">
                     {featuredPost.title}
                   </h2>
                 </a>
 
-                <p className={`text-sm md:text-base leading-relaxed line-clamp-3 ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
+                <p className="font-body text-sm md:text-base leading-relaxed line-clamp-3 text-[var(--app-text-muted)]">
                   {featuredPost.description}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 text-xs text-[#707a8a] pt-2">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--app-text-muted)] pt-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-[11px] text-[#fcd535] uppercase tracking-wider">
+                    <span className="font-subheading font-bold text-[11px] text-[var(--app-accent)] uppercase tracking-wider">
                       Studio Design Note
                     </span>
                   </div>
@@ -132,11 +119,7 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
               <div className="shrink-0 flex items-center">
                 <a
                   href={featuredPost.path}
-                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-xs transition-all shadow-md ${
-                    isLight
-                      ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                      : 'bg-white text-[#0b0e11] hover:bg-[#e2e2e2]'
-                  }`}
+                  className="studio-btn-primary inline-flex items-center gap-2 px-6 py-3 cursor-pointer"
                 >
                   <span>Read Article</span>
                   <ArrowRight className="w-4 h-4" />
@@ -152,15 +135,7 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                selectedCategory === cat
-                  ? isLight
-                    ? 'bg-[#0f172a] text-white border-[#0f172a]'
-                    : 'bg-white text-[#0b0e11] border-white font-semibold'
-                  : isLight
-                  ? 'bg-white border-[#e2e8f0] text-[#64748b] hover:text-[#0f172a]'
-                  : 'bg-[#181d24] border-[#262c36] text-[#9ca3af] hover:text-white'
-              }`}
+              className={`studio-pill ${selectedCategory === cat ? 'active' : ''}`}
             >
               {cat === 'all' ? 'All Articles' : cat}
             </button>
@@ -168,45 +143,39 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = ({
         </div>
 
         {/* Articles Grid: Strict 2-Column Rule */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1240px] w-full mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
           {gridPosts.map((post: BlogPost) => (
             <article
               key={post.slug}
-              className={`template-card-kinetic flex flex-col justify-between p-6 rounded-2xl border transition-all duration-200 group hover:-translate-y-1 shadow-sm ${
-                isLight
-                  ? 'bg-white border-[#e2e8f0] hover:border-[#cbd5e1]'
-                  : 'bg-[#181d24] border-[#262c36] hover:border-[#3a4250]'
-              }`}
+              className="studio-panel flex flex-col justify-between p-6 rounded-2xl group transition-all duration-200 hover:-translate-y-1"
             >
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-[11px] tracking-wide text-[#d97706] dark:text-[#fcd535] uppercase">
+                  <span className="font-subheading font-bold text-[11px] tracking-wide text-[var(--app-text-muted)] uppercase">
                     {post.category}
                   </span>
-                  <div className="flex items-center gap-1 text-[11px] text-[#707a8a]">
+                  <div className="flex items-center gap-1 text-[11px] text-[var(--app-text-muted)]">
                     <Clock className="w-3 h-3" />
                     <span>{post.readTime}</span>
                   </div>
                 </div>
 
-                <a href={post.path} className="group-hover:text-[#d97706] dark:group-hover:text-[#fcd535] transition-colors">
-                  <h3 className={`text-lg font-bold tracking-tight line-clamp-2 ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                <a href={post.path} className="group-hover:text-[var(--app-accent)] transition-colors">
+                  <h3 className="font-heading text-lg font-bold tracking-tight line-clamp-2 text-[var(--app-text)]">
                     {post.title}
                   </h3>
                 </a>
 
-                <p className={`text-xs leading-relaxed line-clamp-3 ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
+                <p className="font-body text-xs leading-relaxed line-clamp-3 text-[var(--app-text-muted)]">
                   {post.description}
                 </p>
               </div>
 
-              <div className="pt-6 border-t mt-6 flex items-center justify-between border-current/10 text-xs">
-                <span className="text-[11px] text-[#707a8a]">{post.publishedDate}</span>
+              <div className="pt-6 border-t mt-6 flex items-center justify-between border-[var(--app-border-subtle)] text-xs">
+                <span className="text-[11px] text-[var(--app-text-muted)]">{post.publishedDate}</span>
                 <a
                   href={post.path}
-                  className={`inline-flex items-center gap-1 font-semibold text-xs cursor-pointer ${
-                    isLight ? 'text-[#0f172a] hover:underline' : 'text-white hover:underline'
-                  }`}
+                  className="inline-flex items-center gap-1 font-semibold text-xs text-[var(--app-text)] hover:text-[var(--app-accent)] transition-colors cursor-pointer"
                 >
                   <span>Read Story</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -233,10 +202,8 @@ interface BlogDetailViewProps extends BlogViewBaseProps {
 
 export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
   blog,
-  theme = 'dark',
   onOpenEditorWithTemplate,
 }) => {
-  const isLight = theme === 'light';
 
   useEffect(() => {
     updatePageSEO({
@@ -270,46 +237,42 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
   const otherPosts = BLOG_POSTS.filter((p) => p.slug !== blog.slug).slice(0, 4);
 
   return (
-    <div
-      className={`w-full min-h-screen pt-20 pb-20 transition-colors duration-200 ${
-        isLight ? 'bg-[#f8fafc] text-[#0f172a]' : 'bg-[#0b0e11] text-[#e1e2e7]'
-      }`}
-    >
-      <div className="max-w-4xl mx-auto px-4 md:px-8 flex flex-col gap-10">
+    <div className="w-full min-h-screen pt-24 pb-20 bg-[var(--app-bg)] text-[var(--app-text)] transition-colors duration-200">
+      <div className="studio-container-narrow flex flex-col gap-10">
         {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#707a8a]">
-          <a href="/" className="hover:underline cursor-pointer">
+        <nav aria-label="Breadcrumb" className="studio-breadcrumb">
+          <a href="/" className="hover:text-[var(--app-text)] transition-colors">
             Home
           </a>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <a href="/blog" className="hover:underline cursor-pointer">
+          <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+          <a href="/blog" className="hover:text-[var(--app-text)] transition-colors">
             Blog
           </a>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className={`font-medium line-clamp-1 ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+          <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+          <span className="text-[var(--app-text)] font-semibold line-clamp-1">
             {blog.title}
           </span>
         </nav>
 
         {/* Article Header */}
-        <header className="flex flex-col gap-5 border-b pb-8 border-current/10">
+        <header className="flex flex-col gap-5 border-b pb-8 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-[#d97706]/10 text-[#d97706] dark:bg-[#fcd535]/15 dark:text-[#fcd535]">
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-subheading font-bold uppercase tracking-wider bg-[var(--app-surface-secondary)] text-[var(--app-accent)] border border-[var(--app-border-subtle)]">
               {blog.category}
             </span>
           </div>
 
-          <h1 className={`text-3xl md:text-5xl font-bold tracking-tight leading-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+          <h1 className="font-heading text-3xl md:text-5xl font-extrabold tracking-tight leading-tight text-[var(--app-text)]">
             {blog.title}
           </h1>
 
-          <p className={`text-base md:text-xl leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
+          <p className="font-body text-base md:text-xl leading-relaxed text-[var(--app-text-muted)]">
             {blog.subtitle}
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 text-xs text-[#707a8a] pt-2 border-t border-current/10">
+          <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--app-text-muted)] pt-3 border-t border-[var(--app-border-subtle)]">
             <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-[11px] text-[#fcd535] uppercase tracking-wider">
+              <span className="font-subheading font-bold text-[11px] text-[var(--app-accent)] uppercase tracking-wider">
                 Studio Design Note
               </span>
             </div>
@@ -326,11 +289,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
 
         {/* Featured Template Interactive Callout (if paired with template) */}
         {featuredTemplate && (
-          <div
-            className={`p-6 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-lg ${
-              isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-            }`}
-          >
+          <div className="studio-panel p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
               <div
                 style={{ backgroundColor: featuredTemplate.theme.bg }}
@@ -339,13 +298,13 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
                 <Sparkles style={{ color: featuredTemplate.theme.ink }} className="w-6 h-6" />
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#d97706] dark:text-[#fcd535]">
+                <span className="text-[10px] uppercase font-subheading font-bold tracking-wider text-[var(--app-text-muted)]">
                   Paired Art Direction
                 </span>
-                <h3 className={`text-base font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                <h3 className="font-heading text-base font-bold text-[var(--app-text)]">
                   {featuredTemplate.title}
                 </h3>
-                <p className="text-xs text-[#707a8a]">
+                <p className="font-body text-xs text-[var(--app-text-muted)]">
                   Test this style directly in the Studio Creator with your own words.
                 </p>
               </div>
@@ -355,11 +314,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
               {onOpenEditorWithTemplate ? (
                 <button
                   onClick={() => onOpenEditorWithTemplate(featuredTemplate)}
-                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs cursor-pointer shadow-md ${
-                    isLight
-                      ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                      : 'bg-white text-[#0b0e11] hover:bg-[#e2e2e2]'
-                  }`}
+                  className="studio-btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs cursor-pointer"
                 >
                   <PenTool className="w-3.5 h-3.5" />
                   <span>Open Style in Studio</span>
@@ -367,11 +322,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
               ) : (
                 <a
                   href={`/create?template=${featuredTemplate.id}`}
-                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs cursor-pointer shadow-md ${
-                    isLight
-                      ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                      : 'bg-white text-[#0b0e11] hover:bg-[#e2e2e2]'
-                  }`}
+                  className="studio-btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs cursor-pointer"
                 >
                   <PenTool className="w-3.5 h-3.5" />
                   <span>Open Style in Studio</span>
@@ -382,34 +333,28 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
         )}
 
         {/* Article Body Content */}
-        <main className="flex flex-col gap-10 leading-relaxed text-sm md:text-base">
+        <main className="flex flex-col gap-10 leading-relaxed text-sm md:text-base font-body">
           {blog.sections.map((section, idx) => (
             <section key={idx} className="flex flex-col gap-4">
-              <h2 className={`text-xl md:text-2xl font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+              <h2 className="font-heading text-xl md:text-2xl font-bold tracking-tight text-[var(--app-text)]">
                 {section.heading}
               </h2>
 
-              <p className={`leading-relaxed ${isLight ? 'text-[#334155]' : 'text-[#cbd5e1]'}`}>
+              <p className="leading-relaxed text-[var(--app-text)] opacity-90">
                 {section.body}
               </p>
 
               {section.callout && (
-                <div
-                  className={`p-5 rounded-xl border-l-4 my-2 text-xs md:text-sm flex flex-col gap-1.5 ${
-                    isLight
-                      ? 'bg-[#f1f5f9] border-[#0f172a] text-[#1e293b]'
-                      : 'bg-[#181d24] border-[#fcd535] text-[#e2e8f0]'
-                  }`}
-                >
-                  <span className="font-bold">{section.callout.title}</span>
+                <div className="p-5 rounded-xl border-l-4 my-2 text-xs md:text-sm flex flex-col gap-1.5 bg-[var(--app-surface-secondary)] border-[var(--app-accent)] text-[var(--app-text)]">
+                  <span className="font-subheading font-bold text-sm">{section.callout.title}</span>
                   <p className="leading-relaxed opacity-90">{section.callout.text}</p>
                 </div>
               )}
 
               {section.bullets && (
-                <ul className="flex flex-col gap-2 pl-4 list-disc text-xs md:text-sm">
+                <ul className="flex flex-col gap-2 pl-4 list-disc text-xs md:text-sm text-[var(--app-text-muted)]">
                   {section.bullets.map((bullet, bIdx) => (
-                    <li key={bIdx} className={isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}>
+                    <li key={bIdx}>
                       {bullet}
                     </li>
                   ))}
@@ -420,11 +365,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
                 <div className="pt-2">
                   <a
                     href={`/create?template=${section.templateId}`}
-                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs transition-all shadow-sm cursor-pointer ${
-                      isLight
-                        ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                        : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
-                    }`}
+                    className="studio-btn-primary inline-flex items-center gap-2 px-4 py-2.5 text-xs cursor-pointer"
                   >
                     <PenTool className="w-3.5 h-3.5" />
                     <span>{section.actionPrompt || 'Load This Preset in Studio →'}</span>
@@ -436,19 +377,15 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
         </main>
 
         {/* Author Bio Box */}
-        <section
-          className={`p-6 rounded-2xl border flex items-center gap-4 ${
-            isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-          }`}
-        >
-          <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#d97706] to-[#fcd535] flex items-center justify-center text-[#181a20] font-bold text-lg shrink-0">
+        <section className="studio-panel p-6 rounded-2xl flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[var(--app-surface-secondary)] border border-[var(--app-border-subtle)] flex items-center justify-center text-[var(--app-accent)] font-bold text-lg shrink-0">
             {blog.author.charAt(0)}
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className={`text-sm font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+            <span className="font-heading text-sm font-bold text-[var(--app-text)]">
               {blog.author}
             </span>
-            <p className="text-xs text-[#707a8a]">
+            <p className="font-body text-xs text-[var(--app-text-muted)]">
               Contributing curator to Aesthetic Card Studio, researching digital ephemera, typography systems, and book arts.
             </p>
           </div>
@@ -456,12 +393,12 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
 
         {/* Related Articles */}
         {otherPosts.length > 0 && (
-          <section className="flex flex-col gap-6 pt-10 border-t border-current/10">
+          <section className="flex flex-col gap-6 pt-10 border-t border-[var(--app-border-subtle)]">
             <div className="flex items-center justify-between">
-              <h3 className={`text-xl font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+              <h3 className="font-heading text-xl font-bold text-[var(--app-text)]">
                 Explore More Stories
               </h3>
-              <a href="/blog" className="text-xs font-semibold hover:underline flex items-center gap-1 text-[#d97706] dark:text-[#fcd535]">
+              <a href="/blog" className="text-xs font-semibold hover:underline flex items-center gap-1 text-[var(--app-text-muted)] hover:text-[var(--app-accent)]">
                 <span>View all</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </a>
@@ -472,23 +409,17 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
                 <a
                   key={post.slug}
                   href={post.path}
-                  className={`p-4 rounded-xl border flex flex-col justify-between gap-3 transition-all hover:-translate-y-0.5 group ${
-                    isLight
-                      ? 'bg-white border-[#e2e8f0] hover:border-[#cbd5e1]'
-                      : 'bg-[#181d24] border-[#262c36] hover:border-[#3a4250]'
-                  }`}
+                  className="studio-panel p-4 rounded-xl flex flex-col justify-between gap-3 transition-all hover:-translate-y-0.5 group"
                 >
                   <div className="flex flex-col gap-1.5">
-                    <span className="text-[10px] font-semibold uppercase text-[#707a8a]">
+                    <span className="text-[10px] font-subheading font-bold uppercase text-[var(--app-text-muted)]">
                       {post.category}
                     </span>
-                    <h4 className={`text-xs font-bold line-clamp-2 group-hover:text-[#d97706] dark:group-hover:text-[#fcd535] transition-colors ${
-                      isLight ? 'text-[#0f172a]' : 'text-white'
-                    }`}>
+                    <h4 className="font-heading text-xs font-bold line-clamp-2 group-hover:text-[var(--app-accent)] transition-colors text-[var(--app-text)]">
                       {post.title}
                     </h4>
                   </div>
-                  <span className="text-[11px] text-[#707a8a]">{post.readTime}</span>
+                  <span className="text-[11px] text-[var(--app-text-muted)]">{post.readTime}</span>
                 </a>
               ))}
             </div>

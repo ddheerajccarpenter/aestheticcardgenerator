@@ -24,21 +24,21 @@ export const TemplateComparisonDock: React.FC<TemplateComparisonDockProps> = ({
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-xl animate-bounce-in">
       <div
-        className={`px-4 py-3 rounded-2xl border shadow-2xl flex items-center justify-between gap-4 backdrop-blur-xl ${
+        className={`px-4 py-3 rounded-2xl border shadow-xl flex items-center justify-between gap-4 backdrop-blur-xl ${
           isLight
-            ? 'bg-white/95 border-[#cbd5e1] text-[#0f172a]'
-            : 'bg-[#181d24]/95 border-[#262c36] text-[#f4f1ea]'
+            ? 'bg-white/95 border-[#cbd5e1] text-[#111417]'
+            : 'bg-[#12151b]/95 border-[#222731] text-[#f4f1ea]'
         }`}
       >
         <div className="flex items-center gap-2 overflow-x-auto">
-          <span className="text-xs font-bold text-[#fcd535] uppercase tracking-wider shrink-0">
+          <span className="text-xs font-bold text-[#E2D9C8] dark:text-[#E2D9C8] uppercase tracking-wider shrink-0">
             Compare ({selectedTemplates.length}/4):
           </span>
           {selectedTemplates.map((tmpl) => (
             <div
               key={tmpl.id}
               className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs font-semibold ${
-                isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#12151b] border-[#323946]'
+                isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#181d24] border-[#2e3543]'
               }`}
             >
               <span
@@ -60,20 +60,20 @@ export const TemplateComparisonDock: React.FC<TemplateComparisonDockProps> = ({
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onClear}
-            className="text-[11px] text-[#707a8a] hover:underline cursor-pointer"
+            className="text-[11px] text-[#94a3b8] hover:underline cursor-pointer"
           >
             Clear
           </button>
 
           <button
             onClick={onOpenModal}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
               isLight
-                ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
+                ? 'bg-[#111417] text-white hover:bg-[#222730]'
+                : 'bg-[#E2D9C8] text-[#111417] hover:bg-[#ECE5D8]'
             }`}
           >
-            <SquareDuotoneIcon name="compare" size="sm" />
+            <SquareDuotoneIcon name="compare" size="sm" variant={isLight ? 'light' : 'dark'} />
             <span>Compare Side-by-Side</span>
           </button>
         </div>

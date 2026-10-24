@@ -3,13 +3,23 @@ import type { CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
 import { updatePageSEO } from '../utils/seo';
 import { toPng } from 'html-to-image';
+import {
+  ArrowRight,
+  Check,
+  ChevronDown,
+  Layers,
+  LayoutTemplate,
+  PenTool,
+  Plus,
+  ShieldCheck,
+  Sliders,
+  Download,
+  Copy,
+} from 'lucide-react';
 import { ASSET_AVATARS } from '../data/canvasAssets';
 import { SquareDuotoneIcon } from '../components/SquareDuotoneIcon';
-import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
-import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 import { createThreeCardPreviewScene } from '../engines/threeCardStage';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
-import { LazyTemplateCard } from '../components/LazyTemplateCard';
 import { getBrandedExportFilename } from '../engines/brandedExportAndThreePng';
 
 interface HomeViewProps {
@@ -28,15 +38,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Aesthetic Card Studio — Design Quote Cards, Posters, and Aesthetic IDs',
+      title: 'ACG — Aesthetic Card Generator | Generate without Internet',
       description:
-        'Set crisp typography on 50+ tactile paper and holographic surfaces, or build multi-layer cards in the studio. Runs 100% in your browser.',
+        'Create beautiful cards, posters, and passes fully in your browser. 100% offline, local-first canvas, zero cloud tracking, up to 16K export.',
       canonicalPath: '/',
       ogType: 'website',
     });
   }, []);
 
-  // Live hero interactive mini-studio state
+  // Mobile accordion disclosure states (matching wireframe)
+  const [aboutCanvasOpen, setAboutCanvasOpen] = useState(false);
+  const [howToUseOpen, setHowToUseOpen] = useState(false);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
+
+  // Live interactive canvas preview state
   const heroCardRef = useRef<HTMLDivElement>(null);
   const threeMountRef = useRef<HTMLDivElement>(null);
   const threeStageRef = useRef<any>(null);
@@ -47,45 +62,27 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [isDownloadingHero, setIsDownloadingHero] = useState(false);
   const [is3DMode, setIs3DMode] = useState(false);
 
-  // Directly editable hero content
+  // Directly editable quote fields
   const [heroQuote, setHeroQuote] = useState(
     '“In the depth of winter, I finally learned that within me there lay an invincible summer.”'
   );
   const [heroAuthor, setHeroAuthor] = useState('Albert Camus — Return to Tipasa');
-  const [heroTag, setHeroTag] = useState('FAVORITE LINES • NO. 04');
+  const [heroTag, setHeroTag] = useState('EDITORIAL NO. 04');
 
   // ID Mode editable fields
   const [heroIdName, setHeroIdName] = useState('Dan Valentini');
-  const [heroIdRole, setHeroIdRole] = useState('Vision Architect & Producer');
-  const [heroIdClearance, setHeroIdClearance] = useState('ALL-ACCESS CREW • TIER 01');
+  const [heroIdRole, setHeroIdRole] = useState('Vision Architect');
+  const [heroIdClearance, setHeroIdClearance] = useState('ALL-ACCESS • TIER 01');
 
-  // Templates showcase pagination (Top 4 initially, increment by +4)
-  const [visibleCount, setVisibleCount] = useState(4);
-  const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-
-  // Template comparison state
-  const [selectedForCompare, setSelectedForCompare] = useState<CardTemplate[]>([]);
-  const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
-
+  // Palette presets for the canvas preview
   const heroPalettes = [
     {
-      id: 'st-germain',
-      name: 'St. Germain',
-      bg: '#f4ede4',
-      ink: '#2c2825',
-      badge: 'EST. 1997',
-      accent: '#2c2825',
-      surface: 'cotton-rag-300gsm',
-    },
-    {
-      id: 'warm-linen',
-      name: 'Warm Linen',
-      bg: '#fce7cf',
-      ink: '#451a03',
+      id: 'albert-cream',
+      name: 'Archival Linen',
+      bg: '#fbf9f4',
+      ink: '#1c1b18',
       badge: 'ARCHIVAL',
-      accent: '#451a03',
+      accent: '#2a2825',
       surface: 'woven-canvas-linen',
     },
     {
@@ -119,7 +116,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const currentHeroPalette = heroPalettes[heroPaletteIndex];
 
-  // Three.js 3D View mounting with debouncing and texture reuse
+  // Three.js 3D View mounting
   useEffect(() => {
     if (!is3DMode || !threeMountRef.current || !heroCardRef.current) {
       if (threeStageRef.current) {
@@ -144,7 +141,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
           if (ctx) {
             ctx.drawImage(img, 0, 0);
             if (threeStageRef.current && lastHeroModeRef.current === heroMode) {
-              // Efficiently update existing GPU texture without rebuilding WebGL context
               threeStageRef.current.updateTexture(off, currentHeroPalette.surface);
             } else {
               if (threeStageRef.current) threeStageRef.current();
@@ -167,9 +163,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
       isMounted = false;
       clearTimeout(timer);
     };
-  }, [is3DMode, heroMode, currentHeroPalette, heroQuote, heroAuthor, heroTag, heroIdName, heroIdRole]);
+  }, [is3DMode, heroMode, currentHeroPalette, heroQuote, heroAuthor, heroTag, heroIdName, heroIdRole, heroIdClearance]);
 
-  // Clean up 3D scene on unmount
   useEffect(() => {
     return () => {
       if (threeStageRef.current) {
@@ -208,585 +203,891 @@ export const HomeView: React.FC<HomeViewProps> = ({
     }
   };
 
-  const categories = [
-    { id: 'all', label: 'All Curated Styles' },
-    { id: 'id-card', label: '★ Aesthetic ID Cards' },
-    { id: 'pastel', label: 'Cute & Pastel' },
-    { id: 'vintage', label: 'Vintage & Retro' },
-    { id: 'fan', label: 'Fan & Character' },
-    { id: 'minimal', label: 'Minimalist' },
-    { id: 'school', label: 'School & Club' },
-    { id: 'quote', label: 'Editorial Quotes' },
-  ];
+  // Wireframe's 8 Curated Categories
+  const wireframeCategoryCards = useMemo(() => {
+    const findTemplate = (id: string) => PRESET_TEMPLATES.find((t) => t.id === id);
 
-  const filteredTemplates = useMemo(() => {
-    return PRESET_TEMPLATES.filter((t) => {
-      const matchesCategory = activeCategory === 'all' || t.category === activeCategory;
-      if (!matchesCategory) return false;
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase().trim();
-      return (
-        t.title.toLowerCase().includes(q) ||
-        t.quote.toLowerCase().includes(q) ||
-        t.author.toLowerCase().includes(q) ||
-        t.tag.toLowerCase().includes(q) ||
-        t.categoryLabel.toLowerCase().includes(q) ||
-        t.badge.toLowerCase().includes(q)
-      );
-    });
-  }, [activeCategory, searchQuery]);
-
-  // Sliced to display 2-per-row pairs on homepage
-  const displayedTemplates = useMemo(() => {
-    return filteredTemplates.slice(0, visibleCount);
-  }, [filteredTemplates, visibleCount]);
-
-  const toggleCompareTemplate = (tmpl: CardTemplate) => {
-    setSelectedForCompare((prev) => {
-      const exists = prev.some((t) => t.id === tmpl.id);
-      if (exists) {
-        return prev.filter((t) => t.id !== tmpl.id);
-      }
-      if (prev.length >= 4) {
-        return [prev[1], prev[2], prev[3], tmpl];
-      }
-      return [...prev, tmpl];
-    });
-  };
-
-  const faqs = [
-    {
-      q: 'Is Aesthetic Card Studio really free?',
-      a: 'Yes, 100% free. There are no subscriptions, paywalls, or watermarks on your exported cards.',
-    },
-    {
-      q: 'Does this app save or track what I write?',
-      a: 'Never. The studio runs entirely client-side inside your own web browser. Your text, photos, and drafts never touch any server or cloud database.',
-    },
-    {
-      q: 'What resolution do the cards download in?',
-      a: 'Cards export from true 4K Ultra HD up to 16K Studio Extreme, perfectly sharp for prints and high-density screens.',
-    },
-    {
-      q: 'Can I change aspect ratios for Stories or Square posts?',
-      a: 'Yes. Switch between Square, 4:5 Portrait, 9:16 Story, and 16:9 Landscape anytime with proportional auto-reflow.',
-    },
-  ];
+    return [
+      {
+        id: 'blank',
+        label: 'Blank Card',
+        tag: 'CREATE',
+        isBlank: true,
+        link: '/canvas?blank=true',
+        description: 'Start from scratch with custom dimensions',
+      },
+      {
+        id: 'quote',
+        label: 'Quote',
+        tag: 'EDITORIAL',
+        template: findTemplate('camus-summer') || PRESET_TEMPLATES[0],
+      },
+      {
+        id: 'minimal',
+        label: 'Minimal',
+        tag: 'SWISS',
+        template: findTemplate('dieter-rams-minimal') || PRESET_TEMPLATES[1],
+      },
+      {
+        id: 'aesthetic',
+        label: 'Aesthetic',
+        tag: 'ID PASS',
+        template: findTemplate('id-jennie-crimson') || PRESET_TEMPLATES[2],
+      },
+      {
+        id: 'nature',
+        label: 'Nature',
+        tag: 'BOTANICAL',
+        template: findTemplate('emily-dickinson-mint') || PRESET_TEMPLATES[3],
+      },
+      {
+        id: 'dark',
+        label: 'Dark',
+        tag: 'OBSIDIAN',
+        template: findTemplate('obsidian-monochrome') || PRESET_TEMPLATES[4],
+      },
+      {
+        id: 'collage',
+        label: 'Collage',
+        tag: 'CANVAS',
+        template: findTemplate('id-darkwave-sound') || PRESET_TEMPLATES[5],
+      },
+      {
+        id: 'poster',
+        label: 'Poster',
+        tag: 'SOCIAL 4:5',
+        template: findTemplate('travel-license-pass') || PRESET_TEMPLATES[6],
+      },
+    ];
+  }, []);
 
   return (
-    <div className={`w-full pt-16 transition-colors duration-200 ${isLight ? 'text-[#0f172a]' : 'text-[#f4f1ea]'}`}>
-      {/* SECTION 1: HERO */}
-      <section className="relative w-full px-4 md:px-8 py-12 md:py-20 flex flex-col items-center text-center overflow-hidden">
-        {/* Exact Hero Badge Replacement */}
-        <div
-          className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-semibold mb-6 ${
-            isLight
-              ? 'bg-white border-[#e2e8f0] text-[#475569] shadow-sm'
-              : 'bg-[#181d24] border-[#262c36] text-[#c4c7c8]'
-          }`}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#facc15]" />
-          <span>Local-First Card &amp; ID Studio • Up to 16K Export</span>
+    <div className={`w-full pt-14 sm:pt-16 transition-colors duration-200 ${isLight ? 'text-[#101114]' : 'text-[#f4f1ea]'}`}>
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* 1. HERO SECTION (Wireframe: Panoramic Landscape + Headline + CTA)   */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      <section className="relative w-full px-4 md:px-8 pt-8 md:pt-14 pb-10 flex flex-col items-center text-center overflow-hidden">
+        {/* Subtle Architectural Landscape Contour Background (Honoring wireframe mountain motif) */}
+        <div className="absolute inset-0 pointer-events-none opacity-25 overflow-hidden -z-10 flex items-center justify-center">
+          <svg
+            className="w-full max-w-5xl h-auto transition-opacity"
+            viewBox="0 0 1000 320"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0,280 C200,240 320,160 500,200 C680,240 800,120 1000,180 L1000,320 L0,320 Z"
+              fill={isLight ? '#e2e8f0' : '#1e232b'}
+              fillOpacity="0.4"
+            />
+            <path
+              d="M0,220 C250,140 400,260 620,170 C780,100 880,190 1000,130 L1000,320 L0,320 Z"
+              fill={isLight ? '#cbd5e1' : '#161920'}
+              fillOpacity="0.3"
+            />
+            <circle cx="500" cy="80" r="36" fill={isLight ? '#e2e8f0' : '#262c36'} fillOpacity="0.4" />
+          </svg>
         </div>
 
-        {/* Exact Hero Title Replacement */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold max-w-4xl tracking-tight mb-4 leading-tight font-heading">
-          Design quote cards, posters, and aesthetic IDs.
+        {/* Top Feature Pill */}
+        <div
+          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-semibold mb-4 transition-all ${
+            isLight
+              ? 'bg-white/80 border-[#cbd5e1] text-[#334155] shadow-xs'
+              : 'bg-[#181d24]/80 border-[#262c36] text-[#AAA9A4] shadow-xs'
+          }`}
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-[#0ecb81]" />
+          <span className="font-subheading">100% Offline • Zero Cloud Tracking</span>
+        </div>
+
+        {/* Wireframe Headline: Generate without Internet */}
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold max-w-4xl tracking-tight mb-3 leading-[1.12] font-heading">
+          Generate without Internet
         </h1>
 
-        {/* Exact Hero Subtitle Replacement */}
-        <p className={`text-sm md:text-base max-w-2xl mx-auto mb-8 leading-relaxed font-body ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-          Set crisp typography on 50+ tactile paper and holographic surfaces, or build multi-layer cards in the studio. Runs 100% in your browser.
+        {/* Wireframe Subtitle: Create beautiful cards, posters and more. Fully in your browser. */}
+        <p className={`text-sm sm:text-base max-w-xl mx-auto mb-6 leading-relaxed font-body ${
+          isLight ? 'text-[#475569]' : 'text-[#8e95a5]'
+        }`}>
+          Create beautiful cards, posters and more. Fully in your browser.
         </p>
 
-        {/* 2 Clear Action CTAs */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
+        {/* Wireframe Primary Action: Start Creating → */}
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <a
             href="/create"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm active:scale-[0.98] transition-all cursor-pointer shadow-lg bg-[#facc15] text-[#0b0e11] hover:bg-[#ffe270]"
+            className="studio-btn-primary group shadow-lg px-6 py-3 rounded-xl text-sm font-bold inline-flex items-center gap-2"
           >
-            <span>Open Card Creator</span>
-            <SquareDuotoneIcon name="arrow-right" size="sm" variant="dark" />
+            <span>Start Creating</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
 
           <a
             href="/canvas"
-            className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl border font-semibold text-sm transition-colors cursor-pointer ${
-              isLight
-                ? 'bg-white border-[#cbd5e1] text-[#0f172a] hover:bg-slate-50'
-                : 'bg-[#181d24] border-[#384152] text-white hover:bg-[#222730]'
-            }`}
+            className="studio-btn-secondary px-5 py-3 rounded-xl text-sm font-semibold inline-flex items-center gap-2"
           >
-            <span>Launch Freeform Canvas →</span>
+            <Layers className="w-4 h-4 opacity-75" />
+            <span>Canvas Studio</span>
           </a>
         </div>
+      </section>
 
-        {/* Interactive Mini-Studio Frame */}
-        <div
-          className={`w-full max-w-4xl border p-3 md:p-6 rounded-2xl shadow-2xl flex flex-col gap-3 text-left ${
-            isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
-          }`}
-        >
-          {/* Mini-Studio Toolbar: Mode Switcher + Palettes + 3D View + Quick Actions */}
-          <div
-            className={`flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 rounded-xl border ${
-              isLight ? 'bg-slate-50 border-[#e2e8f0]' : 'bg-[#181d24] border-[#2b3340]'
-            }`}
-          >
-            {/* Mode Toggle Buttons */}
-            <div className="flex items-center gap-1 bg-black/10 dark:bg-black/40 p-1 rounded-lg">
-              <button
-                onClick={() => setHeroMode('quote')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                  heroMode === 'quote'
-                    ? isLight
-                      ? 'bg-white text-[#0f172a] shadow-sm font-bold'
-                      : 'bg-[#facc15] text-[#0b0e11] shadow-sm font-bold'
-                    : isLight
-                    ? 'text-[#64748b] hover:text-[#0f172a]'
-                    : 'text-[#cbd5e1] hover:text-white font-medium'
-                }`}
-              >
-                <span>Quote Mode</span>
-              </button>
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* 2. CENTRAL WORKSPACE: ABOUT CANVAS | CANVAS / PREVIEW | HOW TO USE  */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      <section className={`w-full px-4 md:px-8 py-8 border-t ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
+        <div className="max-w-7xl mx-auto">
+          {/* DESKTOP LAYOUT (3-Column Wireframe Grid) */}
+          <div className="hidden lg:grid grid-cols-12 gap-6 items-stretch">
+            {/* Left Column: About Canvas */}
+            <div
+              className={`col-span-3 p-6 rounded-2xl border flex flex-col justify-between transition-all shadow-sm ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <div className="flex flex-col gap-3">
+                <h2 className="text-lg font-bold font-heading">
+                  About Canvas
+                </h2>
+                <p className={`text-xs leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#8e95a5]'}`}>
+                  A simple and powerful canvas to create aesthetic cards, posters, social media graphics and more.
+                </p>
 
-              <button
-                onClick={() => setHeroMode('id')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                  heroMode === 'id'
-                    ? isLight
-                      ? 'bg-white text-[#0f172a] shadow-sm font-bold'
-                      : 'bg-[#facc15] text-[#0b0e11] shadow-sm font-bold'
-                    : isLight
-                    ? 'text-[#64748b] hover:text-[#0f172a]'
-                    : 'text-[#cbd5e1] hover:text-white font-medium'
-                }`}
-              >
-                <span>ID Card Mode</span>
-              </button>
-            </div>
+                <ul className="flex flex-col gap-2.5 mt-3 text-xs">
+                  <li className="flex items-center gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#0ecb81]/15 text-[#0ecb81] flex items-center justify-center shrink-0">
+                      <Check className="w-3 h-3 stroke-[2.5]" />
+                    </span>
+                    <span>Works offline</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#0ecb81]/15 text-[#0ecb81] flex items-center justify-center shrink-0">
+                      <Check className="w-3 h-3 stroke-[2.5]" />
+                    </span>
+                    <span>Easy to use</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#0ecb81]/15 text-[#0ecb81] flex items-center justify-center shrink-0">
+                      <Check className="w-3 h-3 stroke-[2.5]" />
+                    </span>
+                    <span>Multiple templates</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#0ecb81]/15 text-[#0ecb81] flex items-center justify-center shrink-0">
+                      <Check className="w-3 h-3 stroke-[2.5]" />
+                    </span>
+                    <span>Export in high quality</span>
+                  </li>
+                </ul>
+              </div>
 
-            {/* Palettes */}
-            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
-              <span className={`text-[11px] px-1 font-semibold ${isLight ? 'text-[#64748b]' : 'text-[#cbd5e1]'}`}>
-                Palette:
-              </span>
-              {heroPalettes.map((pal, idx) => (
-                <button
-                  key={pal.id}
-                  onClick={() => setHeroPaletteIndex(idx)}
-                  className={`w-6 h-6 rounded-md border border-black/20 dark:border-white/30 shadow-xs transition-all cursor-pointer relative shrink-0 ${
-                    heroPaletteIndex === idx
-                      ? 'ring-2 ring-[#facc15] ring-offset-2 ring-offset-slate-50 dark:ring-offset-[#181d24] scale-110'
-                      : 'opacity-85 hover:opacity-100'
-                  }`}
-                  style={{ backgroundColor: pal.bg }}
-                  title={pal.name}
+              <div className="pt-4 border-t border-current/10 mt-6">
+                <a
+                  href="/create"
+                  className="text-xs font-bold text-[#e2d9c8] hover:underline inline-flex items-center gap-1"
                 >
-                  <span
-                    className="absolute inset-0 m-auto w-2 h-2 rounded-full border border-black/30 dark:border-white/40"
-                    style={{ backgroundColor: pal.ink }}
-                  />
-                </button>
-              ))}
+                  <span>Open Creator</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
 
-            {/* 3D View Toggle + Quick Actions */}
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => setIs3DMode((prev) => !prev)}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
-                  is3DMode
-                    ? 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535] font-bold'
-                    : isLight
-                    ? 'border-slate-200 text-[#475569] hover:bg-slate-100'
-                    : 'border-[#384152] text-[#e2e8f0] bg-[#1a2028] hover:bg-[#252c38]'
-                }`}
-                title="Toggle interactive Three.js 3D tilt view"
-              >
-                <SquareDuotoneIcon name="cube" size="sm" variant={is3DMode ? 'dark' : isLight ? 'default' : 'light'} />
-                <span>3D View</span>
-              </button>
+            {/* Center Column: Canvas / Preview Area (DOMINANT 6 COLS) */}
+            <div
+              className={`col-span-6 p-5 rounded-2xl border flex flex-col gap-3 shadow-xl ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              {/* Header row of the preview area */}
+              <div className="flex items-center justify-between gap-2 pb-2 border-b border-current/10">
+                <div>
+                  <h2 className="text-sm font-bold font-heading">
+                    Canvas / Preview Area
+                  </h2>
+                  <span className={`text-[11px] ${isLight ? 'text-[#64748b]' : 'text-[#8e95a5]'}`}>
+                    Your design will appear here
+                  </span>
+                </div>
 
-              <button
-                onClick={handleCopyHero}
-                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                  isLight ? 'border-slate-200 hover:bg-slate-100 text-[#475569]' : 'border-[#384152] hover:bg-[#252c38] text-[#e2e8f0] bg-[#1a2028]'
-                }`}
-                title="Copy Card Text"
-              >
-                <SquareDuotoneIcon name={copiedHero ? 'check' : 'copy'} size="sm" variant={isLight ? 'default' : 'light'} />
-              </button>
+                {/* Interactive Mode Toggle */}
+                <div className="flex items-center gap-1 bg-black/10 dark:bg-black/30 p-1 rounded-lg">
+                  <button
+                    onClick={() => setHeroMode('quote')}
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                      heroMode === 'quote'
+                        ? isLight
+                          ? 'bg-white text-[#111417] shadow-xs font-bold'
+                          : 'bg-[#E2D9C8] text-[#111417] shadow-xs font-bold'
+                        : isLight
+                        ? 'text-[#64748b] hover:text-[#111417]'
+                        : 'text-[#94a3b8] hover:text-[#f4f1ea]'
+                    }`}
+                  >
+                    Quote
+                  </button>
 
-              <button
-                onClick={handleDownloadHeroPng}
-                disabled={isDownloadingHero}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-xs bg-[#facc15] text-[#0b0e11] hover:bg-[#ffe270] transition-all cursor-pointer"
-                title="Download 2x Preview"
+                  <button
+                    onClick={() => setHeroMode('id')}
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                      heroMode === 'id'
+                        ? isLight
+                          ? 'bg-white text-[#111417] shadow-xs font-bold'
+                          : 'bg-[#E2D9C8] text-[#111417] shadow-xs font-bold'
+                        : isLight
+                        ? 'text-[#64748b] hover:text-[#111417]'
+                        : 'text-[#94a3b8] hover:text-[#f4f1ea]'
+                    }`}
+                  >
+                    ID Pass
+                  </button>
+                </div>
+              </div>
+
+              {/* Sub-toolbar: Palettes + 3D + Actions */}
+              <div className="flex items-center justify-between gap-2 py-1">
+                {/* Palette dots */}
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[10px] uppercase font-bold tracking-wider ${isLight ? 'text-[#64748b]' : 'text-[#8e95a5]'}`}>
+                    Palette:
+                  </span>
+                  {heroPalettes.map((pal, idx) => (
+                    <button
+                      key={pal.id}
+                      onClick={() => setHeroPaletteIndex(idx)}
+                      className={`w-4.5 h-4.5 rounded-md border border-black/20 dark:border-white/20 shadow-xs transition-all cursor-pointer relative ${
+                        heroPaletteIndex === idx
+                          ? 'ring-2 ring-[#E2D9C8] scale-110'
+                          : 'opacity-70 hover:opacity-100'
+                      }`}
+                      style={{ backgroundColor: pal.bg }}
+                      title={pal.name}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setIs3DMode((prev) => !prev)}
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                      is3DMode
+                        ? isLight
+                          ? 'bg-[#111417] text-white border-[#111417]'
+                          : 'bg-[#E2D9C8] text-[#111417] border-[#E2D9C8]'
+                        : isLight
+                        ? 'border-slate-200 text-[#475569] hover:bg-slate-100'
+                        : 'border-[#2e3543] text-[#cbd5e1] bg-[#1a1e27] hover:bg-[#222733]'
+                    }`}
+                    title="Toggle 3D"
+                  >
+                    <SquareDuotoneIcon name="cube" size="sm" variant={is3DMode ? 'dark' : isLight ? 'default' : 'light'} />
+                    <span>3D</span>
+                  </button>
+
+                  <button
+                    onClick={handleCopyHero}
+                    className={`p-1 rounded-lg border transition-colors cursor-pointer ${
+                      copiedHero
+                        ? 'border-[#0ecb81] bg-[#0ecb81]/20 text-[#0ecb81]'
+                        : isLight
+                        ? 'border-slate-200 hover:bg-slate-100 text-[#475569]'
+                        : 'border-[#2e3543] hover:bg-[#222733] text-[#cbd5e1] bg-[#1a1e27]'
+                    }`}
+                    title={copiedHero ? 'Copied to clipboard!' : 'Copy Text'}
+                  >
+                    {copiedHero ? <Check className="w-3.5 h-3.5 text-[#0ecb81]" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+
+                  <button
+                    onClick={handleDownloadHeroPng}
+                    disabled={isDownloadingHero}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer ${
+                      isLight
+                        ? 'bg-[#111417] text-white hover:bg-[#222730]'
+                        : 'bg-[#E2D9C8] text-[#111417] hover:bg-[#ECE5D8]'
+                    }`}
+                    title="Download Card"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Central Canvas Preview Surface */}
+              <div
+                className={`relative w-full min-h-[300px] flex-1 flex items-center justify-center p-4 rounded-xl overflow-hidden border ${
+                  isLight ? 'bg-slate-100 border-[#e2e8f0]' : 'bg-[#0f1116] border-[#222731]'
+                }`}
               >
-                <SquareDuotoneIcon name="download" size="sm" variant="dark" />
-                <span>Export</span>
-              </button>
+                {is3DMode ? (
+                  <div ref={threeMountRef} className="w-full h-[320px] flex items-center justify-center" />
+                ) : (
+                  <div
+                    ref={heroCardRef}
+                    style={{
+                      backgroundColor: currentHeroPalette.bg,
+                      color: currentHeroPalette.ink,
+                    }}
+                    className="relative w-full max-w-sm min-h-[250px] p-5 rounded-xl transition-colors duration-200 shadow-xl flex flex-col justify-between border border-black/10 overflow-hidden"
+                  >
+                    <div className="absolute inset-0 card-noise opacity-25 pointer-events-none" />
+
+                    {heroMode === 'quote' ? (
+                      <>
+                        <div className="flex items-center justify-between pb-2 border-b border-current/15 text-[10px] font-mono tracking-wider opacity-75 relative z-10">
+                          <input
+                            type="text"
+                            value={heroTag}
+                            onChange={(e) => setHeroTag(e.target.value)}
+                            className="bg-transparent border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none max-w-[160px] font-mono"
+                          />
+                          <span className="px-1.5 py-0.5 rounded border border-current/25 shrink-0 font-mono text-[9px] font-bold">
+                            {currentHeroPalette.badge}
+                          </span>
+                        </div>
+
+                        <div className="my-3 relative z-10">
+                          <textarea
+                            value={heroQuote}
+                            onChange={(e) => setHeroQuote(e.target.value)}
+                            rows={3}
+                            className="w-full bg-transparent resize-none border-b border-dashed border-transparent hover:border-current/25 focus:border-current/50 outline-none font-editorial text-lg leading-relaxed tracking-tight text-inherit"
+                          />
+                        </div>
+
+                        <div className="pt-2 border-t border-current/15 flex items-center justify-between relative z-10">
+                          <div className="flex items-center gap-1">
+                            <span className="opacity-60 text-xs">—</span>
+                            <input
+                              type="text"
+                              value={heroAuthor}
+                              onChange={(e) => setHeroAuthor(e.target.value)}
+                              className="bg-transparent border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-xs font-semibold opacity-85 text-inherit max-w-[180px]"
+                            />
+                          </div>
+                          <span className="text-[9px] font-mono opacity-50 uppercase tracking-wider">
+                            {currentHeroPalette.name}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="relative z-10 flex flex-col items-center">
+                          <div className="w-8 h-1.5 rounded-full bg-black/30 border border-current/40 mb-1.5" />
+                          <div className="w-full flex items-center justify-between pb-1.5 border-b border-current/15 text-[9px] font-mono tracking-wider opacity-85">
+                            <span className="font-bold tracking-widest uppercase">CREATIVE PASS</span>
+                            <span className="px-1 py-0.2 rounded bg-black/10 border border-current/30 font-bold">
+                              {currentHeroPalette.badge}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="my-2.5 flex items-center gap-3 relative z-10">
+                          <div className="w-16 h-20 rounded-lg overflow-hidden border border-current/30 shadow-md shrink-0 relative bg-black/10">
+                            <img
+                              src={ASSET_AVATARS.grungeDan}
+                              alt="Portrait"
+                              className="w-full h-full object-cover grayscale contrast-125"
+                            />
+                          </div>
+
+                          <div className="flex-1 flex flex-col gap-1 font-mono text-xs">
+                            <div>
+                              <span className="text-[8px] uppercase tracking-wider opacity-60 block">NAME</span>
+                              <input
+                                type="text"
+                                value={heroIdName}
+                                onChange={(e) => setHeroIdName(e.target.value)}
+                                className="w-full bg-transparent font-bold text-xs border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-inherit"
+                              />
+                            </div>
+                            <div>
+                              <span className="text-[8px] uppercase tracking-wider opacity-60 block">ROLE</span>
+                              <input
+                                type="text"
+                                value={heroIdRole}
+                                onChange={(e) => setHeroIdRole(e.target.value)}
+                                className="w-full bg-transparent text-[11px] border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none opacity-85 text-inherit"
+                              />
+                            </div>
+                            <div>
+                              <span className="text-[8px] uppercase tracking-wider opacity-60 block">STATUS</span>
+                              <input
+                                type="text"
+                                value={heroIdClearance}
+                                onChange={(e) => setHeroIdClearance(e.target.value)}
+                                className="w-full bg-transparent font-semibold text-[10px] border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-inherit"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-current/15 flex items-center justify-between text-[9px] font-mono opacity-80 relative z-10">
+                          <span className="font-bold tracking-tight">||||| | |||| ||| |||||||</span>
+                          <span className="uppercase font-bold tracking-wider">VERIFIED</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column: How and why to use */}
+            <div
+              className={`col-span-3 p-6 rounded-2xl border flex flex-col justify-between transition-all shadow-sm ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <div className="flex flex-col gap-3">
+                <h2 className="text-lg font-bold font-heading">
+                  How and why to use
+                </h2>
+                <p className={`text-xs leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#8e95a5]'}`}>
+                  Use templates or start from scratch. Customize text, images, colors and more. Perfect for social media, personal use or creative projects.
+                </p>
+
+                <ol className="flex flex-col gap-3 mt-3 text-xs">
+                  <li className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full border border-current/20 flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <span>Choose a template or start blank</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full border border-current/20 flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <span>Customize your design</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full border border-current/20 flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <span>Export and share</span>
+                  </li>
+                </ol>
+              </div>
+
+              <div className="pt-4 border-t border-current/10 mt-6">
+                <a
+                  href="/templates"
+                  className="text-xs font-bold text-[#e2d9c8] hover:underline inline-flex items-center gap-1"
+                >
+                  <span>Browse Templates</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Card Canvas or Three.js 3D View */}
-          <div
-            className={`relative w-full min-h-[360px] md:min-h-[440px] flex items-center justify-center p-4 sm:p-6 md:p-10 rounded-xl overflow-hidden border ${
-              isLight ? 'bg-slate-100 border-[#e2e8f0]' : 'bg-[#12151a] border-[#262c36]'
-            }`}
-          >
-            {is3DMode ? (
-              <div ref={threeMountRef} className="w-full h-[400px] flex items-center justify-center" />
-            ) : (
-              /* Pure Card Render Node (Zero Aspect Ratio Badge, Zero Bleed) */
+          {/* MOBILE LAYOUT (Canvas First, then Collapsible Accordions) */}
+          <div className="lg:hidden flex flex-col gap-4">
+            {/* 1. Mobile Canvas / Preview Area (PLACED FIRST AT FULL WIDTH!) */}
+            <div
+              className={`p-4 rounded-2xl border flex flex-col gap-3 shadow-md ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2 pb-2 border-b border-current/10">
+                <div>
+                  <h2 className="text-sm font-bold font-heading">
+                    Canvas / Preview Area
+                  </h2>
+                  <span className={`text-[10px] ${isLight ? 'text-[#64748b]' : 'text-[#8e95a5]'}`}>
+                    Your design will appear here
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1 bg-black/10 dark:bg-black/30 p-1 rounded-lg">
+                  <button
+                    onClick={() => setHeroMode('quote')}
+                    className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                      heroMode === 'quote'
+                        ? isLight
+                          ? 'bg-white text-[#111417] font-bold shadow-xs'
+                          : 'bg-[#E2D9C8] text-[#111417] font-bold shadow-xs'
+                        : 'opacity-70'
+                    }`}
+                  >
+                    Quote
+                  </button>
+                  <button
+                    onClick={() => setHeroMode('id')}
+                    className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                      heroMode === 'id'
+                        ? isLight
+                          ? 'bg-white text-[#111417] font-bold shadow-xs'
+                          : 'bg-[#E2D9C8] text-[#111417] font-bold shadow-xs'
+                        : 'opacity-70'
+                    }`}
+                  >
+                    ID Pass
+                  </button>
+                </div>
+              </div>
+
+              {/* Render Canvas */}
               <div
-                ref={heroCardRef}
-                style={{
-                  backgroundColor: currentHeroPalette.bg,
-                  color: currentHeroPalette.ink,
-                }}
-                className="relative w-full max-w-lg min-h-[300px] p-6 sm:p-8 md:p-10 rounded-2xl transition-colors duration-200 shadow-2xl flex flex-col justify-between border border-black/10 overflow-hidden"
+                className={`relative w-full min-h-[260px] flex items-center justify-center p-3 rounded-xl overflow-hidden border ${
+                  isLight ? 'bg-slate-100 border-[#e2e8f0]' : 'bg-[#0f1116] border-[#222731]'
+                }`}
               >
-                <div className="absolute inset-0 card-noise opacity-30 pointer-events-none" />
+                <div
+                  ref={heroCardRef}
+                  style={{
+                    backgroundColor: currentHeroPalette.bg,
+                    color: currentHeroPalette.ink,
+                  }}
+                  className="relative w-full max-w-xs min-h-[230px] p-4 rounded-xl shadow-lg flex flex-col justify-between border border-black/10 overflow-hidden"
+                >
+                  <div className="absolute inset-0 card-noise opacity-25 pointer-events-none" />
 
-                {heroMode === 'quote' ? (
-                  <>
-                    <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-current/15 text-[10px] sm:text-[11px] font-mono tracking-wider opacity-75 relative z-10">
-                      <input
-                        type="text"
-                        value={heroTag}
-                        onChange={(e) => setHeroTag(e.target.value)}
-                        className="bg-transparent border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none max-w-[200px] font-mono"
-                        title="Click to edit folio tag"
-                      />
-                      <span className="px-1.5 py-0.5 rounded border border-current/25 shrink-0 font-mono text-[9px] font-bold">
-                        {currentHeroPalette.badge}
-                      </span>
-                    </div>
-
-                    <div className="my-5 sm:my-7 relative z-10">
-                      <textarea
-                        value={heroQuote}
-                        onChange={(e) => setHeroQuote(e.target.value)}
-                        rows={3}
-                        className="w-full bg-transparent resize-none border-b border-dashed border-transparent hover:border-current/25 focus:border-current/50 outline-none font-editorial text-xl sm:text-2xl md:text-3xl leading-relaxed tracking-tight text-inherit"
-                        title="Click and type your words directly"
-                      />
-                    </div>
-
-                    <div className="pt-4 border-t border-current/15 flex items-center justify-between relative z-10">
-                      <div className="flex items-center gap-1.5">
-                        <span className="opacity-60 text-xs">—</span>
-                        <input
-                          type="text"
-                          value={heroAuthor}
-                          onChange={(e) => setHeroAuthor(e.target.value)}
-                          className="bg-transparent border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-xs font-semibold opacity-85 text-inherit max-w-[240px]"
-                          title="Click to edit author attribution"
-                        />
-                      </div>
-                      {/* Bug Fix B: Ratio label strictly removed from exported card */}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="relative z-10 flex flex-col items-center">
-                      <div className="w-10 h-2.5 rounded-full bg-black/30 border border-current/40 mb-3" />
-                      <div className="w-full flex items-center justify-between pb-2.5 border-b border-current/15 text-[10px] font-mono tracking-wider opacity-85">
-                        <span className="font-bold tracking-widest uppercase">★ OFFICIAL CREATIVE PASS ★</span>
-                        <span className="px-1.5 py-0.5 rounded bg-black/10 border border-current/30 font-bold">
+                  {heroMode === 'quote' ? (
+                    <>
+                      <div className="flex items-center justify-between pb-1.5 border-b border-current/15 text-[9px] font-mono opacity-75 relative z-10">
+                        <span>{heroTag}</span>
+                        <span className="px-1 rounded border border-current/25 font-bold">
                           {currentHeroPalette.badge}
                         </span>
                       </div>
-                    </div>
-
-                    <div className="my-4 flex items-center gap-4 relative z-10">
-                      <div className="w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden border border-current/30 shadow-md shrink-0 relative bg-black/10">
+                      <div className="my-2 relative z-10">
+                        <p className="font-editorial text-base leading-snug">
+                          {heroQuote}
+                        </p>
+                      </div>
+                      <div className="pt-1.5 border-t border-current/15 flex items-center justify-between text-[10px] relative z-10">
+                        <span className="opacity-80 font-semibold">— {heroAuthor}</span>
+                        <span className="opacity-50 text-[9px] font-mono">{currentHeroPalette.name}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between pb-1 border-b border-current/15 text-[8px] font-mono opacity-80 relative z-10">
+                        <span className="font-bold uppercase">CREATIVE PASS</span>
+                        <span className="px-1 rounded bg-black/10 font-bold">{currentHeroPalette.badge}</span>
+                      </div>
+                      <div className="my-2 flex items-center gap-2.5 relative z-10 font-mono text-[10px]">
                         <img
                           src={ASSET_AVATARS.grungeDan}
-                          alt="Profile Portrait"
-                          className="w-full h-full object-cover grayscale contrast-125"
+                          alt="Avatar"
+                          className="w-14 h-16 rounded object-cover grayscale shrink-0 border border-current/30"
                         />
-                      </div>
-
-                      <div className="flex-1 flex flex-col gap-2 font-mono text-xs">
-                        <div>
-                          <span className="text-[9px] uppercase tracking-wider opacity-60 block">HOLDER NAME</span>
-                          <input
-                            type="text"
-                            value={heroIdName}
-                            onChange={(e) => setHeroIdName(e.target.value)}
-                            className="w-full bg-transparent font-bold text-sm border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-inherit"
-                          />
-                        </div>
-                        <div>
-                          <span className="text-[9px] uppercase tracking-wider opacity-60 block">ROLE / SPECIALTY</span>
-                          <input
-                            type="text"
-                            value={heroIdRole}
-                            onChange={(e) => setHeroIdRole(e.target.value)}
-                            className="w-full bg-transparent text-xs border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none opacity-85 text-inherit"
-                          />
-                        </div>
-                        <div>
-                          <span className="text-[9px] uppercase tracking-wider opacity-60 block">CLEARANCE STATUS</span>
-                          <input
-                            type="text"
-                            value={heroIdClearance}
-                            onChange={(e) => setHeroIdClearance(e.target.value)}
-                            className="w-full bg-transparent font-semibold text-[11px] border-b border-transparent hover:border-current/30 focus:border-current/60 outline-none text-inherit"
-                          />
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-bold text-xs">{heroIdName}</span>
+                          <span className="opacity-80">{heroIdRole}</span>
+                          <span className="text-[9px] opacity-70">{heroIdClearance}</span>
                         </div>
                       </div>
-                    </div>
-
-                    <div className="pt-3 border-t border-current/15 flex items-center justify-between text-[10px] font-mono opacity-80 relative z-10">
-                      <div className="flex items-center gap-1.5">
-                        <span className="tracking-tight text-[11px] font-bold">||||| | |||| ||| |||||||</span>
-                        <span>NO. TTC6253021</span>
+                      <div className="pt-1 border-t border-current/15 flex items-center justify-between text-[8px] font-mono opacity-80 relative z-10">
+                        <span>||||| |||| ||</span>
+                        <span className="font-bold">VERIFIED</span>
                       </div>
-                      <span className="text-[9px] uppercase font-bold tracking-wider">VERIFIED ACCESS</span>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
+                </div>
               </div>
-            )}
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between gap-2 pt-1">
+                <div className="flex items-center gap-1">
+                  {heroPalettes.map((pal, idx) => (
+                    <button
+                      key={pal.id}
+                      onClick={() => setHeroPaletteIndex(idx)}
+                      className={`w-4 h-4 rounded-md border border-black/20 ${heroPaletteIndex === idx ? 'ring-2 ring-[#e2d9c8]' : 'opacity-70'}`}
+                      style={{ backgroundColor: pal.bg }}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href="/create"
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#e2d9c8] text-[#111417] inline-flex items-center gap-1 shadow-xs"
+                  >
+                    <PenTool className="w-3 h-3" />
+                    <span>Open Editor</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Mobile Collapsible: About Canvas */}
+            <div
+              className={`rounded-xl border overflow-hidden transition-all ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <button
+                onClick={() => setAboutCanvasOpen((prev) => !prev)}
+                className="w-full p-4 text-left font-bold text-sm flex items-center justify-between cursor-pointer"
+                aria-expanded={aboutCanvasOpen}
+              >
+                <span className="font-heading">About Canvas</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${aboutCanvasOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {aboutCanvasOpen && (
+                <div className={`px-4 pb-4 text-xs leading-relaxed border-t pt-3 ${
+                  isLight ? 'text-[#475569] border-[#e2e8f0]' : 'text-[#8e95a5] border-[#222731]'
+                }`}>
+                  <p className="mb-3">
+                    A simple and powerful canvas to create aesthetic cards, posters, social media graphics and more.
+                  </p>
+                  <ul className="flex flex-col gap-2">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-[#0ecb81]" />
+                      <span>Works offline</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-[#0ecb81]" />
+                      <span>Easy to use</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-[#0ecb81]" />
+                      <span>Multiple templates</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-[#0ecb81]" />
+                      <span>Export in high quality</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Mobile Collapsible: How and why to use */}
+            <div
+              className={`rounded-xl border overflow-hidden transition-all ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <button
+                onClick={() => setHowToUseOpen((prev) => !prev)}
+                className="w-full p-4 text-left font-bold text-sm flex items-center justify-between cursor-pointer"
+                aria-expanded={howToUseOpen}
+              >
+                <span className="font-heading">How and why to use</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${howToUseOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {howToUseOpen && (
+                <div className={`px-4 pb-4 text-xs leading-relaxed border-t pt-3 ${
+                  isLight ? 'text-[#475569] border-[#e2e8f0]' : 'text-[#8e95a5] border-[#222731]'
+                }`}>
+                  <p className="mb-3">
+                    Use templates or start from scratch. Customize text, images, colors and more. Perfect for social media, personal use or creative projects.
+                  </p>
+                  <ol className="flex flex-col gap-2">
+                    <li className="flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full border border-current/30 flex items-center justify-center font-mono text-[9px] font-bold">1</span>
+                      <span>Choose a template or start blank</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full border border-current/30 flex items-center justify-center font-mono text-[9px] font-bold">2</span>
+                      <span>Customize your design</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full border border-current/30 flex items-center justify-center font-mono text-[9px] font-bold">3</span>
+                      <span>Export and share</span>
+                    </li>
+                  </ol>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 2: TEMPLATE DIRECTORY & LIVE SEARCH */}
-      <section
-        id="templates-section"
-        className={`w-full px-4 md:px-8 py-16 border-t ${
-          isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'
-        }`}
-      >
-        <div className="max-w-[1240px] mx-auto flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* 3. TEMPLATES SECTION (Wireframe: Header + View All + 8 Categories)  */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      <section className={`w-full px-4 md:px-8 py-10 border-t ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
+        <div className="max-w-7xl mx-auto flex flex-col gap-6">
+          {/* Wireframe Header Row: "Templates" on left, "View All →" on right */}
+          <div className="flex items-center justify-between">
             <div>
-              <span className="text-xs uppercase font-bold tracking-wider text-[#d97706] dark:text-[#fcd535]">
-                Curated Styles
-              </span>
-              {/* Part 1.2 exact replacement header */}
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mt-1 font-heading">
-                Featured Templates
+              <h2 className="text-xl md:text-2xl font-bold font-heading">
+                Templates
               </h2>
             </div>
-            <p className={`text-xs max-w-md ${isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}`}>
-              Showing {displayedTemplates.length} of {PRESET_TEMPLATES.length} templates. Select styles to compare side-by-side or customize in the studio.
-            </p>
+            <a
+              href="/templates"
+              className={`text-xs font-bold inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border transition-all ${
+                isLight
+                  ? 'bg-slate-50 border-[#cbd5e1] text-[#111417] hover:bg-slate-100'
+                  : 'bg-[#181d24] border-[#2e3543] text-[#e2d9c8] hover:bg-[#202732]'
+              }`}
+            >
+              <span>View All</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </a>
           </div>
 
-          {/* Search Bar & Result Stats */}
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-            <div className="relative flex-1 max-w-md">
-              <SquareDuotoneIcon name="search" size="sm" className="absolute left-2.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search templates by quote, author, title, or vibe..."
-                className={`w-full pl-11 pr-8 py-2 rounded-xl text-xs border transition-all focus:outline-none ${
-                  isLight
-                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] placeholder-[#94a3b8] focus:border-[#d97706]'
-                    : 'bg-[#181d24] border-[#262c36] text-white placeholder-[#707a8a] focus:border-[#fcd535]'
-                }`}
-              />
-            </div>
+          {/* Wireframe 8-Category Grid: Blank, Quote, Minimal, Aesthetic, Nature, Dark, Collage, Poster */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+            {wireframeCategoryCards.map((item) => {
+              if (item.isBlank) {
+                return (
+                  <a
+                    key={item.id}
+                    href={item.link}
+                    className={`group rounded-xl border border-dashed p-3 sm:p-4 flex flex-col items-center justify-center text-center transition-all duration-200 hover:-translate-y-0.5 cursor-pointer min-h-[140px] sm:min-h-[160px] ${
+                      isLight
+                        ? 'border-[#94a3b8] hover:border-[#111417] bg-white hover:bg-slate-50'
+                        : 'border-[#384152] hover:border-[#e2d9c8] bg-[#14171d] hover:bg-[#181d24]'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                      <Plus className="w-4 h-4 text-[#e2d9c8]" />
+                    </div>
+                    <span className="text-xs font-bold font-heading block">{item.label}</span>
+                    <span className="text-[10px] text-[#94a3b8] font-mono mt-0.5 uppercase tracking-wider">{item.tag}</span>
+                  </a>
+                );
+              }
 
-            <div className="flex items-center gap-2 text-xs">
-              <span className={isLight ? 'text-[#64748b]' : 'text-[#707a8a]'}>
-                Showing <strong className={isLight ? 'text-[#0f172a]' : 'text-white'}>{displayedTemplates.length}</strong> of{' '}
-                {PRESET_TEMPLATES.length} templates
-              </span>
-            </div>
-          </div>
-
-          {/* Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  setActiveCategory(cat.id);
-                  setVisibleCount(4);
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                  activeCategory === cat.id
-                    ? isLight
-                      ? 'bg-[#0f172a] text-white shadow-sm'
-                      : 'bg-[#222730] text-white shadow-sm border border-[#444748]'
-                    : isLight
-                    ? 'bg-white text-[#64748b] hover:text-[#0f172a] border border-[#e2e8f0]'
-                    : 'bg-[#181d24] text-[#9ca3af] hover:text-white border border-[#262c36]'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          {/* TEMPLATE SHOWCASE GRID: STRICT 2-PER-ROW LAYOUT (Part 4.2) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1240px] w-full">
-            {displayedTemplates.map((template) => {
-              const isSelected = selectedForCompare.some((t) => t.id === template.id);
+              const tmpl = item.template;
+              if (!tmpl) return null;
 
               return (
-                <div
-                  key={template.id}
-                  className={`template-card-kinetic group flex flex-col border rounded-3xl overflow-hidden transition-all duration-200 hover:-translate-y-1 shadow-xl ${
-                    isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+                <a
+                  key={item.id}
+                  href={`/create?template=${tmpl.id}`}
+                  onClick={(e) => {
+                    if (onOpenEditorWithTemplate) {
+                      e.preventDefault();
+                      onOpenEditorWithTemplate(tmpl);
+                    }
+                  }}
+                  className={`group rounded-xl border p-2 sm:p-2.5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 shadow-xs cursor-pointer min-h-[140px] sm:min-h-[160px] ${
+                    isLight
+                      ? 'bg-white border-[#e2e8f0] hover:border-[#94a3b8]'
+                      : 'bg-[#14171d] border-[#262c36] hover:border-[#e2d9c8]/50'
                   }`}
                 >
-                  {/* Real Card Visual Artwork Preview (Unified with Archival Blueprint Lazy-Loading) */}
-                  <LazyTemplateCard aspectRatioClass="aspect-auto">
-                    <UnifiedCardThumbnail
-                      template={template}
-                      isLight={isLight}
-                    />
-                  </LazyTemplateCard>
-
-                  {/* Actions Bar */}
-                  <div className={`p-4 flex items-center justify-between gap-3 ${isLight ? 'bg-slate-50' : 'bg-[#181d24]'}`}>
-                    <span className="text-xs text-[#707a8a] font-medium">
-                      {template.categoryLabel}
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => toggleCompareTemplate(template)}
-                        className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535]'
-                            : isLight
-                            ? 'border-slate-300 hover:bg-slate-100 text-[#475569]'
-                            : 'border-[#323946] hover:bg-[#20252e] text-[#c4c7c8]'
-                        }`}
-                      >
-                        {isSelected ? 'Remove' : 'Compare'}
-                      </button>
-
-                      <a
-                        href={`/create?template=${template.id}`}
-                        onClick={(e) => {
-                          if (onOpenEditorWithTemplate) {
-                            e.preventDefault();
-                            onOpenEditorWithTemplate(template);
-                          }
-                        }}
-                        className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer shadow-md ${
-                          isLight
-                            ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                            : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
-                        }`}
-                      >
-                        <span>Open in Studio →</span>
-                      </a>
-                    </div>
+                  <div className="w-full aspect-square rounded-lg overflow-hidden border border-black/10 relative bg-black/10 mb-2">
+                    <UnifiedCardThumbnail template={tmpl} isLight={isLight} />
                   </div>
-                </div>
+                  <div className="text-center pb-1">
+                    <span className="text-xs font-bold font-heading truncate block group-hover:text-[#e2d9c8] transition-colors">
+                      {item.label}
+                    </span>
+                    <span className="text-[9px] text-[#94a3b8] font-mono uppercase tracking-wider block truncate">
+                      {tmpl.title}
+                    </span>
+                  </div>
+                </a>
               );
             })}
           </div>
+        </div>
+      </section>
 
-          {/* Part 4.3 Footer Status Bar & View More Actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 border-t border-current/10">
-            <span className="text-xs font-semibold text-[#707a8a] font-subheading">
-              Showing {displayedTemplates.length} of {PRESET_TEMPLATES.length} Templates
-            </span>
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* 4. FEATURES SECTION (Wireframe: 4 Cards on Desktop / Mobile Box)    */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      <section className={`w-full px-4 md:px-8 py-10 border-t ${isLight ? 'border-[#e2e8f0]' : 'border-[#1f242c]'}`}>
+        <div className="max-w-7xl mx-auto flex flex-col gap-5">
+          {/* Mobile Accordion Toggle for Features */}
+          <div className="flex md:hidden items-center justify-between">
+            <button
+              onClick={() => setFeaturesOpen((prev) => !prev)}
+              className="w-full flex items-center justify-between text-base font-bold font-heading cursor-pointer py-1"
+            >
+              <span>Features</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${featuresOpen ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
 
-            <div className="flex items-center gap-3">
-              {displayedTemplates.length < filteredTemplates.length && (
-                <button
-                  onClick={() => setVisibleCount((prev) => prev + 4)}
-                  className={`px-5 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                    isLight
-                      ? 'bg-white border-[#cbd5e1] hover:bg-slate-50 text-[#0f172a]'
-                      : 'bg-[#181d24] border-[#262c36] hover:bg-[#222730] text-white'
-                  }`}
-                >
-                  Load 4 More
-                </button>
-              )}
+          <div className="hidden md:block">
+            <h2 className="text-xl md:text-2xl font-bold font-heading">
+              Features
+            </h2>
+          </div>
 
-              <a
-                href="/templates"
-                className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
-                  isLight
-                    ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                    : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
-                }`}
-              >
-                <span>Browse All {PRESET_TEMPLATES.length} Templates →</span>
-              </a>
+          {/* 4 Feature Cards (Visible on Desktop, Collapsible or 2x2 on Mobile) */}
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${featuresOpen ? 'block' : 'hidden md:grid'}`}>
+            {/* Feature 1: 100% Offline */}
+            <div
+              className={`p-5 rounded-2xl border flex items-start gap-3.5 transition-all ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <div className="w-9 h-9 rounded-xl bg-[#0ecb81]/15 text-[#0ecb81] flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold font-heading">
+                  100% Offline
+                </h3>
+                <p className={`text-xs mt-1 leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#8e95a5]'}`}>
+                  Works directly in your browser. Zero cloud tracking.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2: Multiple Templates */}
+            <div
+              className={`p-5 rounded-2xl border flex items-start gap-3.5 transition-all ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <div className="w-9 h-9 rounded-xl bg-[#38bdf8]/15 text-[#38bdf8] flex items-center justify-center shrink-0">
+                <LayoutTemplate className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold font-heading">
+                  Multiple Templates
+                </h3>
+                <p className={`text-xs mt-1 leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#8e95a5]'}`}>
+                  Wide range of designs for quotes, passes &amp; posters.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 3: Easy Customization */}
+            <div
+              className={`p-5 rounded-2xl border flex items-start gap-3.5 transition-all ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <div className="w-9 h-9 rounded-xl bg-[#e2d9c8]/15 text-[#e2d9c8] flex items-center justify-center shrink-0">
+                <Sliders className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold font-heading">
+                  Easy Customization
+                </h3>
+                <p className={`text-xs mt-1 leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#8e95a5]'}`}>
+                  Text, images, colors and 50+ procedural finishes.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 4: High Quality Export */}
+            <div
+              className={`p-5 rounded-2xl border flex items-start gap-3.5 transition-all ${
+                isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+              }`}
+            >
+              <div className="w-9 h-9 rounded-xl bg-[#ec4899]/15 text-[#ec4899] flex items-center justify-center shrink-0">
+                <Download className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold font-heading">
+                  High Quality Export
+                </h3>
+                <p className={`text-xs mt-1 leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#8e95a5]'}`}>
+                  Download in Retina, 4K Ultra-HD &amp; 16K extreme PNG.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* SECTION 3: FAQ */}
-      <section className="w-full px-4 md:px-8 py-16 border-t border-current/10">
-        <div className="max-w-3xl mx-auto flex flex-col gap-6">
-          <div className="text-center">
-            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight font-heading">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-xs text-[#707a8a] mt-1">
-              Everything you need to know about the local-first card engine.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3 mt-4">
-            {faqs.map((faq, idx) => (
-              <div
-                key={faq.q}
-                className={`border rounded-2xl overflow-hidden transition-all ${
-                  isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
-                }`}
-              >
-                <button
-                  onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-                  className="w-full p-4 text-left font-bold text-sm flex items-center justify-between cursor-pointer"
-                >
-                  <span>{faq.q}</span>
-                  <span className="text-xs opacity-60">{openFaqIndex === idx ? '−' : '+'}</span>
-                </button>
-                {openFaqIndex === idx && (
-                  <div className={`px-4 pb-4 text-xs leading-relaxed ${isLight ? 'text-[#475569]' : 'text-[#9ca3af]'}`}>
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Floating Comparison Dock (Part 4.4) */}
-      <TemplateComparisonDock
-        selectedTemplates={selectedForCompare}
-        onRemoveTemplate={(id) => setSelectedForCompare((prev) => prev.filter((t) => t.id !== id))}
-        onClear={() => setSelectedForCompare([])}
-        onOpenModal={() => setComparisonModalOpen(true)}
-        theme={theme}
-      />
-
-      {/* Side-by-Side Comparison Modal (Part 4.4) */}
-      <TemplateComparisonModal
-        isOpen={comparisonModalOpen}
-        onClose={() => setComparisonModalOpen(false)}
-        templates={selectedForCompare}
-        onOpenTemplate={(tmpl) => {
-          if (onOpenEditorWithTemplate) {
-            onOpenEditorWithTemplate(tmpl);
-          } else {
-            window.location.href = `/create?template=${tmpl.id}`;
-          }
-        }}
-        theme={theme}
-      />
     </div>
   );
 };

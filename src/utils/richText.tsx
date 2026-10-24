@@ -8,7 +8,7 @@ import React from 'react';
  */
 export function parseRichText(
   text: string,
-  accentColor: string = '#fcd535'
+  accentColor: string = '#E2D9C8'
 ): React.ReactNode[] {
   if (!text) return [];
 
@@ -16,7 +16,7 @@ export function parseRichText(
   const regex = /(\*\*[\s\S]*?\*\*|\*[^*\s][\s\S]*?\*|==[\s\S]*?==)/g;
   const parts = text.split(regex);
 
-  // If accentColor is dark (e.g. #000 or #181a20 or #2c2825), fall back to luminous warm amber #fcd535
+  // If accentColor is dark (e.g. #000 or #181a20 or #2c2825), fall back to warm bone #E2D9C8
   const isDarkColor = (hex: string) => {
     if (!hex || !hex.startsWith('#') || hex.length < 7) return false;
     const r = parseInt(hex.slice(1, 3), 16);
@@ -27,10 +27,10 @@ export function parseRichText(
   };
 
   const highlightBg = isDarkColor(accentColor)
-    ? 'rgba(252, 213, 53, 0.35)'
+    ? 'rgba(226, 217, 200, 0.45)'
     : accentColor.startsWith('#') && accentColor.length === 7
     ? `${accentColor}40`
-    : accentColor || 'rgba(252, 213, 53, 0.35)';
+    : accentColor || 'rgba(226, 217, 200, 0.45)';
 
   return parts.map((part, index) => {
     if (!part) return null;

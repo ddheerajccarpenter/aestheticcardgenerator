@@ -34,6 +34,8 @@ export const PALETTE_PRESETS: CardTheme[] = [
   { id: 'kawaii-lace', name: 'Kawaii Baby Pink', bg: '#ffdfeb', ink: '#4a1525', category: 'badge' },
   { id: 'campus-camel', name: 'Campus Camel Oat', bg: '#d4c0ad', ink: '#191716', category: 'badge' },
   { id: 'vip-lanyard', name: 'VIP Obsidian Cyan', bg: '#101216', ink: '#22d3ee', category: 'badge' },
+  { id: 'slate-editorial', name: 'Swiss Slate & Champagne', bg: '#0e1014', ink: '#f1f0ec', border: '#2d323c', category: 'editorial' },
+  { id: 'high-tech-bone', name: 'High-Tech Editorial Bone', bg: '#15181e', ink: '#e2d9c8', border: '#383e4c', category: 'editorial' },
 ];
 
 const ORIGINAL_TEMPLATES: CardTemplate[] = [

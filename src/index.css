@@ -7,41 +7,65 @@
     --font-subheading: 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-body: 'SamsungOne', 'One UI Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
-    /* Universal 60:30:10 Gradient Tokens - Dark Mode Default */
-    --c60-dominant: #111216;   /* 60% Top Dominant: Deep Matte Obsidian */
-    --c30-secondary: #1b1e26;  /* 30% Middle Shade: Warm Slate Charcoal */
-    --c10-accent: #2c241d;     /* 10% Bottom Shade: Umber Espresso Tint */
-    --ui-accent-solid: #e5b84b;
+    /* Universal 60:30:10 Gradient Tokens - Dark Mode Default (Restrained Charcoal/Slate) */
+    --c60-dominant: #0c0e12;   /* 60% Dominant: Deep Matte Obsidian Charcoal */
+    --c30-secondary: #14171d;  /* 30% Middle Shade: Dark Graphite Slate */
+    --c10-accent: #1e222b;     /* 10% Low-contrast Depth Tone */
+    --ui-accent-solid: #e2d9c8; /* Restrained Warm Bone / Champagne */
     --text-primary: #f4f1ea;
-    --text-secondary: #cbd5e1;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
 
-    /* Dark Mode Duotone Icon Tokens */
-    --icon-frame-bg: rgba(255, 255, 255, 0.05);
-    --icon-frame-border: rgba(255, 255, 255, 0.14);
-    --icon-duotone-primary: #f5c451;
-    --icon-duotone-secondary: rgba(245, 196, 81, 0.3);
+    /* Dark Mode Duotone Icon Tokens (Editorial Bone & Neutral) */
+    --icon-frame-bg: rgba(255, 255, 255, 0.04);
+    --icon-frame-border: rgba(255, 255, 255, 0.10);
+    --icon-duotone-primary: #e2d9c8;
+    --icon-duotone-secondary: rgba(226, 217, 200, 0.35);
 
-    /* Airtable + Binance Design System Tokens */
-    --color-canvas: #0b0e11;
+    /* ========================================================================= */
+    /* FIXED APPLICATION UI TOKENS (Separated from dynamic canvas document state) */
+    /* ========================================================================= */
+    --app-bg: #101114;                    /* Main application background */
+    --app-surface: #181A1E;               /* Elevated application surface */
+    --app-surface-secondary: #202228;     /* Secondary interactive surface */
+    --app-text-primary: #F1F0EC;          /* Primary application text */
+    --app-text-secondary: #AAA9A4;        /* Secondary application text */
+    --app-text-muted: #787980;            /* Muted captions & shortcuts */
+    --app-border-subtle: #34353A;         /* Structural separation border */
+    --app-border-strong: #44454c;         /* Focused container border */
+    --app-accent: #E2D9C8;                /* Warm bone / champagne accent */
+    --app-accent-hover: #ece5d8;          /* Micro-brightened accent hover */
+    --app-accent-ink: #171717;            /* Dark high-contrast ink on bone */
+
+    /* Editorial Semantic Tokens mapped to Application UI */
+    --color-canvas: var(--app-bg);
     --color-canvas-light: #f8fafc;
-    --color-surface-card: #181d24;
-    --color-surface-soft: #14171d;
-    --color-surface-elevated: #222730;
-    --color-hairline: #262c36;
+    --color-surface-soft: var(--app-surface);
+    --color-surface-card: var(--app-surface);
+    --color-surface-elevated: var(--app-surface-secondary);
+    --color-hairline: var(--app-border-subtle);
     --color-hairline-light: #e2e8f0;
-    --color-border-subtle: #1f242c;
-    --color-border-focus: #3b82f6;
+    --color-border-subtle: var(--app-border-subtle);
+    --color-border-strong: var(--app-border-strong);
+    --color-border-focus: var(--app-accent);
 
-    --color-primary: #ffffff;
-    --color-primary-binance: #fcd535;
-    --color-primary-airtable: #181d26;
-    --color-accent: #fcd535;
-    --color-secondary: #f5cf2e;
+    --color-primary: var(--app-accent);
+    --color-primary-active: #d8cfbd;
+    --color-on-primary: var(--app-accent-ink);
+    --color-accent: var(--app-accent);
+    --color-accent-hover: var(--app-accent-hover);
+    --color-accent-active: #d8cfbd;
+    --color-accent-ink: var(--app-accent-ink);
+    --color-accent-soft: rgba(226, 217, 200, 0.12);
+    --color-accent-border: rgba(226, 217, 200, 0.22);
+    --color-secondary: var(--app-accent);
+    --color-primary-binance: var(--app-accent);
+    --color-primary-airtable: #181A1E;
     
-    --color-ink: #ffffff;
-    --color-ink-dark: #181a20;
-    --color-body: #cbd5e1;
-    --color-muted: #94a3b8;
+    --color-ink: var(--app-text-primary);
+    --color-ink-dark: #181A1E;
+    --color-body: var(--app-text-secondary);
+    --color-muted: var(--app-text-muted);
     
     --color-trading-up: #0ecb81;
     --color-trading-down: #f6465d;
@@ -65,28 +89,55 @@
   html.light,
   [data-theme="light"],
   :root[data-theme="light"] {
-    --c60-dominant: #f6f8fa;   /* 60% Top Dominant: Clean daylight white */
-    --c30-secondary: #edf2f7;  /* 30% Middle Shade: Cool slate pearl */
-    --c10-accent: #e2e8f0;     /* 10% Bottom Shade: Muted border accent */
-    --ui-accent-solid: #d97706;
-    --text-primary: #0f172a;
+    --c60-dominant: #f8f9fa;   /* 60% Top Dominant: Clean daylight white */
+    --c30-secondary: #f1f3f5;  /* 30% Middle Shade: Cool slate pearl */
+    --c10-accent: #e9ecef;     /* 10% Bottom Shade: Muted border accent */
+    --ui-accent-solid: #111417;
+    --text-primary: #111417;
     --text-secondary: #475569;
+    --text-muted: #64748b;
 
     --icon-frame-bg: rgba(15, 23, 42, 0.04);
     --icon-frame-border: rgba(15, 23, 42, 0.12);
-    --icon-duotone-primary: #0f172a;
-    --icon-duotone-secondary: rgba(217, 119, 6, 0.4);
+    --icon-duotone-primary: #111417;
+    --icon-duotone-secondary: rgba(17, 20, 23, 0.35);
 
-    --color-canvas: #f8fafc;
-    --color-surface-card: #ffffff;
-    --color-surface-soft: #f1f5f9;
-    --color-surface-elevated: #e2e8f0;
-    --color-hairline: #e2e8f0;
+    /* Fixed Application UI Tokens - Light Mode */
+    --app-bg: #f8fafc;
+    --app-surface: #ffffff;
+    --app-surface-secondary: #f1f5f9;
+    --app-text-primary: #101114;
+    --app-text-secondary: #475569;
+    --app-text-muted: #64748b;
+    --app-border-subtle: #e2e8f0;
+    --app-border-strong: #cbd5e1;
+    --app-accent: #171717;
+    --app-accent-hover: #262626;
+    --app-accent-ink: #ffffff;
+
+    --color-canvas: var(--app-bg);
+    --color-surface-soft: var(--app-surface);
+    --color-surface-card: var(--app-surface);
+    --color-surface-elevated: var(--app-surface-secondary);
+    --color-hairline: var(--app-border-subtle);
     --color-hairline-light: #cbd5e1;
-    --color-border-subtle: #e2e8f0;
-    --color-ink: #0f172a;
-    --color-body: #475569;
-    --color-muted: #64748b;
+    --color-border-subtle: var(--app-border-subtle);
+    --color-border-strong: var(--app-border-strong);
+    --color-border-focus: var(--app-accent);
+
+    --color-primary: var(--app-accent);
+    --color-primary-active: #050608;
+    --color-on-primary: var(--app-accent-ink);
+    --color-accent: var(--app-accent);
+    --color-accent-hover: var(--app-accent-hover);
+    --color-accent-active: #050608;
+    --color-accent-ink: var(--app-accent-ink);
+    --color-accent-soft: rgba(17, 20, 23, 0.06);
+    --color-accent-border: rgba(17, 20, 23, 0.15);
+
+    --color-ink: var(--app-text-primary);
+    --color-body: var(--app-text-secondary);
+    --color-muted: var(--app-text-muted);
   }
 
   html {
@@ -107,12 +158,21 @@
     color: var(--color-ink);
   }
 
-  /* Base Body Rule: SamsungOne in Bold Style (font-weight: 700) */
+  /* Base Body Rule: Elegant, high-readability editorial typography */
   body, p, span, li, input, textarea, select, button, label {
     font-family: var(--font-body);
-    font-weight: 700;
+    font-weight: 500;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  p, .body-regular {
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  strong, b, .font-bold {
+    font-weight: 700 !important;
   }
 
   /* Main & Section Headings: Murecho (800) */
@@ -128,14 +188,14 @@
     font-family: var(--font-subheading) !important;
     font-weight: 600 !important;
     letter-spacing: -0.005em;
-    line-height: 1.3;
+    line-height: 1.35;
   }
 
   /* Numeric Readouts (Sliders, Coordinates, Dimensions) */
   .numeric-readout, input[type="number"] {
     font-family: var(--font-subheading);
     font-variant-numeric: tabular-nums;
-    font-weight: 700;
+    font-weight: 600;
   }
 }
 
@@ -187,40 +247,31 @@
 
 /* High-Contrast Variants for Square Duotone Icons */
 .sq-icon-dark,
-.bg-\[\#facc15\] .sq-duotone-icon,
-.bg-\[\#fcd535\] .sq-duotone-icon,
-.bg-\[\#ffe270\] .sq-duotone-icon,
-.bg-amber-400 .sq-duotone-icon,
-.bg-yellow-400 .sq-duotone-icon,
-.btn-primary .sq-duotone-icon {
-  --icon-frame-bg: rgba(0, 0, 0, 0.08) !important;
-  --icon-frame-border: rgba(0, 0, 0, 0.22) !important;
-  --icon-duotone-primary: #0b0e11 !important;
-  --icon-duotone-secondary: rgba(11, 14, 17, 0.35) !important;
-  color: #0b0e11 !important;
+.btn-primary .sq-duotone-icon,
+.btn-editorial-primary .sq-duotone-icon,
+.bg-bone .sq-duotone-icon {
+  --icon-frame-bg: rgba(0, 0, 0, 0.06) !important;
+  --icon-frame-border: rgba(0, 0, 0, 0.16) !important;
+  --icon-duotone-primary: #111417 !important;
+  --icon-duotone-secondary: rgba(17, 20, 23, 0.35) !important;
+  color: #111417 !important;
 }
 
 .sq-icon-dark .bx-duotone-primary,
-.bg-\[\#facc15\] .sq-duotone-icon .bx-duotone-primary,
-.bg-\[\#fcd535\] .sq-duotone-icon .bx-duotone-primary,
-.bg-\[\#ffe270\] .sq-duotone-icon .bx-duotone-primary,
-.bg-amber-400 .sq-duotone-icon .bx-duotone-primary,
-.bg-yellow-400 .sq-duotone-icon .bx-duotone-primary,
-.btn-primary .sq-duotone-icon .bx-duotone-primary {
-  fill: #0b0e11 !important;
-  stroke: #0b0e11 !important;
-  color: #0b0e11 !important;
+.btn-primary .sq-duotone-icon .bx-duotone-primary,
+.btn-editorial-primary .sq-duotone-icon .bx-duotone-primary,
+.bg-bone .sq-duotone-icon .bx-duotone-primary {
+  fill: #111417 !important;
+  stroke: #111417 !important;
+  color: #111417 !important;
 }
 
 .sq-icon-dark .bx-duotone-secondary,
-.bg-\[\#facc15\] .sq-duotone-icon .bx-duotone-secondary,
-.bg-\[\#fcd535\] .sq-duotone-icon .bx-duotone-secondary,
-.bg-\[\#ffe270\] .sq-duotone-icon .bx-duotone-secondary,
-.bg-amber-400 .sq-duotone-icon .bx-duotone-secondary,
-.bg-yellow-400 .sq-duotone-icon .bx-duotone-secondary,
-.btn-primary .sq-duotone-icon .bx-duotone-secondary {
-  fill: rgba(11, 14, 17, 0.35) !important;
-  color: rgba(11, 14, 17, 0.35) !important;
+.btn-primary .sq-duotone-icon .bx-duotone-secondary,
+.btn-editorial-primary .sq-duotone-icon .bx-duotone-secondary,
+.bg-bone .sq-duotone-icon .bx-duotone-secondary {
+  fill: rgba(17, 20, 23, 0.35) !important;
+  color: rgba(17, 20, 23, 0.35) !important;
 }
 
 .sq-icon-light {
@@ -264,13 +315,18 @@ html:not(.light) .border-\[\#1f242c\],
   border-color: #2b3340 !important;
 }
 
-/* YouTube-Style Ambient Stage (Workspace editor only, never export) */
+/* Editor Ambient Stage: Pinned to Application UI Background */
 .editor-ambient-stage {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background-color: var(--workspace-backdrop, #0c0e12);
-  transition: background-color 360ms ease;
+  background-color: var(--app-bg, #101114);
+  transition: background-color 200ms ease;
+}
+
+html.light .editor-ambient-stage,
+[data-theme="light"] .editor-ambient-stage {
+  background-color: var(--app-bg, #f8fafc);
 }
 
 .editor-ambient-stage::before {
@@ -377,19 +433,224 @@ html.light .universal-page-bg,
   opacity: 0.85;
 }
 
-/* Tactile UI Interaction Physics — Global Stylesheet */
+/* Tactile UI Interaction Physics — Purposeful Editorial Physics */
 button, .btn-interactive, .sq-duotone-icon, .palette-swatch {
-  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+  transition: transform 160ms cubic-bezier(0.2, 0, 0, 1), border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
 button:active, .btn-interactive:active, .sq-duotone-icon:active, .palette-swatch:active {
-  transform: scale(0.95) translateY(1.5px) !important;
-  transition: transform 55ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: scale(0.98) translateY(0.5px);
+  transition: transform 60ms ease-out;
 }
 
-/* Clean Editorial Template Card Container (Zero AI-slop mouse wobble) */
+/* Editorial Button Utilities */
+.btn-editorial-primary,
+.studio-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-family: var(--font-subheading);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+  cursor: pointer;
+}
+.btn-editorial-primary:hover,
+.studio-btn-primary:hover {
+  background-color: var(--color-accent-hover);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
+}
+.btn-editorial-primary:active,
+.studio-btn-primary:active {
+  background-color: var(--color-accent-active);
+  transform: scale(0.98);
+}
+
+.btn-editorial-ghost,
+.studio-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--app-surface-secondary);
+  color: var(--app-text-primary);
+  font-family: var(--font-subheading);
+  border: 1px solid var(--app-border-subtle);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.125rem;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+  cursor: pointer;
+}
+.btn-editorial-ghost:hover,
+.studio-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--app-border-strong);
+}
+html.light .btn-editorial-ghost:hover,
+html.light .studio-btn-secondary:hover {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.studio-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  background-color: transparent;
+  color: var(--app-text-secondary);
+  font-family: var(--font-subheading);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.875rem;
+  transition: background-color 140ms ease, color 140ms ease;
+  cursor: pointer;
+}
+.studio-btn-ghost:hover {
+  background-color: var(--app-surface-secondary);
+  color: var(--app-text-primary);
+}
+
+/* Studio Surface Panel */
+.studio-panel {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border-subtle);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.22);
+}
+
+/* Studio Form Controls */
+.studio-input {
+  background-color: var(--app-surface-secondary);
+  border: 1px solid var(--app-border-subtle);
+  color: var(--app-text-primary);
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  padding: 0.5625rem 0.875rem;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.studio-input:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 2px rgba(226, 217, 200, 0.2);
+}
+html.light .studio-input:focus {
+  box-shadow: 0 0 0 2px rgba(17, 20, 23, 0.15);
+}
+
+/* Studio Filter Pills */
+.studio-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-subheading);
+  transition: all 140ms ease;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid var(--app-border-subtle);
+  background-color: var(--app-surface-secondary);
+  color: var(--app-text-secondary);
+}
+.studio-pill:hover {
+  color: var(--app-text-primary);
+  border-color: var(--app-border-strong);
+}
+.studio-pill.active {
+  background-color: var(--app-accent);
+  color: var(--app-accent-ink);
+  border-color: var(--app-accent);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Studio Section / Page Breadcrumbs */
+.studio-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--app-text-muted);
+  font-family: var(--font-subheading);
+}
+.studio-breadcrumb a {
+  color: var(--app-text-muted);
+  transition: color 120ms ease;
+}
+.studio-breadcrumb a:hover {
+  color: var(--app-text-primary);
+}
+.studio-breadcrumb .active {
+  color: var(--app-text-primary);
+  font-weight: 600;
+}
+
+/* Studio Page Containers */
+.studio-container {
+  max-width: 80rem; /* 1280px / 7xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 640px) {
+  .studio-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .studio-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.studio-container-narrow {
+  max-width: 56rem; /* 896px / 4xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 640px) {
+  .studio-container-narrow {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Accessible visible focus indicator */
+:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Clean Editorial Template Card Container */
 .template-card-kinetic {
-  transition: transform 220ms ease, box-shadow 220ms ease;
+  transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
 .template-card-kinetic:hover {
@@ -470,7 +731,7 @@ button:active, .btn-interactive:active, .sq-duotone-icon:active, .palette-swatch
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   ARCHIVAL BLUEPRINT LAZY SHIMMER (Section 4.1 & 9.3)
+   ARCHIVAL BLUEPRINT LAZY SHIMMER
    ───────────────────────────────────────────────────────────────────────────── */
 @keyframes lazyShimmerSweep {
   0% { transform: translate3d(-100%, 0, 0); }
@@ -481,13 +742,42 @@ button:active, .btn-interactive:active, .sq-duotone-icon:active, .palette-swatch
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.04) 30%,
-    rgba(252, 213, 53, 0.09) 50%,
-    rgba(255, 255, 255, 0.04) 70%,
+    rgba(255, 255, 255, 0.03) 30%,
+    rgba(226, 217, 200, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 70%,
     transparent 100%
   );
   animation: lazyShimmerSweep 1.8s infinite ease-in-out;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   MAXIMALIST HIGH-TECH EDITORIAL STYLING TOKENS & UTILITIES
+   ───────────────────────────────────────────────────────────────────────────── */
+.bg-grid-slate-hairline {
+  background-size: 24px 24px;
+  background-image: 
+    linear-gradient(to right, rgba(226, 217, 200, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 217, 200, 0.04) 1px, transparent 1px);
+}
 
+.high-tech-card-glow {
+  box-shadow: 0 0 0 1px rgba(226, 217, 200, 0.12), 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}
 
+.high-tech-card-glow:hover {
+  box-shadow: 0 0 0 1px rgba(226, 217, 200, 0.35), 0 16px 40px -10px rgba(226, 217, 200, 0.1);
+}
+
+.font-mono-header {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-feature-settings: 'tnum', 'zero';
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

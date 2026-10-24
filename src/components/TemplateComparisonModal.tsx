@@ -66,8 +66,8 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
         </div>
 
         {/* Live Synchronized Test Quote & Photo Bar */}
-        <div className={`p-4 border-b flex flex-col md:flex-row items-center gap-3 text-xs ${isLight ? 'bg-slate-50 border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'}`}>
-          <span className="font-bold text-[#fcd535] shrink-0 uppercase tracking-wider">
+        <div className={`p-4 border-b flex flex-col md:flex-row items-center gap-3 text-xs ${isLight ? 'bg-slate-50 border-[#e2e8f0]' : 'bg-[#161920] border-[#222731]'}`}>
+          <span className="font-bold text-[#E2D9C8] dark:text-[#E2D9C8] shrink-0 uppercase tracking-wider">
             Test Content:
           </span>
           <input
@@ -76,7 +76,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
             onChange={(e) => setTestTag(e.target.value)}
             placeholder="Header tag..."
             className={`w-full md:w-36 px-2.5 py-1.5 rounded-lg border outline-none font-mono ${
-              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#323946] text-white'
+              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#2e3543] text-white'
             }`}
           />
           <input
@@ -85,7 +85,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
             onChange={(e) => setTestQuote(e.target.value)}
             placeholder="Type your quote to test in both styles..."
             className={`flex-1 w-full px-3 py-1.5 rounded-lg border outline-none font-medium ${
-              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#323946] text-white'
+              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#2e3543] text-white'
             }`}
           />
           <input
@@ -94,7 +94,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
             onChange={(e) => setTestAuthor(e.target.value)}
             placeholder="Author attribution..."
             className={`w-full md:w-44 px-3 py-1.5 rounded-lg border outline-none font-medium ${
-              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#323946] text-white'
+              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#2e3543] text-white'
             }`}
           />
         </div>
@@ -190,8 +190,8 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                     }}
                     className={`mt-2 w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 ${
                       isLight
-                        ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                        : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
+                        ? 'bg-[#111417] text-white hover:bg-[#222730]'
+                        : 'bg-[#E2D9C8] text-[#111417] hover:bg-[#ECE5D8]'
                     }`}
                   >
                     <span>Open This Style in Studio →</span>

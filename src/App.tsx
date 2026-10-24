@@ -34,6 +34,7 @@ import {
   Search,
   BookOpen,
   PenTool,
+  Layers,
   LayoutTemplate,
   Newspaper,
   Sun,
@@ -349,36 +350,30 @@ export const App: React.FC = () => {
       <CookieConsentBanner
         theme={theme}
         onNavigate={navigate}
-      />
-
-      {/* Command Palette (⌘K) Modal */}
+      />      {/* Command Palette (⌘K) Modal */}
       {shortcutsOpen && (
         <div
           className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-start justify-center pt-20 p-4"
           onClick={() => setShortcutsOpen(false)}
         >
           <div
-            className={`w-full max-w-lg rounded-2xl border shadow-2xl overflow-hidden animate-scale-in ${
-              isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-            }`}
+            className="w-full max-w-lg rounded-2xl studio-panel shadow-2xl overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search Input Bar */}
-            <div className={`p-4 border-b flex items-center gap-3 ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
-              <Search className={`w-4 h-4 ${isLight ? 'text-[#94a3b8]' : 'text-[#707a8a]'}`} />
+            <div className="p-4 border-b border-[var(--app-border-subtle)] flex items-center gap-3">
+              <Search className="w-4 h-4 text-[var(--app-text-muted)]" />
               <input
                 type="text"
                 autoFocus
                 value={commandQuery}
                 onChange={(e) => setCommandQuery(e.target.value)}
                 placeholder="Type a style, action, or command (e.g. 'St. Germain', 'Quote', 'Editor')..."
-                className={`w-full text-sm bg-transparent focus:outline-none ${
-                  isLight ? 'text-[#0f172a] placeholder-[#94a3b8]' : 'text-white placeholder-[#707a8a]'
-                }`}
+                className="w-full text-sm bg-transparent focus:outline-none text-[var(--app-text)] placeholder-[var(--app-text-muted)] font-body"
               />
               <button
                 onClick={() => setShortcutsOpen(false)}
-                className="text-[#707a8a] hover:text-white cursor-pointer"
+                className="text-[var(--app-text-muted)] hover:text-[var(--app-text)] cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -389,7 +384,7 @@ export const App: React.FC = () => {
               {/* Template search results if searching */}
               {matchingTemplatesInCommand.length > 0 && (
                 <div className="mb-2">
-                  <span className="px-2 py-1 text-[10px] font-semibold text-[#707a8a] uppercase block">
+                  <span className="px-2 py-1 text-[10px] font-subheading font-bold text-[var(--app-text-muted)] uppercase block">
                     Matching Art Directions
                   </span>
                   {matchingTemplatesInCommand.map((tmpl) => (
@@ -399,27 +394,25 @@ export const App: React.FC = () => {
                         handleOpenEditorWithTemplate(tmpl);
                         setShortcutsOpen(false);
                       }}
-                      className={`w-full p-2 rounded-lg text-left flex items-center justify-between transition-colors cursor-pointer ${
-                        isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
-                      }`}
+                      className="w-full p-2 rounded-lg text-left flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)]"
                     >
                       <div className="flex items-center gap-2">
                         <span
                           style={{ backgroundColor: tmpl.theme.bg }}
                           className="w-3.5 h-3.5 rounded border border-black/20"
                         ></span>
-                        <span className={isLight ? 'text-[#0f172a] font-medium' : 'text-white font-medium'}>
+                        <span className="font-heading font-medium text-[var(--app-text)]">
                           {tmpl.title}
                         </span>
-                        <span className="text-[10px] text-[#707a8a]">({tmpl.categoryLabel})</span>
+                        <span className="text-[10px] text-[var(--app-text-muted)]">({tmpl.categoryLabel})</span>
                       </div>
-                      <span className="text-[10px] text-[#0ecb81]">Open Style →</span>
+                      <span className="text-[10px] text-[var(--app-accent)] font-semibold">Open Style →</span>
                     </button>
                   ))}
                 </div>
               )}
 
-              <span className="px-2 py-1 text-[10px] font-semibold text-[#707a8a] uppercase block">
+              <span className="px-2 py-1 text-[10px] font-subheading font-bold text-[var(--app-text-muted)] uppercase block">
                 Quick Studio Navigation
               </span>
 
@@ -428,16 +421,30 @@ export const App: React.FC = () => {
                   navigate('/create');
                   setShortcutsOpen(false);
                 }}
-                className={`w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
-                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
-                }`}
+                className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
-                  <PenTool className="w-4 h-4 text-[#0ecb81]" />
-                  <span className={isLight ? 'text-[#0f172a]' : 'text-white'}>Open Studio Editor</span>
+                  <PenTool className="w-4 h-4 text-[var(--app-accent)]" />
+                  <span className="font-medium">Open Card Creator</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${isLight ? 'bg-[#e2e8f0]' : 'bg-[#14171d]'}`}>
+                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /create
+                </span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate('/canvas');
+                  setShortcutsOpen(false);
+                }}
+                className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Layers className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium">Launch Freeform Canvas Studio</span>
+                </div>
+                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                  /canvas
                 </span>
               </button>
 
@@ -446,15 +453,13 @@ export const App: React.FC = () => {
                   navigate('/templates');
                   setShortcutsOpen(false);
                 }}
-                className={`w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
-                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
-                }`}
+                className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
-                  <LayoutTemplate className={`w-4 h-4 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
-                  <span className={isLight ? 'text-[#0f172a]' : 'text-white'}>Browse Template Library</span>
+                  <LayoutTemplate className="w-4 h-4 text-[var(--app-accent)]" />
+                  <span className="font-medium">Browse Template Library</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${isLight ? 'bg-[#e2e8f0]' : 'bg-[#14171d]'}`}>
+                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /templates
                 </span>
               </button>
@@ -464,15 +469,13 @@ export const App: React.FC = () => {
                   navigate('/guides');
                   setShortcutsOpen(false);
                 }}
-                className={`w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
-                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
-                }`}
+                className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
-                  <BookOpen className="w-4 h-4 text-[#3b82f6]" />
-                  <span className={isLight ? 'text-[#0f172a]' : 'text-white'}>Explore Design & Typography Guides</span>
+                  <BookOpen className="w-4 h-4 text-sky-400" />
+                  <span className="font-medium">Explore Design &amp; Typography Guides</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${isLight ? 'bg-[#e2e8f0]' : 'bg-[#14171d]'}`}>
+                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /guides
                 </span>
               </button>
@@ -482,15 +485,13 @@ export const App: React.FC = () => {
                   navigate('/blog');
                   setShortcutsOpen(false);
                 }}
-                className={`w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
-                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
-                }`}
+                className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
-                  <Newspaper className="w-4 h-4 text-[#ec4899]" />
-                  <span className={isLight ? 'text-[#0f172a]' : 'text-white'}>Studio Blog & Design Essays</span>
+                  <Newspaper className="w-4 h-4 text-pink-400" />
+                  <span className="font-medium">Studio Blog &amp; Design Essays</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${isLight ? 'bg-[#e2e8f0]' : 'bg-[#14171d]'}`}>
+                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /blog
                 </span>
               </button>
@@ -500,28 +501,26 @@ export const App: React.FC = () => {
                   toggleTheme();
                   setShortcutsOpen(false);
                 }}
-                className={`w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
-                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
-                }`}
+                className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
                   {isLight ? (
-                    <Moon className="w-4 h-4 text-[#475569]" />
+                    <Moon className="w-4 h-4 text-[var(--app-accent)]" />
                   ) : (
-                    <Sun className="w-4 h-4 text-[#fcd535]" />
+                    <Sun className="w-4 h-4 text-[var(--app-accent)]" />
                   )}
-                  <span className={isLight ? 'text-[#0f172a]' : 'text-white'}>
+                  <span className="font-medium">
                     Switch to {isLight ? 'Dark (Obsidian)' : 'Light (Daylight)'} Mode
                   </span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${isLight ? 'bg-[#e2e8f0]' : 'bg-[#14171d]'}`}>
+                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   Theme
                 </span>
               </button>
             </div>
 
-            <div className={`p-3 border-t text-[11px] text-[#707a8a] text-center ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
-              Press <kbd className="px-1.5 py-0.5 rounded border text-current">Esc</kbd> to close
+            <div className="p-3 border-t border-[var(--app-border-subtle)] text-[11px] text-[var(--app-text-muted)] text-center font-body">
+              Press <kbd className="px-1.5 py-0.5 rounded border border-[var(--app-border-subtle)] text-current">Esc</kbd> to close
             </div>
           </div>
         </div>
@@ -534,41 +533,39 @@ export const App: React.FC = () => {
           onClick={() => setGuideModalOpen(false)}
         >
           <div
-            className={`w-full max-w-2xl max-h-[85vh] rounded-2xl border shadow-2xl flex flex-col overflow-hidden animate-scale-in ${
-              isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-            }`}
+            className="w-full max-w-2xl max-h-[85vh] rounded-2xl studio-panel shadow-2xl flex flex-col overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className={`p-5 border-b flex items-center justify-between ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
+            <div className="p-5 border-b border-[var(--app-border-subtle)] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <BookOpen className={`w-5 h-5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
-                <h3 className={`text-base font-bold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                  Typesetting & Design System Guide
+                <BookOpen className="w-5 h-5 text-[var(--app-accent)]" />
+                <h3 className="font-heading text-base font-bold text-[var(--app-text)]">
+                  Typesetting &amp; Design System Guide
                 </h3>
               </div>
               <button
                 onClick={() => setGuideModalOpen(false)}
-                className="text-[#707a8a] hover:text-white cursor-pointer"
+                className="text-[var(--app-text-muted)] hover:text-[var(--app-text)] cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto flex flex-col gap-6 text-xs leading-relaxed">
+            <div className="p-6 overflow-y-auto flex flex-col gap-6 text-xs leading-relaxed font-body">
               <div className="flex flex-col gap-2">
-                <h4 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                  1. Optical Hierarchy & Line Measure
+                <h4 className="font-heading text-sm font-bold text-[var(--app-text)]">
+                  1. Optical Hierarchy &amp; Line Measure
                 </h4>
-                <p className={isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}>
+                <p className="text-[var(--app-text-muted)] leading-relaxed">
                   Editorial cards shine when lines do not stretch past 45–65 characters. When rendering long quotes (over 200 characters), reduce font size to 20–22px to avoid clipping and preserve comfortable negative space around your margins.
                 </p>
               </div>
 
               <div className="flex flex-col gap-2">
-                <h4 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                <h4 className="font-heading text-sm font-bold text-[var(--app-text)]">
                   2. Font Pairings
                 </h4>
-                <p className={isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}>
+                <p className="text-[var(--app-text-muted)] leading-relaxed">
                   • <strong>Newsreader (Editorial Serif)</strong>: Best for philosophical reflections, literature quotes, and classic essays.<br />
                   • <strong>Playfair Display</strong>: High-contrast drama, ideal for short 1–2 line poetic fragments.<br />
                   • <strong>Inter (Humanist Sans)</strong>: Clean, modern readability for software notes, critique, and product design axioms.<br />
@@ -577,22 +574,20 @@ export const App: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <h4 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
-                  3. Export Resolutions & Social Specs
+                <h4 className="font-heading text-sm font-bold text-[var(--app-text)]">
+                  3. Export Resolutions &amp; Social Specs
                 </h4>
-                <p className={isLight ? 'text-[#64748b]' : 'text-[#9ca3af]'}>
+                <p className="text-[var(--app-text-muted)] leading-relaxed">
                   All PNG and WebP exports are rendered with a 2× device pixel ratio (Retina standard). Square cards export at 2160×2160 pixels, and 4:5 portrait cards export at 2160×2700 pixels, ensuring maximum sharpness on high-DPI smartphone displays.
                 </p>
               </div>
 
-              <div className={`p-4 rounded-xl border flex items-center justify-between ${
-                isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
-              }`}>
+              <div className="p-4 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex items-center justify-between">
                 <div>
-                  <span className={`font-semibold block ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                  <span className="font-heading font-bold block text-[var(--app-text)]">
                     Ready to craft your card?
                   </span>
-                  <span className="text-[11px] text-[#707a8a]">Jump into the Studio Editor to start typesetting.</span>
+                  <span className="text-[11px] text-[var(--app-text-muted)]">Jump into the Studio Editor to start typesetting.</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -600,11 +595,7 @@ export const App: React.FC = () => {
                       setGuideModalOpen(false);
                       navigate('/guides');
                     }}
-                    className={`px-3 py-2 rounded-lg font-medium text-xs transition-colors cursor-pointer border ${
-                      isLight
-                        ? 'border-[#e2e8f0] text-[#475569] hover:bg-[#f1f5f9]'
-                        : 'border-[#262c36] text-[#c6c6c7] hover:bg-[#1f242c]'
-                    }`}
+                    className="studio-btn-secondary px-3 py-2 text-xs"
                   >
                     View All Guides
                   </button>
@@ -613,11 +604,7 @@ export const App: React.FC = () => {
                       setGuideModalOpen(false);
                       navigate('/create');
                     }}
-                    className={`px-4 py-2 rounded-lg font-semibold text-xs transition-colors cursor-pointer ${
-                      isLight
-                        ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                        : 'bg-white text-[#0b0e11] hover:bg-[#e2e2e2]'
-                    }`}
+                    className="studio-btn-primary px-4 py-2 text-xs"
                   >
                     Open Studio
                   </button>

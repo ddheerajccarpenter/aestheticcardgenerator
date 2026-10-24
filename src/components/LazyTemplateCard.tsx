@@ -17,12 +17,12 @@ export const LazyTemplateCard: React.FC<{
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
-          const timer = window.setTimeout(() => setHydrated(true), 180);
+          const timer = window.setTimeout(() => setHydrated(true), 60);
           io.disconnect();
           return () => window.clearTimeout(timer);
         }
       },
-      { rootMargin: '180px 0px', threshold: 0.05 }
+      { rootMargin: '240px 0px', threshold: 0.05 }
     );
     io.observe(node);
     return () => io.disconnect();
@@ -31,45 +31,43 @@ export const LazyTemplateCard: React.FC<{
   return (
     <div
       ref={hostRef}
-      className={`relative overflow-hidden rounded-[18px] border border-white/10 ${aspectRatioClass} ${className} template-card-kinetic`}
+      className={`relative overflow-hidden rounded-2xl border border-white/[0.08] dark:border-white/[0.08] ${aspectRatioClass} ${className} template-card-kinetic`}
     >
-      {/* Archival Blueprint Skeleton Loader while lazy-loading */}
+      {/* Clean, Neutral Geometric Skeleton while mounting */}
       {!hydrated && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-10 flex flex-col justify-between p-5 bg-[#14161b] transition-opacity duration-300 pointer-events-none select-none"
+          className="absolute inset-0 z-10 flex flex-col justify-between p-6 bg-[#13161c] transition-opacity duration-300 pointer-events-none select-none"
         >
-          <div className="flex justify-between items-center text-[10px] tracking-widest uppercase opacity-60 font-subheading">
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#fcd535] animate-pulse" />
-              + PLATE REG.
-            </span>
-            <span>LOADING SURFACE...</span>
+          {/* Top metadata skeleton */}
+          <div className="flex justify-between items-center">
+            <div className="h-3 w-20 rounded bg-white/[0.06]" />
+            <div className="h-4 w-12 rounded bg-white/[0.06]" />
           </div>
 
-          {/* Architectural Crosshair Grid */}
-          <div className="relative flex-1 flex items-center justify-center my-4 opacity-15">
-            <div className="w-full h-[1px] bg-white/40 absolute top-1/2 left-0 -translate-y-1/2" />
-            <div className="h-full w-[1px] bg-white/40 absolute left-1/2 top-0 -translate-x-1/2" />
-            <div className="w-16 h-16 rounded-full border border-white/30 flex items-center justify-center text-[9px] font-mono">
-              3D PBR
-            </div>
+          {/* Central quote text skeleton */}
+          <div className="space-y-2.5 my-auto">
+            <div className="h-4 w-5/6 rounded bg-white/[0.07]" />
+            <div className="h-4 w-4/6 rounded bg-white/[0.07]" />
+            <div className="h-4 w-3/6 rounded bg-white/[0.05]" />
           </div>
 
+          {/* Bottom citation skeleton */}
+          <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
+            <div className="h-3 w-28 rounded bg-white/[0.06]" />
+            <div className="h-3 w-8 rounded bg-white/[0.04]" />
+          </div>
+
+          {/* Ambient subtle shimmer sweep */}
           <div className="lazy-shimmer-sweep absolute inset-0 pointer-events-none" />
-
-          <div className="flex justify-between items-center text-[10px] opacity-50 font-subheading">
-            <span className="font-mono">4K READY • MASTER</span>
-            <span>+</span>
-          </div>
         </div>
       )}
 
-      {/* Real Card Content with Blur-Up & Spring Unfold */}
+      {/* Real Card Content Reveal */}
       {inView && (
         <div
-          className={`w-full h-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            hydrated ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-[0.96] blur-[6px]'
+          className={`w-full h-full transition-opacity duration-300 ease-out ${
+            hydrated ? 'opacity-100' : 'opacity-0'
           }`}
         >
           {children}

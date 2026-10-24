@@ -26,15 +26,18 @@ Built with a 60:30:10 ambient color system, zero server dependencies, and offlin
 
 ## Visual Philosophy
 
-The studio is designed around strict mathematical balance and tactile typography:
+The studio is designed around strict mathematical balance, editorial restraint, and tactile typography:
 
-- **60:30:10 Scroll Dynamic**: 60% deep obsidian (`#0b0e11`), 30% structured slate surfaces (`#14171d`), 10% electric amber (`#fcd535`) and rose (`#ec4899`) accents.
+- **60:30:10 Editorial Palette**: 60% deep charcoal canvas (`#101114`), 30% structured graphite slate surfaces (`#181A1E`, `#202228`), 10% warm bone / muted champagne (`#E2D9C8`) primary accents with subtle low-contrast slate dividers (`#34353A`).
 - **Harmonious Typography**:
-  - **Murecho**: Expressive, editorial display headings.
-  - **Funnel Sans**: Precision badges, tags, and categorical labels.
-  - **SamsungOne Bold**: High-legibility UI controls and reading body copy.
-- **Dual Layout Harmony**: Strict 2-column or 4-column layouts across all viewport sizes.
+  - **Murecho**: Expressive, editorial display headings (700–900 weights).
+  - **Funnel Sans**: Precision badges, tags, categorical labels, and navigation.
+  - **SamsungOne Bold**: High-legibility UI controls, range sliders, and reading body copy.
+- **Architectural Color Decoupling**: Global application UI colors are strictly separated from editable canvas document state. Selecting custom card palettes (cream, burgundy, acid yellow, celadon) never recolors the navigation, toolbars, inspectors, or workspace stage.
+- **Conversion Hierarchy**: Single dominant primary CTA (**Open Card Creator**) paired with an understated secondary workflow (**Launch Freeform Canvas**).
+- **Mobile-First Ergonomics**: Compact floating privacy banner (<8% viewport footprint) docked above the mobile navigation bar, preserving instant access to card creation and previews.
 - **Pure Card Isolation**: Ambient workspace glows, guideline rulers, and ratio badges stay strictly in the editor and never contaminate exported images.
+- **Complete SEO Architecture**: Automated 28-route `sitemap.xml` and host-declared `robots.txt` for 100% search crawler indexability.
 
 ---
 

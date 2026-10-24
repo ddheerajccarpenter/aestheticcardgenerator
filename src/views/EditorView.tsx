@@ -933,7 +933,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           particleCount: 50,
           spread: 60,
           origin: { y: 0.8 },
-          colors: ['#fcd535', '#ffffff', '#aa2d00', '#0a2e0e'],
+          colors: ['#E2D9C8', '#ffffff', '#222731', '#111417'],
         });
         return;
       }
@@ -1013,7 +1013,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
         particleCount: 50,
         spread: 60,
         origin: { y: 0.8 },
-        colors: ['#fcd535', '#ffffff', '#aa2d00', '#0a2e0e'],
+        colors: ['#E2D9C8', '#ffffff', '#222731', '#111417'],
       });
 
       showToast(`Exported ${downloadExt.toUpperCase()} (${format.startsWith('ultra-') ? format.toUpperCase() : 'Master'})`);
@@ -1196,13 +1196,13 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 }`}
                 title="Search book or track metadata"
               >
-                <BookOpen className="w-3 h-3 text-[#fcd535]" />
+                <BookOpen className="w-3 h-3 text-[#111417] dark:text-[#E2D9C8]" />
                 <span>Import Book / Song</span>
               </button>
               <button
                 onClick={handleRandomQuote}
                 className={`inline-flex items-center gap-1 text-[11px] hover:underline cursor-pointer ${
-                  isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
+                  isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'
                 }`}
               >
                 <Shuffle className="w-3 h-3" />
@@ -1255,8 +1255,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
               rows={isMobileSheet ? 3 : 4}
               className={`w-full rounded-xl p-3 text-sm leading-relaxed resize-none focus:outline-none border transition-all ${
                 isLight
-                  ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                  : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+                  ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#111417]'
+                  : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#E2D9C8]'
               }`}
               placeholder="Paste or type your quote, poetry, or thoughts..."
             />
@@ -1270,7 +1270,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 <button
                   onClick={handleAutoFitFontSize}
                   className={`flex items-center gap-1 font-medium cursor-pointer ${
-                    isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
+                    isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'
                   }`}
                   title="Auto-adjust font size to fit"
                 >
@@ -1296,8 +1296,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
               onChange={(e) => setAuthor(e.target.value)}
               className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
                 isLight
-                  ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                  : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+                  ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#111417]'
+                  : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#E2D9C8]'
               }`}
               placeholder="e.g. Albert Camus — Return to Tipasa"
             />
@@ -1320,8 +1320,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 onChange={(e) => setTag(e.target.value)}
                 className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
                   isLight
-                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                    : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#111417]'
+                    : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#E2D9C8]'
                 }`}
                 placeholder="e.g. VOL. 08 • NOTES"
               />
@@ -1340,8 +1340,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 onChange={(e) => setBadge(e.target.value)}
                 className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none ${
                   isLight
-                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#d97706]'
-                    : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#fcd535]'
+                    ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#111417]'
+                    : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#E2D9C8]'
                 }`}
                 placeholder="e.g. EST. 1997"
               />
@@ -1392,8 +1392,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       }}
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
                         isLight
-                          ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                          : 'bg-[#fcd535] text-black hover:bg-[#e5c027]'
+                          ? 'bg-[#111417] text-white hover:bg-[#222731]'
+                          : 'bg-[#E2D9C8] text-[#111417] hover:bg-[#d5cbba]'
                       }`}
                     >
                       Use Quote
@@ -1437,8 +1437,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
                       fontChoice === f.id
                         ? isLight
-                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
-                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                          ? 'border-[#111417] bg-[#f8fafc] text-[#0f172a] ring-1 ring-[#111417]'
+                          : 'border-[#E2D9C8] bg-[#181d24] text-white ring-1 ring-[#E2D9C8]'
                         : isLight
                         ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
                         : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
@@ -1465,8 +1465,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
                       fontChoice === f.id
                         ? isLight
-                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
-                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                          ? 'border-[#111417] bg-[#f8fafc] text-[#0f172a] ring-1 ring-[#111417]'
+                          : 'border-[#E2D9C8] bg-[#181d24] text-white ring-1 ring-[#E2D9C8]'
                         : isLight
                         ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
                         : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
@@ -1493,8 +1493,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
                       fontChoice === f.id
                         ? isLight
-                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
-                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                          ? 'border-[#111417] bg-[#f8fafc] text-[#0f172a] ring-1 ring-[#111417]'
+                          : 'border-[#E2D9C8] bg-[#181d24] text-white ring-1 ring-[#E2D9C8]'
                         : isLight
                         ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
                         : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
@@ -1520,8 +1520,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
                       fontChoice === f.id
                         ? isLight
-                          ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
-                          : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                          ? 'border-[#111417] bg-[#f8fafc] text-[#0f172a] ring-1 ring-[#111417]'
+                          : 'border-[#E2D9C8] bg-[#181d24] text-white ring-1 ring-[#E2D9C8]'
                         : isLight
                         ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
                         : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
@@ -1542,7 +1542,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 <button
                   type="button"
                   onClick={() => customFontInputRef.current?.click()}
-                  className="text-[11px] font-semibold text-[#fcd535] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="text-[11px] font-semibold text-[#111417] dark:text-[#E2D9C8] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <Upload className="w-3 h-3" />
                   <span>+ Upload Font</span>
@@ -1578,8 +1578,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
                         fontChoice === cf.familyName
                           ? isLight
-                            ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
-                            : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                            ? 'border-[#111417] bg-[#f8fafc] text-[#0f172a] ring-1 ring-[#111417]'
+                            : 'border-[#E2D9C8] bg-[#181d24] text-white ring-1 ring-[#E2D9C8]'
                           : isLight
                           ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
                           : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
@@ -1595,7 +1595,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               ) : (
                 <div
                   onClick={() => customFontInputRef.current?.click()}
-                  className="p-3 rounded-xl border border-dashed border-current/20 text-center cursor-pointer hover:border-[#fcd535] transition-colors"
+                  className="p-3 rounded-xl border border-dashed border-current/20 text-center cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8] transition-colors"
                 >
                   <span className="text-xs text-[#707a8a] block">Click to upload .ttf, .otf, .woff, or .woff2</span>
                   <span className="text-[10px] text-[#707a8a]/70">Zero server upload • Saved to browser IndexedDB</span>
@@ -1619,7 +1619,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               step="1"
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
-              className="w-full accent-[#fcd535] cursor-pointer"
+              className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#707a8a]">
               <span>Small 14px</span>
@@ -1643,7 +1643,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               step="0.05"
               value={lineHeight}
               onChange={(e) => setLineHeight(Number(e.target.value))}
-              className="w-full accent-[#fcd535] cursor-pointer"
+              className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#707a8a]">
               <span>Tight 1.0</span>
@@ -1667,7 +1667,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               step="0.01"
               value={letterSpacing}
               onChange={(e) => setLetterSpacing(Number(e.target.value))}
-              className="w-full accent-[#fcd535] cursor-pointer"
+              className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#707a8a]">
               <span>Compact -0.04em</span>
@@ -1799,7 +1799,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             <button
               onClick={handleRandomPalette}
               className={`inline-flex items-center gap-1 text-[11px] hover:underline cursor-pointer ${
-                isLight ? 'text-[#d97706]' : 'text-[#fcd535]'
+                isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'
               }`}
             >
               <Shuffle className="w-3 h-3" />
@@ -1818,8 +1818,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 className={`p-2.5 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-all ${
                   bgColor === p.bg && inkColor === p.ink
                     ? isLight
-                      ? 'border-[#d97706] ring-2 ring-[#d97706]/40 shadow-sm'
-                      : 'border-[#fcd535] ring-1 ring-[#fcd535] shadow-sm'
+                      ? 'border-[#111417] ring-1 ring-[#111417] shadow-sm'
+                      : 'border-[#E2D9C8] ring-1 ring-[#E2D9C8] shadow-sm'
                     : isLight
                     ? 'border-[#e2e8f0] bg-white hover:border-[#cbd5e1]'
                     : 'border-[#262c36] bg-[#181d24] hover:border-[#444748]'
@@ -1896,7 +1896,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               <button
                 type="button"
                 onClick={() => paletteFileInputRef.current?.click()}
-                className="text-[11px] font-semibold text-[#fcd535] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-semibold text-[#111417] dark:text-[#E2D9C8] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <Upload className="w-3 h-3" />
                 <span>Upload Photo</span>
@@ -1931,7 +1931,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             />
 
             {isExtractingPalette && (
-              <div className="p-3 rounded-xl border border-[#fcd535]/40 bg-[#fcd535]/5 text-center text-xs animate-pulse">
+              <div className="p-3 rounded-xl border border-[#E2D9C8]/40 bg-[#E2D9C8]/5 text-center text-xs animate-pulse">
                 Extracting 5-color palette from photo...
               </div>
             )}
@@ -1947,7 +1947,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       setInkColor(extractedPalette.ink);
                       showToast('Applied photo palette to card');
                     }}
-                    className="text-[11px] px-2 py-0.5 rounded bg-[#fcd535] text-black font-semibold cursor-pointer"
+                    className="text-[11px] px-2 py-0.5 rounded bg-[#111417] text-white dark:bg-[#E2D9C8] dark:text-[#111417] font-semibold cursor-pointer"
                   >
                     Apply All
                   </button>
@@ -1992,7 +1992,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               step="4"
               value={padding}
               onChange={(e) => setPadding(Number(e.target.value))}
-              className="w-full accent-[#fcd535] cursor-pointer"
+              className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#707a8a]">
               <span>Compact 20px</span>
@@ -2015,7 +2015,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               step="2"
               value={borderRadius}
               onChange={(e) => setBorderRadius(Number(e.target.value))}
-              className="w-full accent-[#fcd535] cursor-pointer"
+              className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#707a8a]">
               <span>Sharp 0px</span>
@@ -2046,8 +2046,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     className={`px-2 py-1 rounded-md capitalize font-medium shrink-0 transition-colors cursor-pointer ${
                       textureCategory === cat.id
                         ? isLight
-                          ? 'bg-[#0f172a] text-white'
-                          : 'bg-[#fcd535] text-black font-semibold'
+                          ? 'bg-[#111417] text-white'
+                          : 'bg-[#E2D9C8] text-[#111417] font-semibold'
                         : isLight
                         ? 'bg-slate-100 text-slate-600 hover:text-slate-900'
                         : 'bg-black/30 text-slate-400 hover:text-white'
@@ -2073,8 +2073,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       className={`p-2 rounded-lg border text-left cursor-pointer transition-all ${
                         selectedTextureId === t.id
                           ? isLight
-                            ? 'border-[#d97706] bg-[#fffbeb] text-[#0f172a] ring-1 ring-[#d97706]'
-                            : 'border-[#fcd535] bg-[#181d24] text-white ring-1 ring-[#fcd535]'
+                            ? 'border-[#111417] bg-[#f8fafc] text-[#0f172a] ring-1 ring-[#111417]'
+                            : 'border-[#E2D9C8] bg-[#181d24] text-white ring-1 ring-[#E2D9C8]'
                           : isLight
                           ? 'border-[#e2e8f0] bg-white text-[#475569] hover:text-[#0f172a]'
                           : 'border-[#262c36] bg-[#14171d] text-[#9ca3af] hover:text-white'
@@ -2102,7 +2102,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     step="5"
                     value={textureIntensity}
                     onChange={(e) => setTextureIntensity(Number(e.target.value))}
-                    className="w-full accent-[#fcd535] cursor-pointer"
+                    className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
                   />
 
                   <div className="flex justify-between items-center text-xs pt-1">
@@ -2118,7 +2118,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     step="10"
                     value={textureScale}
                     onChange={(e) => setTextureScale(Number(e.target.value))}
-                    className="w-full accent-[#fcd535] cursor-pointer"
+                    className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
                   />
 
                   {/* Blend Modes */}
@@ -2132,7 +2132,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                           onClick={() => setTextureBlendMode(bm)}
                           className={`text-[9px] px-1.5 py-0.5 rounded font-mono uppercase cursor-pointer ${
                             textureBlendMode === bm
-                              ? 'bg-[#fcd535] text-black font-bold'
+                              ? 'bg-[#111417] text-white dark:bg-[#E2D9C8] dark:text-[#111417] font-bold'
                               : 'bg-black/20 text-[#707a8a] hover:text-white'
                           }`}
                         >
@@ -2161,7 +2161,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 type="checkbox"
                 checked={isHolographic}
                 onChange={(e) => setIsHolographic(e.target.checked)}
-                className="accent-[#fcd535] w-4 h-4 cursor-pointer"
+                className="accent-[#111417] dark:accent-[#E2D9C8] w-4 h-4 cursor-pointer"
               />
             </label>
 
@@ -2177,7 +2177,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 type="checkbox"
                 checked={showBorder}
                 onChange={(e) => setShowBorder(e.target.checked)}
-                className="accent-[#fcd535] w-4 h-4 cursor-pointer"
+                className="accent-[#111417] dark:accent-[#E2D9C8] w-4 h-4 cursor-pointer"
               />
             </label>
 
@@ -2193,7 +2193,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 type="checkbox"
                 checked={showIcon}
                 onChange={(e) => setShowIcon(e.target.checked)}
-                className="accent-[#fcd535] w-4 h-4 cursor-pointer"
+                className="accent-[#111417] dark:accent-[#E2D9C8] w-4 h-4 cursor-pointer"
               />
             </label>
 
@@ -2217,8 +2217,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       className={`px-2 py-0.5 rounded-md capitalize font-medium shrink-0 transition-colors cursor-pointer ${
                         elementCategory === cat.id
                           ? isLight
-                            ? 'bg-[#0f172a] text-white'
-                            : 'bg-[#fcd535] text-black font-semibold'
+                            ? 'bg-[#111417] text-white'
+                            : 'bg-[#E2D9C8] text-[#111417] font-semibold'
                           : isLight
                           ? 'bg-slate-100 text-slate-600 hover:text-slate-900'
                           : 'bg-black/30 text-slate-400 hover:text-white'
@@ -2244,7 +2244,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         title={el.name}
                         className={`p-1.5 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all aspect-square ${
                           selectedElementId === el.id
-                            ? 'bg-[#fcd535] text-black ring-2 ring-[#fcd535]'
+                            ? isLight
+                              ? 'bg-[#111417] text-white ring-2 ring-[#111417]'
+                              : 'bg-[#E2D9C8] text-[#111417] ring-2 ring-[#E2D9C8]'
                             : isLight
                             ? 'bg-white hover:bg-slate-100 text-slate-800'
                             : 'bg-[#181d24] hover:bg-[#222730] text-slate-300'
@@ -2269,9 +2271,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
   return (
     <div
-      className={`w-full pt-13 sm:pt-16 min-h-screen flex flex-col transition-colors duration-200 ${
-        isLight ? 'bg-[#f6f8fa] text-[#181a20]' : 'bg-[#0b0e11] text-[#e1e2e7]'
-      }`}
+      className="w-full pt-13 sm:pt-16 min-h-screen flex flex-col transition-colors duration-200 bg-[var(--app-bg)] text-[var(--app-text)]"
       onClick={() => {
         // Deselect when clicking empty background
         setAspectMenuOpen(false);
@@ -2280,20 +2280,12 @@ export const EditorView: React.FC<EditorViewProps> = ({
     >
       {/* Toast Notification */}
       {toastMessage && (
-        <div
-          className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-xl border shadow-2xl animate-fade-in text-xs font-medium ${
-            isLight
-              ? 'bg-white text-[#0f172a] border-[#e2e8f0]'
-              : 'bg-[#181d24] text-white border-[#384252]'
-          }`}
-        >
-          <CheckCircle2 className="w-4 h-4 text-[#0ecb81] shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-xl studio-panel shadow-2xl animate-fade-in text-xs font-medium text-[var(--app-text)]">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
           <span>{toastMessage}</span>
           <button
             onClick={() => setToastMessage(null)}
-            className={`ml-2 cursor-pointer ${
-              isLight ? 'text-[#64748b] hover:text-[#0f172a]' : 'text-[#707a8a] hover:text-white'
-            }`}
+            className="ml-2 cursor-pointer text-[var(--app-text-muted)] hover:text-[var(--app-text)] transition-colors"
           >
             <X className="w-3 h-3" />
           </button>
@@ -2313,22 +2305,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
       {/* PRIMARY STUDIO TOOLBAR (Compact, Responsive, No Collisions)         */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <div
-        className={`w-full border-b px-3 sm:px-6 py-2 flex items-center justify-between gap-2 sticky top-13 sm:top-16 z-40 backdrop-blur-md transition-colors duration-200 ${
-          isLight
-            ? 'bg-white/95 border-[#e2e8f0] text-[#0f172a]'
-            : 'bg-[#111417]/95 border-[#262c36] text-[#e1e2e7]'
-        }`}
+        className="w-full border-b border-[var(--app-border-subtle)] px-3 sm:px-6 py-2 flex items-center justify-between gap-2 sticky top-13 sm:top-16 z-40 backdrop-blur-md transition-colors duration-200 bg-[var(--app-bg)]/95 text-[var(--app-text)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left: Back, Studio Switch, Title, Undo / Redo */}
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <a
             href="/templates"
-            className={`flex items-center gap-1 px-2 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer shrink-0 ${
-              isLight
-                ? 'bg-white border-[#e2e8f0] text-[#475569] hover:text-[#0f172a] hover:bg-[#f8fafc]'
-                : 'bg-[#181d24] border-[#262c36] text-[#c4c7c8] hover:text-white hover:border-[#444748]'
-            }`}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-muted)] hover:text-[var(--app-text)] hover:bg-[var(--app-surface-secondary)] text-xs font-medium transition-colors cursor-pointer shrink-0"
             title="Back to Template Gallery"
             aria-label="Back to templates"
           >
@@ -2338,15 +2322,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
           <a
             href="/canvas"
-            className={`flex items-center gap-1 px-2 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
-              isLight
-                ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
-                : 'bg-[#181d24] border-[#262c36] text-white hover:border-[#444748]'
-            }`}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text)] hover:bg-[var(--app-surface-secondary)] text-xs font-semibold transition-colors cursor-pointer shrink-0"
             title="Switch to Freeform Canvas Studio"
             aria-label="Switch to Canvas Studio"
           >
-            <Layers className="w-3.5 h-3.5 text-[#fcd535]" />
+            <Layers className="w-3.5 h-3.5 text-[var(--app-accent)]" />
             <span className="hidden md:inline">Canvas Studio</span>
           </a>
 
@@ -2443,7 +2423,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             }`}
             title="Switch template style"
           >
-            <LayoutTemplate className={`w-3.5 h-3.5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
+            <LayoutTemplate className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
             <span>Presets</span>
           </button>
 
@@ -2457,7 +2437,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   : 'bg-[#181d24] border-[#262c36] text-white hover:border-[#444748]'
               }`}
             >
-              <Crop className={`w-3.5 h-3.5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
+              <Crop className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
               <span>{currentRatioPreset.label}</span>
               <ChevronDown className="w-3.5 h-3.5 opacity-60" />
             </button>
@@ -2523,8 +2503,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
             className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
               showGuidelines
                 ? isLight
-                  ? 'bg-[#d97706] text-white border-[#d97706]'
-                  : 'bg-[#fcd535] text-[#0b0e11] border-[#fcd535]'
+                  ? 'bg-[#111417] text-white border-[#111417]'
+                  : 'bg-[#E2D9C8] text-[#111417] border-[#E2D9C8]'
                 : isLight
                 ? 'bg-white text-[#475569] border-[#e2e8f0] hover:text-[#0f172a]'
                 : 'bg-[#181d24] text-[#c4c7c8] border-[#262c36] hover:text-white'
@@ -2547,7 +2527,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             }`}
             title="Switch template style"
           >
-            <LayoutTemplate className={`w-3.5 h-3.5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
+            <LayoutTemplate className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
             <span className="hidden xs:inline text-[11px]">Styles</span>
           </button>
 
@@ -2576,7 +2556,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             }`}
             title="Share customized card URL with friends"
           >
-            <Share2 className="w-3.5 h-3.5 text-[#fcd535]" />
+            <Share2 className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
             <span>Share Link</span>
           </button>
 
@@ -2593,7 +2573,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             {copied ? (
               <Check className="w-3.5 h-3.5 text-[#0ecb81]" />
             ) : (
-              <Copy className={`w-3.5 h-3.5 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
+              <Copy className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
             )}
             <span>{copied ? 'Copied!' : 'Copy'}</span>
           </button>
@@ -2646,7 +2626,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         onClick={() => setBackdropSurface(b.id)}
                         className={`py-1 text-[10px] rounded border text-center transition-all cursor-pointer ${
                           backdropSurface === b.id
-                            ? 'bg-[#fcd535] text-black font-bold border-[#fcd535]'
+                            ? isLight
+                              ? 'bg-[#111417] text-white font-bold border-[#111417]'
+                              : 'bg-[#E2D9C8] text-[#111417] font-bold border-[#E2D9C8]'
                             : isLight
                             ? 'bg-slate-100 text-slate-700 border-slate-200'
                             : 'bg-black/30 text-slate-300 border-white/10'
@@ -2707,10 +2689,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     <span className="font-medium block">SVG Vector File</span>
                     <span className="text-[10px] text-[#707a8a]">Scalable vector format</span>
                   </div>
-                  <span className="text-[10px] font-mono text-[#d97706]">SVG</span>
+                  <span className="text-[10px] font-mono text-[#707a8a]">SVG</span>
                 </button>
 
-                <div className="px-3 py-1 text-[10px] uppercase font-semibold text-[#fcd535] tracking-wider border-t border-current/10 mt-1">
+                <div className="px-3 py-1 text-[10px] uppercase font-semibold text-[#111417] dark:text-[#E2D9C8] tracking-wider border-t border-current/10 mt-1">
                   Ultra-HD Master Exporters
                 </div>
                 <button
@@ -2723,7 +2705,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     <span className="font-semibold block">Ultra-HD 4K (3840px)</span>
                     <span className="text-[10px] text-[#707a8a]">Pure card isolation, zero gradient bleed</span>
                   </div>
-                  <span className="text-[10px] font-mono text-[#fcd535] font-bold">4K</span>
+                  <span className="text-[10px] font-mono text-[#111417] dark:text-[#E2D9C8] font-bold">4K</span>
                 </button>
                 <button
                   onClick={() => handleExport('ultra-8k')}
@@ -2735,7 +2717,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     <span className="font-semibold block">Print Master 8K (7680px)</span>
                     <span className="text-[10px] text-[#707a8a]">Gallery & offset print archival fidelity</span>
                   </div>
-                  <span className="text-[10px] font-mono text-[#fcd535] font-bold">8K</span>
+                  <span className="text-[10px] font-mono text-[#111417] dark:text-[#E2D9C8] font-bold">8K</span>
                 </button>
                 <button
                   onClick={() => handleExport('ultra-16k')}
@@ -2804,8 +2786,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
               className={`px-2 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer shrink-0 ${
                 aspectRatio === r.id
                   ? isLight
-                    ? 'bg-[#0f172a] text-white font-semibold'
-                    : 'bg-[#fcd535] text-black font-semibold shadow-sm'
+                    ? 'bg-[#111417] text-white font-semibold'
+                    : 'bg-[#E2D9C8] text-[#111417] font-semibold shadow-sm'
                   : isLight
                   ? 'bg-[#f1f5f9] text-[#475569] hover:text-[#0f172a]'
                   : 'bg-[#181d24] text-[#a0a5ad] hover:text-white'
@@ -2825,7 +2807,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             <button
               onClick={handleAutoFitFontSize}
               className={`px-2 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 cursor-pointer ${
-                isLight ? 'bg-[#fffbeb] text-[#d97706]' : 'bg-[#fcd535]/15 text-[#fcd535]'
+                isLight ? 'bg-[#f1f5f9] text-[#111417]' : 'bg-[#E2D9C8]/15 text-[#E2D9C8]'
               }`}
               title="Auto-fit font size"
             >
@@ -2840,8 +2822,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
             className={`px-2 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 cursor-pointer transition-colors ${
               ambientModeEnabled
                 ? isLight
-                  ? 'bg-[#d97706]/15 text-[#d97706]'
-                  : 'bg-[#fcd535]/15 text-[#fcd535]'
+                  ? 'bg-[#111417]/10 text-[#111417]'
+                  : 'bg-[#E2D9C8]/15 text-[#E2D9C8]'
                 : 'text-[#707a8a] hover:text-white'
             }`}
             title="Toggle real-time workspace ambient backglow (isolated to stage wrapper, never exported)"
@@ -2855,7 +2837,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
             onClick={() => setIs3DMode(!is3DMode)}
             className={`px-2 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 cursor-pointer transition-colors ${
               is3DMode
-                ? 'bg-[#fcd535] text-black font-semibold'
+                ? isLight
+                  ? 'bg-[#111417] text-white font-semibold'
+                  : 'bg-[#E2D9C8] text-[#111417] font-semibold'
                 : isLight
                 ? 'bg-[#f1f5f9] text-[#475569] hover:text-[#0f172a]'
                 : 'bg-[#181d24] text-[#a0a5ad] hover:text-white'
@@ -2889,7 +2873,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             onClick={() => setShowGuidelines(!showGuidelines)}
             className={`w-7 h-7 flex items-center justify-center rounded-md border text-xs cursor-pointer ${
               showGuidelines
-                ? isLight ? 'bg-[#d97706] text-white border-[#d97706]' : 'bg-[#fcd535] text-black border-[#fcd535]'
+                ? isLight ? 'bg-[#111417] text-white border-[#111417]' : 'bg-[#E2D9C8] text-[#111417] border-[#E2D9C8]'
                 : isLight ? 'border-[#e2e8f0] text-[#707a8a]' : 'border-[#262c36] text-[#707a8a]'
             }`}
             title="Toggle print guidelines"
@@ -2919,7 +2903,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
         <div
           ref={stageRef}
           className={`flex-1 p-3 sm:p-6 md:p-12 flex flex-col items-center justify-center overflow-auto min-h-[300px] sm:min-h-[460px] pb-24 lg:pb-12 transition-colors duration-200 editor-ambient-stage ${
-            isLight ? 'bg-[#f1f5f9]' : 'bg-[#0b0e11]'
+            isLight ? 'bg-[#f8fafc]' : 'bg-[#101114]'
           }`}
           onClick={(e) => {
             // Click on the empty workspace background to deselect
@@ -2935,7 +2919,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a]' : 'bg-[#181d24] border-[#262c36] text-white'
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#fcd535]"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E2D9C8]"></span>
               <span>
                 Selected: <strong className="capitalize">{selectedElement}</strong>
               </span>
@@ -2993,7 +2977,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 }}
                 className={`relative w-full shadow-2xl transition-colors duration-200 flex flex-col justify-between overflow-hidden select-text ${
                   showBorder ? 'border border-current/15' : ''
-                } ${selectedElement === 'card' ? 'ring-2 ring-[#fcd535]/80 ring-offset-2' : ''}`}
+                } ${selectedElement === 'card' ? 'ring-2 ring-[#E2D9C8]/80 ring-offset-2' : ''}`}
               >
                 {/* Procedural Surface Texture Overlay (55+ Textures) */}
                 {selectedTextureId !== 'none' && (
@@ -3007,10 +2991,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 {/* Safe Guidelines Overlay */}
                 {showGuidelines && (
                   <div
-                    className="absolute inset-4 border border-dashed border-[#fcd535]/60 pointer-events-none z-30 flex items-center justify-center"
+                    className="absolute inset-4 border border-dashed border-[#E2D9C8]/60 pointer-events-none z-30 flex items-center justify-center"
                     aria-hidden="true"
                   >
-                    <span className="text-[10px] font-mono bg-[#fcd535] text-black px-1.5 py-0.5 rounded font-bold">
+                    <span className="text-[10px] font-mono bg-[#E2D9C8] text-[#111417] px-1.5 py-0.5 rounded font-bold">
                       SAFE PRINT AREA
                     </span>
                   </div>
@@ -3055,7 +3039,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     tagInputRef.current?.focus();
                   }}
                   className={`relative z-10 flex items-center justify-between pb-3.5 border-b border-current/15 text-[11px] font-mono tracking-wider opacity-75 cursor-pointer rounded transition-all shrink-0 ${
-                    selectedElement === 'tag' ? 'ring-1 ring-[#fcd535] bg-black/5 p-1' : ''
+                    selectedElement === 'tag' ? 'ring-1 ring-[#E2D9C8] bg-black/5 p-1' : ''
                   }`}
                   title="Click to edit folio header tag"
                 >
@@ -3074,7 +3058,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         isHolographic
                           ? 'holographic-foil shadow-sm border border-transparent font-bold'
                           : 'border border-current/25 font-mono'
-                      } ${selectedElement === 'badge' ? 'ring-1 ring-[#fcd535] bg-black/10' : ''}`}
+                      } ${selectedElement === 'badge' ? 'ring-1 ring-[#E2D9C8] bg-black/10' : ''}`}
                       title="Click to edit corner badge"
                     >
                       {badge}
@@ -3092,7 +3076,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   }}
                   className={`relative z-10 py-4 cursor-pointer rounded transition-all min-h-0 overflow-hidden ${
                     verticalAlign === 'top' ? 'my-0 mb-auto' : verticalAlign === 'bottom' ? 'my-0 mt-auto' : 'my-auto'
-                  } ${selectedElement === 'quote' ? 'ring-1 ring-[#fcd535] bg-black/5 p-2' : ''}`}
+                  } ${selectedElement === 'quote' ? 'ring-1 ring-[#E2D9C8] bg-black/5 p-2' : ''}`}
                   title="Click to edit quote text and typography"
                 >
                   <blockquote
@@ -3118,7 +3102,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     }}
                     className={`${getFontFamilyClass(fontChoice)} transition-all`}
                   >
-                    “{parseRichText(quote, '#fcd535')}”
+                    “{parseRichText(quote, '#E2D9C8')}”
                   </blockquote>
                 </div>
 
@@ -3131,7 +3115,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     authorInputRef.current?.focus();
                   }}
                   className={`relative z-10 pt-3.5 border-t border-current/15 flex items-center justify-between cursor-pointer rounded transition-all shrink-0 ${
-                    selectedElement === 'author' ? 'ring-1 ring-[#fcd535] bg-black/5 p-1' : ''
+                    selectedElement === 'author' ? 'ring-1 ring-[#E2D9C8] bg-black/5 p-1' : ''
                   }`}
                   title="Click to edit author and citation"
                 >
@@ -3145,12 +3129,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
         </div>
       </div>
 
-            {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* MOBILE BOTTOM DOCKED CATEGORY STRIP (Always visible on mobile < lg) */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* MOBILE BOTTOM DOCKED CATEGORY STRIP (Docked cleanly at bottom on mobile) */}
       <div
-        className={`lg:hidden fixed bottom-14 left-0 right-0 z-30 border-t backdrop-blur-lg px-2 py-1.5 transition-colors ${
-          isLight ? 'bg-white/95 border-[#e2e8f0]' : 'bg-[#111417]/95 border-[#262c36]'
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t backdrop-blur-xl px-2 py-1.5 pb-[env(safe-area-inset-bottom,4px)] transition-colors shadow-2xl ${
+          isLight ? 'bg-white/98 border-[#e2e8f0]' : 'bg-[#111417]/98 border-[#262c36]'
         }`}
       >
         <div className="grid grid-cols-4 gap-1 max-w-md mx-auto">
@@ -3159,8 +3141,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
             className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
               mobileSheetOpen && activeTab === 'content'
                 ? isLight
-                  ? 'bg-[#0f172a] text-white shadow-sm'
-                  : 'bg-[#fcd535] text-black shadow-sm'
+                  ? 'bg-[#111417] text-white shadow-sm'
+                  : 'bg-[#E2D9C8] text-[#111417] shadow-sm'
                 : isLight
                 ? 'text-[#475569] hover:bg-[#f1f5f9]'
                 : 'text-[#c4c7c8] hover:bg-[#181d24]'
@@ -3174,8 +3156,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
             className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
               mobileSheetOpen && activeTab === 'type'
                 ? isLight
-                  ? 'bg-[#0f172a] text-white shadow-sm'
-                  : 'bg-[#fcd535] text-black shadow-sm'
+                  ? 'bg-[#111417] text-white shadow-sm'
+                  : 'bg-[#E2D9C8] text-[#111417] shadow-sm'
                 : isLight
                 ? 'text-[#475569] hover:bg-[#f1f5f9]'
                 : 'text-[#c4c7c8] hover:bg-[#181d24]'
@@ -3189,8 +3171,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
             className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
               mobileSheetOpen && activeTab === 'palette'
                 ? isLight
-                  ? 'bg-[#0f172a] text-white shadow-sm'
-                  : 'bg-[#fcd535] text-black shadow-sm'
+                  ? 'bg-[#111417] text-white shadow-sm'
+                  : 'bg-[#E2D9C8] text-[#111417] shadow-sm'
                 : isLight
                 ? 'text-[#475569] hover:bg-[#f1f5f9]'
                 : 'text-[#c4c7c8] hover:bg-[#181d24]'
@@ -3204,8 +3186,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
             className={`py-2 px-1 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition-all cursor-pointer ${
               mobileSheetOpen && activeTab === 'decor'
                 ? isLight
-                  ? 'bg-[#0f172a] text-white shadow-sm'
-                  : 'bg-[#fcd535] text-black shadow-sm'
+                  ? 'bg-[#111417] text-white shadow-sm'
+                  : 'bg-[#E2D9C8] text-[#111417] shadow-sm'
                 : isLight
                 ? 'text-[#475569] hover:bg-[#f1f5f9]'
                 : 'text-[#c4c7c8] hover:bg-[#181d24]'
@@ -3304,7 +3286,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 onClick={() => setShowGuidelines(!showGuidelines)}
                 className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer ${
                   showGuidelines
-                    ? isLight ? 'bg-[#fffbeb] border-[#d97706] text-[#d97706]' : 'bg-[#1f242c] border-[#fcd535] text-[#fcd535]'
+                    ? isLight ? 'bg-[#f8fafc] border-[#111417] text-[#111417]' : 'bg-[#1f242c] border-[#E2D9C8] text-[#E2D9C8]'
                     : isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
                 }`}
               >
@@ -3410,7 +3392,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             {/* Drawer Header */}
             <div className={`p-4 border-b flex items-center justify-between ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
               <div className="flex items-center gap-2">
-                <LayoutTemplate className={`w-4 h-4 ${isLight ? 'text-[#d97706]' : 'text-[#fcd535]'}`} />
+                <LayoutTemplate className={`w-4 h-4 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
                 <h3 className={`text-sm font-semibold ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
                   Choose Preset Art Direction
                 </h3>
@@ -3436,7 +3418,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   type="checkbox"
                   checked={preserveTextOnSwitch}
                   onChange={(e) => setPreserveTextOnSwitch(e.target.checked)}
-                  className="accent-[#fcd535] w-4 h-4 cursor-pointer"
+                  className="accent-[#111417] dark:accent-[#E2D9C8] w-4 h-4 cursor-pointer"
                 />
                 <span className={isLight ? 'text-[#334155]' : 'text-[#c4c7c8]'}>
                   Preserve my current quote and author text (recommended)

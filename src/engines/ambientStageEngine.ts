@@ -143,9 +143,10 @@ export function updateWorkspaceAmbientBackdrop(
     return;
   }
 
-  const baseBg = fallbackColors?.bg || '#f5eee3';
-  const darkerBackdrop = getDarkerColor(baseBg, isLight ? 'light' : 'dark', isLight ? 0.18 : 0.28);
-  ambientWrapperEl.style.setProperty('--workspace-backdrop', darkerBackdrop);
+  // Mandatory separation: the workspace backdrop NEVER inherits or tints with the card palette.
+  // It remains strictly pinned to the application's fixed UI canvas token.
+  const appCanvasBg = isLight ? '#f8fafc' : '#101114';
+  ambientWrapperEl.style.setProperty('--workspace-backdrop', appCanvasBg);
 
   // If cardElement is a canvas with contents
   if (cardElement instanceof HTMLCanvasElement && cardElement.width > 0 && cardElement.height > 0) {

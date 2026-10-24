@@ -32,8 +32,14 @@ dist-ssr
 *.jpeg
 .env*
 
-# Markdown files (strictly keep only README.md)
+# Markdown files
 *.md
-!README.md
 **/*.md
+!README.md
+!DESIGN.md
+!DESIGN_STUDIO_REFERENCE.md
 !**/README.md
+!src/fix.md
+!AGENTS.md
+!.agents/**
+

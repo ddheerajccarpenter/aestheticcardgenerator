@@ -190,14 +190,14 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
   }, [currentSpreadIndex]);
 
   return (
-    <div className={`w-full min-h-screen pt-20 pb-20 transition-colors duration-200 ${isLight ? 'text-[#18191e]' : 'text-[#f4f1ea]'}`}>
-      <div className="max-w-6xl mx-auto px-4 md:px-8 flex flex-col items-center gap-8">
+    <div className="w-full min-h-screen pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+      <div className="studio-container flex flex-col items-center gap-8">
         {/* Book Header Bar */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4 border-current/10">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
             <SquareDuotoneIcon name="book" size="md" />
             <div>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-[#fcd535] font-subheading">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
                 Editorial Field Guide • Book Edition
               </span>
               <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
@@ -282,7 +282,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
                 </p>
 
                 <div className="p-4 rounded-xl border border-current/15 mb-6 bg-black/5 dark:bg-white/5">
-                  <h3 className="text-xs uppercase font-bold tracking-wider text-[#d97706] dark:text-[#fcd535] mb-1.5 font-subheading">
+                  <h3 className="text-xs uppercase font-bold tracking-wider text-[#111417] dark:text-[#E2D9C8] mb-1.5 font-subheading">
                     {spread.leftPage.rule}
                   </h3>
                   <p className="text-xs leading-relaxed font-body">
@@ -326,7 +326,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
                 </div>
 
                 <div className="mb-4">
-                  <h3 className="text-xs uppercase font-bold tracking-wider text-[#d97706] dark:text-[#fcd535] mb-1 font-subheading">
+                  <h3 className="text-xs uppercase font-bold tracking-wider text-[#111417] dark:text-[#E2D9C8] mb-1 font-subheading">
                     {spread.rightPage.rule}
                   </h3>
                   <p className="text-xs opacity-85 leading-relaxed font-body">
@@ -362,17 +362,13 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
 
               {/* Direct Studio Launcher Button */}
               <div className="pt-4 border-t border-current/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <span className="text-[11px] font-mono opacity-70">
+                <span className="text-[11px] font-mono text-[var(--app-text-muted)]">
                   Ready to apply to your words?
                 </span>
 
                 <a
                   href={spread.rightPage.actionUrl}
-                  className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
-                    isLight
-                      ? 'bg-[#1c1815] text-[#f7f2e7] hover:bg-black'
-                      : 'bg-[#fcd535] text-[#0b0e11] hover:bg-[#ffe270]'
-                  }`}
+                  className="studio-btn-primary w-full sm:w-auto !py-2.5 !text-xs cursor-pointer"
                 >
                   <span>{spread.rightPage.actionLabel}</span>
                 </a>
@@ -387,24 +383,20 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
           <button
             onClick={handlePrev}
             disabled={currentSpreadIndex === 0}
-            className={`px-4 py-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-30 ${
-              isLight ? 'bg-white border-slate-300' : 'bg-[#181d24] border-[#262c36]'
-            }`}
+            className="studio-btn-secondary !text-xs !py-2 disabled:opacity-30 cursor-pointer"
           >
             <SquareDuotoneIcon name="arrow-left" size="sm" />
             <span>← Previous Spread</span>
           </button>
 
-          <span className="text-xs font-mono font-bold text-[#fcd535]">
+          <span className="text-xs font-mono font-bold text-[var(--app-text-primary)]">
             {currentSpreadIndex + 1} / {totalSpreads}
           </span>
 
           <button
             onClick={handleNext}
             disabled={currentSpreadIndex === totalSpreads - 1}
-            className={`px-4 py-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-30 ${
-              isLight ? 'bg-white border-slate-300' : 'bg-[#181d24] border-[#262c36]'
-            }`}
+            className="studio-btn-secondary !text-xs !py-2 disabled:opacity-30 cursor-pointer"
           >
             <span>Next Spread →</span>
             <SquareDuotoneIcon name="arrow-right" size="sm" />

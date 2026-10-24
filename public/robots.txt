@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Host
+Host: https://aestheticcardgenerator.pages.dev
+
+# Sitemaps
 Sitemap: https://aestheticcardgenerator.pages.dev/sitemap.xml
