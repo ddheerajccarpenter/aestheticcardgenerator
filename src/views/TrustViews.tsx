@@ -64,7 +64,7 @@ export const AboutView: React.FC<TrustViewBaseProps> = () => {
             {/* Column 1: Local-First Architecture */}
             <div className="p-6 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0ecb81] block mb-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--app-accent)] block mb-2">
                   01 • LOCAL-FIRST MEMORY
                 </span>
                 <h2 className="text-lg font-bold mb-2 font-heading text-[var(--app-text-primary)]">
@@ -192,7 +192,7 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
                 type="button"
                 className="studio-btn-secondary !text-xs !py-2.5"
               >
-                {copiedEmail ? <Check className="w-3.5 h-3.5 text-[#0ecb81]" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedEmail ? <Check className="w-3.5 h-3.5 text-[var(--app-accent)]" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedEmail ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
@@ -202,7 +202,7 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
           <div className="studio-panel p-6 sm:p-8 flex flex-col justify-between shadow-xl">
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-[#0ecb81]" />
+                <span className="w-2 h-2 rounded-full bg-[var(--app-accent)]" />
                 <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">Issue Tracking</h2>
               </div>
               <p className="text-xs text-[var(--app-text-secondary)] leading-relaxed">
@@ -347,8 +347,8 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
 
         <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-[#0ecb81]" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#0ecb81] font-subheading">
+            <Lock className="w-4 h-4 text-[var(--app-accent)]" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-accent)] font-subheading">
               Legal Transparency
             </span>
           </div>
@@ -668,8 +668,8 @@ export const AccessibilityView: React.FC<TrustViewBaseProps> = () => {
 
         <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <Eye className="w-4 h-4 text-[#0ecb81]" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#0ecb81] font-subheading">
+            <Eye className="w-4 h-4 text-[var(--app-accent)]" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-accent)] font-subheading">
               Inclusion &amp; Standards
             </span>
           </div>
@@ -805,7 +805,7 @@ export const CreditsView: React.FC<TrustViewBaseProps> = () => {
               </div>
               <div className="flex items-center gap-2 text-[11px] font-mono shrink-0">
                 <span className="text-[var(--app-text-muted)]">{c.author}</span>
-                <span className="px-2 py-0.5 rounded border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-[#0ecb81]">
+                <span className="px-2 py-0.5 rounded border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-[var(--app-accent)]">
                   {c.license}
                 </span>
               </div>
@@ -901,7 +901,7 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
         </div>
 
         <div className="mt-6 flex items-center gap-2 text-xs text-[var(--app-text-muted)] font-subheading">
-          <span className="w-2 h-2 rounded-full bg-[#0ecb81] animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-[var(--app-accent)] animate-pulse" />
           <span>Studio is running normally — this URL simply does not exist</span>
         </div>
       </div>

@@ -406,7 +406,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
   };
 
   return (
-    <div className="w-full flex-1 flex flex-col pt-14 min-h-[calc(100vh-56px)] bg-[#0c0d10] text-[#f4f1ea] transition-colors duration-200">
+    <div className="creator-workspace w-full flex-1 flex flex-col pt-14 min-h-[calc(100vh-56px)] bg-[var(--app-bg)] text-[var(--app-text-primary)] transition-colors duration-200">
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* WORKSPACE TOOLBAR                                                   */}
       {/* ─────────────────────────────────────────────────────────────────── */}
@@ -794,7 +794,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                   backgroundColor: currentPalette.bg,
                   color: currentPalette.ink,
                 }}
-                className={`w-full ${getAspectDimensions()} p-6 sm:p-8 rounded-xl shadow-2xl transition-colors duration-200 flex flex-col justify-between border border-black/15 overflow-hidden relative select-text`}
+                className={`w-full ${getAspectDimensions()} p-6 sm:p-8 rounded-xl shadow-md transition-colors duration-200 flex flex-col justify-between border border-black/15 overflow-hidden relative select-text`}
               >
                 {/* Subtle paper grain texture */}
                 <div className="absolute inset-0 card-noise opacity-25 pointer-events-none" />

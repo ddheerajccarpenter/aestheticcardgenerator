@@ -31,31 +31,31 @@ export const LazyTemplateCard: React.FC<{
   return (
     <div
       ref={hostRef}
-      className={`relative overflow-hidden rounded-2xl border border-white/[0.08] dark:border-white/[0.08] ${aspectRatioClass} ${className} template-card-kinetic`}
+      className={`relative overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] ${aspectRatioClass} ${className} template-card-kinetic`}
     >
       {/* Clean, Neutral Geometric Skeleton while mounting */}
       {!hydrated && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-10 flex flex-col justify-between p-6 bg-[#13161c] transition-opacity duration-300 pointer-events-none select-none"
+          className="absolute inset-0 z-10 flex flex-col justify-between p-6 bg-[var(--app-surface-secondary)] transition-opacity duration-300 pointer-events-none select-none"
         >
           {/* Top metadata skeleton */}
           <div className="flex justify-between items-center">
-            <div className="h-3 w-20 rounded bg-white/[0.06]" />
-            <div className="h-4 w-12 rounded bg-white/[0.06]" />
+            <div className="h-3 w-20 rounded bg-[var(--app-text-primary)]/10" />
+            <div className="h-4 w-12 rounded bg-[var(--app-text-primary)]/10" />
           </div>
 
           {/* Central quote text skeleton */}
           <div className="space-y-2.5 my-auto">
-            <div className="h-4 w-5/6 rounded bg-white/[0.07]" />
-            <div className="h-4 w-4/6 rounded bg-white/[0.07]" />
-            <div className="h-4 w-3/6 rounded bg-white/[0.05]" />
+            <div className="h-4 w-5/6 rounded bg-[var(--app-text-primary)]/10" />
+            <div className="h-4 w-4/6 rounded bg-[var(--app-text-primary)]/10" />
+            <div className="h-4 w-3/6 rounded bg-[var(--app-text-primary)]/10" />
           </div>
 
           {/* Bottom citation skeleton */}
-          <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
-            <div className="h-3 w-28 rounded bg-white/[0.06]" />
-            <div className="h-3 w-8 rounded bg-white/[0.04]" />
+          <div className="pt-3 border-t border-[var(--app-border-subtle)] flex items-center justify-between">
+            <div className="h-3 w-28 rounded bg-[var(--app-text-primary)]/10" />
+            <div className="h-3 w-8 rounded bg-[var(--app-text-primary)]/10" />
           </div>
 
           {/* Ambient subtle shimmer sweep */}

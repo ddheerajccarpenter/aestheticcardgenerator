@@ -140,7 +140,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
             <ul className="flex flex-col gap-2.5 text-xs">
               {category.designTips.map((tip, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0ecb81] shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[var(--app-accent)] shrink-0 mt-0.5" />
                   <span className="text-[var(--app-text-secondary)]">{tip}</span>
                 </li>
               ))}

@@ -40,7 +40,6 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
-import { initScrollGradientEngine } from './utils/scrollGradientEngine';
 import { restoreSavedCustomFonts } from './services/customFontManager';
 
 export const App: React.FC = () => {
@@ -96,13 +95,9 @@ export const App: React.FC = () => {
     }
   }, [currentPath]);
 
-  // Initialize 60fps Scroll Gradient Engine and restore Saved Fonts
+  // Restore saved fonts for locally stored designs.
   useEffect(() => {
-    const cleanupGradient = initScrollGradientEngine();
     restoreSavedCustomFonts();
-    return () => {
-      cleanupGradient();
-    };
   }, []);
 
   const toggleTheme = () => {
@@ -304,12 +299,8 @@ export const App: React.FC = () => {
   return (
     <div
       data-theme={theme}
-      className={`min-h-screen flex flex-col font-sans transition-colors duration-200 relative ${
-        isLight ? 'text-[#181a20]' : 'text-[#f4f1ea]'
-      }`}
+      className="app-shell min-h-screen flex flex-col font-sans transition-colors duration-200 relative text-[var(--app-text-primary)]"
     >
-      {/* Universal 60:30:10 Scroll-Reactive Background Field */}
-      <div className="universal-page-bg" />
       {/* Global Header (shown across public marketing pages, hidden on standalone fullscreen studio) */}
       {currentPath !== '/canvas' && (
         <Header
@@ -324,9 +315,11 @@ export const App: React.FC = () => {
       {/* Main Content Area */}
       <main
         className={`flex-1 transition-all duration-200 ${
-          currentPath !== '/create' && currentPath !== '/canvas'
-            ? 'pb-24 md:pb-0 md:pl-16'
-            : ''
+          currentPath === '/create'
+            ? 'md:pl-16'
+            : currentPath !== '/canvas'
+              ? 'pb-24 md:pb-0 md:pl-16'
+              : ''
         }`}
       >
         {renderCurrentRoute()}

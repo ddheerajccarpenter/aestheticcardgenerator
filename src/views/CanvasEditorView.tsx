@@ -41,12 +41,12 @@ import {
   ZoomIn,
   ZoomOut,
   ArrowLeft,
+  Check,
   Grid,
   Upload,
   ChevronDown,
   LayoutTemplate,
   FilePlus,
-  HelpCircle,
   QrCode,
   Barcode,
   Award,
@@ -63,7 +63,6 @@ import {
   Sun,
   Moon,
   Box,
-  Terminal,
   Folder,
   FolderOpen,
   RefreshCw,
@@ -150,6 +149,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       }
     }
 
+    if (isBlank) {
+      return createBlankCanvas();
+    }
+
     if (!isBlank) {
       const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
       if (saved) {
@@ -167,15 +170,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               if (matchedTemplate) {
                 return templateToCanvasDoc(matchedTemplate);
               }
-              // Or expand collapsed objects to properly fill the canvas
-              const expanded = normalizeTemplateDimensions(
-                parsed.objects as any,
-                parsed.canvasWidth,
-                parsed.canvasHeight,
-                parsed.canvasWidth,
-                parsed.canvasHeight
-              );
-              return { ...parsed, objects: expanded as any };
+              // Keep custom compositions intact. The collapse heuristic is only safe
+              // when we can restore a known template with its original geometry.
+              return parsed;
             }
             return parsed;
           }
@@ -200,7 +197,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // Viewport / Zoom & Stage Toggles
   const [zoom, setZoom] = useState<number>(1);
   const [showGrid, setShowGrid] = useState<boolean>(false);
-  const [ambientModeEnabled, setAmbientModeEnabled] = useState<boolean>(true);
+  const [ambientModeEnabled, setAmbientModeEnabled] = useState<boolean>(false);
   const [is3DMode, setIs3DMode] = useState<boolean>(false);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'inspector' | 'layers' | 'recycle' | 'templates'>('inspector');
   const [layerViewMode, setLayerViewMode] = useState<'folders' | 'flat'>('folders');
@@ -213,6 +210,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   // Natural-Language Quick Command Bar State (Leftover Item 5)
   const [quickCommandText, setQuickCommandText] = useState('');
+  const [quickCommandOpen, setQuickCommandOpen] = useState(false);
 
   // Saved Clips & Recycle Drawer (Leftover Item 6)
   const [savedClips, setSavedClips] = useState<CanvasObject[]>(() => {
@@ -402,10 +400,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // It remains strictly pinned to the application UI color tokens (--app-bg / #101114).
   useEffect(() => {
     updateWorkspaceAmbientBackdrop(
-      canvasElementRef.current,
       canvasContainerRef.current,
       ambientModeEnabled,
-      undefined,
       isLight
     );
   }, [ambientModeEnabled, isLight]);
@@ -529,25 +525,6 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     });
   }, []);
 
-  // Auto-fit zoom on mount or canvas resize
-  useEffect(() => {
-    const fitZoom = () => {
-      if (!canvasContainerRef.current) return;
-      const containerW = canvasContainerRef.current.clientWidth - 80;
-      const containerH = canvasContainerRef.current.clientHeight - 80;
-      if (containerW <= 0 || containerH <= 0) return;
-
-      const scaleW = containerW / doc.canvasWidth;
-      const scaleH = containerH / doc.canvasHeight;
-      const targetScale = Math.min(scaleW, scaleH, 1);
-      setZoom(Math.max(0.2, Number(targetScale.toFixed(2))));
-    };
-
-    fitZoom();
-    window.addEventListener('resize', fitZoom);
-    return () => window.removeEventListener('resize', fitZoom);
-  }, [doc.canvasWidth, doc.canvasHeight]);
-
   // Persist draft to localStorage (debounced)
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -625,41 +602,44 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const addObject = useCallback(
     (newObj: CanvasObject) => {
+      const currentDoc = docRef.current;
       // Set zIndex to top
-      const maxZ = doc.objects.reduce((max, o) => Math.max(max, o.zIndex), 0);
+      const maxZ = currentDoc.objects.reduce((max, o) => Math.max(max, o.zIndex), 0);
       newObj.zIndex = maxZ + 1;
 
       const nextDoc: CanvasDocument = {
-        ...doc,
+        ...currentDoc,
         updatedAt: new Date().toISOString(),
-        objects: [...doc.objects, newObj],
+        objects: [...currentDoc.objects, newObj],
       };
       commitDocumentChange(nextDoc);
       setSelectedId(newObj.id);
       setActiveSidebarTab('inspector');
     },
-    [doc, commitDocumentChange]
+    [commitDocumentChange]
   );
 
   const deleteObject = useCallback(
     (id: string) => {
+      const currentDoc = docRef.current;
       const nextDoc: CanvasDocument = {
-        ...doc,
+        ...currentDoc,
         updatedAt: new Date().toISOString(),
-        objects: doc.objects.filter((o) => o.id !== id),
+        objects: currentDoc.objects.filter((o) => o.id !== id),
       };
       commitDocumentChange(nextDoc);
       if (selectedId === id) setSelectedId(null);
     },
-    [doc, selectedId, commitDocumentChange]
+    [selectedId, commitDocumentChange]
   );
 
   const duplicateObject = useCallback(
     (id: string) => {
-      const target = doc.objects.find((o) => o.id === id);
+      const currentDoc = docRef.current;
+      const target = currentDoc.objects.find((o) => o.id === id);
       if (!target) return;
 
-      const maxZ = doc.objects.reduce((max, o) => Math.max(max, o.zIndex), 0);
+      const maxZ = currentDoc.objects.reduce((max, o) => Math.max(max, o.zIndex), 0);
       const clone: CanvasObject = {
         ...JSON.parse(JSON.stringify(target)),
         id: createObjectId(target.type),
@@ -670,20 +650,21 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       };
 
       const nextDoc: CanvasDocument = {
-        ...doc,
+        ...currentDoc,
         updatedAt: new Date().toISOString(),
-        objects: [...doc.objects, clone],
+        objects: [...currentDoc.objects, clone],
       };
       commitDocumentChange(nextDoc);
       setSelectedId(clone.id);
     },
-    [doc, commitDocumentChange]
+    [commitDocumentChange]
   );
 
   // Layer ordering
   const reorderObject = useCallback(
     (id: string, direction: 'front' | 'back' | 'up' | 'down') => {
-      const sorted = [...doc.objects].sort((a, b) => a.zIndex - b.zIndex);
+      const currentDoc = docRef.current;
+      const sorted = [...currentDoc.objects].sort((a, b) => a.zIndex - b.zIndex);
       const index = sorted.findIndex((o) => o.id === id);
       if (index === -1) return;
 
@@ -704,13 +685,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       }
 
       const nextDoc: CanvasDocument = {
-        ...doc,
+        ...currentDoc,
         updatedAt: new Date().toISOString(),
         objects: sorted,
       };
       commitDocumentChange(nextDoc);
     },
-    [doc, commitDocumentChange]
+    [commitDocumentChange]
   );
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -718,30 +699,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // ───────────────────────────────────────────────────────────────────────────
 
   const getCanvasCoords = useCallback(
-    (e: React.MouseEvent | MouseEvent | React.TouchEvent | TouchEvent) => {
+    (e: React.PointerEvent | PointerEvent) => {
       if (!canvasElementRef.current) return { x: 0, y: 0 };
       const rect = canvasElementRef.current.getBoundingClientRect();
-      const clientX =
-        'touches' in e && e.touches.length > 0
-          ? e.touches[0].clientX
-          : 'changedTouches' in e && e.changedTouches.length > 0
-          ? e.changedTouches[0].clientX
-          : (e as MouseEvent).clientX;
-      const clientY =
-        'touches' in e && e.touches.length > 0
-          ? e.touches[0].clientY
-          : 'changedTouches' in e && e.changedTouches.length > 0
-          ? e.changedTouches[0].clientY
-          : (e as MouseEvent).clientY;
       return {
-        x: (clientX - rect.left) / zoom,
-        y: (clientY - rect.top) / zoom,
+        x: (e.clientX - rect.left) / zoom,
+        y: (e.clientY - rect.top) / zoom,
       };
     },
     [zoom]
   );
 
-  const handleObjectMouseDown = (e: React.MouseEvent, obj: CanvasObject) => {
+  const handleObjectPointerDown = (e: React.PointerEvent, obj: CanvasObject) => {
     e.stopPropagation();
     if (obj.locked) {
       setSelectedId(obj.id);
@@ -768,8 +737,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     };
   };
 
-  const handleResizeHandleMouseDown = (
-    e: React.MouseEvent,
+  const handleResizeHandlePointerDown = (
+    e: React.PointerEvent,
     handle: string,
     obj: CanvasObject
   ) => {
@@ -794,7 +763,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     };
   };
 
-  const handleRotateHandleMouseDown = (e: React.MouseEvent, obj: CanvasObject) => {
+  const handleRotateHandlePointerDown = (e: React.PointerEvent, obj: CanvasObject) => {
     e.stopPropagation();
     if (obj.locked) return;
 
@@ -878,7 +847,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         y: Math.round(doc.canvasHeight / 2 - 80),
         width: 360,
         height: 60,
-        color: isLight ? '#0f172a' : '#ffffff',
+        color: isLight ? 'var(--app-accent)' : '#ffffff',
       })
     );
 
@@ -929,7 +898,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   useEffect(() => {
     let animFrameId: number | null = null;
 
-    const handlePointerMove = (e: PointerEvent | MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       const drag = dragRef.current;
       if (!drag.isDragging && !drag.isResizing && !drag.isRotating) return;
       if (!selectedId) return;
@@ -1083,15 +1052,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointercancel', handlePointerUp);
-    window.addEventListener('mousemove', handlePointerMove);
-    window.addEventListener('mouseup', handlePointerUp);
     return () => {
       if (animFrameId) cancelAnimationFrame(animFrameId);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('pointercancel', handlePointerUp);
-      window.removeEventListener('mousemove', handlePointerMove);
-      window.removeEventListener('mouseup', handlePointerUp);
     };
   }, [selectedId, showGrid, getCanvasCoords, updateObject, commitDocumentChange]);
 
@@ -1149,7 +1114,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId, doc.objects, handleUndo, handleRedo, duplicateObject, deleteObject, updateObject]);
+  }, [editingTextId, selectedId, doc.objects, handleUndo, handleRedo, duplicateObject, deleteObject, updateObject]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // IMAGE UPLOAD HANDLER
@@ -1157,6 +1122,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.currentTarget.value = '';
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
@@ -1176,40 +1142,40 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
       const img = new Image();
       img.onload = () => {
-        // Calculate balanced initial dimensions
-        let w = img.naturalWidth;
-        let h = img.naturalHeight;
-        const maxInitial = Math.min(doc.canvasWidth * 0.45, 360);
-        if (w > maxInitial) {
-          h = Math.round((h * maxInitial) / w);
-          w = maxInitial;
-        }
+        // Keep both wide and tall images inside a sensible first placement.
+        const maxWidth = Math.min(docRef.current.canvasWidth * 0.45, 360);
+        const maxHeight = Math.min(docRef.current.canvasHeight * 0.6, 360);
+        const scale = Math.min(1, maxWidth / img.naturalWidth, maxHeight / img.naturalHeight);
+        const w = Math.max(1, Math.round(img.naturalWidth * scale));
+        const h = Math.max(1, Math.round(img.naturalHeight * scale));
 
         const newImgObj = createImageObject(dataUrl, {
           name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || 'Uploaded Photo',
           width: w,
           height: h,
-          x: Math.round(doc.canvasWidth / 2 - w / 2),
-          y: Math.round(doc.canvasHeight / 2 - h / 2),
+          x: Math.round(docRef.current.canvasWidth / 2 - w / 2),
+          y: Math.round(docRef.current.canvasHeight / 2 - h / 2),
           borderRadius: 12,
         });
 
         addObject(newImgObj);
         showToast('Photo added to canvas!');
       };
+      img.onerror = () => showToast('Could not open this image. Please try another file.');
       img.src = dataUrl;
     };
     reader.onerror = () => {
       showToast('Error reading image file. Please try another image.');
     };
     reader.readAsDataURL(file);
-    e.target.value = '';
   };
 
   // In-Place Photo Replacement: Preserves all position coordinates, dimensions, rotation, clip masks, and z-index
   const handleReplacePhotoInPlace = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const targetId = pendingReplaceLayerIdRef.current || selectedId;
+    pendingReplaceLayerIdRef.current = null;
+    e.currentTarget.value = '';
     if (!file || !targetId) return;
 
     const currentObj = docRef.current.objects.find((o) => o.id === targetId);
@@ -1217,6 +1183,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
     if (!file.type.startsWith('image/')) {
       showToast('Please select a valid image file (PNG, JPEG, WebP, SVG).');
+      return;
+    }
+
+    if (file.size > 8 * 1024 * 1024) {
+      showToast('File size is too large (max 8MB). Please choose a smaller photo.');
       return;
     }
 
@@ -1237,12 +1208,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         showToast('Photo replaced in-place while keeping layout intact!');
       };
       img.onerror = () => {
-        updateObject(targetId, {
-          src: dataUrl,
-          filteredSrc: undefined,
-          name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || currentObj.name,
-        });
-        showToast('Photo replaced in-place!');
+        showToast('Could not open this image. The current photo was kept.');
       };
       img.src = dataUrl;
     };
@@ -1250,8 +1216,6 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       showToast('Error reading image file.');
     };
     reader.readAsDataURL(file);
-    e.target.value = '';
-    pendingReplaceLayerIdRef.current = null;
   };
 
   // Offline AI Background Removal: Runs 100% locally via WASM/WebGPU with client-side chroma fallback
@@ -1289,9 +1253,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     if (!canvasElementRef.current) return;
     setExporting(true);
     setExportDropdownOpen(false);
-    setSelectedId(null); // Temporarily deselect so handles & rings are NOT exported
 
-    // Wait a frame for React to clear selection outlines
+    // Wait for selection controls to hide before capturing the artwork.
     await new Promise((resolve) => setTimeout(resolve, 80));
 
     try {
@@ -1359,7 +1322,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
       // MANDATORY FILENAME RULE: Always starts with aestheticcardgenerator.com
       const filename = getBrandedExportFilename(
-        actualFormat === 'jpeg' ? 'png' : (actualFormat as 'png' | 'webp'),
+        actualFormat as 'png' | 'jpeg' | 'webp',
         '2d',
         isUltra ? (format.toUpperCase() as '4K' | '8K' | '16K') : undefined
       );
@@ -1367,7 +1330,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       const link = document.createElement('a');
       link.download = filename;
       link.href = dataUrl;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      if (actualFormat === 'webp') {
+        window.setTimeout(() => URL.revokeObjectURL(dataUrl), 3000);
+      }
 
       showToast(`Exported ${doc.title} (${Math.round(doc.canvasWidth * scale)}×${Math.round(doc.canvasHeight * scale)}px pure card isolate)!`);
     } catch (err) {
@@ -1417,13 +1385,6 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     });
     showToast('Fitted card elements to canvas!');
   }, [commitDocumentChange]);
-
-  // Self-heal: If document was loaded in a collapsed state from the previous preset compounding bug, auto-fit to canvas immediately
-  useEffect(() => {
-    if (isDocumentCollapsed(docRef.current)) {
-      handleFitCardToCanvas();
-    }
-  }, [handleFitCardToCanvas]);
 
   // Quick Command Execution (Leftover Item 5)
   const handleExecuteQuickCommand = useCallback((cmd: string) => {
@@ -1546,11 +1507,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // ───────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="w-full min-h-screen flex flex-col pt-0 transition-colors duration-200 bg-[var(--app-bg)] text-[var(--app-text)]">
+    <div className="canvas-editor w-full min-h-screen flex flex-col pt-0 transition-colors duration-200 bg-[var(--app-bg)] text-[var(--app-text)]">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl studio-panel shadow-2xl flex items-center gap-2 text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 text-[var(--app-text)]">
-          <Sparkles className="w-4 h-4 text-[var(--app-accent)]" />
+          <Check className="w-4 h-4 text-[var(--app-text-secondary)]" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -1597,11 +1558,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               onChange={(e) => setDoc((prev) => ({ ...prev, title: e.target.value }))}
               onBlur={(e) => commitDocumentChange({ ...doc, title: e.target.value })}
               className={`doc-title-input text-xs sm:text-sm font-semibold tracking-tight bg-transparent border-b border-transparent hover:border-[#707a8a] focus:border-[#111417] dark:focus:border-[#E2D9C8] focus:outline-none px-1 py-0.5 rounded transition-all max-w-[90px] sm:max-w-[160px] md:max-w-xs ${
-                isLight ? 'text-[#0f172a]' : 'text-white'
+                isLight ? 'text-[var(--app-accent)]' : 'text-white'
               }`}
               title="Click to rename document"
             />
-            <span className="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-[#707a8a]/10 text-[#707a8a]">
+            <span className="hidden xl:inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-[#707a8a]/10 text-[#707a8a]">
               {doc.canvasWidth} × {doc.canvasHeight} px
             </span>
           </div>
@@ -1656,15 +1617,6 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
             <button
-              onClick={() => setZoom(1)}
-              className={`p-1.5 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
-                isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#181d24]'
-              }`}
-              title="Reset to 100%"
-            >
-              1:1
-            </button>
-            <button
               onClick={handleFitToScreen}
               className={`p-1.5 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
                 isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#181d24]'
@@ -1673,112 +1625,109 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             >
               Fit
             </button>
-            <button
-              onClick={handleFitCardToCanvas}
-              className={`p-1.5 rounded-lg text-xs font-mono transition-colors cursor-pointer flex items-center gap-1 ${
-                isLight ? 'hover:bg-[#f1f3f5] text-[#2563eb]' : 'hover:bg-[#181d24] text-[#38bdf8]'
-              }`}
-              title="Fit Card Content: Scales and reflows all card elements to fill the canvas"
-            >
-              <Maximize2 className="w-3.5 h-3.5" />
-              <span className="hidden md:inline text-[11px] font-sans font-medium">Fit Card</span>
-            </button>
           </div>
 
           <div className="h-4 w-px bg-[#262c36]/40 mx-1 hidden sm:block" />
 
-          {/* Grid Toggle (Desktop/Tablet) */}
-          <button
-            onClick={() => setShowGrid(!showGrid)}
-            className={`hidden sm:inline-flex p-2 rounded-lg transition-colors cursor-pointer ${
-              showGrid
-                ? isLight
-                  ? 'bg-[#111417] text-white'
-                  : 'bg-[#E2D9C8] text-[#111417]'
-                : isLight
-                ? 'hover:bg-[#f1f3f5] text-[#707a8a]'
-                : 'hover:bg-[#181d24] text-[#707a8a]'
-            }`}
-            title="Toggle alignment grid (20px)"
-          >
-            <Grid className="w-4 h-4" />
-          </button>
-
-          {/* Auto-Align in 8px Grid (Desktop/Tablet) */}
-          <button
-            onClick={() => {
-              const aligned = autoAlignLayersInGrid(doc.objects as any, doc.canvasWidth, doc.canvasHeight);
-              commitDocumentChange({ ...doc, objects: aligned as any });
-              showToast('Auto-aligned all layers to 8px baseline grid');
-            }}
-            className={`hidden sm:inline-flex p-2 rounded-lg transition-colors cursor-pointer ${
-              isLight ? 'hover:bg-[#f1f3f5] text-[#707a8a]' : 'hover:bg-[#181d24] text-[#707a8a]'
-            }`}
-            title="Auto-align layers to 8px baseline grid & center alignments"
-          >
-            <Sparkles className="w-4 h-4 text-[#ec4899]" />
-          </button>
-
-          <div className="h-4 w-px bg-[#262c36]/40 mx-0.5 sm:mx-1" />
-
-          {/* Ambient Lighting Toggle (YouTube-Style - Leftover Item 3) */}
-          <button
-            onClick={() => setAmbientModeEnabled(!ambientModeEnabled)}
-            className={`p-1.5 sm:px-2 sm:py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
-              ambientModeEnabled
-                ? isLight
-                  ? 'bg-[#111417]/10 text-[#111417]'
-                  : 'bg-[#E2D9C8]/15 text-[#E2D9C8]'
-                : 'text-[#707a8a] hover:text-white'
-            }`}
-            title="Toggle YouTube-style Ambient Glow around card stage"
-          >
-            <Sun className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Ambient</span>
-          </button>
-
-          {/* 3D Physical Card View Toggle (Three.js - Leftover Item 2) */}
-          <button
-            onClick={() => setIs3DMode(!is3DMode)}
-            className={`p-1.5 sm:px-2 sm:py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
-              is3DMode
-                ? isLight
-                  ? 'bg-[#111417] text-white font-bold'
-                  : 'bg-[#E2D9C8] text-[#111417] font-bold'
-                : isLight
-                ? 'bg-slate-100 text-slate-700 hover:text-black'
-                : 'bg-[#181d24] text-[#a0a5ad] hover:text-white'
-            }`}
-            title="Toggle Three.js 3D Physical Card Stage with dynamic reflections"
-          >
-            <Box className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">3D View</span>
-          </button>
+          <details className="relative">
+            <summary className={`list-none p-2 rounded-lg flex items-center gap-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+              isLight ? 'hover:bg-[#f1f3f5] text-[#707a8a]' : 'hover:bg-[#181d24] text-[#a0a5ad]'
+            }`}>
+              <Eye className="w-4 h-4" />
+              <span className="hidden md:inline">View</span>
+              <ChevronDown className="w-3 h-3" />
+            </summary>
+            <div className={`absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-52 rounded-xl border p-2 shadow-2xl z-50 flex flex-col gap-1 canvas-utility-popover ${
+              isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+            }`}>
+              <button
+                onClick={(e) => {
+                  setShowGrid((shown) => !shown);
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full px-2 py-2 text-left text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                  isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#222730]'
+                }`}
+                aria-pressed={showGrid}
+              >
+                <span className="flex items-center gap-2"><Grid className="w-3.5 h-3.5" /> Alignment grid</span>
+                <span className="text-[var(--app-text-muted)]">{showGrid ? 'On' : 'Off'}</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  setZoom(1);
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full px-2 py-2 text-left text-xs flex items-center gap-2 cursor-pointer transition-colors ${
+                  isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#222730]'
+                }`}
+              >
+                <ZoomIn className="w-3.5 h-3.5" /> Actual size (100%)
+              </button>
+              <button
+                onClick={(e) => {
+                  handleFitCardToCanvas();
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full px-2 py-2 text-left text-xs flex items-center gap-2 cursor-pointer transition-colors ${
+                  isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#222730]'
+                }`}
+                title="Scale and reflow the layers to fit the canvas"
+              >
+                <Maximize2 className="w-3.5 h-3.5" /> Fit layers to canvas
+              </button>
+              <div className="h-px w-full bg-[var(--app-border-subtle)] my-1" />
+              <button
+                onClick={(e) => {
+                  const aligned = autoAlignLayersInGrid(doc.objects as any, doc.canvasWidth, doc.canvasHeight);
+                  commitDocumentChange({ ...doc, objects: aligned as any });
+                  showToast('Layers aligned to grid');
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full px-2 py-2 text-left text-xs flex items-center gap-2 cursor-pointer transition-colors ${
+                  isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#222730]'
+                }`}
+                title="Align layers to an 8px baseline grid"
+              >
+                <AlignCenter className="w-3.5 h-3.5" /> Align layers
+              </button>
+              <button
+                onClick={(e) => {
+                  setAmbientModeEnabled((enabled) => !enabled);
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full px-2 py-2 text-left text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                  isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#222730]'
+                }`}
+                aria-pressed={ambientModeEnabled}
+              >
+                <span className="flex items-center gap-2"><Sun className="w-3.5 h-3.5" /> Stage tone</span>
+                <span className="text-[var(--app-text-muted)]">{ambientModeEnabled ? 'Soft' : 'Plain'}</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  setIs3DMode((enabled) => !enabled);
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full px-2 py-2 text-left text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                  isLight ? 'hover:bg-[#f1f3f5]' : 'hover:bg-[#222730]'
+                }`}
+                aria-pressed={is3DMode}
+              >
+                <span className="flex items-center gap-2"><Box className="w-3.5 h-3.5" /> 3D preview</span>
+                <span className="text-[var(--app-text-muted)]">{is3DMode ? 'On' : 'Off'}</span>
+              </button>
+            </div>
+          </details>
         </div>
 
-        {/* Right: Theme Toggle, Template Picker, Blank Canvas & Export */}
+        {/* Right: Common options and export */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          {/* Studio Theme Toggle Button */}
-          {onToggleTheme && (
-            <button
-              onClick={onToggleTheme}
-              className={`p-1.5 sm:p-2 rounded-lg border transition-colors cursor-pointer ${
-                isLight
-                  ? 'bg-white border-[#e2e8f0] text-slate-700 hover:bg-[#f8fafc]'
-                  : 'bg-[#181d24] border-[#262c36] text-[#E2D9C8] hover:bg-[#222730]'
-              }`}
-              title={`Switch to ${isLight ? 'Dark' : 'Light'} Mode`}
-              aria-label="Toggle Theme"
-            >
-              {isLight ? <Moon className="w-3.5 h-3.5 text-slate-700" /> : <Sun className="w-3.5 h-3.5 text-[#E2D9C8]" />}
-            </button>
-          )}
-
           <button
             onClick={() => setTemplateDrawerOpen(true)}
-            className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
+            className={`hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
               isLight
-                ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
+                ? 'bg-white border-[#e2e8f0] text-[var(--app-accent)] hover:bg-[#f8fafc]'
                 : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
             }`}
           >
@@ -1786,31 +1735,83 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <span>Templates</span>
           </button>
 
-          <button
-            onClick={() => setMediaModalOpen(true)}
-            className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
+          <details className="relative">
+            <summary className={`list-none inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
               isLight
-                ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
+                ? 'bg-white border-[#e2e8f0] text-[var(--app-accent)] hover:bg-[#f8fafc]'
                 : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
-            }`}
-            title="Search and import book or song cover & metadata"
-          >
-            <BookOpen className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
-            <span>Import Book / Song</span>
-          </button>
-
-          <button
-            onClick={() => handleCreateBlank()}
-            className={`hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
-              isLight
-                ? 'bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]'
-                : 'bg-[#181d24] border-[#262c36] text-white hover:bg-[#222730]'
-            }`}
-            title="Start fresh blank canvas"
-          >
-            <FilePlus className="w-3.5 h-3.5" />
-            <span>Blank</span>
-          </button>
+            }`}>
+              <span>More</span>
+              <ChevronDown className="w-3 h-3" />
+            </summary>
+            <div className={`absolute right-0 top-full mt-2 w-52 rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 canvas-utility-popover ${
+              isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
+            }`}>
+              <button
+                onClick={(e) => {
+                  setTemplateDrawerOpen(true);
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`xl:hidden w-full text-left px-3 py-2 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
+                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                }`}
+              >
+                <LayoutTemplate className="w-3.5 h-3.5" /> Templates
+              </button>
+              {onToggleTheme && (
+                <button
+                  onClick={(e) => {
+                    onToggleTheme();
+                    e.currentTarget.closest('details')?.removeAttribute('open');
+                  }}
+                  className={`w-full text-left px-3 py-2 text-xs flex items-center gap-2 cursor-pointer transition-colors ${
+                    isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                  }`}
+                >
+                  {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+                  Switch to {isLight ? 'dark' : 'light'} theme
+                </button>
+              )}
+              <div className="h-px w-full bg-[var(--app-border-subtle)] my-1" />
+              <button
+                onClick={(e) => {
+                  setMediaModalOpen(true);
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
+                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                }`}
+                title="Search and import book or song cover & metadata"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Book / song</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  handleCreateBlank();
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
+                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                }`}
+              >
+                <FilePlus className="w-3.5 h-3.5" />
+                <span>Blank canvas</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  setQuickCommandOpen((open) => !open);
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
+                  isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
+                }`}
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span>{quickCommandOpen ? 'Close quick edit' : 'Quick edit'}</span>
+              </button>
+            </div>
+          </details>
 
           {/* Export Dropdown */}
           <div className="relative">
@@ -1830,7 +1831,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
             {exportDropdownOpen && (
               <div
-                className={`absolute right-0 top-full mt-2 w-52 rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 ${
+                className={`absolute right-0 top-full mt-2 w-52 rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 canvas-utility-popover ${
                   isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
                 }`}
               >
@@ -1862,8 +1863,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   <span className="text-[10px] opacity-60 font-mono">Small</span>
                 </button>
                 <div className={`h-px my-1 ${isLight ? 'bg-slate-200' : 'bg-[#262c36]'}`} />
-                <div className="px-3 py-1 text-[10px] font-semibold text-[#707a8a] uppercase tracking-wider">
-                  Ultra-HD Master
+                <div className="px-3 py-1 text-[11px] font-medium text-[var(--app-text-muted)]">
+                  High resolution
                 </div>
                 <button
                   onClick={() => handleExport('4k')}
@@ -1881,7 +1882,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   }`}
                 >
                   <span>Ultra-HD 8K</span>
-                  <span className="text-[10px] text-[#ec4899] font-mono">7680px</span>
+                  <span className="text-[10px] text-[var(--app-text-secondary)] font-mono">7680px</span>
                 </button>
                 <button
                   onClick={() => handleExport('16k')}
@@ -1890,11 +1891,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   }`}
                 >
                   <span>Ultra-HD 16K</span>
-                  <span className="text-[10px] text-[#3b82f6] font-mono">15360px</span>
+                  <span className="text-[10px] text-[var(--app-text-secondary)] font-mono">15360px</span>
                 </button>
                 <div className={`h-px my-1 ${isLight ? 'bg-slate-200' : 'bg-[#262c36]'}`} />
-                <div className="px-3 py-1 text-[10px] font-semibold text-[#707a8a] uppercase tracking-wider">
-                  3D Transparent PNG
+                <div className="px-3 py-1 text-[11px] font-medium text-[var(--app-text-muted)]">
+                  Transparent 3D
                 </div>
                 <button
                   onClick={() => handleExport('3d-4k')}
@@ -1902,8 +1903,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
                   }`}
                 >
-                  <span>🧊 3D Card (4K Alpha)</span>
-                  <span className="text-[10px] text-[#0ecb81] font-mono">3840px</span>
+                  <span>3D card (4K, transparent)</span>
+                  <span className="text-[10px] text-[var(--app-accent)] font-mono">3840px</span>
                 </button>
                 <button
                   onClick={() => handleExport('3d-8k')}
@@ -1911,8 +1912,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     isLight ? 'hover:bg-[#f1f5f9]' : 'hover:bg-[#222730]'
                   }`}
                 >
-                  <span>🧊 3D Card (8K Alpha)</span>
-                  <span className="text-[10px] text-[#0ecb81] font-mono">7680px</span>
+                  <span>3D card (8K, transparent)</span>
+                  <span className="text-[10px] text-[var(--app-accent)] font-mono">7680px</span>
                 </button>
               </div>
             )}
@@ -1923,19 +1924,21 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* ───────────────────────────────────────────────────────────────────── */}
       {/* QUICK COMMAND BAR ("TELL STUDIO WHAT TO CHANGE" - Leftover Item 5)    */}
       {/* ───────────────────────────────────────────────────────────────────── */}
+      {quickCommandOpen && (
       <div
         className={`px-4 py-2 border-b flex items-center gap-3 transition-colors shrink-0 z-20 ${
           isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#12151b] border-[#222730]'
         }`}
       >
         <div className="flex items-center gap-1.5 text-xs text-[#111417] dark:text-[#E2D9C8] font-mono shrink-0">
-          <Terminal className="w-4 h-4" />
-          <span className="hidden sm:inline font-bold">Quick Command:</span>
+          <Sliders className="w-4 h-4" />
+          <span className="hidden sm:inline font-bold">Quick edit</span>
         </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleExecuteQuickCommand(quickCommandText);
+            setQuickCommandOpen(false);
           }}
           className="flex-1 flex items-center gap-2"
         >
@@ -1943,10 +1946,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             type="text"
             value={quickCommandText}
             onChange={(e) => setQuickCommandText(e.target.value)}
-            placeholder='Type a quick edit: e.g. "Change name to Arya", "Switch to cyber pink", "Auto-align layers", "Make photo circular"...'
+            placeholder="Describe a small change to this design"
             className={`flex-1 px-3 py-1.5 rounded-lg text-xs border outline-none transition-all ${
               isLight
-                ? 'bg-slate-50 border-slate-200 text-[#0f172a] focus:border-[#111417]'
+                ? 'bg-slate-50 border-slate-200 text-[var(--app-accent)] focus:border-[#111417]'
                 : 'bg-[#181d24] border-[#2c3340] text-white focus:border-[#E2D9C8]'
             }`}
           />
@@ -1962,6 +1965,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           </button>
         </form>
       </div>
+      )}
 
       {/* ───────────────────────────────────────────────────────────────────── */}
       {/* MAIN WORKSPACE BODY                                                   */}
@@ -1969,10 +1973,24 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       <div className="flex-1 flex overflow-hidden relative">
         {/* LEFT TOOLBAR: Add Elements (Desktop) */}
         <aside
-          className={`hidden lg:flex w-16 border-r flex-col items-center py-4 gap-4 shrink-0 transition-colors z-20 ${
+          className={`hidden lg:flex w-16 border-r flex-col items-center py-4 gap-2 shrink-0 transition-colors z-20 ${
             isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#222730]'
           }`}
         >
+          <details className="relative">
+            <summary className={`list-none w-11 h-11 rounded-xl border flex flex-col items-center justify-center gap-0.5 text-xs font-semibold cursor-pointer ${
+              isLight
+                ? 'bg-[#f8fafc] border-[#e2e8f0] hover:bg-[#f1f5f9]'
+                : 'bg-[#181d24] border-[#262c36] hover:bg-[#222730]'
+            }`}>
+              <FilePlus className="w-4 h-4" />
+              <span>Add</span>
+            </summary>
+            <div className={`absolute left-full top-0 ml-2 z-50 w-72 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-2xl border p-3 shadow-2xl canvas-utility-popover canvas-add-menu ${
+              isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
+            }`}>
+              <h4 className="px-1 pb-2 text-xs font-semibold">Add to canvas</h4>
+              <div className="grid grid-cols-2 gap-1">
           {/* Add Text */}
           <button
             onClick={() =>
@@ -1986,29 +2004,29 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 })
               )
             }
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+            className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1] hover:bg-[#f1f5f9]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748] hover:bg-[#222730]'
             }`}
             title="Add independent Text layer"
           >
-            <Type className="w-4 h-4 text-[#38bdf8]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Text</span>
+            <Type className="w-4 h-4 text-[var(--app-text-secondary)]" />
+            <span className="text-xs font-medium text-[#707a8a]">Text</span>
           </button>
 
           {/* Add Image */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+            className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1] hover:bg-[#f1f5f9]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748] hover:bg-[#222730]'
             }`}
             title="Upload Photo / Avatar from your device"
           >
-            <Upload className="w-4 h-4 text-[#ec4899]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Upload</span>
+            <Upload className="w-4 h-4 text-[var(--app-text-secondary)]" />
+            <span className="text-xs font-medium text-[#707a8a]">Upload</span>
           </button>
 
           {/* Sample Avatars Picker */}
@@ -2028,18 +2046,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               );
               showToast('Added vector portrait avatar!');
             }}
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+            className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1] hover:bg-[#f1f5f9]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748] hover:bg-[#222730]'
             }`}
             title="Add preset vector portrait"
           >
-            <ImageIcon className="w-4 h-4 text-[#a855f7]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Avatar</span>
+            <ImageIcon className="w-4 h-4 text-[var(--app-text-secondary)]" />
+            <span className="text-xs font-medium text-[#707a8a]">Avatar</span>
           </button>
 
-          <div className="w-8 h-px bg-[#262c36]/40" />
+          <div className="col-span-2 w-full h-px bg-[#262c36]/40" />
 
           {/* Add Shapes */}
           <button
@@ -2051,22 +2069,22 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   y: Math.round(doc.canvasHeight / 2 - 120),
                   width: 360,
                   height: 240,
-                  fill: isLight ? '#f1f5f9' : '#1e242c',
-                  stroke: isLight ? '#cbd5e1' : '#333b47',
+                  fill: '#e4ddcf',
+                  stroke: '#a7a197',
                   strokeWidth: 2,
                   borderRadius: 16,
                 })
               )
             }
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+            className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
             }`}
             title="Add Rounded Box"
           >
-            <Square className="w-4 h-4 text-[#eab308]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Box</span>
+            <Square className="w-4 h-4 text-[var(--app-text-secondary)]" />
+            <span className="text-xs font-medium text-[#707a8a]">Box</span>
           </button>
 
           <button
@@ -2078,21 +2096,21 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   y: Math.round(doc.canvasHeight / 2 - 60),
                   width: 120,
                   height: 120,
-                  fill: '#ffccd5',
-                  stroke: '#ff4d6d',
+                  fill: '#e4ddcf',
+                  stroke: '#a7a197',
                   strokeWidth: 2,
                 })
               )
             }
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+            className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
             }`}
             title="Add Circle"
           >
-            <Circle className="w-4 h-4 text-[#10b981]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Circle</span>
+            <Circle className="w-4 h-4 text-[var(--app-text-secondary)]" />
+            <span className="text-xs font-medium text-[#707a8a]">Circle</span>
           </button>
 
           <button
@@ -2104,19 +2122,19 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   y: Math.round(doc.canvasHeight / 2 - 25),
                   width: 50,
                   height: 50,
-                  fill: '#fcd535',
+                  fill: '#d8cfbd',
                 })
               )
             }
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+            className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
             }`}
             title="Add Star"
           >
-            <Star className="w-4 h-4 text-[#fcd535]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Star</span>
+            <Star className="w-4 h-4 text-[var(--app-text-secondary)]" />
+            <span className="text-xs font-medium text-[#707a8a]">Star</span>
           </button>
 
           <button
@@ -2128,19 +2146,19 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   y: Math.round(doc.canvasHeight / 2 - 25),
                   width: 50,
                   height: 50,
-                  fill: '#ff4d6d',
+                  fill: '#d8cfbd',
                 })
               )
             }
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+            className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
             }`}
             title="Add Heart"
           >
-            <Heart className="w-4 h-4 text-[#f43f5e]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Heart</span>
+            <Heart className="w-4 h-4 text-[var(--app-text-secondary)]" />
+            <span className="text-xs font-medium text-[#707a8a]">Heart</span>
           </button>
 
           <button
@@ -2152,11 +2170,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   y: Math.round(doc.canvasHeight / 2),
                   width: 300,
                   height: 2,
-                  fill: isLight ? '#cbd5e1' : '#475569',
+                  fill: '#a7a197',
                 })
               )
             }
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+            className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
               isLight
                 ? 'bg-[#f8fafc] border-[#e2e8f0] hover:border-[#cbd5e1]'
                 : 'bg-[#181d24] border-[#262c36] hover:border-[#444748]'
@@ -2164,16 +2182,16 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             title="Add Divider Line"
           >
             <Minus className="w-4 h-4 text-[#94a3b8]" />
-            <span className="text-[9px] font-medium text-[#707a8a]">Line</span>
+            <span className="text-xs font-medium text-[#707a8a]">Line</span>
           </button>
 
-          <div className="w-8 h-px bg-[#262c36]/40" />
+          <div className="col-span-2 w-full h-px bg-[#262c36]/40" />
 
           {/* Stamps & Accents Popover Drawer Trigger */}
           <div className="relative">
             <button
               onClick={() => setStampsDrawerOpen(!stampsDrawerOpen)}
-              className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-0.5 border transition-all cursor-pointer group ${
+              className={`w-full h-9 rounded-none flex flex-row items-center justify-start gap-2 px-2 border transition-all cursor-pointer group ${
                 stampsDrawerOpen
                   ? isLight
                     ? 'bg-[#111417] text-white border-[#111417] font-bold shadow-md'
@@ -2184,14 +2202,14 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               }`}
               title="Open Curated Stamps, Badges & Accents Drawer"
             >
-              <Award className="w-4 h-4 text-[#ec4899]" />
+              <Award className="w-4 h-4 text-[var(--app-text-secondary)]" />
               <span className="text-[9px] font-medium">Stamps</span>
             </button>
 
             {/* Stamps Popover Menu */}
             {stampsDrawerOpen && (
               <div
-                className={`absolute left-14 top-0 w-64 rounded-2xl border p-2.5 shadow-2xl z-50 flex flex-col gap-2 ${
+                className={`absolute left-full top-0 ml-2 w-64 rounded-2xl border p-2.5 shadow-2xl z-50 canvas-utility-popover flex flex-col gap-2 ${
                   isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
                 }`}
               >
@@ -2402,6 +2420,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               </div>
             )}
           </div>
+
+              </div>
+            </div>
+          </details>
         </aside>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
@@ -2453,8 +2475,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 width: `${doc.canvasWidth}px`,
                 height: `${doc.canvasHeight}px`,
                 backgroundColor: doc.background || '#ffffff',
-                boxShadow:
-                  '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0,0,0,0.1)',
+                boxShadow: isLight
+                  ? '0 8px 18px -14px rgba(41, 39, 34, 0.28), 0 0 0 1px rgba(41, 39, 34, 0.12)'
+                  : '0 14px 28px -18px rgba(0, 0, 0, 0.56), 0 0 0 1px rgba(226, 217, 200, 0.08)',
               }}
               className="relative overflow-hidden shrink-0 transition-colors"
             >
@@ -2467,10 +2490,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     ...(guide.orientation === 'x'
                       ? { left: `${guide.pos}px`, top: 0, bottom: 0, width: 1 }
                       : { top: `${guide.pos}px`, left: 0, right: 0, height: 1 }),
-                    backgroundColor: guide.orientation === 'x' ? '#ec4899' : '#38bdf8',
+                    backgroundColor: 'var(--app-accent)',
                     zIndex: 99999,
                     pointerEvents: 'none',
-                    boxShadow: guide.orientation === 'x' ? '0 0 3px rgba(236,72,153,0.8)' : '0 0 3px rgba(56,189,248,0.8)',
+                    opacity: 0.8,
                   }}
                 />
               ))}
@@ -2480,7 +2503,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 .sort((a, b) => a.zIndex - b.zIndex)
                 .map((obj) => {
                   if (!obj.visible) return null;
-                  const isSelected = obj.id === selectedId;
+                  const isSelected = obj.id === selectedId && !exporting;
 
                   return (
                     <div
@@ -2489,8 +2512,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         e.stopPropagation();
                         setSelectedId(obj.id);
                       }}
-                      onPointerDown={(e) => handleObjectMouseDown(e, obj)}
-                      onMouseDown={(e) => handleObjectMouseDown(e, obj)}
+                      onPointerDown={(e) => handleObjectPointerDown(e, obj)}
                       style={{
                         position: 'absolute',
                         left: `${obj.x}px`,
@@ -2537,8 +2559,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               textAlign: obj.align,
                               lineHeight: obj.lineHeight,
                               letterSpacing: `${obj.letterSpacing}px`,
-                              background: 'rgba(59, 130, 246, 0.08)',
-                              border: '2px dashed #3b82f6',
+                              background: 'color-mix(in srgb, var(--app-accent) 8%, transparent)',
+                              border: `2px dashed ${isLight ? '#111417' : '#E2D9C8'}`,
                               borderRadius: '4px',
                               outline: 'none',
                               resize: 'none',
@@ -2827,7 +2849,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           style={{
                             position: 'absolute',
                             inset: -3,
-                            border: '2px solid #3b82f6',
+                            border: `2px solid ${isLight ? '#111417' : '#E2D9C8'}`,
                             pointerEvents: 'none',
                             zIndex: 9999,
                           }}
@@ -2843,7 +2865,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                 <button
                                   onClick={() => setEditingTextId(obj.id)}
                                   title="Edit text inline (or double-click text)"
-                                  className="p-1 rounded-lg text-blue-400 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1 text-[10px] font-semibold cursor-pointer"
+                                  className="p-1 rounded-lg text-[var(--app-accent)] hover:text-[var(--app-text-primary)] hover:bg-white/10 transition-colors flex items-center gap-1 text-[10px] font-semibold cursor-pointer"
                                 >
                                   <Type className="w-3.5 h-3.5" />
                                   <span>Edit</span>
@@ -2911,7 +2933,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                     replaceFileInputRef.current?.click();
                                   }}
                                   title="Replace photo in-place"
-                                  className="p-1 rounded-lg text-[#ec4899] hover:bg-white/10 transition-colors flex items-center gap-1 text-[10px] font-semibold cursor-pointer"
+                                  className="p-1 rounded-lg text-[var(--app-text-secondary)] hover:bg-white/10 transition-colors flex items-center gap-1 text-[10px] font-semibold cursor-pointer"
                                 >
                                   <Upload className="w-3 h-3" />
                                   <span>Replace</span>
@@ -2931,8 +2953,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                           {/* Rotation handle protruding above */}
                           <div
-                            onPointerDown={(e) => handleRotateHandleMouseDown(e, obj)}
-                            onMouseDown={(e) => handleRotateHandleMouseDown(e, obj)}
+                            onPointerDown={(e) => handleRotateHandlePointerDown(e, obj)}
                             style={{
                               position: 'absolute',
                               top: -26,
@@ -2942,7 +2963,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               height: 14,
                               borderRadius: '50%',
                               backgroundColor: '#ffffff',
-                              border: '2px solid #3b82f6',
+                              border: `2px solid ${isLight ? '#111417' : '#E2D9C8'}`,
                               pointerEvents: 'auto',
                               cursor: 'grab',
                               touchAction: 'none',
@@ -2957,7 +2978,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               transform: 'translateX(-50%)',
                               width: 1,
                               height: 12,
-                              backgroundColor: '#3b82f6',
+                              backgroundColor: isLight ? '#111417' : '#E2D9C8',
                             }}
                           />
 
@@ -2974,14 +2995,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           ].map((handle) => (
                             <div
                               key={handle.pos}
-                              onPointerDown={(e) => handleResizeHandleMouseDown(e, handle.pos, obj)}
-                              onMouseDown={(e) => handleResizeHandleMouseDown(e, handle.pos, obj)}
+                              onPointerDown={(e) => handleResizeHandlePointerDown(e, handle.pos, obj)}
                               style={{
                                 position: 'absolute',
                                 width: 10,
                                 height: 10,
                                 backgroundColor: '#ffffff',
-                                border: '2px solid #3b82f6',
+                                border: `2px solid ${isLight ? '#111417' : '#E2D9C8'}`,
                                 borderRadius: 2,
                                 pointerEvents: 'auto',
                                 touchAction: 'none',
@@ -3032,7 +3052,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               className={`flex-1 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                 activeSidebarTab === 'inspector'
                   ? isLight
-                    ? 'bg-[#0f172a] text-white shadow-sm'
+                    ? 'bg-[var(--app-accent)] text-white shadow-sm'
                     : 'bg-[#222730] text-white shadow-sm border border-[#444748]'
                   : 'text-[#707a8a] hover:text-white'
               }`}
@@ -3045,7 +3065,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               className={`flex-1 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                 activeSidebarTab === 'layers'
                   ? isLight
-                    ? 'bg-[#0f172a] text-white shadow-sm'
+                    ? 'bg-[var(--app-accent)] text-white shadow-sm'
                     : 'bg-[#222730] text-white shadow-sm border border-[#444748]'
                   : 'text-[#707a8a] hover:text-white'
               }`}
@@ -3058,13 +3078,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               className={`flex-1 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                 activeSidebarTab === 'recycle'
                   ? isLight
-                    ? 'bg-[#0f172a] text-white shadow-sm'
+                    ? 'bg-[var(--app-accent)] text-white shadow-sm'
                     : 'bg-[#222730] text-white shadow-sm border border-[#444748]'
                   : 'text-[#707a8a] hover:text-white'
               }`}
               title="Saved Clips & Recycle Tray (Notebook Page 3)"
             >
-              <RefreshCw className="w-3.5 h-3.5 text-[#0ecb81]" />
+              <RefreshCw className="w-3.5 h-3.5 text-[var(--app-accent)]" />
               <span>Clips</span>
             </button>
           </div>
@@ -3220,7 +3240,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         value={selectedObject.text}
                         onChange={(e) => updateObject(selectedObject.id, { text: e.target.value })}
                         rows={3}
-                        className={`w-full p-2.5 rounded-xl text-xs border focus:outline-none focus:border-[#3b82f6] leading-relaxed ${
+                        className={`w-full p-2.5 rounded-xl text-xs border focus:outline-none focus:border-[var(--app-accent)] leading-relaxed ${
                           isLight ? 'bg-[#f8fafc] border-[#cbd5e1]' : 'bg-[#181d24] border-[#262c36]'
                         }`}
                         placeholder="Type text here..."
@@ -3254,7 +3274,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             max={96}
                             value={selectedObject.fontSize}
                             onChange={(e) => updateObject(selectedObject.id, { fontSize: Number(e.target.value) })}
-                            className="w-full accent-[#3b82f6]"
+                            className="w-full accent-[var(--app-accent)]"
                           />
                         </div>
                         <div className="flex flex-col gap-1">
@@ -3300,7 +3320,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               className={`px-2 py-1 rounded text-[11px] font-semibold capitalize transition-colors cursor-pointer ${
                                 selectedObject.align === align
                                   ? isLight
-                                    ? 'bg-[#0f172a] text-white'
+                                    ? 'bg-[var(--app-accent)] text-white'
                                     : 'bg-[#222730] text-white'
                                   : 'text-[#707a8a]'
                               }`}
@@ -3322,7 +3342,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           }
                           className={`px-3 py-1 rounded-lg border text-xs font-semibold cursor-pointer ${
                             selectedObject.fontStyle === 'italic'
-                              ? 'bg-[#3b82f6] text-white border-[#3b82f6]'
+                              ? 'bg-[#E2D9C8] text-[#111417] border-[#E2D9C8]'
                               : isLight
                               ? 'border-[#e2e8f0]'
                               : 'border-[#262c36]'
@@ -3351,7 +3371,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           </button>
                           <button
                             onClick={() => replaceFileInputRef.current?.click()}
-                            className="text-[11px] font-semibold text-[#ec4899] hover:underline cursor-pointer flex items-center gap-1"
+                            className="text-[11px] font-semibold text-[var(--app-text-secondary)] hover:underline cursor-pointer flex items-center gap-1"
                             title="Replace image in-place keeping layout and crop"
                           >
                             <Upload className="w-3 h-3" />
@@ -3383,7 +3403,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               }}
                               className={`p-2 rounded-xl text-left border text-xs font-semibold cursor-pointer transition-all ${
                                 selectedObject.filterPreset === f.id || (!selectedObject.filterPreset && f.id === 'original')
-                                  ? 'border-[#3b82f6] bg-[#3b82f6]/10 text-white ring-1 ring-[#3b82f6]'
+                                  ? 'border-[#E2D9C8] bg-[#E2D9C8]/10 text-[#E2D9C8] ring-1 ring-[#E2D9C8]'
                                   : isLight ? 'border-slate-200 hover:bg-slate-50' : 'border-[#262c36] hover:bg-[#181d24]'
                               }`}
                             >
@@ -3397,7 +3417,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-semibold text-[#707a8a]">Shape Clipping Mask</span>
-                          <Crop className="w-3 h-3 text-[#ec4899]" />
+                          <Crop className="w-3 h-3 text-[var(--app-text-secondary)]" />
                         </div>
                         <div className="grid grid-cols-2 gap-1">
                           {[
@@ -3413,7 +3433,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               onClick={() => updateObject(selectedObject.id, { clipMask: mask.id })}
                               className={`py-1.5 px-1 rounded-lg text-[11px] font-semibold border text-center cursor-pointer transition-all ${
                                 (selectedObject.clipMask || 'none') === mask.id
-                                  ? 'border-[#ec4899] bg-[#ec4899]/15 text-white ring-1 ring-[#ec4899]'
+                                  ? isLight
+                                    ? 'border-[#111417] bg-[#111417]/5 text-[#111417] ring-1 ring-[#111417]'
+                                    : 'border-[#E2D9C8] bg-[#E2D9C8]/10 text-[#E2D9C8] ring-1 ring-[#E2D9C8]'
                                   : isLight ? 'border-slate-200 text-slate-700 hover:bg-slate-50' : 'border-[#262c36] text-[#707a8a] hover:bg-[#181d24]'
                               }`}
                             >
@@ -3433,7 +3455,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               onClick={() => updateObject(selectedObject.id, { objectFit: fit })}
                               className={`flex-1 py-1.5 rounded-lg text-xs font-semibold capitalize border cursor-pointer ${
                                 selectedObject.objectFit === fit
-                                  ? 'bg-[#3b82f6] text-white border-[#3b82f6]'
+                                  ? 'bg-[#E2D9C8] text-[#111417] border-[#E2D9C8]'
                                   : isLight
                                   ? 'border-[#e2e8f0] text-[#707a8a]'
                                   : 'border-[#262c36] text-[#707a8a]'
@@ -3482,7 +3504,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               max={50}
                               value={(selectedObject as any).panX || 0}
                               onChange={(e) => updateObject(selectedObject.id, { panX: Number(e.target.value) } as any)}
-                              className="w-full accent-[#38bdf8]"
+                              className="w-full accent-[var(--app-accent)]"
                             />
                           </div>
                           <div className="flex flex-col gap-0.5">
@@ -3493,7 +3515,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               max={50}
                               value={(selectedObject as any).panY || 0}
                               onChange={(e) => updateObject(selectedObject.id, { panY: Number(e.target.value) } as any)}
-                              className="w-full accent-[#38bdf8]"
+                              className="w-full accent-[var(--app-accent)]"
                             />
                           </div>
                         </div>
@@ -3510,7 +3532,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           max={100}
                           value={selectedObject.borderRadius}
                           onChange={(e) => updateObject(selectedObject.id, { borderRadius: Number(e.target.value) })}
-                          className="w-full accent-[#3b82f6]"
+                          className="w-full accent-[var(--app-accent)]"
                         />
                       </div>
 
@@ -3525,7 +3547,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           step={0.05}
                           value={selectedObject.opacity}
                           onChange={(e) => updateObject(selectedObject.id, { opacity: Number(e.target.value) })}
-                          className="w-full accent-[#3b82f6]"
+                          className="w-full accent-[var(--app-accent)]"
                         />
                       </div>
                     </div>
@@ -3567,7 +3589,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           max={20}
                           value={selectedObject.strokeWidth}
                           onChange={(e) => updateObject(selectedObject.id, { strokeWidth: Number(e.target.value) })}
-                          className="w-full accent-[#3b82f6]"
+                          className="w-full accent-[var(--app-accent)]"
                         />
                       </div>
 
@@ -3582,7 +3604,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             max={60}
                             value={selectedObject.borderRadius}
                             onChange={(e) => updateObject(selectedObject.id, { borderRadius: Number(e.target.value) })}
-                            className="w-full accent-[#3b82f6]"
+                            className="w-full accent-[var(--app-accent)]"
                           />
                         </div>
                       )}
@@ -3678,16 +3700,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 /* B. Nothing Selected: CANVAS & DOCUMENT PROPERTIES */
                 <div className="flex flex-col gap-5">
                   <div className="pb-3 border-b border-[#262c36]/30">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#707a8a]">
-                      Global Document Setup
-                    </span>
-                    <h4 className="text-sm font-semibold">Canvas Settings</h4>
+                    <h4 className="text-base font-semibold">Canvas</h4>
                   </div>
 
                   {/* Canvas Presets */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs font-semibold text-[#707a8a]">Dimensions Presets</label>
-                    <div className="flex flex-col gap-1.5">
+                  <details>
+                    <summary className={`list-none flex items-center justify-between py-2 text-xs font-semibold cursor-pointer ${
+                      isLight ? 'text-[#475569]' : 'text-[#a0a5ad]'
+                    }`}>
+                      <span>Canvas size</span>
+                      <span className="font-mono text-[11px]">{doc.canvasWidth} × {doc.canvasHeight}</span>
+                    </summary>
+                    <div className="flex flex-col gap-1.5 mt-1">
                       {CANVAS_DIMENSION_PRESETS.map((preset) => (
                         <button
                           key={preset.id}
@@ -3709,7 +3733,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           }}
                           className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                             doc.canvasWidth === preset.width && doc.canvasHeight === preset.height
-                              ? 'border-[#3b82f6] bg-[#3b82f6]/10 text-white font-semibold'
+                              ? isLight
+                                ? 'border-[#111417] bg-[#111417]/5 text-[#111417] font-semibold'
+                                : 'border-[#E2D9C8] bg-[#E2D9C8]/10 text-[#E2D9C8] font-semibold'
                               : isLight
                               ? 'border-[#e2e8f0] hover:bg-[#f8fafc]'
                               : 'border-[#262c36] hover:bg-[#181d24]'
@@ -3728,8 +3754,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         onClick={handleFitCardToCanvas}
                         className={`w-full mt-2 p-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                           isLight
-                            ? 'border-[#3b82f6]/40 bg-[#3b82f6]/10 text-[#2563eb] hover:bg-[#3b82f6]/20'
-                            : 'border-[#38bdf8]/40 bg-[#38bdf8]/10 text-[#38bdf8] hover:bg-[#38bdf8]/20'
+                            ? 'border-[#111417]/30 bg-[#111417]/5 text-[#111417] hover:bg-[#111417]/10'
+                            : 'border-[#E2D9C8]/30 bg-[#E2D9C8]/5 text-[#E2D9C8] hover:bg-[#E2D9C8]/10'
                         }`}
                         title="Fit all card elements to fill current canvas dimensions"
                       >
@@ -3737,12 +3763,14 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         <span>Fit Content to Canvas</span>
                       </button>
                     </div>
-                  </div>
+                  </details>
 
                   {/* Custom Canvas Width & Height */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs font-semibold text-[#707a8a]">Custom Canvas Dimensions (px)</label>
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                  <details>
+                    <summary className={`py-2 text-xs font-semibold cursor-pointer ${
+                      isLight ? 'text-[#475569]' : 'text-[#a0a5ad]'
+                    }`}>Custom dimensions</summary>
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono mt-1">
                       <div className="flex items-center gap-2 p-2 rounded-lg border border-[#262c36]/40">
                         <span className="text-[#707a8a]">W</span>
                         <input
@@ -3772,7 +3800,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         />
                       </div>
                     </div>
-                  </div>
+                  </details>
 
                   {/* Background Color */}
                   <div className="flex flex-col gap-2">
@@ -3796,7 +3824,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   </div>
 
                   {/* Quick Color Presets */}
-                  <div className="grid grid-cols-6 gap-1.5">
+                  <details>
+                    <summary className={`py-2 text-xs font-semibold cursor-pointer ${
+                      isLight ? 'text-[#475569]' : 'text-[#a0a5ad]'
+                    }`}>Color presets</summary>
+                    <div className="grid grid-cols-6 gap-1.5 mt-1">
                     {[
                       '#ffffff',
                       '#f4ede4',
@@ -3808,7 +3840,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                       '#e4ff37',
                       '#efe5cb',
                       '#f2f8f4',
-                      '#1e293b',
+                      'var(--app-accent-hover)',
                       '#0a0a0a',
                     ].map((c) => (
                       <button
@@ -3819,19 +3851,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         title={c}
                       />
                     ))}
-                  </div>
+                    </div>
+                  </details>
 
-                  {/* Tip banner */}
-                  <div
-                    className={`p-3 rounded-xl border text-[11px] leading-relaxed flex items-start gap-2 ${
-                      isLight ? 'bg-[#f8fafc] border-[#e2e8f0] text-[#64748b]' : 'bg-[#181d24] border-[#262c36] text-[#9ca3af]'
-                    }`}
-                  >
-                    <HelpCircle className="w-4 h-4 text-[#111417] dark:text-[#E2D9C8] shrink-0 mt-0.5" />
-                    <span>
-                      Click any element on the canvas or in the Layers tab to edit its text, typography, size, or colors.
-                    </span>
-                  </div>
                 </div>
               )}
             </div>
@@ -3847,7 +3869,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     onClick={() => setLayerViewMode('folders')}
                     className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
                       layerViewMode === 'folders'
-                        ? 'bg-[#3b82f6] text-white shadow-sm'
+                        ? 'bg-[#E2D9C8] text-[#111417] shadow-sm'
                         : 'text-[#707a8a] hover:text-white'
                     }`}
                   >
@@ -3857,7 +3879,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     onClick={() => setLayerViewMode('flat')}
                     className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
                       layerViewMode === 'flat'
-                        ? 'bg-[#3b82f6] text-white shadow-sm'
+                        ? 'bg-[#E2D9C8] text-[#111417] shadow-sm'
                         : 'text-[#707a8a] hover:text-white'
                     }`}
                   >
@@ -3888,7 +3910,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           className="w-full px-3 py-2 flex items-center justify-between text-xs font-bold text-left cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
                         >
                           <div className="flex items-center gap-2">
-                            {folderOpen.photo ? <FolderOpen className="w-4 h-4 text-[#ec4899]" /> : <Folder className="w-4 h-4 text-[#ec4899]" />}
+                            {folderOpen.photo ? <FolderOpen className="w-4 h-4 text-[var(--app-text-secondary)]" /> : <Folder className="w-4 h-4 text-[var(--app-text-secondary)]" />}
                             <span>📁 1. Profile Photo & Avatar</span>
                           </div>
                           <span className="text-[10px] opacity-60 font-mono">{photos.length}</span>
@@ -3904,7 +3926,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                   onClick={() => setSelectedId(obj.id)}
                                   className={`p-2 rounded-xl border flex flex-col gap-2 cursor-pointer transition-all ${
                                     obj.id === selectedId
-                                      ? 'border-[#ec4899] bg-[#ec4899]/10'
+                                      ? 'border-[var(--app-accent)] bg-[var(--color-accent-soft)]'
                                       : 'border-current/10 hover:bg-black/5 dark:hover:bg-white/5'
                                   }`}
                                 >
@@ -3917,7 +3939,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                           setSelectedId(obj.id);
                                           replaceFileInputRef.current?.click();
                                         }}
-                                        className="text-[10px] font-bold text-[#ec4899] hover:underline cursor-pointer"
+                                        className="text-[10px] font-bold text-[var(--app-text-secondary)] hover:underline cursor-pointer"
                                       >
                                         Replace
                                       </button>
@@ -3952,7 +3974,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           className="w-full px-3 py-2 flex items-center justify-between text-xs font-bold text-left cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
                         >
                           <div className="flex items-center gap-2">
-                            {folderOpen.text ? <FolderOpen className="w-4 h-4 text-[#38bdf8]" /> : <Folder className="w-4 h-4 text-[#38bdf8]" />}
+                            {folderOpen.text ? <FolderOpen className="w-4 h-4 text-[var(--app-text-secondary)]" /> : <Folder className="w-4 h-4 text-[var(--app-text-secondary)]" />}
                             <span>📁 2. Editable Text Fields</span>
                           </div>
                           <span className="text-[10px] opacity-60 font-mono">{texts.length}</span>
@@ -3965,7 +3987,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                 onClick={() => setSelectedId(obj.id)}
                                 className={`p-2 rounded-xl border flex flex-col gap-1 cursor-pointer transition-all ${
                                   obj.id === selectedId
-                                    ? 'border-[#38bdf8] bg-[#38bdf8]/10'
+                                    ? 'border-[var(--app-accent)] bg-[var(--color-accent-soft)]'
                                     : 'border-current/10 hover:bg-black/5 dark:hover:bg-white/5'
                                 }`}
                               >
@@ -3979,8 +4001,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                   onChange={(e) => updateObject(obj.id, { text: e.target.value })}
                                   className={`w-full px-2 py-1 rounded text-xs border outline-none font-medium ${
                                     isLight
-                                      ? 'bg-white border-slate-300 text-black focus:border-[#38bdf8]'
-                                      : 'bg-[#181d24] border-[#2c3340] text-white focus:border-[#38bdf8]'
+                                      ? 'bg-white border-slate-300 text-black focus:border-[var(--app-accent)]'
+                                      : 'bg-[#181d24] border-[#2c3340] text-white focus:border-[var(--app-accent)]'
                                   }`}
                                 />
                               </div>
@@ -4028,7 +4050,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                     e.stopPropagation();
                                     handleSaveToRecycleClips(obj);
                                   }}
-                                  className="text-[10px] font-bold text-[#0ecb81] hover:underline cursor-pointer"
+                                  className="text-[10px] font-bold text-[var(--app-accent)] hover:underline cursor-pointer"
                                   title="Save to Recycle Tray"
                                 >
                                   + Save Clip
@@ -4058,7 +4080,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           className="w-full px-3 py-2 flex items-center justify-between text-xs font-bold text-left cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
                         >
                           <div className="flex items-center gap-2">
-                            {folderOpen.frame ? <FolderOpen className="w-4 h-4 text-[#a855f7]" /> : <Folder className="w-4 h-4 text-[#a855f7]" />}
+                            {folderOpen.frame ? <FolderOpen className="w-4 h-4 text-[var(--app-text-secondary)]" /> : <Folder className="w-4 h-4 text-[var(--app-text-secondary)]" />}
                             <span>📁 4. Card Frame & Background</span>
                           </div>
                           <span className="text-[10px] opacity-60 font-mono">{frames.length}</span>
@@ -4071,7 +4093,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                 onClick={() => setSelectedId(obj.id)}
                                 className={`p-2 rounded-xl border flex items-center justify-between text-xs cursor-pointer ${
                                   obj.id === selectedId
-                                    ? 'border-[#a855f7] bg-[#a855f7]/10'
+                                    ? 'border-[var(--app-accent)] bg-[var(--color-accent-soft)]'
                                     : 'border-current/10 hover:bg-black/5 dark:hover:bg-white/5'
                                 }`}
                               >
@@ -4097,16 +4119,16 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         onClick={() => setSelectedId(obj.id)}
                         className={`flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer group ${
                           isSelected
-                            ? 'bg-[#3b82f6]/10 border-[#3b82f6] text-white font-semibold'
+                            ? 'bg-[var(--color-accent-soft)] border-[var(--app-accent)] text-[var(--app-accent)] font-semibold'
                             : isLight
                             ? 'bg-[#f8fafc] border-[#e2e8f0] hover:bg-[#f1f5f9]'
                             : 'bg-[#181d24] border-[#262c36] hover:bg-[#222730]'
                         }`}
                       >
                         <div className="flex items-center gap-2 truncate">
-                          {obj.type === 'text' && <Type className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />}
-                          {obj.type === 'image' && <ImageIcon className="w-3.5 h-3.5 text-[#ec4899] shrink-0" />}
-                          {obj.type === 'shape' && <Square className="w-3.5 h-3.5 text-[#eab308] shrink-0" />}
+                          {obj.type === 'text' && <Type className="w-3.5 h-3.5 text-[var(--app-text-secondary)] shrink-0" />}
+                          {obj.type === 'image' && <ImageIcon className="w-3.5 h-3.5 text-[var(--app-text-secondary)] shrink-0" />}
+                          {obj.type === 'shape' && <Square className="w-3.5 h-3.5 text-[var(--app-text-secondary)] shrink-0" />}
                           <span className="text-xs truncate max-w-[140px]">{obj.name}</span>
                         </div>
                         <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100">
@@ -4153,7 +4175,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#0ecb81] uppercase tracking-wider font-mono">
+                  <span className="font-bold text-[var(--app-accent)] uppercase tracking-wider font-mono">
                     ♻ Recycle Drawer
                   </span>
                   <span className="text-[10px] text-[#707a8a]">{savedClips.length} Clips</span>
@@ -4168,8 +4190,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   onClick={() => handleSaveToRecycleClips(selectedObject)}
                   className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer ${
                     isLight
-                      ? 'bg-[#0f172a] text-white hover:bg-[#1e293b]'
-                      : 'bg-[#0ecb81] text-black hover:bg-[#12e09b]'
+                      ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)]'
+                      : 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)]'
                   }`}
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
@@ -4191,9 +4213,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     <div className="flex items-center gap-2.5 truncate">
                       <div className="w-8 h-8 rounded-lg bg-black/10 dark:bg-white/10 flex items-center justify-center shrink-0">
                         {clip.type === 'image' ? (
-                          <ImageIcon className="w-4 h-4 text-[#ec4899]" />
+                          <ImageIcon className="w-4 h-4 text-[var(--app-text-secondary)]" />
                         ) : clip.type === 'text' ? (
-                          <Type className="w-4 h-4 text-[#38bdf8]" />
+                          <Type className="w-4 h-4 text-[var(--app-text-secondary)]" />
                         ) : (
                           <Sparkles className="w-4 h-4 text-[#111417] dark:text-[#E2D9C8]" />
                         )}
@@ -4300,7 +4322,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           />
           <div
             className={`lg:hidden fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t shadow-2xl p-4 flex flex-col max-h-[75vh] animate-slide-up transition-colors ${
-              isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a]' : 'bg-[#111417] border-[#262c36] text-[#e1e2e7]'
+              isLight ? 'bg-white border-[#e2e8f0] text-[var(--app-accent)]' : 'bg-[#111417] border-[#262c36] text-[#e1e2e7]'
             }`}
           >
             <div className="flex items-center justify-between pb-3 border-b border-current/10 shrink-0">
@@ -4338,12 +4360,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
               <button
                 onClick={() => {
-                  addObject(createTextObject({ text: 'Your text here', fontSize: 24, color: isLight ? '#0f172a' : '#ffffff' }));
+                  addObject(createTextObject({ text: 'Your text here', fontSize: 24, color: isLight ? 'var(--app-accent)' : '#ffffff' }));
                   setMobileAddSheetOpen(false);
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <Type className="w-5 h-5 text-[#3b82f6]" />
+                <Type className="w-5 h-5 text-[var(--app-text-secondary)]" />
                 <span className="text-xs font-medium">Text</span>
               </button>
 
@@ -4354,7 +4376,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <Upload className="w-5 h-5 text-[#10b981]" />
+                <Upload className="w-5 h-5 text-[var(--app-text-secondary)]" />
                 <span className="text-xs font-medium">Upload Photo</span>
               </button>
 
@@ -4365,51 +4387,51 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <Sparkles className="w-5 h-5 text-[#8b5cf6]" />
+                <Sparkles className="w-5 h-5 text-[var(--app-text-secondary)]" />
                 <span className="text-xs font-medium">Avatar</span>
               </button>
 
               <button
                 onClick={() => {
-                  addObject(createShapeObject('rect', { name: 'Card Box', width: 200, height: 120, fill: '#f1f5f9' }));
+                  addObject(createShapeObject('rect', { name: 'Card Box', width: 200, height: 120, fill: '#e4ddcf' }));
                   setMobileAddSheetOpen(false);
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <Square className="w-5 h-5 text-[#f59e0b]" />
+                <Square className="w-5 h-5 text-[var(--app-accent)]" />
                 <span className="text-xs font-medium">Box</span>
               </button>
 
               <button
                 onClick={() => {
-                  addObject(createShapeObject('circle', { name: 'Circle Badge', width: 100, height: 100, fill: '#e2e8f0' }));
+                  addObject(createShapeObject('circle', { name: 'Circle Badge', width: 100, height: 100, fill: '#e4ddcf' }));
                   setMobileAddSheetOpen(false);
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <Circle className="w-5 h-5 text-[#ec4899]" />
+                <Circle className="w-5 h-5 text-[var(--app-text-secondary)]" />
                 <span className="text-xs font-medium">Circle</span>
               </button>
 
               <button
                 onClick={() => {
-                  addObject(createShapeObject('star', { name: 'Star Badge', width: 80, height: 80, fill: '#fcd535' }));
+                  addObject(createShapeObject('star', { name: 'Star Badge', width: 80, height: 80, fill: '#d8cfbd' }));
                   setMobileAddSheetOpen(false);
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <Star className="w-5 h-5 text-[#fcd535]" />
+                <Star className="w-5 h-5 text-[var(--app-text-secondary)]" />
                 <span className="text-xs font-medium">Star</span>
               </button>
 
               <button
                 onClick={() => {
-                  addObject(createShapeObject('heart', { name: 'Heart Stamp', width: 80, height: 80, fill: '#ff4d6d' }));
+                  addObject(createShapeObject('heart', { name: 'Heart Stamp', width: 80, height: 80, fill: '#d8cfbd' }));
                   setMobileAddSheetOpen(false);
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <Heart className="w-5 h-5 text-[#ff4d6d]" />
+                <Heart className="w-5 h-5 text-[var(--app-text-secondary)]" />
                 <span className="text-xs font-medium">Heart</span>
               </button>
 
@@ -4420,7 +4442,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <Barcode className="w-5 h-5 text-[#f97316]" />
+                <Barcode className="w-5 h-5 text-[var(--app-accent)]" />
                 <span className="text-xs font-medium">Barcode</span>
               </button>
 
@@ -4431,7 +4453,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#111417] dark:hover:border-[#E2D9C8]"
               >
-                <QrCode className="w-5 h-5 text-[#06b6d4]" />
+                <QrCode className="w-5 h-5 text-[var(--app-accent)]" />
                 <span className="text-xs font-medium">QR Code</span>
               </button>
             </div>
@@ -4449,7 +4471,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           />
           <div
             className={`lg:hidden fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t shadow-2xl flex flex-col max-h-[75vh] animate-slide-up transition-colors ${
-              isLight ? 'bg-white border-[#e2e8f0] text-[#0f172a]' : 'bg-[#111417] border-[#262c36] text-[#e1e2e7]'
+              isLight ? 'bg-white border-[#e2e8f0] text-[var(--app-accent)]' : 'bg-[#111417] border-[#262c36] text-[#e1e2e7]'
             }`}
           >
             {/* Sheet Tabs Header */}
@@ -4543,7 +4565,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         onClick={() => setSelectedId(obj.id)}
                         className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer ${
                           obj.id === selectedId
-                            ? isLight ? 'bg-[#f1f5f9] border-[#0f172a]' : 'bg-[#181d24] border-[#E2D9C8]'
+                            ? isLight ? 'bg-[#f1f5f9] border-[var(--app-accent)]' : 'bg-[#181d24] border-[#E2D9C8]'
                             : isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
                         }`}
                       >
@@ -4595,7 +4617,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           <div
             onClick={(e) => e.stopPropagation()}
             className={`w-full max-w-5xl max-h-[90vh] rounded-3xl border flex flex-col overflow-hidden shadow-2xl transition-colors ${
-              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#262c36] text-[#e1e2e7]'
+              isLight ? 'bg-white border-[#cbd5e1] text-[var(--app-accent)]' : 'bg-[#12151b] border-[#262c36] text-[#e1e2e7]'
             }`}
           >
             {/* Modal Header */}
@@ -4606,7 +4628,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg sm:text-xl font-bold tracking-tight">Aesthetic Template Library</h3>
                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                    isLight ? 'bg-slate-200 text-[#0f172a]' : 'bg-[#E2D9C8]/10 text-[#E2D9C8] border border-[#E2D9C8]/25'
+                    isLight ? 'bg-slate-200 text-[var(--app-accent)]' : 'bg-[#E2D9C8]/10 text-[#E2D9C8] border border-[#E2D9C8]/25'
                   }`}>
                     {filteredTemplates.length} {filteredTemplates.length === 1 ? 'Template' : 'Templates'}
                   </span>
@@ -4646,7 +4668,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   placeholder="Search templates (e.g. Pinterest, Polaroid, Vinyl, Matcha, Y2K, Boarding Pass, Jennie)..."
                   className={`w-full pl-10 pr-9 py-2.5 rounded-xl text-xs sm:text-sm border transition-all focus:outline-none ${
                     isLight
-                      ? 'bg-[#f1f5f9] border-[#cbd5e1] text-[#0f172a] focus:border-[#111417] focus:bg-white'
+                      ? 'bg-[#f1f5f9] border-[#cbd5e1] text-[var(--app-accent)] focus:border-[#111417] focus:bg-white'
                       : 'bg-[#181d26] border-[#262c36] text-white focus:border-[#E2D9C8] focus:bg-[#1c222c]'
                   }`}
                 />
@@ -4755,7 +4777,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           {/* Pinterest Pick Floating Badge */}
                           {isPinterest && (
                             <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black/70 text-[#E2D9C8] border border-[#E2D9C8]/40 backdrop-blur-xs flex items-center gap-1 shadow-sm">
-                              <Sparkles className="w-2.5 h-2.5 text-[#ff006e]" />
+                              <Sparkles className="w-2.5 h-2.5 text-[var(--app-accent)]" />
                               <span>Pinterest</span>
                             </div>
                           )}

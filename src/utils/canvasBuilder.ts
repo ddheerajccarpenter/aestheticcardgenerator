@@ -106,7 +106,7 @@ export const createShapeObject = (
   type: 'shape',
   name: overrides?.name || `${shape.charAt(0).toUpperCase() + shape.slice(1)} Layer`,
   shape,
-  fill: overrides?.fill || '#e2e8f0',
+  fill: overrides?.fill || '#e4ddcf',
   stroke: overrides?.stroke || 'transparent',
   strokeWidth: overrides?.strokeWidth ?? 0,
   opacity: overrides?.opacity ?? 1,

@@ -10,7 +10,7 @@ export type ExportTier = '4K' | '8K' | '12K' | '16K';
  * (or with optional tier suffix if requested, never random template slugs).
  */
 export function getBrandedExportFilename(
-  ext: 'png' | 'webp' | 'svg' = 'png',
+  ext: 'png' | 'jpeg' | 'webp' | 'svg' = 'png',
   mode: '2d' | '3d' = '2d',
   includeTier?: ExportTier
 ): string {

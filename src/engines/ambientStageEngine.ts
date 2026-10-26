@@ -126,74 +126,15 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-/**
- * Samples the active card canvas or element to extract 3 harmonious ambient tones
- * and applies them ONLY to the outer workspace wrapper (.editor-ambient-stage).
- */
+/** Applies a quiet, neutral stage tone without sampling or changing card artwork. */
 export function updateWorkspaceAmbientBackdrop(
-  cardElement: HTMLElement | HTMLCanvasElement | null,
   ambientWrapperEl: HTMLElement | null,
   enabled: boolean,
-  fallbackColors?: { bg: string; ink: string; accent?: string },
   isLight = false
 ): void {
   if (!ambientWrapperEl) return;
-  if (!enabled) {
-    ambientWrapperEl.style.setProperty('--ambient-opacity', '0');
-    return;
-  }
-
-  // Mandatory separation: the workspace backdrop NEVER inherits or tints with the card palette.
-  // It remains strictly pinned to the application's fixed UI canvas token.
-  const appCanvasBg = isLight ? '#f8fafc' : '#101114';
-  ambientWrapperEl.style.setProperty('--workspace-backdrop', appCanvasBg);
-
-  // If cardElement is a canvas with contents
-  if (cardElement instanceof HTMLCanvasElement && cardElement.width > 0 && cardElement.height > 0) {
-    try {
-      const sampleCanvas = document.createElement('canvas');
-      sampleCanvas.width = 16;
-      sampleCanvas.height = 16;
-      const sCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
-      if (sCtx) {
-        sCtx.drawImage(cardElement, 0, 0, 16, 16);
-        const data = sCtx.getImageData(0, 0, 16, 16).data;
-
-        const pickPixel = (x: number, y: number): string => {
-          const idx = (y * 16 + x) * 4;
-          return `${data[idx]}, ${data[idx + 1]}, ${data[idx + 2]}`;
-        };
-
-        const c1 = pickPixel(3, 3);
-        const c2 = pickPixel(8, 8);
-        const c3 = pickPixel(12, 12);
-
-        ambientWrapperEl.style.setProperty('--ambient-c1', c1);
-        ambientWrapperEl.style.setProperty('--ambient-c2', c2);
-        ambientWrapperEl.style.setProperty('--ambient-c3', c3);
-        ambientWrapperEl.style.setProperty('--ambient-opacity', isLight ? '0.3' : '0.45');
-        return;
-      }
-    } catch {
-      // Canvas may be tainted; use fallback
-    }
-  }
-
-  // Fallback extraction from colors
-  if (fallbackColors) {
-    const hexToRgb = (hex: string): string => {
-      const clean = hex.replace('#', '');
-      const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
-      const num = parseInt(full, 16) || 0;
-      return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
-    };
-
-    ambientWrapperEl.style.setProperty('--ambient-c1', hexToRgb(fallbackColors.bg));
-    ambientWrapperEl.style.setProperty('--ambient-c2', hexToRgb(fallbackColors.accent || fallbackColors.bg));
-    ambientWrapperEl.style.setProperty(
-      '--ambient-c3',
-      hexToRgb(fallbackColors.ink)
-    );
-    ambientWrapperEl.style.setProperty('--ambient-opacity', isLight ? '0.28' : '0.45');
-  }
+  ambientWrapperEl.style.setProperty(
+    '--workspace-backdrop',
+    enabled ? (isLight ? '#efede7' : '#181715') : (isLight ? '#f6f4ef' : '#100f0e')
+  );
 }

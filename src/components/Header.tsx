@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* ─────────────────────────────────────────────────────────────────── */}
       <aside
         aria-label="Desktop Navigation Rail"
-        className="hidden md:flex fixed top-0 bottom-0 left-0 w-16 z-40 bg-[#090a0d] border-r border-[#1a1d24] flex-col items-center py-4 justify-between select-none transition-colors duration-200"
+        className="hidden md:flex fixed top-0 bottom-0 left-0 w-16 z-40 bg-[var(--app-bg)] border-r border-[var(--app-border-subtle)] flex-col items-center py-4 justify-between select-none transition-colors duration-200"
       >
         {/* Top: Brand Ring Glyph + Main Navigation Icons */}
         <div className="flex flex-col items-center gap-6 w-full">
@@ -50,8 +50,8 @@ export const Header: React.FC<HeaderProps> = ({
             title="ACG — Home Gallery"
             aria-label="ACG — Home Gallery"
           >
-            <div className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center transition-transform group-hover:scale-105">
-              <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="w-6 h-6 rounded-full border-2 border-[var(--app-text-primary)] flex items-center justify-center transition-transform group-hover:scale-105">
+              <div className="w-2 h-2 rounded-full bg-[var(--app-text-primary)] opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </a>
 
@@ -62,15 +62,15 @@ export const Header: React.FC<HeaderProps> = ({
               href="/"
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group ${
                 isGallery
-                  ? 'bg-white/10 text-white shadow-xs'
-                  : 'text-[#8e939e] hover:text-white hover:bg-white/5'
+                  ? isLight ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'bg-white/10 text-white'
+                  : isLight ? 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-black/5' : 'text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5'
               }`}
               title="Explore Gallery"
               aria-label="Explore Gallery"
             >
               <Compass className="w-5 h-5" />
               {isGallery && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-white rounded-r" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[var(--app-text-primary)] rounded-r" />
               )}
             </a>
 
@@ -79,15 +79,15 @@ export const Header: React.FC<HeaderProps> = ({
               href="/templates"
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group ${
                 isTemplates
-                  ? 'bg-white/10 text-white shadow-xs'
-                  : 'text-[#8e939e] hover:text-white hover:bg-white/5'
+                  ? isLight ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'bg-white/10 text-white'
+                  : isLight ? 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-black/5' : 'text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5'
               }`}
               title="Template Catalog"
               aria-label="Template Catalog"
             >
               <LayoutTemplate className="w-5 h-5" />
               {isTemplates && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-white rounded-r" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[var(--app-text-primary)] rounded-r" />
               )}
             </a>
 
@@ -96,22 +96,22 @@ export const Header: React.FC<HeaderProps> = ({
               href="/canvas"
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group ${
                 isCanvas
-                  ? 'bg-white/10 text-white shadow-xs'
-                  : 'text-[#8e939e] hover:text-white hover:bg-white/5'
+                  ? isLight ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'bg-white/10 text-white'
+                  : isLight ? 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-black/5' : 'text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5'
               }`}
               title="Freeform Studio Canvas"
               aria-label="Freeform Studio Canvas"
             >
               <Layers className="w-5 h-5" />
               {isCanvas && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-white rounded-r" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[var(--app-text-primary)] rounded-r" />
               )}
             </a>
 
             {/* Quick Search / Command Palette */}
             <button
               onClick={onOpenShortcuts}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-[#8e939e] hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5 transition-all cursor-pointer"
               title="Quick Search (⌘K)"
               aria-label="Quick Search"
             >
@@ -124,24 +124,24 @@ export const Header: React.FC<HeaderProps> = ({
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group ${
                 isGuides
                   ? 'bg-white/10 text-white shadow-xs'
-                  : 'text-[#8e939e] hover:text-white hover:bg-white/5'
+                  : isLight ? 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-black/5' : 'text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5'
               }`}
               title="Design Guides"
               aria-label="Design Guides"
             >
               <BookOpen className="w-5 h-5" />
               {isGuides && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-white rounded-r" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[var(--app-text-primary)] rounded-r" />
               )}
             </a>
 
             {/* Divider */}
-            <div className="w-6 h-px bg-[#1f2228] my-1" />
+            <div className="w-6 h-px bg-[var(--app-border-subtle)] my-1" />
 
             {/* Create Action Button (Reference B prominent Create) */}
             <a
               href="/create"
-              className="w-10 h-10 rounded-full bg-white text-black hover:bg-[#e2d9c8] flex items-center justify-center shadow-md transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+              className="w-10 h-10 rounded-full bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               title="Create New Design"
               aria-label="Create New Design"
             >
@@ -154,7 +154,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex flex-col items-center gap-2 w-full px-2">
           <button
             onClick={onToggleTheme}
-            className="w-10 h-10 rounded-xl text-[#8e939e] hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-xl text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors cursor-pointer"
             title={`Switch to ${isLight ? 'Dark' : 'Light'} Mode`}
             aria-label={`Switch to ${isLight ? 'Dark' : 'Light'} Mode`}
           >
@@ -163,7 +163,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <a
             href="/about"
-            className="w-10 h-10 rounded-xl text-[#8e939e] hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-xl text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors cursor-pointer"
             title="About ACG"
             aria-label="About ACG"
           >

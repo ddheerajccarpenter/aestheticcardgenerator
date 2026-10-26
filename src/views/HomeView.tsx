@@ -154,7 +154,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   };
 
   return (
-    <div className="w-full pt-6 md:pt-8 pb-20 px-4 sm:px-6 md:px-8 max-w-[1500px] mx-auto text-[#f4f1ea] transition-colors duration-200">
+    <div className="w-full pt-6 md:pt-8 pb-20 px-4 sm:px-6 md:px-8 max-w-[1500px] mx-auto text-[var(--app-text-primary)] transition-colors duration-200">
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* COMPACT GALLERY CONTROLS (Reference A Layout + Reference B Headings)*/}
       {/* ─────────────────────────────────────────────────────────────────── */}
@@ -165,7 +165,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight font-sans text-inherit">
               Explore designs
             </h1>
-            <span className="text-xs font-mono text-[#8e939e] px-2 py-0.5 rounded-full border border-[#1f2228] bg-[#121418]">
+            <span className="text-xs font-mono text-[var(--app-text-secondary)] px-2 py-0.5 rounded border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)]">
               {filteredCards.length}
             </span>
           </div>
@@ -176,8 +176,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setActiveCategory('all')}
               className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer shrink-0 ${
                 activeCategory === 'all'
-                  ? 'bg-white text-black font-semibold shadow-xs'
-                  : 'border border-[#222630] bg-[#121418] text-[#8e939e] hover:text-white hover:border-[#383e4c]'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                  : 'border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
               }`}
             >
               All
@@ -186,8 +186,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setActiveCategory('quote')}
               className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer shrink-0 ${
                 activeCategory === 'quote'
-                  ? 'bg-white text-black font-semibold shadow-xs'
-                  : 'border border-[#222630] bg-[#121418] text-[#8e939e] hover:text-white hover:border-[#383e4c]'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                  : 'border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
               }`}
             >
               Quote Cards
@@ -196,8 +196,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setActiveCategory('id-card')}
               className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer shrink-0 ${
                 activeCategory === 'id-card'
-                  ? 'bg-white text-black font-semibold shadow-xs'
-                  : 'border border-[#222630] bg-[#121418] text-[#8e939e] hover:text-white hover:border-[#383e4c]'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                  : 'border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
               }`}
             >
               ID Pass
@@ -206,8 +206,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setActiveCategory('editorial')}
               className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer shrink-0 ${
                 activeCategory === 'editorial'
-                  ? 'bg-white text-black font-semibold shadow-xs'
-                  : 'border border-[#222630] bg-[#121418] text-[#8e939e] hover:text-white hover:border-[#383e4c]'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                  : 'border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
               }`}
             >
               Editorial
@@ -216,8 +216,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setActiveCategory('minimal')}
               className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer shrink-0 ${
                 activeCategory === 'minimal'
-                  ? 'bg-white text-black font-semibold shadow-xs'
-                  : 'border border-[#222630] bg-[#121418] text-[#8e939e] hover:text-white hover:border-[#383e4c]'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                  : 'border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
               }`}
             >
               Minimal
@@ -231,8 +231,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => setSearchOpen((prev) => !prev)}
               className={`p-2 rounded-lg border transition-colors cursor-pointer ${
                 searchOpen || searchQuery
-                  ? 'border-white bg-[#1a1d24] text-white'
-                  : 'border-[#222630] bg-[#121418] text-[#8e939e] hover:text-white hover:border-[#383e4c]'
+                  ? 'border-[var(--app-accent)] bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]'
+                  : 'border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
               }`}
               title="Toggle search filter"
               aria-label="Toggle search filter"
@@ -241,13 +241,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </button>
 
             {/* Grid Density Toggle (Reference A top right icon) */}
-            <div className="hidden sm:flex items-center border border-[#222630] bg-[#121418] rounded-lg p-0.5">
+            <div className="hidden sm:flex items-center border border-[var(--app-border-subtle)] bg-[var(--app-surface)] rounded-md p-0.5">
               <button
                 onClick={() => setGridColumns('dense')}
                 className={`p-1.5 rounded-md transition-colors cursor-pointer ${
                   gridColumns === 'dense'
-                    ? 'bg-[#1e222a] text-white shadow-xs'
-                    : 'text-[#8e939e] hover:text-white'
+                    ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)]'
+                    : 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
                 }`}
                 title="Dense Grid (Reference A)"
                 aria-label="Dense Grid"
@@ -258,8 +258,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 onClick={() => setGridColumns('comfortable')}
                 className={`p-1.5 rounded-md transition-colors cursor-pointer ${
                   gridColumns === 'comfortable'
-                    ? 'bg-[#1e222a] text-white shadow-xs'
-                    : 'text-[#8e939e] hover:text-white'
+                    ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)]'
+                    : 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
                 }`}
                 title="Showcase Grid (Reference B)"
                 aria-label="Showcase Grid"
@@ -280,7 +280,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Instant search by title, quote, author, tag..."
-              className="w-full pl-9 pr-9 py-2 text-xs rounded-xl border border-[#2b303c] bg-[#121418] text-[#f4f1ea] placeholder-[#64748b] focus:outline-none focus:border-white transition-colors"
+              className="w-full pl-9 pr-9 py-2 text-xs rounded border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-primary)] placeholder-[var(--app-text-muted)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
             />
             {searchQuery && (
               <button
@@ -299,14 +299,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ARTWORK GALLERY GRID (Reference A Visual Density + Immediate Focus)  */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       {filteredCards.length === 0 ? (
-        <div className="py-24 text-center flex flex-col items-center justify-center gap-3 border border-[#1f2228] rounded-2xl bg-[#0e1014]">
-          <span className="text-sm text-[#8e939e]">No designs match your criteria.</span>
+        <div className="py-24 text-center flex flex-col items-center justify-center gap-3 border border-[var(--app-border-subtle)] rounded-lg bg-[var(--app-surface)]">
+          <span className="text-sm text-[var(--app-text-secondary)]">No designs match your criteria.</span>
           <button
             onClick={() => {
               setActiveCategory('all');
               setSearchQuery('');
             }}
-            className="px-4 py-2 rounded-full text-xs font-semibold bg-white text-black hover:bg-slate-200 transition-colors cursor-pointer mt-2"
+            className="px-4 py-2 rounded text-xs font-semibold bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] transition-colors cursor-pointer mt-2"
           >
             Show All Designs
           </button>
@@ -326,7 +326,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <article
                 key={card.id}
                 onClick={() => handleOpenPreview(card)}
-                className="group relative rounded-2xl overflow-hidden border border-[#1a1d24] hover:border-white/35 transition-all duration-200 cursor-pointer shadow-md hover:shadow-2xl flex flex-col bg-[#0e1014]"
+                className="group relative rounded-lg overflow-hidden border border-[var(--app-border-subtle)] hover:border-[var(--app-border-strong)] transition-colors duration-200 cursor-pointer flex flex-col bg-[var(--app-surface)]"
               >
                 {/* Visual Card Artwork Viewport */}
                 <div className="w-full overflow-hidden">
@@ -340,32 +340,32 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
 
                 {/* Restrained Metadata Strip Under Card (Reference A Pattern) */}
-                <div className="p-3.5 px-4 bg-[#0e1014] border-t border-[#1a1d24] flex items-center justify-between text-xs select-none">
+                <div className="p-3.5 px-4 bg-[var(--app-surface)] border-t border-[var(--app-border-subtle)] flex items-center justify-between text-xs select-none">
                   {/* Left: Icon glyph + Title */}
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="p-1 rounded-md bg-[#161820] text-[#8e939e] shrink-0">
+                    <div className="p-1 rounded bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] shrink-0">
                       {getCategoryIcon(card.category)}
                     </div>
-                    <span className="font-semibold text-xs tracking-tight text-white truncate max-w-[170px] sm:max-w-[210px]">
+                    <span className="font-semibold text-xs tracking-tight text-[var(--app-text-primary)] truncate max-w-[170px] sm:max-w-[210px]">
                       {card.title}
                     </span>
-                    <span className="hidden sm:inline-block text-[10px] font-mono text-[#8e939e] border border-[#222630] px-1.5 py-0.5 rounded uppercase">
+                    <span className="hidden sm:inline-block text-[10px] font-mono text-[var(--app-text-secondary)] border border-[var(--app-border-subtle)] px-1.5 py-0.5 rounded uppercase">
                       {card.categoryLabel}
                     </span>
                   </div>
 
                   {/* Right: Author / Aspect Format */}
-                  <div className="text-[11px] text-[#8e939e] font-sans truncate shrink-0 max-w-[120px] text-right">
+                  <div className="text-[11px] text-[var(--app-text-secondary)] font-sans truncate shrink-0 max-w-[120px] text-right">
                     {card.author}
                   </div>
                 </div>
 
                 {/* Restrained Hover / Focus Overlay Action Dock */}
-                <div className="absolute inset-x-0 bottom-12 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-between z-20 pointer-events-none">
+                <div className="absolute inset-x-0 bottom-12 p-3 bg-[var(--app-surface)] border-t border-[var(--app-border-subtle)] opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150 flex items-center justify-between z-20 pointer-events-none">
                   <div className="flex items-center gap-2 pointer-events-auto">
                     <button
                       onClick={(e) => handleUseTemplate(card, e)}
-                      className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-black hover:bg-slate-200 transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                      className="px-3 py-1.5 rounded text-xs font-semibold bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] transition-colors flex items-center gap-1.5 cursor-pointer"
                       title="Open in Creator"
                     >
                       <span>Use Template</span>
@@ -374,7 +374,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                     <button
                       onClick={(e) => handleOpenPreview(card, e)}
-                      className="p-1.5 rounded-full border border-white/30 bg-black/60 hover:bg-black text-white transition-colors cursor-pointer"
+                      className="p-1.5 rounded border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] transition-colors cursor-pointer"
                       title="Inspect full-resolution preview"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
@@ -383,7 +383,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                   <button
                     onClick={(e) => handleCopyText(card, e)}
-                    className="p-1.5 rounded-full border border-white/30 bg-black/60 hover:bg-black text-white transition-colors cursor-pointer pointer-events-auto"
+                    className="p-1.5 rounded border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] transition-colors cursor-pointer pointer-events-auto"
                     title={isCopied ? 'Copied quote!' : 'Copy formatted quote'}
                   >
                     {isCopied ? (
@@ -404,22 +404,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ─────────────────────────────────────────────────────────────────── */}
       {previewTemplate && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
           onClick={() => setPreviewTemplate(null)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl border border-[#242833] bg-[#0e1014] p-6 shadow-2xl flex flex-col gap-5 overflow-hidden animate-scale-in"
+            className="w-full max-w-lg rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-6 flex flex-col gap-5 overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-[#1f2228]">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--app-border-subtle)]">
               <div>
-                <h3 className="font-bold text-sm text-white">{previewTemplate.title}</h3>
-                <span className="text-[11px] text-[#8e939e]">{previewTemplate.categoryLabel}</span>
+                <h3 className="font-bold text-sm text-[var(--app-text-primary)]">{previewTemplate.title}</h3>
+                <span className="text-[11px] text-[var(--app-text-secondary)]">{previewTemplate.categoryLabel}</span>
               </div>
               <button
                 onClick={() => setPreviewTemplate(null)}
-                className="p-1.5 rounded-lg text-[#8e939e] hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                className="p-1.5 rounded text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-[var(--app-surface-secondary)] transition-colors cursor-pointer"
                 title="Close"
               >
                 <X className="w-4 h-4" />
@@ -439,7 +439,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="flex items-center justify-between pt-1">
               <button
                 onClick={(e) => handleCopyText(previewTemplate, e)}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#222630] bg-[#14161b] hover:bg-[#1c1f26] text-[#8e939e] hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded text-xs font-medium border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] hover:bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 {copiedId === previewTemplate.id ? (
                   <>
@@ -457,13 +457,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPreviewTemplate(null)}
-                  className="px-4 py-2 rounded-lg text-xs font-medium border border-[#222630] hover:bg-[#1a1d24] text-[#8e939e] hover:text-white transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded text-xs font-medium border border-[var(--app-border-subtle)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] transition-colors cursor-pointer"
                 >
                   Close
                 </button>
                 <button
                   onClick={() => handleUseTemplate(previewTemplate)}
-                  className="px-5 py-2 rounded-lg text-xs font-bold bg-white text-black hover:bg-slate-200 transition-colors shadow-md flex items-center gap-1.5 cursor-pointer"
+                  className="px-5 py-2 rounded text-xs font-semibold bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>Open in Creator</span>
                   <ArrowRight className="w-3.5 h-3.5" />
