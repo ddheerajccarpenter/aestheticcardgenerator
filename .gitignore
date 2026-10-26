@@ -41,5 +41,6 @@ dist-ssr
 !**/README.md
 !src/fix.md
 !AGENTS.md
+!page.md
 !.agents/**
 

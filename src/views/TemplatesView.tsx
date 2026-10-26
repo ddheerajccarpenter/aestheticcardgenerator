@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import type { CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
 import { updatePageSEO } from '../utils/seo';
-import { AdSlot } from '../components/AdSlot';
 import {
   Search,
   X,
@@ -296,9 +295,6 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
             })}
           </div>
         )}
-
-        {/* Optional Safe AdSense slot */}
-        <AdSlot slotId="templates-bottom-slot" />
 
 
       </div>

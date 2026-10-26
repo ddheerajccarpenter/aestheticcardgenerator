@@ -25,14 +25,14 @@
     /* ========================================================================= */
     /* FIXED APPLICATION UI TOKENS (Separated from dynamic canvas document state) */
     /* ========================================================================= */
-    --app-bg: #101114;                    /* Main application background */
-    --app-surface: #181A1E;               /* Elevated application surface */
-    --app-surface-secondary: #202228;     /* Secondary interactive surface */
+    --app-bg: #090a0d;                    /* Main application background (Reference A Near-Black) */
+    --app-surface: #111318;               /* Elevated application surface */
+    --app-surface-secondary: #171a22;     /* Secondary interactive surface */
     --app-text-primary: #F1F0EC;          /* Primary application text */
-    --app-text-secondary: #AAA9A4;        /* Secondary application text */
-    --app-text-muted: #787980;            /* Muted captions & shortcuts */
-    --app-border-subtle: #34353A;         /* Structural separation border */
-    --app-border-strong: #44454c;         /* Focused container border */
+    --app-text-secondary: #8e939e;        /* Secondary application text */
+    --app-text-muted: #64748b;            /* Muted captions & shortcuts */
+    --app-border-subtle: #1a1d24;         /* Structural separation border */
+    --app-border-strong: #2c323e;         /* Focused container border */
     --app-accent: #E2D9C8;                /* Warm bone / champagne accent */
     --app-accent-hover: #ece5d8;          /* Micro-brightened accent hover */
     --app-accent-ink: #171717;            /* Dark high-contrast ink on bone */

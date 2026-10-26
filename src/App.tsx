@@ -6,7 +6,7 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { HomeView } from './views/HomeView';
-import { EditorView } from './views/EditorView';
+import { CreatorView } from './views/CreatorView';
 import { CanvasEditorView } from './views/CanvasEditorView';
 import { TemplatesView } from './views/TemplatesView';
 import { CategoryView } from './views/CategoryView';
@@ -152,7 +152,7 @@ export const App: React.FC = () => {
   const renderCurrentRoute = () => {
     const path = currentPath === '/' ? '/' : currentPath.replace(/\/$/, '');
 
-    // 1. Homepage
+    // 1. Gallery Homepage
     if (path === '/') {
       return (
         <HomeView
@@ -160,19 +160,17 @@ export const App: React.FC = () => {
           onOpenEditorWithTemplate={handleOpenEditorWithTemplate}
           onNavigateToEditor={() => navigate('/create')}
           onNavigate={navigate}
-          onOpenGuide={() => setGuideModalOpen(true)}
         />
       );
     }
 
-    // 2. Card Creator
+    // 2. Dedicated Creator Workspace
     if (path === '/create') {
       return (
-        <EditorView
+        <CreatorView
           theme={theme}
           initialTemplate={activeTemplate}
           onNavigateHome={() => navigate('/')}
-          onEditingSheetChange={setIsEditorSheetOpen}
         />
       );
     }
@@ -324,16 +322,24 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main className={`flex-1 ${currentPath !== '/create' && currentPath !== '/canvas' ? 'pb-24 md:pb-0' : ''}`}>
+      <main
+        className={`flex-1 transition-all duration-200 ${
+          currentPath !== '/create' && currentPath !== '/canvas'
+            ? 'pb-24 md:pb-0 md:pl-16'
+            : ''
+        }`}
+      >
         {renderCurrentRoute()}
       </main>
 
       {/* Global Footer (shown on all public pages except fullscreen editors) */}
       {currentPath !== '/create' && currentPath !== '/canvas' && (
-        <Footer
-          theme={theme}
-          onNavigate={navigate}
-        />
+        <div className="md:pl-16 transition-all duration-200">
+          <Footer
+            theme={theme}
+            onNavigate={navigate}
+          />
+        </div>
       )}
 
       {/* 4-Item Mobile Bottom Navigation */}
