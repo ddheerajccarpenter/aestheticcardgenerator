@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CardTemplate } from '../types/card';
+import type { CardTemplate, FontChoice } from '../types/card';
 import { ASSET_AVATARS } from '../data/canvasAssets';
 import { sanitizeQuote } from '../utils/richText';
 
@@ -11,6 +11,38 @@ interface UnifiedCardThumbnailProps {
   interactiveTilt?: boolean;
   onClick?: () => void;
 }
+
+const getFontFamily = (f?: FontChoice): string => {
+  switch (f) {
+    case 'editorial':
+      return "'Newsreader', Georgia, serif";
+    case 'serif':
+      return "'Playfair Display', Georgia, serif";
+    case 'instrument':
+      return "'Instrument Serif', Georgia, serif";
+    case 'cormorant':
+      return "'Cormorant Garamond', Georgia, serif";
+    case 'syne':
+      return "'Syne', sans-serif";
+    case 'space-grotesk':
+      return "'Space Grotesk', sans-serif";
+    case 'unbounded':
+      return "'Unbounded', sans-serif";
+    case 'mono':
+      return "'JetBrains Mono', monospace";
+    case 'space-mono':
+      return "'Space Mono', monospace";
+    case 'pixel':
+      return "'VT323', monospace";
+    case 'caveat':
+      return "'Caveat', cursive";
+    case 'reenie':
+      return "'Reenie Beanie', cursive";
+    case 'sans':
+    default:
+      return "'Plus Jakarta Sans', -apple-system, sans-serif";
+  }
+};
 
 export const UnifiedCardThumbnail: React.FC<UnifiedCardThumbnailProps> = ({
   template,
@@ -35,6 +67,8 @@ export const UnifiedCardThumbnail: React.FC<UnifiedCardThumbnailProps> = ({
       : ASSET_AVATARS.studentScholar);
 
   const cleanQuote = sanitizeQuote(template.quote);
+  const cardFont = getFontFamily(template.font);
+  const cardAlign = template.align || 'left';
 
   return (
     <div
@@ -43,17 +77,19 @@ export const UnifiedCardThumbnail: React.FC<UnifiedCardThumbnailProps> = ({
         backgroundColor: template.theme.bg,
         color: template.theme.ink,
       }}
-      className={`relative p-6 flex flex-col justify-between border-b border-black/10 overflow-hidden select-none ${defaultMinH} ${className}`}
+      className={`relative p-6 sm:p-7 flex flex-col justify-between overflow-hidden select-none transition-colors duration-150 ${defaultMinH} ${className}`}
     >
       {/* Subtle tactile paper micro-grain */}
-      <div className="absolute inset-0 card-noise opacity-20 pointer-events-none" />
+      {template.showGrain !== false && (
+        <div className="absolute inset-0 card-noise opacity-20 pointer-events-none" />
+      )}
 
       {/* Pure Header Strip: Folio tag & Badge */}
       <div className="flex items-center justify-between text-[11px] font-mono opacity-80 z-10 shrink-0">
-        <span className="font-semibold truncate max-w-[200px] tracking-wider">
+        <span className="font-semibold truncate max-w-[200px] tracking-wider uppercase">
           {template.tag || template.categoryLabel}
         </span>
-        <span className="border border-current/35 px-1.5 py-0.5 rounded font-mono text-[9px] font-bold tracking-tight">
+        <span className="border border-current/35 px-1.5 py-0.5 rounded font-mono text-[9px] font-bold tracking-tight uppercase">
           {template.badge || 'EST. 2026'}
         </span>
       </div>
@@ -77,21 +113,27 @@ export const UnifiedCardThumbnail: React.FC<UnifiedCardThumbnailProps> = ({
             <p className="opacity-75 line-clamp-2 text-[10px] leading-snug font-body">
               {cleanQuote}
             </p>
-            <div className="mt-1 flex items-center gap-1.5 text-[9px] font-mono opacity-65">
-              <span className="font-bold tracking-widest">||||| ||| ||||</span>
-              <span>ID-PASS</span>
+            <div className="mt-1 flex items-center gap-2 text-[9px] font-mono opacity-70">
+              <span className="font-bold tracking-widest text-[11px]">||||| ||| ||||</span>
+              <span className="tracking-wider uppercase">ID-PASS</span>
             </div>
           </div>
         </div>
       ) : (
-        <blockquote className="my-4 text-base sm:text-lg leading-relaxed line-clamp-3 font-editorial z-10 font-normal">
+        <blockquote
+          style={{
+            fontFamily: cardFont,
+            textAlign: cardAlign,
+          }}
+          className="my-4 text-base sm:text-lg leading-relaxed line-clamp-3 z-10 font-normal tracking-tight"
+        >
           “{cleanQuote}”
         </blockquote>
       )}
 
       {/* Pure Footer: Author & Category Label */}
       <div className="flex items-center justify-between text-[11px] font-medium opacity-80 truncate z-10 pt-2 border-t border-current/15 shrink-0">
-        <cite className="not-italic truncate max-w-[200px] font-subheading">
+        <cite className="not-italic truncate max-w-[220px] font-subheading">
           — {template.author}
         </cite>
         <span className="font-mono text-[9px] uppercase opacity-70 tracking-wider">

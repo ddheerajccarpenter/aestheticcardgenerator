@@ -44,6 +44,14 @@ const PALETTES: PaletteOption[] = [
     surface: 'woven-canvas-linen',
   },
   {
+    id: 'field-linen',
+    name: 'Field Linen',
+    bg: '#f4ede4',
+    ink: '#1c1b18',
+    badge: 'FIELD',
+    surface: 'woven-canvas-linen',
+  },
+  {
     id: 'terracotta-orange',
     name: 'Terracotta',
     bg: '#d44727',
@@ -58,6 +66,22 @@ const PALETTES: PaletteOption[] = [
     ink: '#f5f5f7',
     badge: 'MIDNIGHT',
     surface: 'warm-nano-texture-matte',
+  },
+  {
+    id: 'slate-archive',
+    name: 'Slate Archive',
+    bg: '#1c2533',
+    ink: '#ffffff',
+    badge: 'ARCHIVE',
+    surface: 'warm-nano-texture-matte',
+  },
+  {
+    id: 'identity-cream',
+    name: 'Identity Sand',
+    bg: '#f1ede3',
+    ink: '#23211e',
+    badge: 'ALL-ACCESS',
+    surface: 'pvc-security-id-sheen',
   },
   {
     id: 'soft-celadon',
@@ -169,7 +193,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
   // Sync initialTemplate changes if provided
   useEffect(() => {
     if (initialTemplate) {
-      if (initialTemplate.category === 'id-card') {
+      if (initialTemplate.category === 'id-card' || initialTemplate.hasPhotoArea) {
         setMode('id');
         setIdName(initialTemplate.title);
         setAspectRatio('2:3');
@@ -179,6 +203,18 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
         setAuthor(initialTemplate.author);
         setTag(initialTemplate.tag || 'EDITORIAL NO. 04');
         setAspectRatio('4:5');
+      }
+      if (initialTemplate.font) {
+        if (['mono', 'space-mono', 'pixel'].includes(initialTemplate.font)) {
+          setFontFamily('mono');
+        } else if (['sans', 'syne', 'space-grotesk', 'unbounded'].includes(initialTemplate.font)) {
+          setFontFamily('sans');
+        } else {
+          setFontFamily('editorial');
+        }
+      }
+      if (initialTemplate.align) {
+        setTextAlign(initialTemplate.align);
       }
       const match = PALETTES.findIndex(
         (p) => p.bg.toLowerCase() === initialTemplate.theme.bg.toLowerCase()
