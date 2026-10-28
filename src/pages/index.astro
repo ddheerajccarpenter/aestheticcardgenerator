@@ -1,0 +1,14 @@
+---
+import App from '../App';
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="ACG — Aesthetic Card Generator"
+  description="A quiet, browser-based studio for making editorial cards, identity passes, and original designs."
+  path="/"
+>
+  <App client:only="react">
+    <div slot="fallback" class="acg-boot" role="status">Opening the studio…</div>
+  </App>
+</SiteLayout>

@@ -1,3 +1,2 @@
-# Cloudflare Pages SPA rewrite rule
-# Rewrites all subroutes to index.html with 200 status for client-side routing
-/*    /index.html   200
+# Astro writes a static HTML document for each public route.
+# Unknown paths are intentionally left to Cloudflare Pages' 404 handling.

@@ -16,7 +16,8 @@ import {
   Crop,
 } from 'lucide-react';
 import { ASSET_AVATARS } from '../data/canvasAssets';
-import { createThreeCardPreviewScene } from '../engines/threeCardStage';
+import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
+import { ThreeDPreviewControls } from '../components/ThreeDPreviewControls';
 import { getBrandedExportFilename, triggerBrandedBlobDownload } from '../engines/brandedExportAndThreePng';
 
 export interface CreatorViewProps {
@@ -165,9 +166,7 @@ const getTemplateAvatar = (template?: CardTemplate) =>
 
 export const CreatorView: React.FC<CreatorViewProps> = ({
   initialTemplate,
-  theme = 'dark',
 }) => {
-  const isLight = theme === 'light';
 
   useEffect(() => {
     updatePageSEO({
@@ -221,7 +220,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
   // Canvas refs and export/preview state
   const cardRef = useRef<HTMLDivElement>(null);
   const threeMountRef = useRef<HTMLDivElement>(null);
-  const threeStageRef = useRef<any>(null);
+  const threeStageRef = useRef<ThreeCardPreviewController | null>(null);
   const lastModeRef = useRef<string>(mode);
 
   const [is3DMode, setIs3DMode] = useState(false);
@@ -417,24 +416,24 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* WORKSPACE TOOLBAR                                                   */}
       {/* ─────────────────────────────────────────────────────────────────── */}
-      <div className="h-12 border-b border-[#1f2228] bg-[#0c0d10] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0">
+      <div className="h-12 border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0">
         {/* Left: Back to Gallery + Mode Switcher */}
         <div className="flex items-center gap-3">
           <a
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-[#8e939e] hover:text-white transition-colors cursor-pointer mr-1"
+            className="inline-flex items-center gap-1.5 text-xs text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] transition-colors cursor-pointer mr-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Gallery</span>
           </a>
 
-          <div className="flex p-0.5 rounded-lg border border-[#23262d] bg-[#14161b] text-xs">
+          <div className="flex p-0.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-xs">
             <button
               onClick={() => handleModeChange('quote')}
               className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
                 mode === 'quote'
-                  ? 'bg-[#20232a] text-white font-semibold shadow-xs'
-                  : 'text-[#8e939e] hover:text-white'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold shadow-xs'
+                  : 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
               }`}
             >
               Quote Card
@@ -443,8 +442,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
               onClick={() => handleModeChange('id')}
               className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
                 mode === 'id'
-                  ? 'bg-[#20232a] text-white font-semibold shadow-xs'
-                  : 'text-[#8e939e] hover:text-white'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold shadow-xs'
+                  : 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
               }`}
             >
               ID Pass
@@ -455,8 +454,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
         {/* Right: Format, 3D Preview, Duplicate, Export */}
         <div className="flex items-center gap-2">
           {/* Format Selector */}
-          <div className="flex items-center border border-[#23262d] bg-[#14161b] rounded-lg p-0.5 text-xs">
-            <span className="hidden sm:inline pl-2 pr-1 text-[11px] text-[#8e939e] flex items-center gap-1">
+          <div className="flex items-center border border-[var(--app-border-subtle)] bg-[var(--app-surface)] rounded-lg p-0.5 text-xs">
+            <span className="hidden sm:inline pl-2 pr-1 text-[11px] text-[var(--app-text-secondary)] flex items-center gap-1">
               <Crop className="w-3 h-3" />
               <span>Ratio:</span>
             </span>
@@ -466,8 +465,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 onClick={() => setAspectRatio(r)}
                 className={`px-2 py-1 rounded-md font-mono text-[11px] transition-colors cursor-pointer ${
                   aspectRatio === r
-                    ? 'bg-[#20232a] text-white font-semibold shadow-xs'
-                    : 'text-[#8e939e] hover:text-white'
+                    ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold shadow-xs'
+                    : 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
                 }`}
               >
                 {r}
@@ -480,8 +479,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
             onClick={() => setIs3DMode(!is3DMode)}
             className={`h-8 px-2.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
               is3DMode
-                ? 'bg-[#20232a] border-white text-white font-semibold'
-                : 'border-[#23262d] bg-[#14161b] text-[#8e939e] hover:text-white'
+                ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                : 'border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
             }`}
             title="Toggle 3D Physical Preview"
           >
@@ -492,10 +491,10 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           {/* Duplicate / Copy Action */}
           <button
             onClick={handleCopy}
-            className="h-8 px-2.5 rounded-lg border border-[#23262d] bg-[#14161b] hover:bg-[#1c1f26] text-[#8e939e] hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-8 px-2.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
             title="Copy Text to Clipboard"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-[var(--app-accent)]" /> : <Copy className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
@@ -503,7 +502,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="h-8 px-4 rounded-lg bg-white text-black hover:bg-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+            className="h-8 px-4 rounded-lg bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
             title="Download Retina PNG"
           >
             <Download className="w-3.5 h-3.5" />
@@ -517,14 +516,14 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
       {/* ─────────────────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Left-side Compact Editing Panel */}
-        <aside className="w-full md:w-80 lg:w-88 border-b md:border-b-0 md:border-r border-[#1f2228] bg-[#101216] p-4 sm:p-5 flex flex-col gap-5 overflow-y-auto shrink-0 max-h-[48vh] md:max-h-[calc(100vh-104px)]">
+        <aside className="w-full md:w-80 lg:w-88 border-b md:border-b-0 md:border-r border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-4 sm:p-5 flex flex-col gap-5 overflow-y-auto shrink-0 max-h-[48vh] md:max-h-[calc(100vh-104px)]">
           {/* Palette Preset Group */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+              <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                 Palette
               </label>
-              <span className="text-[11px] text-[#8e939e]">
+              <span className="text-[11px] text-[var(--app-text-secondary)]">
                 {currentPalette.name}
               </span>
             </div>
@@ -533,7 +532,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setTemplatePalette(sourceTemplatePalette)}
-                  className="h-7 rounded border border-white/10 ring-2 ring-white relative flex items-center justify-center"
+                  className="h-7 rounded border border-[var(--app-border-subtle)] ring-2 ring-[var(--app-accent)] relative flex items-center justify-center"
                   style={{ backgroundColor: sourceTemplatePalette.bg }}
                   title={`Original: ${sourceTemplatePalette.name}`}
                   aria-label={`Use original ${sourceTemplatePalette.name} palette`}
@@ -547,8 +546,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                   onClick={() => { setPaletteIndex(idx); setTemplatePalette(null); }}
                   className={`h-7 rounded border transition-all cursor-pointer relative flex items-center justify-center ${
                     !templatePalette && paletteIndex === idx
-                      ? 'ring-2 ring-white scale-105 border-transparent shadow-xs'
-                      : 'border-white/10 hover:opacity-80'
+                      ? 'ring-2 ring-[var(--app-accent)] scale-105 border-transparent shadow-xs'
+                      : 'border-[var(--app-border-subtle)] hover:opacity-80'
                   }`}
                   style={{ backgroundColor: p.bg }}
                   title={p.name}
@@ -571,12 +570,12 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
               {/* Quote Text */}
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+                  <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                     Quote Body
                   </label>
                   <button
                     onClick={handleShuffleQuote}
-                    className="text-[11px] text-[#8e939e] hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+                    className="text-[11px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
                   >
                     <Shuffle className="w-3 h-3" />
                     <span>Inspire</span>
@@ -586,35 +585,35 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                   value={quote}
                   onChange={(e) => setQuote(e.target.value)}
                   rows={4}
-                  className="w-full text-xs leading-relaxed p-2.5 rounded-lg border border-[#23262d] bg-[#0c0d10] text-[#f4f1ea] focus:outline-none focus:border-white transition-colors resize-none"
+                  className="w-full text-xs leading-relaxed p-2.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors resize-none"
                   placeholder="Enter quote or text..."
                 />
               </div>
 
               {/* Author */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                   Author / Source
                 </label>
                 <input
                   type="text"
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[#23262d] bg-[#0c0d10] text-[#f4f1ea] focus:outline-none focus:border-white transition-colors"
+                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
                   placeholder="e.g. Albert Camus"
                 />
               </div>
 
               {/* Header Tag */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                   Header Tag
                 </label>
                 <input
                   type="text"
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[#23262d] bg-[#0c0d10] text-[#f4f1ea] focus:outline-none focus:border-white transition-colors"
+                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
                   placeholder="e.g. FIELD NOTES — 001"
                 />
               </div>
@@ -623,49 +622,49 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
             <div className="flex flex-col gap-4">
               {/* ID Name */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                   Full Name
                 </label>
                 <input
                   type="text"
                   value={idName}
                   onChange={(e) => setIdName(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[#23262d] bg-[#0c0d10] text-[#f4f1ea] focus:outline-none focus:border-white transition-colors"
+                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
                   placeholder="e.g. Dan Valentini"
                 />
               </div>
 
               {/* ID Role */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                   Role / Title
                 </label>
                 <input
                   type="text"
                   value={idRole}
                   onChange={(e) => setIdRole(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[#23262d] bg-[#0c0d10] text-[#f4f1ea] focus:outline-none focus:border-white transition-colors"
+                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
                   placeholder="e.g. Vision Architect"
                 />
               </div>
 
               {/* Clearance / Status */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                   Clearance / Access
                 </label>
                 <input
                   type="text"
                   value={idClearance}
                   onChange={(e) => setIdClearance(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[#23262d] bg-[#0c0d10] text-[#f4f1ea] focus:outline-none focus:border-white transition-colors"
+                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
                   placeholder="e.g. ALL-ACCESS • TIER 01"
                 />
               </div>
 
               {/* Avatar Selection */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                   Portrait / Avatar
                 </label>
                 <div className="flex items-center gap-2">
@@ -673,8 +672,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                     onClick={() => setAvatar(ASSET_AVATARS.grungeDan)}
                     className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-all ${
                       avatar === ASSET_AVATARS.grungeDan
-                        ? 'ring-2 ring-white border-transparent'
-                        : 'border-[#23262d] opacity-70 hover:opacity-100'
+                        ? 'ring-2 ring-[var(--app-accent)] border-transparent'
+                        : 'border-[var(--app-border-subtle)] opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={ASSET_AVATARS.grungeDan} alt="Dan" className="w-full h-full object-cover grayscale" />
@@ -683,13 +682,13 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                     onClick={() => setAvatar(ASSET_AVATARS.jenniePretty)}
                     className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-all ${
                       avatar === ASSET_AVATARS.jenniePretty
-                        ? 'ring-2 ring-white border-transparent'
-                        : 'border-[#23262d] opacity-70 hover:opacity-100'
+                        ? 'ring-2 ring-[var(--app-accent)] border-transparent'
+                        : 'border-[var(--app-border-subtle)] opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={ASSET_AVATARS.jenniePretty} alt="Jennie" className="w-full h-full object-cover" />
                   </button>
-                  <label className="h-11 px-2.5 rounded border border-dashed border-[#23262d] hover:border-white/50 bg-[#0c0d10] text-[10px] text-[#8e939e] hover:text-white flex items-center justify-center gap-1 cursor-pointer transition-colors">
+                  <label className="h-11 px-2.5 rounded border border-dashed border-[var(--app-border-subtle)] hover:border-[var(--app-accent)] bg-[var(--app-bg)] text-[10px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center justify-center gap-1 cursor-pointer transition-colors">
                     <Upload className="w-3 h-3" />
                     <span>Upload</span>
                     <input
@@ -705,8 +704,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           )}
 
           {/* Typography & Alignment Group */}
-          <div className="pt-2 border-t border-[#1f2228] flex flex-col gap-3">
-            <label className="text-[11px] font-mono uppercase tracking-wider text-[#8e939e] font-semibold">
+          <div className="pt-2 border-t border-[var(--app-border-subtle)] flex flex-col gap-3">
+            <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
               Typography &amp; Layout
             </label>
             <div className="grid grid-cols-3 gap-1.5 text-xs">
@@ -714,8 +713,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 onClick={() => setFontFamily('editorial')}
                 className={`py-1.5 rounded-md border text-center transition-colors cursor-pointer ${
                   fontFamily === 'editorial'
-                    ? 'bg-[#20232a] border-white text-white font-semibold'
-                    : 'border-[#23262d] text-[#8e939e] hover:text-white'
+                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
                 }`}
               >
                 Serif
@@ -724,8 +723,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 onClick={() => setFontFamily('sans')}
                 className={`py-1.5 rounded-md border text-center transition-colors cursor-pointer ${
                   fontFamily === 'sans'
-                    ? 'bg-[#20232a] border-white text-white font-semibold'
-                    : 'border-[#23262d] text-[#8e939e] hover:text-white'
+                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
                 }`}
               >
                 Sans
@@ -734,8 +733,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 onClick={() => setFontFamily('mono')}
                 className={`py-1.5 rounded-md border text-center transition-colors cursor-pointer ${
                   fontFamily === 'mono'
-                    ? 'bg-[#20232a] border-white text-white font-semibold'
-                    : 'border-[#23262d] text-[#8e939e] hover:text-white'
+                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
                 }`}
               >
                 Mono
@@ -744,10 +743,10 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
             {mode === 'quote' && (
               <div className="flex flex-col gap-1">
-                <label htmlFor="creator-font-size" className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[#8e939e]">
+                <label htmlFor="creator-font-size" className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)]">
                   <span>Quote size</span><span>{fontSize}px</span>
                 </label>
-                <input id="creator-font-size" type="range" min="14" max="48" step="1" value={fontSize} onChange={(event) => setFontSize(Number(event.target.value))} className="w-full accent-[#e2d9c8]" />
+                <input id="creator-font-size" type="range" min="14" max="48" step="1" value={fontSize} onChange={(event) => setFontSize(Number(event.target.value))} className="w-full accent-[var(--app-accent)]" />
               </div>
             )}
 
@@ -757,8 +756,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 onClick={() => setTextAlign('left')}
                 className={`flex-1 py-1 rounded border flex items-center justify-center cursor-pointer transition-colors ${
                   textAlign === 'left'
-                    ? 'bg-[#20232a] border-white text-white'
-                    : 'border-[#23262d] text-[#8e939e]'
+                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
+                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)]'
                 }`}
                 title="Left Align"
               >
@@ -768,8 +767,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 onClick={() => setTextAlign('center')}
                 className={`flex-1 py-1 rounded border flex items-center justify-center cursor-pointer transition-colors ${
                   textAlign === 'center'
-                    ? 'bg-[#20232a] border-white text-white'
-                    : 'border-[#23262d] text-[#8e939e]'
+                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
+                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)]'
                 }`}
                 title="Center Align"
               >
@@ -779,8 +778,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 onClick={() => setTextAlign('right')}
                 className={`flex-1 py-1 rounded border flex items-center justify-center cursor-pointer transition-colors ${
                   textAlign === 'right'
-                    ? 'bg-[#20232a] border-white text-white'
-                    : 'border-[#23262d] text-[#8e939e]'
+                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
+                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)]'
                 }`}
                 title="Right Align"
               >
@@ -792,14 +791,12 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
         {/* Center Canvas Stage */}
         <main
-          className={`flex-1 p-4 sm:p-8 md:p-12 flex flex-col items-center justify-center overflow-auto relative ${
-            isLight ? 'bg-[#ecece8]' : 'bg-[#0a0b0d]'
-          }`}
+          className="flex-1 p-4 sm:p-8 md:p-12 flex flex-col items-center justify-center overflow-auto relative bg-[var(--app-surface-secondary)]"
         >
           {/* Subtle feedback toast */}
           {feedbackMessage && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-md bg-[#181a20] border border-[#2e323b] text-xs text-white shadow-md animate-fade-in flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-md bg-[var(--app-surface)] border border-[var(--app-border-subtle)] text-xs text-[var(--app-text-primary)] shadow-md animate-fade-in flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--app-accent)]" />
               <span>{feedbackMessage}</span>
             </div>
           )}
@@ -807,11 +804,13 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           {is3DMode && (
             <div className="w-full h-full min-h-[380px] flex flex-col items-center justify-center">
               <div
-                ref={threeMountRef}
-                className="w-full max-w-md h-[420px] flex items-center justify-center cursor-grab active:cursor-grabbing"
-              />
-              <span className="text-[11px] font-mono text-[#8e939e] mt-2">
-                Drag to inspect 3D card surface &amp; reflections
+                className="relative w-full max-w-md h-[420px]"
+              >
+                <div ref={threeMountRef} className="h-full w-full cursor-grab active:cursor-grabbing" />
+                <ThreeDPreviewControls controllerRef={threeStageRef} />
+              </div>
+              <span className="text-[11px] font-mono text-[var(--app-text-secondary)] mt-2">
+                Drag to rotate · Scroll or pinch to zoom
               </span>
             </div>
           )}

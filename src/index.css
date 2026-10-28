@@ -193,40 +193,43 @@
 @layer base {
   :root {
     /* Global Typography System (Part II) */
-    --font-heading: 'Jungle Troubles', 'Caveat', cursive;
+    --font-heading: 'Jungle Troubles', 'Bebas Neue', 'Caveat', sans-serif;
     --font-subheading: 'Designer', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-brand: 'Stretch Pro', Impact, 'Arial Narrow', sans-serif;
+    --font-brand: 'Stretch Pro', 'Bebas Neue', Impact, sans-serif;
     --font-body: 'Designer', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
-    /* Quiet neutral surfaces */
-    --c60-dominant: #100f0e;
-    --c30-secondary: #181715;
-    --c10-accent: #211f1b;
-    --ui-accent-solid: #e2d9c8; /* Restrained Warm Bone / Champagne */
-    --text-primary: #f4f1ea;
-    --text-secondary: #a7a197;
-    --text-muted: #827d73;
+    /* Warm graphite and paper with a single accessible vermilion accent. */
+    --c60-dominant: #171512;
+    --c30-secondary: #211e1b;
+    --c10-accent: #2c2723;
+    --ui-accent-solid: #e05d49;
+    --text-primary: #f4efe6;
+    --text-secondary: #c2b8aa;
+    --text-muted: #aaa092;
 
     /* Dark Mode Duotone Icon Tokens (Editorial Bone & Neutral) */
     --icon-frame-bg: rgba(255, 255, 255, 0.04);
     --icon-frame-border: rgba(255, 255, 255, 0.10);
-    --icon-duotone-primary: #e2d9c8;
-    --icon-duotone-secondary: rgba(226, 217, 200, 0.28);
+    --icon-duotone-primary: #e05d49;
+    --icon-duotone-secondary: rgba(224, 93, 73, 0.24);
 
     /* ========================================================================= */
     /* FIXED APPLICATION UI TOKENS (Separated from dynamic canvas document state) */
     /* ========================================================================= */
-    --app-bg: #100f0e;
-    --app-surface: #181715;
-    --app-surface-secondary: #211f1b;
-    --app-text-primary: #f2efe8;
-    --app-text-secondary: #a7a197;
-    --app-text-muted: #827d73;
-    --app-border-subtle: #292722;
-    --app-border-strong: #3b3831;
-    --app-accent: #e4ddcf;
-    --app-accent-hover: #eee8dd;
-    --app-accent-ink: #181715;
+    --app-bg: #171512;
+    --app-surface: #211e1b;
+    --app-surface-secondary: #2c2723;
+    --app-text-primary: #f4efe6;
+    --app-text-secondary: #c2b8aa;
+    --app-text-muted: #aaa092;
+    --app-border-subtle: #403a34;
+    --app-border-strong: #5a5048;
+    --app-accent: #e05d49;
+    --app-accent-hover: #ec705c;
+    --app-accent-ink: #171512;
+    --app-radius-control: 0.75rem;
+    --app-radius-panel: 1.25rem;
+    --app-radius-stage: 1.5rem;
     --app-ink: var(--app-accent-ink);
     --app-text: var(--app-text-primary);
 
@@ -243,20 +246,20 @@
     --color-border-focus: var(--app-accent);
 
     --color-primary: var(--app-accent);
-    --color-primary-active: #d8cfbd;
+    --color-primary-active: #cf4938;
     --color-on-primary: var(--app-accent-ink);
     --color-accent: var(--app-accent);
     --color-accent-hover: var(--app-accent-hover);
-    --color-accent-active: #d8cfbd;
+    --color-accent-active: #cf4938;
     --color-accent-ink: var(--app-accent-ink);
-    --color-accent-soft: rgba(226, 217, 200, 0.12);
-    --color-accent-border: rgba(226, 217, 200, 0.22);
+    --color-accent-soft: rgba(224, 93, 73, 0.12);
+    --color-accent-border: rgba(224, 93, 73, 0.28);
     --color-secondary: var(--app-accent);
     --color-primary-binance: var(--app-accent);
-    --color-primary-airtable: #211f1b;
+    --color-primary-airtable: #2b2721;
     
     --color-ink: var(--app-text-primary);
-    --color-ink-dark: #211f1b;
+    --color-ink-dark: #2c2723;
     --color-body: var(--app-text-secondary);
     --color-muted: var(--app-text-muted);
     
@@ -282,31 +285,31 @@
   html.light,
   [data-theme="light"],
   :root[data-theme="light"] {
-    --c60-dominant: #f6f4ef;
-    --c30-secondary: #efede7;
-    --c10-accent: #e7e3da;
-    --ui-accent-solid: #292722;
-    --text-primary: #292722;
-    --text-secondary: #706a60;
-    --text-muted: #817b70;
+    --c60-dominant: #f3efe7;
+    --c30-secondary: #fffdf8;
+    --c10-accent: #e9e2d8;
+    --ui-accent-solid: #9d3b2c;
+    --text-primary: #29241f;
+    --text-secondary: #62594f;
+    --text-muted: #655c52;
 
     --icon-frame-bg: rgba(41, 39, 34, 0.04);
     --icon-frame-border: rgba(41, 39, 34, 0.12);
-    --icon-duotone-primary: #292722;
-    --icon-duotone-secondary: rgba(17, 20, 23, 0.35);
+    --icon-duotone-primary: #9d3b2c;
+    --icon-duotone-secondary: rgba(157, 59, 44, 0.28);
 
     /* Fixed Application UI Tokens - Light Mode */
-    --app-bg: #f6f4ef;
-    --app-surface: #fbfaf7;
-    --app-surface-secondary: #efede7;
-    --app-text-primary: #292722;
-    --app-text-secondary: #706a60;
-    --app-text-muted: #817b70;
-    --app-border-subtle: #e3ded4;
-    --app-border-strong: #d0c9bc;
-    --app-accent: #292722;
-    --app-accent-hover: #3a3730;
-    --app-accent-ink: #f7f5f0;
+    --app-bg: #f3efe7;
+    --app-surface: #fffdf8;
+    --app-surface-secondary: #e9e2d8;
+    --app-text-primary: #29241f;
+    --app-text-secondary: #62594f;
+    --app-text-muted: #655c52;
+    --app-border-subtle: #d9d0c3;
+    --app-border-strong: #bfb3a4;
+    --app-accent: #9d3b2c;
+    --app-accent-hover: #842f23;
+    --app-accent-ink: #fff9f0;
     --app-ink: var(--app-accent-ink);
     --app-text: var(--app-text-primary);
 
@@ -321,14 +324,14 @@
     --color-border-focus: var(--app-accent);
 
     --color-primary: var(--app-accent);
-    --color-primary-active: #151410;
+    --color-primary-active: #742b20;
     --color-on-primary: var(--app-accent-ink);
     --color-accent: var(--app-accent);
     --color-accent-hover: var(--app-accent-hover);
-    --color-accent-active: #151410;
+    --color-accent-active: #742b20;
     --color-accent-ink: var(--app-accent-ink);
-    --color-accent-soft: rgba(41, 39, 34, 0.06);
-    --color-accent-border: rgba(41, 39, 34, 0.15);
+    --color-accent-soft: rgba(157, 59, 44, 0.08);
+    --color-accent-border: rgba(157, 59, 44, 0.22);
 
     --color-ink: var(--app-text-primary);
     --color-body: var(--app-text-secondary);
@@ -359,6 +362,10 @@
     font-weight: 500;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  :where(button, input, select, textarea, summary) {
+    border-radius: var(--app-radius-control);
   }
 
   p, .body-regular {
@@ -602,7 +609,7 @@ button:active, .btn-interactive:active, .sq-duotone-icon:active, .palette-swatch
   font-family: var(--font-subheading);
   font-weight: 700;
   font-size: 0.8125rem;
-  border-radius: 0.75rem;
+  border-radius: var(--app-radius-control);
   padding: 0.625rem 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -632,7 +639,7 @@ button:active, .btn-interactive:active, .sq-duotone-icon:active, .palette-swatch
   border: 1px solid var(--app-border-subtle);
   font-weight: 600;
   font-size: 0.8125rem;
-  border-radius: 0.75rem;
+  border-radius: var(--app-radius-control);
   padding: 0.625rem 1.125rem;
   transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
   cursor: pointer;
@@ -672,8 +679,8 @@ html.light .studio-btn-secondary:hover {
 .studio-panel {
   background-color: var(--app-surface);
   border: 1px solid var(--app-border-subtle);
-  border-radius: 0.25rem;
-  box-shadow: none;
+  border-radius: var(--app-radius-panel);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
 /* Studio Form Controls */
@@ -681,7 +688,7 @@ html.light .studio-btn-secondary:hover {
   background-color: var(--app-surface-secondary);
   border: 1px solid var(--app-border-subtle);
   color: var(--app-text-primary);
-  border-radius: 0.125rem;
+  border-radius: var(--app-radius-control);
   font-size: 0.8125rem;
   padding: 0.5625rem 0.875rem;
   outline: none;
@@ -701,7 +708,7 @@ html.light .studio-input:focus {
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 0.875rem;
-  border-radius: 0.125rem;
+  border-radius: 0.75rem;
   font-size: 0.75rem;
   font-weight: 600;
   font-family: var(--font-subheading);
@@ -722,6 +729,48 @@ html.light .studio-input:focus {
   border-color: var(--app-accent);
   font-weight: 700;
   box-shadow: none;
+}
+
+/* Apply the smoked-glass material sparingly to navigation and overlays. */
+.glass-surface {
+  background: color-mix(in srgb, var(--app-surface) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-border-strong) 56%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 250, 240, 0.09), 0 12px 32px rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+  backdrop-filter: blur(18px) saturate(118%);
+}
+
+.editorial-kicker {
+  color: var(--app-accent);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.editorial-rule {
+  border-color: var(--app-border-subtle);
+}
+
+.acg-boot {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  background: var(--app-bg, #171512);
+  color: var(--app-text-primary, #f4efe6);
+  font-family: 'Funnel Sans', sans-serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-surface {
+    background: var(--app-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* Studio Section / Page Breadcrumbs */
@@ -918,31 +967,31 @@ html.light .studio-input:focus {
   border-color: var(--canvas-ui-line) !important;
 }
 
-.canvas-editor .editor-top-toolbar button,
-.canvas-editor .editor-top-toolbar summary,
-.canvas-editor aside button,
-.canvas-editor aside summary {
-  border-radius: 2px !important;
+.canvas-editor .editor-top-toolbar button:not([class~="rounded-full"]),
+.canvas-editor .editor-top-toolbar summary:not([class~="rounded-full"]),
+.canvas-editor aside button:not([class~="rounded-full"]),
+.canvas-editor aside summary:not([class~="rounded-full"]) {
+  border-radius: var(--app-radius-control) !important;
   box-shadow: none !important;
 }
 
-.canvas-editor aside .rounded-lg,
-.canvas-editor aside .rounded-xl,
-.canvas-editor aside .rounded-2xl,
+.canvas-editor aside .rounded-lg:not(button):not(input):not(textarea):not(select):not(summary),
+.canvas-editor aside .rounded-xl:not(button):not(input):not(textarea):not(select):not(summary),
+.canvas-editor aside .rounded-2xl:not(button):not(input):not(textarea):not(select):not(summary),
 .canvas-editor .studio-panel {
-  border-radius: 3px !important;
+  border-radius: var(--app-radius-panel) !important;
   box-shadow: none !important;
 }
 
 .canvas-editor .canvas-utility-popover {
   background-color: var(--app-surface) !important;
   border-color: var(--canvas-ui-line) !important;
-  border-radius: 3px !important;
+  border-radius: var(--app-radius-panel) !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
 }
 
 .canvas-editor .canvas-utility-popover button {
-  border-radius: 0 !important;
+  border-radius: var(--app-radius-control) !important;
   box-shadow: none !important;
 }
 
@@ -983,7 +1032,7 @@ html.light .studio-input:focus {
 .canvas-editor aside input:not([type="color"]),
 .canvas-editor aside textarea,
 .canvas-editor aside select {
-  border-radius: 2px !important;
+  border-radius: var(--app-radius-control) !important;
   box-shadow: none !important;
 }
 
@@ -1085,47 +1134,26 @@ html.light .studio-input:focus {
   background-color: var(--color-accent-soft) !important;
 }
 
-/* The focused creator shares the site palette without recoloring card artwork. */
-.app-shell .creator-workspace [class~="bg-[#0c0d10]"] {
-  background-color: var(--app-bg) !important;
+/* Shared corner rhythm across controls, popovers, and editor stages. */
+.app-shell button:not([class~="rounded-full"]),
+.app-shell input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+.app-shell textarea,
+.app-shell select,
+.app-shell summary:not([class~="rounded-full"]) {
+  border-radius: var(--app-radius-control) !important;
 }
 
-.app-shell .creator-workspace [class~="bg-[#101216]"],
-.app-shell .creator-workspace [class~="bg-[#14161b]"] {
-  background-color: var(--app-surface) !important;
+.app-shell [role="dialog"],
+.app-shell [role="menu"],
+.app-shell [role="listbox"],
+.app-shell .studio-panel,
+.app-shell .canvas-utility-popover,
+.app-shell .canvas-add-menu {
+  border-radius: var(--app-radius-panel) !important;
 }
 
-.app-shell .creator-workspace [class~="bg-[#20232a]"] {
-  background-color: var(--app-accent) !important;
-}
-
-.app-shell .creator-workspace [class~="text-[#f4f1ea]"] {
-  color: var(--app-text-primary) !important;
-}
-
-.app-shell .creator-workspace [class~="text-white"] {
-  color: var(--app-accent-ink) !important;
-}
-
-.app-shell .creator-workspace [class~="text-[#8e939e]"] {
-  color: var(--app-text-secondary) !important;
-}
-
-.app-shell .creator-workspace [class~="border-[#1f2228]"],
-.app-shell .creator-workspace [class~="border-[#23262d]"] {
-  border-color: var(--app-border-subtle) !important;
-}
-
-.app-shell .creator-workspace [class~="border-white"] {
-  border-color: var(--app-accent) !important;
-}
-
-.app-shell .creator-workspace [class*="hover:text-white"]:hover {
-  color: var(--app-text-primary) !important;
-}
-
-.app-shell .creator-workspace [class*="hover:bg-[#1c1f26]"]:hover {
-  background-color: var(--app-surface-secondary) !important;
+.app-shell .editor-ambient-stage {
+  border-radius: var(--app-radius-stage);
 }
 
 [data-rail-label]::after {

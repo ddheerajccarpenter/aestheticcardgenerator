@@ -1,0 +1,57 @@
+---
+import App from '../App';
+import { BLOG_POSTS } from '../data/blog';
+import { TEMPLATE_CATEGORIES } from '../data/categories';
+import { GUIDE_ARTICLES } from '../data/guides';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+export function getStaticPaths() {
+  const staticRoutes = [
+    'create', 'canvas', 'templates', 'guides', 'blog', 'about', 'contact', 'faq',
+    'privacy', 'terms', 'cookies', 'disclaimer', 'accessibility', 'credits',
+  ];
+  const routes = [
+    ...staticRoutes,
+    ...TEMPLATE_CATEGORIES.map(({ path }) => path.slice(1)),
+    ...GUIDE_ARTICLES.map(({ path }) => path.slice(1)),
+    ...BLOG_POSTS.map(({ path }) => path.slice(1)),
+  ];
+
+  return [...new Set(routes)].map((path) => ({ params: { path } }));
+}
+
+const routePath = `/${Astro.params.path ?? ''}`;
+const category = TEMPLATE_CATEGORIES.find(({ path }) => path === routePath);
+const guide = GUIDE_ARTICLES.find(({ path }) => path === routePath);
+const post = BLOG_POSTS.find(({ path }) => path === routePath);
+const staticMeta: Record<string, [string, string]> = {
+  '/create': ['Card Creator — ACG', 'Compose a quote card or identity pass in your browser.'],
+  '/canvas': ['Canvas Editor — ACG', 'Build and edit layered card designs in the local-first canvas studio.'],
+  '/templates': ['Template Library — ACG', 'Browse editable card styles and choose a starting point for your design.'],
+  '/guides': ['Design Guides — ACG', 'Practical guides to card design, typography, and export sizes.'],
+  '/blog': ['Design Notes — ACG', 'Notes on card design, typography, and the craft behind the studio.'],
+  '/about': ['About ACG', 'An independent, local-first studio for making thoughtful cards.'],
+  '/contact': ['Contact ACG', 'Get in touch with the Aesthetic Card Generator team.'],
+  '/faq': ['Frequently Asked Questions — ACG', 'Answers about templates, editing, exports, and browser storage.'],
+  '/privacy': ['Privacy — ACG', 'How the browser-based card studio handles your work and local files.'],
+  '/terms': ['Terms — ACG', 'Terms for using the Aesthetic Card Generator.'],
+  '/cookies': ['Cookies & Storage — ACG', 'Information about browser storage used by the card studio.'],
+  '/disclaimer': ['Disclaimer — ACG', 'Important information about templates and generated card content.'],
+  '/accessibility': ['Accessibility — ACG', 'Accessibility information and ways to report an issue.'],
+  '/credits': ['Credits — ACG', 'Credits for the tools, fonts, and resources used in the studio.'],
+  '/404': ['Page Not Found — ACG', 'The page could not be found. Return to the ACG gallery to continue.'],
+};
+const [title, description] = category
+  ? [category.metaTitle, category.metaDescription]
+  : guide
+    ? [guide.metaTitle, guide.metaDescription]
+    : post
+      ? [post.metaTitle, post.metaDescription]
+      : staticMeta[routePath] ?? ['Aesthetic Card Generator', 'A local-first studio for making editorial cards and original designs.'];
+---
+
+<SiteLayout title={title} description={description} path={routePath}>
+  <App client:only="react">
+    <div slot="fallback" class="acg-boot" role="status">Opening the studio…</div>
+  </App>
+</SiteLayout>

@@ -70,6 +70,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f3efe7' : '#171512');
     if (theme === 'light') {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
@@ -314,11 +315,7 @@ export const App: React.FC = () => {
       {/* Main Content Area */}
       <main
         className={`flex-1 transition-all duration-200 ${
-          currentPath === '/create'
-            ? 'md:pl-16'
-            : currentPath !== '/canvas'
-              ? 'pb-24 md:pb-0 md:pl-16'
-              : ''
+          currentPath === '/create' || currentPath === '/canvas' ? '' : 'pb-24 md:pb-0'
         }`}
       >
         {renderCurrentRoute()}
@@ -326,7 +323,7 @@ export const App: React.FC = () => {
 
       {/* Global Footer (shown on all public pages except fullscreen editors) */}
       {currentPath !== '/create' && currentPath !== '/canvas' && (
-        <div className="md:pl-16 transition-all duration-200">
+        <div className="transition-all duration-200">
           <Footer
             theme={theme}
             onNavigate={navigate}
@@ -434,7 +431,7 @@ export const App: React.FC = () => {
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
-                  <Layers className="w-4 h-4 text-emerald-500" />
+                  <Layers className="w-4 h-4 text-[var(--app-accent)]" />
                   <span className="font-medium">Launch Freeform Canvas Studio</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
@@ -466,7 +463,7 @@ export const App: React.FC = () => {
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
-                  <BookOpen className="w-4 h-4 text-sky-400" />
+                  <BookOpen className="w-4 h-4 text-[var(--app-text-secondary)]" />
                   <span className="font-medium">Explore Design &amp; Typography Guides</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
@@ -482,7 +479,7 @@ export const App: React.FC = () => {
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
-                  <Newspaper className="w-4 h-4 text-pink-400" />
+                  <Newspaper className="w-4 h-4 text-[var(--app-text-secondary)]" />
                   <span className="font-medium">Studio Blog &amp; Design Essays</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">

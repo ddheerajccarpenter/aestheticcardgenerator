@@ -63,7 +63,7 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
         {/* Hero Section */}
         <header className="flex flex-col gap-4 border-b pb-8 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-[var(--app-accent)] animate-pulse"></span>
             <span className="text-xs font-subheading font-bold uppercase tracking-wider text-[var(--app-text-muted)]">
               Editorial Press &amp; Insights
             </span>

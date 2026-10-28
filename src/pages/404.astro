@@ -1,0 +1,14 @@
+---
+import App from '../App';
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="Page Not Found — ACG"
+  description="The page could not be found. Return to the ACG gallery to continue."
+  path="/404"
+>
+  <App client:only="react">
+    <div slot="fallback" class="acg-boot" role="status">Opening the studio…</div>
+  </App>
+</SiteLayout>

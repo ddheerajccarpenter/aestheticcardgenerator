@@ -3,11 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.23.4"
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "astro dev",
+    "build": "tsc -b && astro build",
     "lint": "oxlint",
-    "preview": "vite preview",
+    "preview": "astro preview",
     "pages:deploy": "npm run build && wrangler pages deploy dist --project-name=aestheticcardgenerator --branch=main",
     "pages:preview": "npm run build && wrangler pages deploy dist --project-name=aestheticcardgenerator"
   },
@@ -24,12 +27,14 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@astrojs/react": "^7.1.2",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "astro": "^7.4.3",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",

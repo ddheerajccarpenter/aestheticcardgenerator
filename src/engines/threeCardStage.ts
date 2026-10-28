@@ -1,5 +1,6 @@
-// src/engines/threeCardStage.ts
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 export interface ThreeCardMaterialPreset {
   roughness: number;
@@ -20,13 +21,15 @@ export function getThreeMaterialForSurface(surfaceId: string): ThreeCardMaterial
   if (s.includes('titanium') || s.includes('chrome') || s.includes('gold') || s.includes('metal')) {
     return { roughness: 0.25, metalness: 0.82, clearcoat: 0.4, clearcoatRoughness: 0.2, iridescence: 0.0 };
   }
-  // Default: Tactile Archival / Nano-Textured Paper
   return { roughness: 0.86, metalness: 0.0, clearcoat: 0.0, clearcoatRoughness: 0.9, iridescence: 0.0 };
 }
 
 export type ThreeCardPreviewController = (() => void) & {
   updateTexture: (newCanvas: HTMLCanvasElement, newSurfaceId?: string) => void;
   requestRender: () => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetView: () => void;
 };
 
 export function createThreeCardPreviewScene(
@@ -38,79 +41,89 @@ export function createThreeCardPreviewScene(
 ): ThreeCardPreviewController {
   const width = mountEl.clientWidth || 360;
   const height = mountEl.clientHeight || 360;
+  const maxAspect = Math.max(aspectRatioWidth, aspectRatioHeight) || 1;
+  const cardWidth = 1.8 * (aspectRatioWidth / maxAspect);
+  const cardHeight = 1.8 * (aspectRatioHeight / maxAspect);
+  const cardDepth = 0.045;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 100);
-  camera.position.set(0, 0, 4.2);
-
-  // Use low-power preference to avoid waking discrete GPUs, cap pixel ratio to 1.5
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
     powerPreference: 'low-power',
     stencil: false,
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(width, height, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  mountEl.innerHTML = '';
-  mountEl.appendChild(renderer.domElement);
+  renderer.toneMappingExposure = 1.05;
+  renderer.domElement.style.display = 'block';
+  renderer.domElement.style.width = '100%';
+  renderer.domElement.style.height = '100%';
+  renderer.domElement.style.touchAction = 'none';
+  renderer.domElement.setAttribute('aria-label', 'Interactive 3D card preview. Drag to rotate, scroll or pinch to zoom.');
+  mountEl.replaceChildren(renderer.domElement);
 
-  // Disable mipmaps to eliminate gl.generateMipmap overhead and memory bandwidth
   const cardTexture = new THREE.CanvasTexture(sourceCardCanvas);
   cardTexture.colorSpace = THREE.SRGBColorSpace;
-  cardTexture.generateMipmaps = false;
-  cardTexture.minFilter = THREE.LinearFilter;
+  cardTexture.minFilter = THREE.LinearMipmapLinearFilter;
   cardTexture.magFilter = THREE.LinearFilter;
-  cardTexture.anisotropy = Math.min(2, renderer.capabilities.getMaxAnisotropy());
+  cardTexture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
   cardTexture.needsUpdate = true;
 
-  const maxAspect = Math.max(aspectRatioWidth, aspectRatioHeight) || 1;
-  const normW = 1.8 * (aspectRatioWidth / maxAspect);
-  const normH = 1.8 * (aspectRatioHeight / maxAspect);
-
-  const geometry = new THREE.BoxGeometry(normW, normH, 0.02);
-  const matProps = getThreeMaterialForSurface(surfaceId);
-
+  const geometry = new RoundedBoxGeometry(
+    cardWidth,
+    cardHeight,
+    cardDepth,
+    3,
+    Math.min(cardDepth / 2, Math.min(cardWidth, cardHeight) * 0.018)
+  );
   const frontMaterial = new THREE.MeshPhysicalMaterial({
     map: cardTexture,
-    ...matProps,
+    ...getThreeMaterialForSurface(surfaceId),
+    toneMapped: false,
   });
+  const edgeMaterial = new THREE.MeshStandardMaterial({ color: 0xe5ded2, roughness: 0.72 });
+  const card = new THREE.Mesh(geometry, [edgeMaterial, edgeMaterial, edgeMaterial, edgeMaterial, frontMaterial, edgeMaterial]);
+  scene.add(card);
 
-  const edgeMaterial = new THREE.MeshStandardMaterial({
-    color: 0xeae2d3,
-    roughness: 0.9,
-  });
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
+  const keyLight = new THREE.DirectionalLight(0xfff6e9, 1.8);
+  keyLight.position.set(2.5, 3.2, 4);
+  const fillLight = new THREE.DirectionalLight(0xe3ddd3, 0.7);
+  fillLight.position.set(-3, -2, 2);
+  scene.add(ambientLight, keyLight, fillLight);
 
-  const cardMesh = new THREE.Mesh(geometry, [
-    edgeMaterial, // right
-    edgeMaterial, // left
-    edgeMaterial, // top
-    edgeMaterial, // bottom
-    frontMaterial, // front face
-    edgeMaterial, // back face
-  ]);
-  scene.add(cardMesh);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.09;
+  controls.enablePan = false;
+  controls.zoomSpeed = 0.85;
+  controls.minPolarAngle = 0.18;
+  controls.maxPolarAngle = Math.PI - 0.18;
+  controls.cursorStyle = 'grab';
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.35);
-  const keyLight = new THREE.DirectionalLight(0xfff8eb, 1.8);
-  keyLight.position.set(2.5, 3.2, 4.0);
-  const rimLight = new THREE.DirectionalLight(0xe5b84b, 0.65);
-  rimLight.position.set(-3.0, -2.0, 2.0);
-  scene.add(ambientLight, keyLight, rimLight);
+  const getFitDistance = () => {
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+    const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * camera.aspect);
+    const limitingFov = Math.min(verticalFov, horizontalFov);
+    const cardRadius = Math.hypot(cardWidth, cardHeight, cardDepth) / 2;
+    return cardRadius / Math.sin(limitingFov / 2) * 1.12;
+  };
 
-  let targetRotX = 0;
-  let targetRotY = 0;
-  let isPointerOver = false;
-  let isVisible = true;
+  let baseDistance = getFitDistance();
+  camera.position.set(0, 0, baseDistance);
+  controls.minDistance = baseDistance * 0.48;
+  controls.maxDistance = baseDistance * 2.5;
+  controls.update();
+
+  let isVisible = !document.hidden;
   let isLoopRunning = false;
   let animId = 0;
 
-  const renderFrame = () => {
-    renderer.render(scene, camera);
-  };
+  const renderFrame = () => renderer.render(scene, camera);
 
-  // On-demand physics loop: sleeps at rest (0% GPU when stationary)
   const tick = () => {
     if (!isVisible) {
       isLoopRunning = false;
@@ -118,20 +131,11 @@ export function createThreeCardPreviewScene(
       return;
     }
 
-    const deltaX = targetRotX - cardMesh.rotation.x;
-    const deltaY = targetRotY - cardMesh.rotation.y;
-
-    cardMesh.rotation.x += deltaX * 0.12;
-    cardMesh.rotation.y += deltaY * 0.12;
+    const isMoving = controls.update();
     renderFrame();
-
-    const isMoving = Math.abs(deltaX) > 0.0004 || Math.abs(deltaY) > 0.0004;
-    if (isMoving || isPointerOver) {
+    if (isMoving) {
       animId = requestAnimationFrame(tick);
     } else {
-      cardMesh.rotation.x = targetRotX;
-      cardMesh.rotation.y = targetRotY;
-      renderFrame();
       isLoopRunning = false;
       animId = 0;
     }
@@ -144,27 +148,29 @@ export function createThreeCardPreviewScene(
     }
   };
 
-  const onPointerMove = (e: PointerEvent) => {
-    isPointerOver = true;
-    const rect = mountEl.getBoundingClientRect();
-    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-    targetRotY = nx * 0.32;
-    targetRotX = -ny * 0.26;
+  const resize = () => {
+    const nextWidth = mountEl.clientWidth;
+    const nextHeight = mountEl.clientHeight;
+    if (!nextWidth || !nextHeight) return;
+
+    const zoomRatio = controls.getDistance() / baseDistance;
+    const viewDirection = camera.position.clone().sub(controls.target).normalize();
+    camera.aspect = nextWidth / nextHeight;
+    camera.updateProjectionMatrix();
+    baseDistance = getFitDistance();
+    controls.minDistance = baseDistance * 0.48;
+    controls.maxDistance = baseDistance * 2.5;
+    camera.position.copy(controls.target).addScaledVector(viewDirection, baseDistance * zoomRatio);
+    renderer.setSize(nextWidth, nextHeight, false);
+    controls.update();
     wakeRenderLoop();
   };
 
-  const onPointerLeave = () => {
-    isPointerOver = false;
-    targetRotX = 0;
-    targetRotY = 0;
-    wakeRenderLoop();
-  };
+  const resizeObserver = new ResizeObserver(resize);
+  resizeObserver.observe(mountEl);
+  window.addEventListener('resize', resize);
+  controls.addEventListener('change', wakeRenderLoop);
 
-  mountEl.addEventListener('pointermove', onPointerMove);
-  mountEl.addEventListener('pointerleave', onPointerLeave);
-
-  // Pause rendering when scrolled off-screen or tab is backgrounded
   const observer = new IntersectionObserver(([entry]) => {
     isVisible = entry.isIntersecting && !document.hidden;
     if (isVisible) {
@@ -178,40 +184,60 @@ export function createThreeCardPreviewScene(
   observer.observe(mountEl);
 
   const onVisibilityChange = () => {
-    if (document.hidden) {
-      isVisible = false;
-      if (animId) {
-        cancelAnimationFrame(animId);
-        animId = 0;
-        isLoopRunning = false;
-      }
-    } else {
-      isVisible = true;
+    isVisible = !document.hidden;
+    if (isVisible) {
       wakeRenderLoop();
+    } else if (animId) {
+      cancelAnimationFrame(animId);
+      animId = 0;
+      isLoopRunning = false;
     }
   };
   document.addEventListener('visibilitychange', onVisibilityChange);
-
-  // Render initial static frame immediately
-  renderFrame();
 
   const updateTexture = (newCanvas: HTMLCanvasElement, newSurfaceId?: string) => {
     cardTexture.image = newCanvas;
     cardTexture.needsUpdate = true;
     if (newSurfaceId) {
-      const updatedProps = getThreeMaterialForSurface(newSurfaceId);
-      Object.assign(frontMaterial, updatedProps);
+      Object.assign(frontMaterial, getThreeMaterialForSurface(newSurfaceId));
       frontMaterial.needsUpdate = true;
     }
-    renderFrame();
+    wakeRenderLoop();
   };
+
+  const zoomCamera = (distanceScale: number) => {
+    const offset = camera.position.clone().sub(controls.target);
+    const distance = THREE.MathUtils.clamp(
+      offset.length() * distanceScale,
+      controls.minDistance,
+      controls.maxDistance
+    );
+    camera.position.copy(controls.target).addScaledVector(offset.normalize(), distance);
+    controls.update();
+    wakeRenderLoop();
+  };
+
+  const zoomIn = () => zoomCamera(1 / 1.18);
+  const zoomOut = () => zoomCamera(1.18);
+
+  const resetView = () => {
+    controls.target.set(0, 0, 0);
+    camera.position.set(0, 0, baseDistance);
+    camera.up.set(0, 1, 0);
+    controls.update();
+    wakeRenderLoop();
+  };
+
+  renderFrame();
 
   const cleanup: ThreeCardPreviewController = Object.assign(
     () => {
       observer.disconnect();
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', onVisibilityChange);
-      mountEl.removeEventListener('pointermove', onPointerMove);
-      mountEl.removeEventListener('pointerleave', onPointerLeave);
+      controls.removeEventListener('change', wakeRenderLoop);
+      controls.dispose();
       if (animId) cancelAnimationFrame(animId);
       geometry.dispose();
       frontMaterial.dispose();
@@ -219,12 +245,9 @@ export function createThreeCardPreviewScene(
       cardTexture.dispose();
       renderer.forceContextLoss();
       renderer.dispose();
-      mountEl.innerHTML = '';
+      renderer.domElement.remove();
     },
-    {
-      updateTexture,
-      requestRender: wakeRenderLoop,
-    }
+    { updateTexture, requestRender: wakeRenderLoop, zoomIn, zoomOut, resetView }
   );
 
   return cleanup;

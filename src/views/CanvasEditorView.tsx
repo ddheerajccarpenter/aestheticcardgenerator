@@ -83,7 +83,8 @@ import {
 import {
   updateWorkspaceAmbientBackdrop,
 } from '../engines/ambientStageEngine';
-import { createThreeCardPreviewScene } from '../engines/threeCardStage';
+import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
+import { ThreeDPreviewControls } from '../components/ThreeDPreviewControls';
 import {
   getBrandedExportFilename,
   exportThreeDimensionalCardPNG,
@@ -414,7 +415,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const canvasElementRef = useRef<HTMLDivElement>(null);
   const threeMountRef = useRef<HTMLDivElement>(null);
-  const threeCleanupRef = useRef<any>(null);
+  const threeCleanupRef = useRef<ThreeCardPreviewController | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -454,10 +455,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           if (!ctx) return;
           ctx.drawImage(img, 0, 0);
 
-          if (threeCleanupRef.current && (threeCleanupRef.current as any).updateTexture) {
-            (threeCleanupRef.current as any).updateTexture(offCanvas, 'cotton-rag-300gsm');
+          if (threeCleanupRef.current) {
+            threeCleanupRef.current.updateTexture(offCanvas, 'cotton-rag-300gsm');
           } else {
-            if (threeCleanupRef.current) threeCleanupRef.current();
             threeCleanupRef.current = createThreeCardPreviewScene(
               threeMountRef.current,
               offCanvas,
@@ -2515,13 +2515,15 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         >
           {is3DMode && (
             <div
-              ref={threeMountRef}
+              className="relative flex items-center justify-center"
               style={{
                 width: `${Math.min(doc.canvasWidth, 680)}px`,
                 height: `${Math.min(doc.canvasHeight, 680)}px`,
               }}
-              className="flex items-center justify-center"
-            />
+            >
+              <div ref={threeMountRef} className="h-full w-full" />
+              <ThreeDPreviewControls controllerRef={threeCleanupRef} />
+            </div>
           )}
           <div
             aria-hidden={is3DMode}

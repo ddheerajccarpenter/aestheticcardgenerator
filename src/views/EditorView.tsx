@@ -66,7 +66,8 @@ import {
   getElementById,
 } from '../data/elementsCatalog';
 import { extractPaletteFromImage, type ExtractedPalette } from '../utils/paletteExtractor';
-import { createThreeCardPreviewScene } from '../engines/threeCardStage';
+import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
+import { ThreeDPreviewControls } from '../components/ThreeDPreviewControls';
 import { TIER_LONG_EDGE } from '../engines/ultraHdExportEngine';
 import {
   getBrandedExportFilename,
@@ -195,7 +196,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   // 3D Card Stage View
   const [is3DMode, setIs3DMode] = useState<boolean>(false);
   const threeMountRef = useRef<HTMLDivElement>(null);
-  const threeCleanupRef = useRef<(() => void) | null>(null);
+  const threeCleanupRef = useRef<ThreeCardPreviewController | null>(null);
 
   // Social Safe-Zones Overlay ('none' | 'print' | 'reels' | 'feed')
   const [safeZoneMode, setSafeZoneMode] = useState<'none' | 'print' | 'reels' | 'feed'>('none');
@@ -633,10 +634,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
         const ctx = offscreen.getContext('2d');
         if (ctx) ctx.drawImage(img, 0, 0);
 
-        if (threeCleanupRef.current && (threeCleanupRef.current as any).updateTexture) {
-          (threeCleanupRef.current as any).updateTexture(offscreen, selectedTextureId);
+        if (threeCleanupRef.current) {
+          threeCleanupRef.current.updateTexture(offscreen, selectedTextureId);
         } else {
-          if (threeCleanupRef.current) threeCleanupRef.current();
           const cleanup = createThreeCardPreviewScene(
             threeMountRef.current,
             offscreen,
@@ -2939,11 +2939,13 @@ export const EditorView: React.FC<EditorViewProps> = ({
             /* 3D Physical Three.js Preview Stage */
             <div className="flex flex-col items-center gap-3">
               <div
-                ref={threeMountRef}
-                className="w-[340px] sm:w-[440px] md:w-[500px] h-[440px] sm:h-[500px] rounded-2xl flex items-center justify-center cursor-grab active:cursor-grabbing"
-              />
+                className="relative w-[340px] sm:w-[440px] md:w-[500px] h-[440px] sm:h-[500px] rounded-2xl"
+              >
+                <div ref={threeMountRef} className="h-full w-full cursor-grab active:cursor-grabbing" />
+                <ThreeDPreviewControls controllerRef={threeCleanupRef} />
+              </div>
               <span className="text-[11px] font-mono text-[#707a8a]">
-                Drag to rotate card in 3D space • PBR surface reflections active
+                Drag to rotate · Scroll or pinch to zoom
               </span>
             </div>
           ) : (

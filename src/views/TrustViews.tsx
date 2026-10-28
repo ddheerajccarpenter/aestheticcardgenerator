@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { updatePageSEO } from '../utils/seo';
 import { AdSlot } from '../components/AdSlot';
+import { PRESET_TEMPLATES } from '../data/templates';
 import {
   Mail,
   Cookie,
@@ -828,8 +829,8 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
 
   const suggestions = [
     { label: 'Homepage', path: '/', description: 'Explore templates and design system' },
-    { label: 'Template Library', path: '/templates', description: 'Browse all 56 curated styles' },
-    { label: 'Aesthetic ID Cards', path: '/templates/id-card', description: 'Travel passes, badges & credentials' },
+    { label: 'Template Library', path: '/templates', description: `Browse all ${PRESET_TEMPLATES.length} curated styles` },
+    { label: 'Aesthetic ID Cards', path: '/templates/aesthetic-id-cards', description: 'Travel passes, badges & credentials' },
     { label: 'Card Creator', path: '/create', description: 'Open the live typesetting editor' },
     { label: 'Canvas Studio', path: '/canvas', description: 'Open freeform layered canvas' },
     { label: 'Contact', path: '/contact', description: 'Report a broken link or bug' },
@@ -929,11 +930,11 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
     <div className="w-full min-h-screen pt-20 pb-20 flex flex-col transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <div className="studio-panel w-full max-w-xl overflow-hidden shadow-2xl">
-          <div className="h-1.5 w-full bg-gradient-to-r from-[#ef4444] via-[#f97316] to-[#d97706]" />
+          <div className="h-1.5 w-full bg-[var(--app-accent)]" />
           <div className="p-8 md:p-12 flex flex-col items-center gap-8">
             <div className="flex flex-col items-center gap-3">
-              <div className="flex items-center justify-center w-20 h-20 rounded-2xl border border-[#7f1d1d] bg-[#1c1010]/30">
-                <AlertTriangle className="w-10 h-10 text-[#ef4444]" />
+              <div className="flex items-center justify-center w-20 h-20 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)]">
+                <AlertTriangle className="w-10 h-10 text-[var(--app-accent)]" />
               </div>
               <span className="text-7xl md:text-8xl font-black tracking-tighter leading-none select-none text-[var(--app-border-strong)] font-heading">
                 500
@@ -950,11 +951,11 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
             </div>
 
             {error && error.message && (
-              <div className="w-full p-4 rounded-xl border border-[#7f1d1d]/40 bg-[var(--app-surface-secondary)] text-left">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#ef4444] block mb-1.5 font-subheading">
+              <div className="w-full p-4 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-left">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--app-accent)] block mb-1.5 font-subheading">
                   Error Details
                 </span>
-                <code className="text-[11px] font-mono text-[#f87171] break-all leading-relaxed">
+                <code className="text-[11px] font-mono text-[var(--app-text-primary)] break-all leading-relaxed">
                   {error.message}
                 </code>
               </div>
@@ -992,7 +993,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
         </div>
 
         <div className="mt-6 flex items-center gap-2 text-xs text-[var(--app-text-muted)] font-subheading">
-          <span className="w-2 h-2 rounded-full bg-[#ef4444]" />
+          <span className="w-2 h-2 rounded-full bg-[var(--app-accent)]" />
           <span>Runtime error — your card drafts and local data are unaffected</span>
         </div>
       </div>

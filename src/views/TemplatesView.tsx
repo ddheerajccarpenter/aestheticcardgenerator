@@ -107,10 +107,10 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
   }, [activeCategory, searchQuery]);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
-      <div className="studio-container flex flex-col gap-10">
+    <div className="w-full pt-24 pb-20 text-[var(--app-text-primary)] transition-colors duration-200">
+      <div className="studio-container flex flex-col gap-8 sm:gap-10">
         {/* Breadcrumbs */}
-        <nav aria-label="Breadcrumb" className="studio-breadcrumb">
+        <nav aria-label="Breadcrumb" className="studio-breadcrumb glass-surface w-fit rounded-full px-3 py-2">
           <a href="/" className="cursor-pointer">
             Home
           </a>
@@ -118,39 +118,37 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           <span className="active">Templates</span>
         </nav>
 
-        {/* Clean Header */}
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[var(--app-border-subtle)]">
-          <div>
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block mb-1">
-              Curated Style Archive
-            </span>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-heading">
-              Card Templates
+        <header className="grid gap-6 border-b border-[var(--app-border-subtle)] pb-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="max-w-3xl">
+            <span className="editorial-kicker mb-3 block">The design archive · {PRESET_TEMPLATES.length} starting points</span>
+            <h1 className="font-heading text-5xl leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
+              A style for every story.
             </h1>
-            <p className="text-xs text-[var(--app-text-muted)] mt-1 font-subheading">
-              {PRESET_TEMPLATES.length} curated typographic and aesthetic styles ready to edit
+            <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--app-text-secondary)] sm:text-base">
+              Browse quote cards, identity passes, posters, and scrapbook layouts. Compare a few, then open one in the editor.
             </p>
           </div>
           <a
             href="/canvas?blank=true"
-            className="studio-btn-primary"
+            className="studio-btn-primary min-h-11 w-fit px-5"
           >
             <FilePlus className="w-4 h-4" />
-            <span>Blank Canvas</span>
+            <span>Start with a blank canvas</span>
           </a>
         </header>
 
         {/* SEARCH & CATEGORY FILTER TABS */}
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div className="studio-panel flex flex-col gap-4 p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {/* Search Input */}
-            <div className="relative flex-1 max-w-md">
+            <div className="relative w-full max-w-xl">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--app-text-muted)] pointer-events-none" />
               <input
+                aria-label="Search templates by title, quote, author, or tag"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search styles (e.g. 'Jennie', 'Y2K', 'Swiss', 'Minimal')..."
+                placeholder="Search by name, quote, or style"
                 className="studio-input w-full pl-10 pr-9"
               />
               {searchQuery && (
@@ -164,14 +162,13 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
               )}
             </div>
 
-            <div className="text-xs text-[var(--app-text-muted)] font-subheading">
-              Showing <strong className="text-[var(--app-text-primary)]">{filteredTemplates.length}</strong> of{' '}
-              {PRESET_TEMPLATES.length} styles
+            <div className="shrink-0 text-xs text-[var(--app-text-secondary)] font-subheading" aria-live="polite">
+              <strong className="text-[var(--app-text-primary)]">{filteredTemplates.length}</strong> of {PRESET_TEMPLATES.length} designs
             </div>
           </div>
 
           {/* Primary Category Filter Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <div role="group" aria-label="Filter templates by category" className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             {CATEGORY_TABS.map((tab) => {
               const count =
                 tab.id === 'all'
@@ -183,6 +180,8 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
               return (
                 <button
                   key={tab.id}
+                  type="button"
+                  aria-pressed={activeCategory === tab.id}
                   onClick={() => setActiveCategory(tab.id)}
                   className={`studio-pill ${activeCategory === tab.id ? 'active' : ''}`}
                 >
@@ -206,9 +205,9 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
         {/* TEMPLATES GRID                                                      */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         {filteredTemplates.length === 0 ? (
-          <div className="studio-panel p-12 text-center flex flex-col items-center gap-3">
+          <div className="studio-panel flex flex-col items-center gap-3 p-12 text-center">
             <FileQuestion className="w-10 h-10 text-[var(--app-text-muted)]" />
-            <h3 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
+            <h3 className="font-heading text-2xl text-[var(--app-text-primary)]">
               No templates match "{searchQuery}"
             </h3>
             <p className="text-xs text-[var(--app-text-secondary)] max-w-sm">
@@ -225,17 +224,17 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+          <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 sm:gap-6">
             {filteredTemplates.map((template) => {
               const isSelected = selectedForCompare.some((t) => t.id === template.id);
 
               return (
                 <article
                   key={template.id}
-                  className="studio-panel overflow-hidden transition-all duration-200 hover:-translate-y-1 flex flex-col"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors hover:border-[var(--app-border-strong)]"
                 >
                   {/* Real Card Visual Artwork Preview (Unified with Archival Blueprint Lazy-Loading) */}
-                  <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="border border-[var(--app-border-subtle)]">
+                  <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="m-2 overflow-hidden rounded-xl border border-[var(--app-border-subtle)]">
                     <UnifiedCardThumbnail
                       template={template}
                       isLight={isLight}
@@ -244,19 +243,21 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                   </LazyTemplateCard>
 
                   {/* Card Footer Bar with actions */}
-                  <div className="p-4 flex flex-col gap-3 bg-[var(--app-surface-secondary)] border-t border-[var(--app-border-subtle)] mt-auto">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-sm font-bold font-heading text-[var(--app-text-primary)]">
+                  <div className="mt-auto flex flex-col gap-3 border-t border-[var(--app-border-subtle)] p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-base font-semibold text-[var(--app-text-primary)]">
                           {template.title}
                         </h3>
-                        <span className="text-[10px] text-[var(--app-text-muted)] font-subheading">
+                        <span className="mt-1 block text-[10px] uppercase tracking-[0.08em] text-[var(--app-text-muted)] font-subheading">
                           {template.categoryLabel}
                         </span>
                       </div>
                       <button
                         onClick={() => toggleCompareTemplate(template)}
-                        className={`text-xs px-2.5 py-1 rounded-lg border font-semibold cursor-pointer transition-colors ${
+                        type="button"
+                        aria-pressed={isSelected}
+                        className={`shrink-0 rounded-xl border px-3 py-2 text-[10px] font-semibold transition-colors ${
                           isSelected
                             ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] border-[var(--app-accent)]'
                             : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
@@ -266,10 +267,10 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-1">
+                    <div className="grid grid-cols-1 gap-2 pt-1 min-[420px]:grid-cols-2">
                       <a
                         href={`/canvas?template=${template.id}`}
-                        className="studio-btn-primary !py-2 !text-xs !rounded-xl"
+                        className="studio-btn-primary min-h-10 !py-2 !text-xs !rounded-xl"
                         title="Open in Freeform Canvas Studio"
                       >
                         <Layers className="w-3.5 h-3.5" />
@@ -284,7 +285,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                             onOpenEditorWithTemplate(template);
                           }
                         }}
-                        className="studio-btn-secondary !py-2 !text-xs !rounded-xl"
+                        className="studio-btn-secondary min-h-10 !py-2 !text-xs !rounded-xl"
                         title="Open in classic text typesetting editor"
                       >
                         <span>Card Creator</span>

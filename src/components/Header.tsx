@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, LayoutTemplate, Layers, Search, BookOpen, Plus, Moon, Sun, Info } from 'lucide-react';
+import { Compass, LayoutTemplate, Layers, Search, BookOpen, Plus, Moon, Sun } from 'lucide-react';
 
 interface HeaderProps {
   currentPath?: string;
@@ -21,65 +21,47 @@ export const Header: React.FC<HeaderProps> = ({
     { label: 'Canvas', path: '/canvas', icon: Layers, active: currentPath.startsWith('/canvas') },
     { label: 'Guides', path: '/guides', icon: BookOpen, active: currentPath.startsWith('/guides') },
   ];
-
-  const toolClass = 'relative flex h-10 w-10 items-center justify-center text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]';
-  const activeClass = 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]';
+  const toolClass = 'inline-flex h-10 w-10 items-center justify-center rounded-xl text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]';
 
   return (
-    <>
-      <aside aria-label="Desktop navigation" className="fixed inset-y-0 left-0 z-40 hidden w-16 flex-col items-center justify-between border-r border-[var(--app-border-subtle)] bg-[var(--app-bg)] py-4 md:flex">
-        <div className="flex w-full flex-col items-center gap-5">
-          <a href="/" aria-label="ACG home" title="ACG" className="flex h-12 w-10 flex-col items-center justify-center gap-1 text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-current" aria-hidden="true">
-              <span className="h-2 w-2 rounded-full bg-current" />
-            </span>
-            <span className="font-brand text-[9px] leading-none" aria-hidden="true">ACG</span>
+    <header className="glass-surface fixed inset-x-3 top-3 z-50 mx-auto flex h-14 max-w-[1540px] items-center justify-between gap-2 rounded-2xl px-3 text-[var(--app-text-primary)] sm:px-4">
+      <a href="/" aria-label="ACG home" className="flex min-w-0 items-center gap-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--app-accent)] text-[var(--app-accent)]" aria-hidden="true">
+          <span className="h-2 w-2 rounded-full bg-current" />
+        </span>
+        <span className="font-brand text-base leading-none tracking-wide">ACG</span>
+        <span className="hidden border-l border-[var(--app-border-subtle)] pl-2.5 text-[10px] uppercase tracking-[0.12em] text-[var(--app-text-muted)] lg:inline">Aesthetic Card Generator</span>
+      </a>
+
+      <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
+        {links.map(({ label, path, icon: Icon, active }) => (
+          <a
+            key={path}
+            href={path}
+            aria-current={active ? 'page' : undefined}
+            className={`inline-flex h-10 items-center gap-2 rounded-xl px-2.5 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] lg:px-3 ${active ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)]'}`}
+          >
+            <Icon className="h-4 w-4" aria-hidden="true" />
+            <span>{label}</span>
           </a>
+        ))}
+      </nav>
 
-          <nav aria-label="Primary" className="flex w-full flex-col items-center gap-1 px-2">
-            {links.map(({ label, path, icon: Icon, active }) => (
-              <a key={path} href={path} title={label} aria-label={label} aria-current={active ? 'page' : undefined} data-rail-label={label} className={`${toolClass} ${active ? activeClass : ''}`}>
-                <Icon className="h-5 w-5" aria-hidden="true" />
-                {active && <span className="absolute left-0 h-4 w-px bg-[var(--app-accent)]" aria-hidden="true" />}
-              </a>
-            ))}
-            <button type="button" onClick={onOpenShortcuts} title="Quick search (⌘K)" aria-label="Open quick search" data-rail-label="Quick search" className={toolClass}>
-              <Search className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <span className="my-1 h-px w-6 bg-[var(--app-border-subtle)]" aria-hidden="true" />
-            <a href="/create" title="Create" aria-label="Create a design" data-rail-label="Create" className="relative flex h-10 w-10 items-center justify-center bg-[var(--app-accent)] text-[var(--app-accent-ink)] transition-colors hover:bg-[var(--app-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-accent)]">
-              <Plus className="h-5 w-5" aria-hidden="true" />
-            </a>
-          </nav>
-        </div>
-
-        <div className="flex flex-col items-center gap-1">
-          <button type="button" onClick={onToggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} data-rail-label="Theme" className={toolClass}>
-            {theme === 'light' ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
-          </button>
-          <a href="/about" title="About ACG" aria-label="About ACG" data-rail-label="About ACG" className={toolClass}>
-            <Info className="h-4 w-4" aria-hidden="true" />
-          </a>
-        </div>
-      </aside>
-
-      <header className="fixed left-0 right-0 top-0 z-40 flex h-13 items-center justify-between border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)] px-4 text-[var(--app-text-primary)] md:hidden">
-        <a href="/" aria-label="ACG home" className="flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
-          <span className="h-5 w-5 rounded-full border-2 border-current" aria-hidden="true" />
-          <span className="font-brand text-sm font-semibold tracking-tight">ACG</span>
+      <div className="flex shrink-0 items-center gap-1">
+        <button type="button" onClick={onOpenShortcuts} title="Quick search (⌘K)" aria-label="Open quick search" className={toolClass}>
+          <Search className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <button type="button" onClick={onToggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} className={`${toolClass} hidden sm:inline-flex`}>
+          {theme === 'light' ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
+        </button>
+        <a href="/create" className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-[var(--app-accent)] px-3 text-xs font-semibold text-[var(--app-accent-ink)] transition-colors hover:bg-[var(--app-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] sm:ml-1 sm:px-3.5">
+          <span>Create</span>
+          <Plus className="h-4 w-4" aria-hidden="true" />
         </a>
-        <div className="flex items-center gap-1">
-          <button type="button" onClick={onOpenShortcuts} aria-label="Open quick search" className={`${toolClass} h-9 w-9`}>
-            <Search className="h-4 w-4" aria-hidden="true" />
-          </button>
-          <a href="/create" className="inline-flex h-9 items-center gap-1.5 bg-[var(--app-accent)] px-3 text-xs font-medium text-[var(--app-accent-ink)] transition-colors hover:bg-[var(--app-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
-            Create <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-          </a>
-          <button type="button" onClick={onToggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} className={`${toolClass} h-9 w-9`}>
-            {theme === 'light' ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
-          </button>
-        </div>
-      </header>
-    </>
+        <button type="button" onClick={onToggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} className={`${toolClass} sm:hidden`}>
+          {theme === 'light' ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
+        </button>
+      </div>
+    </header>
   );
 };
