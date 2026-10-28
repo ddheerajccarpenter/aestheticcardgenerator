@@ -330,7 +330,7 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
     updatePageSEO({
       title: 'Privacy Policy — Aesthetic Card Studio',
       description:
-        'Privacy Policy for Aesthetic Card Studio. Detailed disclosure of client-side browser processing, local storage, and future advertising disclosures.',
+        'Privacy Policy for Aesthetic Card Studio, including local browser storage and externally hosted fonts and interface assets.',
       canonicalPath: '/privacy',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -375,7 +375,7 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
               2. Processing of Text and Card Content
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              Any text, quotes, author names, or folio metadata that you type or paste into the Studio Editor is processed strictly inside your local web browser's volatile memory. This data is never transmitted to, stored on, or processed by any remote application servers operated by us.
+              Text and card artwork are processed in your browser. Drafts and preferences may be saved in browser storage so you can continue your work after a refresh. ACG does not send that design content to an ACG application server.
             </p>
           </section>
 
@@ -384,7 +384,7 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
               3. Local Browser Storage (localStorage)
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              To prevent accidental work loss upon page refresh, our application utilizes your browser's local storage mechanism (localStorage key: <code>aesthetic_card_studio_draft</code>) to persist your active card settings locally on your machine. You may clear this draft at any time by clicking the "clear" link in the studio toolbar.
+              ACG uses localStorage for the interface theme and card drafts, sessionStorage for the selected template during navigation, and IndexedDB for locally stored custom fonts and projects. These values remain in this browser and can be cleared through the browser's site-data controls.
             </p>
           </section>
 
@@ -393,22 +393,17 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
               4. External Content Delivery Networks (CDNs)
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              To render high-quality typography, our website fetches open-source web fonts from Google Fonts (Newsreader, Playfair Display, Inter, JetBrains Mono). When your browser loads these fonts, standard HTTP connection metadata (such as IP address and user-agent string) is transmitted to Google's CDN servers according to Google's standard network infrastructure practices.
+              The interface and some card typefaces load from Google Fonts and CDNFONTS. The advanced editor also loads Boxicons from unpkg. When those resources load, your browser makes requests to their hosts and shares standard connection metadata such as IP address and user-agent. Locally installed or previously saved fonts can be used where available.
             </p>
           </section>
 
           <section className="flex flex-col gap-2">
             <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
-              5. Advertising Disclosures (Google AdSense Readiness)
+              5. Analytics and Advertising
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              In the future, this website may display advertisements served by Google or other third-party advertising partners. When advertising services are enabled:
+              This application build does not load an analytics service or active advertising integration. Advertising placeholders are disabled in the current source configuration. If that changes, this policy must be updated to describe the services and choices provided.
             </p>
-            <ul className="flex flex-col gap-2 pl-4 list-disc text-xs text-[var(--app-text-muted)]">
-              <li>Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to this website or other websites.</li>
-              <li>Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to our site and/or other sites on the Internet.</li>
-              <li>Users may opt out of personalized advertising by visiting Google's <a href="https://www.google.com/settings/ads" target="_blank" rel="noreferrer" className="underline text-current">Ads Settings</a>.</li>
-            </ul>
           </section>
 
           <section className="flex flex-col gap-2">
@@ -501,7 +496,7 @@ export const CookieView: React.FC<TrustViewBaseProps> = () => {
     updatePageSEO({
       title: 'Cookie Policy — Aesthetic Card Studio',
       description:
-        'Cookie Policy for Aesthetic Card Studio. Detailed explanation of browser local storage and third-party advertising cookies.',
+        'Cookie and browser-storage policy for Aesthetic Card Studio, including locally saved designs and external font resources.',
       canonicalPath: '/cookies',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -537,16 +532,16 @@ export const CookieView: React.FC<TrustViewBaseProps> = () => {
               1. First-Party Cookies &amp; Local Storage
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              At present, our core application does not set first-party tracking cookies. We utilize browser <code>localStorage</code> strictly to store your interface theme preference (dark/light) and your in-progress card draft so your work is not lost on refresh.
+              ACG does not currently set tracking cookies. It uses localStorage, sessionStorage, and IndexedDB for theme preferences, editor drafts, selected templates, custom fonts, and locally saved projects. You can remove this data in your browser's site-data settings.
             </p>
           </section>
 
           <section className="flex flex-col gap-2">
             <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
-              2. Third-Party Advertising Cookies
+              2. External Resources
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              Third-party vendors, including Google, use cookies (such as the DART cookie) to serve ads based on prior visits to this website or other sites across the internet. You can manage your preferences or opt out of personalized advertising by visiting Google Ads Settings and aboutads.info.
+              Google Fonts, CDNFONTS, and unpkg may serve fonts or icon files used by the interface. Loading those files sends a request to the respective host and shares standard network metadata. This build does not load analytics or advertising scripts.
             </p>
           </section>
         </div>

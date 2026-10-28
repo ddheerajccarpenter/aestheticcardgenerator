@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Compass,
-  LayoutTemplate,
-  Layers,
-  Search,
-  BookOpen,
-  Plus,
-  Moon,
-  Sun,
-  Info,
-} from 'lucide-react';
+import { Compass, LayoutTemplate, Layers, Search, BookOpen, Plus, Moon, Sun, Info } from 'lucide-react';
 
 interface HeaderProps {
   currentPath?: string;
@@ -25,187 +15,67 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
   onOpenShortcuts,
 }) => {
-  const isLight = theme === 'light';
+  const links = [
+    { label: 'Gallery', path: '/', icon: Compass, active: currentPath === '/' },
+    { label: 'Templates', path: '/templates', icon: LayoutTemplate, active: currentPath.startsWith('/templates') },
+    { label: 'Canvas', path: '/canvas', icon: Layers, active: currentPath.startsWith('/canvas') },
+    { label: 'Guides', path: '/guides', icon: BookOpen, active: currentPath.startsWith('/guides') },
+  ];
 
-  const isGallery = currentPath === '/';
-  const isTemplates = currentPath.startsWith('/templates');
-  const isCanvas = currentPath.startsWith('/canvas');
-  const isGuides = currentPath.startsWith('/guides');
+  const toolClass = 'relative flex h-10 w-10 items-center justify-center text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]';
+  const activeClass = 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]';
 
   return (
     <>
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* DESKTOP NAVIGATION RAIL (Reference A: Left Icon Rail)                */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      <aside
-        aria-label="Desktop Navigation Rail"
-        className="hidden md:flex fixed top-0 bottom-0 left-0 w-16 z-40 bg-[var(--app-bg)] border-r border-[var(--app-border-subtle)] flex-col items-center py-4 justify-between select-none transition-colors duration-200"
-      >
-        {/* Top: Brand Ring Glyph + Main Navigation Icons */}
-        <div className="flex flex-col items-center gap-6 w-full">
-          {/* Circular Geometric Ring Mark */}
-          <a
-            href="/"
-            className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all group relative cursor-pointer"
-            title="ACG — Home Gallery"
-            aria-label="ACG — Home Gallery"
-          >
-            <div className="w-6 h-6 rounded-full border-2 border-[var(--app-text-primary)] flex items-center justify-center transition-transform group-hover:scale-105">
-              <div className="w-2 h-2 rounded-full bg-[var(--app-text-primary)] opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+      <aside aria-label="Desktop navigation" className="fixed inset-y-0 left-0 z-40 hidden w-16 flex-col items-center justify-between border-r border-[var(--app-border-subtle)] bg-[var(--app-bg)] py-4 md:flex">
+        <div className="flex w-full flex-col items-center gap-5">
+          <a href="/" aria-label="ACG home" title="ACG" className="flex h-10 w-10 items-center justify-center text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-current" aria-hidden="true">
+              <span className="h-2 w-2 rounded-full bg-current" />
+            </span>
           </a>
 
-          {/* Understated Nav Icon Stack */}
-          <nav aria-label="Desktop Rail Navigation" className="flex flex-col items-center gap-2 w-full px-2">
-            {/* Gallery */}
-            <a
-              href="/"
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group ${
-                isGallery
-                  ? isLight ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'bg-white/10 text-white'
-                  : isLight ? 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-black/5' : 'text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5'
-              }`}
-              title="Explore Gallery"
-              aria-label="Explore Gallery"
-            >
-              <Compass className="w-5 h-5" />
-              {isGallery && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[var(--app-text-primary)] rounded-r" />
-              )}
-            </a>
-
-            {/* Templates */}
-            <a
-              href="/templates"
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group ${
-                isTemplates
-                  ? isLight ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'bg-white/10 text-white'
-                  : isLight ? 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-black/5' : 'text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5'
-              }`}
-              title="Template Catalog"
-              aria-label="Template Catalog"
-            >
-              <LayoutTemplate className="w-5 h-5" />
-              {isTemplates && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[var(--app-text-primary)] rounded-r" />
-              )}
-            </a>
-
-            {/* Freeform Canvas Studio */}
-            <a
-              href="/canvas"
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group ${
-                isCanvas
-                  ? isLight ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'bg-white/10 text-white'
-                  : isLight ? 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-black/5' : 'text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5'
-              }`}
-              title="Freeform Studio Canvas"
-              aria-label="Freeform Studio Canvas"
-            >
-              <Layers className="w-5 h-5" />
-              {isCanvas && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[var(--app-text-primary)] rounded-r" />
-              )}
-            </a>
-
-            {/* Quick Search / Command Palette */}
-            <button
-              onClick={onOpenShortcuts}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5 transition-all cursor-pointer"
-              title="Quick Search (⌘K)"
-              aria-label="Quick Search"
-            >
-              <Search className="w-5 h-5" />
+          <nav aria-label="Primary" className="flex w-full flex-col items-center gap-1 px-2">
+            {links.map(({ label, path, icon: Icon, active }) => (
+              <a key={path} href={path} title={label} aria-label={label} aria-current={active ? 'page' : undefined} data-rail-label={label} className={`${toolClass} ${active ? activeClass : ''}`}>
+                <Icon className="h-5 w-5" aria-hidden="true" />
+                {active && <span className="absolute left-0 h-4 w-px bg-[var(--app-accent)]" aria-hidden="true" />}
+              </a>
+            ))}
+            <button type="button" onClick={onOpenShortcuts} title="Quick search (⌘K)" aria-label="Open quick search" data-rail-label="Quick search" className={toolClass}>
+              <Search className="h-5 w-5" aria-hidden="true" />
             </button>
-
-            {/* Guides */}
-            <a
-              href="/guides"
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group ${
-                isGuides
-                  ? 'bg-white/10 text-white shadow-xs'
-                  : isLight ? 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-black/5' : 'text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5'
-              }`}
-              title="Design Guides"
-              aria-label="Design Guides"
-            >
-              <BookOpen className="w-5 h-5" />
-              {isGuides && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[var(--app-text-primary)] rounded-r" />
-              )}
-            </a>
-
-            {/* Divider */}
-            <div className="w-6 h-px bg-[var(--app-border-subtle)] my-1" />
-
-            {/* Create Action Button (Reference B prominent Create) */}
-            <a
-              href="/create"
-              className="w-10 h-10 rounded-full bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-              title="Create New Design"
-              aria-label="Create New Design"
-            >
-              <Plus className="w-5 h-5 stroke-[2.5]" />
+            <span className="my-1 h-px w-6 bg-[var(--app-border-subtle)]" aria-hidden="true" />
+            <a href="/create" title="Create" aria-label="Create a design" data-rail-label="Create" className="relative flex h-10 w-10 items-center justify-center bg-[var(--app-accent)] text-[var(--app-accent-ink)] transition-colors hover:bg-[var(--app-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-accent)]">
+              <Plus className="h-5 w-5" aria-hidden="true" />
             </a>
           </nav>
         </div>
 
-        {/* Bottom Rail: Theme Switch & Info */}
-        <div className="flex flex-col items-center gap-2 w-full px-2">
-          <button
-            onClick={onToggleTheme}
-            className="w-10 h-10 rounded-xl text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors cursor-pointer"
-            title={`Switch to ${isLight ? 'Dark' : 'Light'} Mode`}
-            aria-label={`Switch to ${isLight ? 'Dark' : 'Light'} Mode`}
-          >
-            {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+        <div className="flex flex-col items-center gap-1">
+          <button type="button" onClick={onToggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} data-rail-label="Theme" className={toolClass}>
+            {theme === 'light' ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
           </button>
-
-          <a
-            href="/about"
-            className="w-10 h-10 rounded-xl text-[var(--app-text-secondary)] hover:text-white hover:bg-white/5 flex items-center justify-center transition-colors cursor-pointer"
-            title="About ACG"
-            aria-label="About ACG"
-          >
-            <Info className="w-4 h-4" />
+          <a href="/about" title="About ACG" aria-label="About ACG" data-rail-label="About ACG" className={toolClass}>
+            <Info className="h-4 w-4" aria-hidden="true" />
           </a>
         </div>
       </aside>
 
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* MOBILE TOP HEADER (< md)                                            */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-13 z-40 bg-[#090a0d]/95 backdrop-blur-md border-b border-[#1a1d24] px-4 flex items-center justify-between text-[#f4f1ea] transition-colors duration-200">
-        {/* Left: Brand ring + text */}
-        <a href="/" className="flex items-center gap-2 group cursor-pointer" aria-label="ACG Home">
-          <div className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center shrink-0 opacity-90 group-hover:opacity-100 transition-opacity" />
-          <span className="font-bold tracking-tight text-sm font-sans">ACG</span>
+      <header className="fixed left-0 right-0 top-0 z-40 flex h-13 items-center justify-between border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)] px-4 text-[var(--app-text-primary)] md:hidden">
+        <a href="/" aria-label="ACG home" className="flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+          <span className="h-5 w-5 rounded-full border-2 border-current" aria-hidden="true" />
+          <span className="text-sm font-semibold tracking-tight">ACG</span>
         </a>
-
-        {/* Right: Search, Create +, Theme */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onOpenShortcuts}
-            className="p-2 rounded-lg border border-[#23262d] bg-[#14161b] text-[#8e939e] hover:text-white transition-colors cursor-pointer"
-            aria-label="Search"
-          >
-            <Search className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={onOpenShortcuts} aria-label="Open quick search" className={`${toolClass} h-9 w-9`}>
+            <Search className="h-4 w-4" aria-hidden="true" />
           </button>
-
-          <a
-            href="/create"
-            className="px-3 py-1 rounded-full text-xs font-bold bg-white text-black hover:bg-slate-200 transition-colors shadow-xs cursor-pointer flex items-center gap-1"
-          >
-            <span>Create</span>
-            <Plus className="w-3 h-3 stroke-[2.5]" />
+          <a href="/create" className="inline-flex h-9 items-center gap-1.5 bg-[var(--app-accent)] px-3 text-xs font-medium text-[var(--app-accent-ink)] transition-colors hover:bg-[var(--app-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+            Create <Plus className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
-
-          <button
-            onClick={onToggleTheme}
-            className="p-2 rounded-lg border border-[#23262d] bg-[#14161b] text-[#8e939e] hover:text-white transition-colors cursor-pointer"
-            aria-label="Toggle Theme"
-          >
-            {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+          <button type="button" onClick={onToggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} className={`${toolClass} h-9 w-9`}>
+            {theme === 'light' ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
           </button>
         </div>
       </header>

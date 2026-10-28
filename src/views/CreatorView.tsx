@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { ASSET_AVATARS } from '../data/canvasAssets';
 import { createThreeCardPreviewScene } from '../engines/threeCardStage';
-import { getBrandedExportFilename } from '../engines/brandedExportAndThreePng';
+import { getBrandedExportFilename, triggerBrandedBlobDownload } from '../engines/brandedExportAndThreePng';
 
 export interface CreatorViewProps {
   initialTemplate?: CardTemplate;
@@ -117,7 +117,51 @@ const PALETTES: PaletteOption[] = [
   },
 ];
 
-type AspectRatioOption = '4:5' | '1:1' | '2:3' | '9:16';
+type AspectRatioOption = '4:5' | '1:1' | '2:3' | '9:16' | '8:5' | '16:9';
+
+const findTemplatePalette = (template?: CardTemplate) => {
+  if (!template?.theme) return -1;
+  return PALETTES.findIndex((palette) => palette.bg.toLowerCase() === template.theme.bg.toLowerCase());
+};
+
+const getTemplatePalette = (template?: CardTemplate): PaletteOption | null => {
+  if (!template?.theme) return null;
+  const matchingPalette = PALETTES[findTemplatePalette(template)];
+  return {
+    id: template.theme.id,
+    name: template.theme.name || matchingPalette?.name || template.title,
+    bg: template.theme.bg,
+    ink: template.theme.ink,
+    badge: template.badge || matchingPalette?.badge || 'DESIGN',
+    surface: matchingPalette?.surface || (template.surfaceFinish === 'grain' ? 'woven-canvas-linen' : 'warm-nano-texture-matte'),
+  };
+};
+
+const getTemplateRatio = (template?: CardTemplate): AspectRatioOption => {
+  if (!template) return '4:5';
+  const width = template.canvasDoc?.canvasWidth ?? (template.layoutHint === 'vertical' ? 640 : template.layoutHint === 'square' ? 1080 : 960);
+  const height = template.canvasDoc?.canvasHeight ?? (template.layoutHint === 'vertical' ? 960 : template.layoutHint === 'square' ? 1080 : 600);
+  const ratio = width / height;
+  if (ratio >= 1.68) return '16:9';
+  if (ratio >= 1.4) return '8:5';
+  if (ratio >= 0.9) return '1:1';
+  if (ratio >= 0.72) return '4:5';
+  if (ratio >= 0.61) return '2:3';
+  return '9:16';
+};
+
+const getTemplateTextField = (template: CardTemplate | undefined, fields: string[]) => {
+  const textObjects = template?.canvasDoc?.objects.filter((object) => object.type === 'text') || [];
+  const field = textObjects.find((object) => {
+    const name = object.name.toLowerCase();
+    return !name.includes('label') && fields.some((key) => name.includes(key));
+  });
+  return field?.type === 'text' ? field.text : undefined;
+};
+
+const getTemplateAvatar = (template?: CardTemplate) =>
+  template?.canvasDoc?.objects.find((object) => object.type === 'image')?.src ||
+  (template?.category === 'id-card' || template?.hasPhotoArea ? ASSET_AVATARS.studentScholar : ASSET_AVATARS.grungeDan);
 
 export const CreatorView: React.FC<CreatorViewProps> = ({
   initialTemplate,
@@ -136,30 +180,26 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
   // Mode: Quote card or ID pass
   const [mode, setMode] = useState<'quote' | 'id'>(() => {
-    if (initialTemplate?.category === 'id-card') return 'id';
+    if (initialTemplate?.category === 'id-card' || initialTemplate?.hasPhotoArea) return 'id';
     return 'quote';
   });
 
   // Palette selection
-  const [paletteIndex, setPaletteIndex] = useState(() => {
-    if (initialTemplate?.theme?.bg) {
-      const match = PALETTES.findIndex(
-        (p) => p.bg.toLowerCase() === initialTemplate.theme.bg.toLowerCase()
-      );
-      if (match !== -1) return match;
-    }
-    return 0;
-  });
+  const [paletteIndex, setPaletteIndex] = useState(() => Math.max(0, findTemplatePalette(initialTemplate)));
+  const [templatePalette, setTemplatePalette] = useState<PaletteOption | null>(() => getTemplatePalette(initialTemplate));
+  const [sourceTemplatePalette] = useState<PaletteOption | null>(() => getTemplatePalette(initialTemplate));
 
   // Aspect ratio
-  const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>(() => {
-    if (initialTemplate?.category === 'id-card') return '2:3';
-    return '4:5';
-  });
+  const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>(() => getTemplateRatio(initialTemplate));
 
   // Typography & Appearance
-  const [fontFamily, setFontFamily] = useState<'editorial' | 'sans' | 'mono'>('editorial');
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [fontFamily, setFontFamily] = useState<'editorial' | 'sans' | 'mono'>(() => {
+    if (['mono', 'space-mono', 'pixel'].includes(initialTemplate?.font || '')) return 'mono';
+    if (['sans', 'syne', 'space-grotesk', 'unbounded'].includes(initialTemplate?.font || '')) return 'sans';
+    return 'editorial';
+  });
+  const [fontSize, setFontSize] = useState(initialTemplate?.fontSize || 26);
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>(() => initialTemplate?.align || 'left');
 
   // Quote mode content
   const [quote, setQuote] = useState(
@@ -172,10 +212,11 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
   const [tag, setTag] = useState(initialTemplate?.tag || 'FIELD NOTES — 001');
 
   // ID mode content
-  const [idName, setIdName] = useState(initialTemplate?.title || 'Dan Valentini');
-  const [idRole, setIdRole] = useState('Vision Architect');
-  const [idClearance, setIdClearance] = useState('ALL-ACCESS • TIER 01');
-  const [avatar, setAvatar] = useState<string>(ASSET_AVATARS.grungeDan);
+  const templateQuoteLines = initialTemplate?.quote.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) || [];
+  const [idName, setIdName] = useState(() => getTemplateTextField(initialTemplate, ['value name', 'field name', 'name']) || initialTemplate?.title || 'Dan Valentini');
+  const [idRole, setIdRole] = useState(() => getTemplateTextField(initialTemplate, ['role', 'position', 'focus area']) || templateQuoteLines[1] || (initialTemplate ? '' : 'Vision Architect'));
+  const [idClearance, setIdClearance] = useState(() => getTemplateTextField(initialTemplate, ['clearance', 'access level', 'status']) || initialTemplate?.tag || templateQuoteLines[0] || (initialTemplate ? '' : 'ALL-ACCESS • TIER 01'));
+  const [avatar, setAvatar] = useState<string>(() => getTemplateAvatar(initialTemplate));
 
   // Canvas refs and export/preview state
   const cardRef = useRef<HTMLDivElement>(null);
@@ -188,49 +229,9 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
 
-  const currentPalette = PALETTES[paletteIndex] || PALETTES[0];
+  const currentPalette = templatePalette || PALETTES[paletteIndex] || PALETTES[0];
 
-  // Sync initialTemplate changes if provided
-  useEffect(() => {
-    if (initialTemplate) {
-      if (initialTemplate.category === 'id-card' || initialTemplate.hasPhotoArea) {
-        setMode('id');
-        setIdName(initialTemplate.title);
-        setAspectRatio('2:3');
-      } else {
-        setMode('quote');
-        setQuote(initialTemplate.quote);
-        setAuthor(initialTemplate.author);
-        setTag(initialTemplate.tag || 'EDITORIAL NO. 04');
-        setAspectRatio('4:5');
-      }
-      if (initialTemplate.font) {
-        if (['mono', 'space-mono', 'pixel'].includes(initialTemplate.font)) {
-          setFontFamily('mono');
-        } else if (['sans', 'syne', 'space-grotesk', 'unbounded'].includes(initialTemplate.font)) {
-          setFontFamily('sans');
-        } else {
-          setFontFamily('editorial');
-        }
-      }
-      if (initialTemplate.align) {
-        setTextAlign(initialTemplate.align);
-      }
-      const match = PALETTES.findIndex(
-        (p) => p.bg.toLowerCase() === initialTemplate.theme.bg.toLowerCase()
-      );
-      if (match !== -1) setPaletteIndex(match);
-    }
-  }, [initialTemplate]);
-
-  const handleModeChange = (newMode: 'quote' | 'id') => {
-    setMode(newMode);
-    if (newMode === 'id' && aspectRatio === '4:5') {
-      setAspectRatio('2:3');
-    } else if (newMode === 'quote' && aspectRatio === '2:3') {
-      setAspectRatio('4:5');
-    }
-  };
+  const handleModeChange = (newMode: 'quote' | 'id') => setMode(newMode);
 
   const showToast = (msg: string) => {
     setFeedbackMessage(msg);
@@ -252,7 +253,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
     let isMounted = true;
     const timer = setTimeout(() => {
       if (!cardRef.current) return;
-      toPng(cardRef.current, { pixelRatio: 1.5 }).then((dataUrl) => {
+      toPng(cardRef.current, { pixelRatio: 1.5, skipFonts: true }).then((dataUrl) => {
         if (!isMounted) return;
         const img = new Image();
         img.onload = () => {
@@ -263,8 +264,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           const ctx = off.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0);
-            const wRatio = aspectRatio === '1:1' ? 4 : aspectRatio === '9:16' ? 9 : aspectRatio === '2:3' ? 2 : 4;
-            const hRatio = aspectRatio === '1:1' ? 4 : aspectRatio === '9:16' ? 16 : aspectRatio === '2:3' ? 3 : 5;
+            const [wRatio, hRatio] = aspectRatio.split(':').map(Number);
 
             if (threeStageRef.current && lastModeRef.current === mode) {
               threeStageRef.current.updateTexture(off, currentPalette.surface);
@@ -282,6 +282,9 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           }
         };
         img.src = dataUrl;
+      }).catch((error) => {
+        console.error('Failed to prepare the 3D card preview:', error);
+        if (isMounted) setIs3DMode(false);
       });
     }, 150);
 
@@ -302,6 +305,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
     idClearance,
     avatar,
     fontFamily,
+    fontSize,
     textAlign,
   ]);
 
@@ -334,11 +338,10 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 2,
         cacheBust: true,
+        skipFonts: true,
       });
-      const link = document.createElement('a');
-      link.download = getBrandedExportFilename('png');
-      link.href = dataUrl;
-      link.click();
+      const blob = await (await fetch(dataUrl)).blob();
+      triggerBrandedBlobDownload(blob, getBrandedExportFilename('png'));
       showToast('Exported Retina PNG');
     } catch (err) {
       console.error('Failed to export card image:', err);
@@ -393,6 +396,10 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
   const getAspectDimensions = () => {
     switch (aspectRatio) {
+      case '8:5':
+        return 'aspect-[8/5] max-w-[560px]';
+      case '16:9':
+        return 'aspect-video max-w-[640px]';
       case '1:1':
         return 'aspect-square max-w-[440px]';
       case '2:3':
@@ -453,7 +460,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
               <Crop className="w-3 h-3" />
               <span>Ratio:</span>
             </span>
-            {(['4:5', '1:1', '2:3', '9:16'] as AspectRatioOption[]).map((r) => (
+            {(['8:5', '16:9', '4:5', '1:1', '2:3', '9:16'] as AspectRatioOption[]).map((r) => (
               <button
                 key={r}
                 onClick={() => setAspectRatio(r)}
@@ -522,12 +529,24 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
               </span>
             </div>
             <div className="grid grid-cols-7 gap-1.5">
+              {sourceTemplatePalette && !templatePalette && (
+                <button
+                  type="button"
+                  onClick={() => setTemplatePalette(sourceTemplatePalette)}
+                  className="h-7 rounded border border-white/10 ring-2 ring-white relative flex items-center justify-center"
+                  style={{ backgroundColor: sourceTemplatePalette.bg }}
+                  title={`Original: ${sourceTemplatePalette.name}`}
+                  aria-label={`Use original ${sourceTemplatePalette.name} palette`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: sourceTemplatePalette.ink }} />
+                </button>
+              )}
               {PALETTES.map((p, idx) => (
                 <button
                   key={p.id}
-                  onClick={() => setPaletteIndex(idx)}
+                  onClick={() => { setPaletteIndex(idx); setTemplatePalette(null); }}
                   className={`h-7 rounded border transition-all cursor-pointer relative flex items-center justify-center ${
-                    paletteIndex === idx
+                    !templatePalette && paletteIndex === idx
                       ? 'ring-2 ring-white scale-105 border-transparent shadow-xs'
                       : 'border-white/10 hover:opacity-80'
                   }`}
@@ -535,7 +554,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                   title={p.name}
                   aria-label={p.name}
                 >
-                  {paletteIndex === idx && (
+                  {!templatePalette && paletteIndex === idx && (
                     <div
                       className="w-1.5 h-1.5 rounded-full"
                       style={{ backgroundColor: p.ink }}
@@ -723,6 +742,15 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
               </button>
             </div>
 
+            {mode === 'quote' && (
+              <div className="flex flex-col gap-1">
+                <label htmlFor="creator-font-size" className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[#8e939e]">
+                  <span>Quote size</span><span>{fontSize}px</span>
+                </label>
+                <input id="creator-font-size" type="range" min="14" max="48" step="1" value={fontSize} onChange={(event) => setFontSize(Number(event.target.value))} className="w-full accent-[#e2d9c8]" />
+              </div>
+            )}
+
             {/* Alignment Buttons */}
             <div className="flex items-center gap-1">
               <button
@@ -776,7 +804,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
             </div>
           )}
 
-          {is3DMode ? (
+          {is3DMode && (
             <div className="w-full h-full min-h-[380px] flex flex-col items-center justify-center">
               <div
                 ref={threeMountRef}
@@ -786,8 +814,11 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 Drag to inspect 3D card surface &amp; reflections
               </span>
             </div>
-          ) : (
-            <div className="w-full flex items-center justify-center p-2">
+          )}
+          <div
+            aria-hidden={is3DMode}
+            className={`w-full flex items-center justify-center p-2 ${is3DMode ? 'pointer-events-none absolute -left-[10000px] top-0' : ''}`}
+          >
               <div
                 ref={cardRef}
                 style={{
@@ -819,7 +850,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                             ? 'font-mono text-base'
                             : 'font-sans font-medium'
                         }`}
-                        style={{ textAlign }}
+                      style={{ textAlign, fontSize: `${quote.length > 180 ? Math.max(14, Math.floor(fontSize * Math.sqrt(180 / quote.length))) : fontSize}px` }}
                       >
                         {quote}
                       </p>
@@ -885,8 +916,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                   </>
                 )}
               </div>
-            </div>
-          )}
+          </div>
         </main>
       </div>
     </div>

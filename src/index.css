@@ -1125,3 +1125,32 @@ html.light .studio-input:focus {
 .app-shell .creator-workspace [class*="hover:bg-[#1c1f26]"]:hover {
   background-color: var(--app-surface-secondary) !important;
 }
+
+[data-rail-label]::after {
+  content: attr(data-rail-label);
+  position: absolute;
+  z-index: 60;
+  top: 50%;
+  left: calc(100% + 10px);
+  padding: 6px 8px;
+  border: 1px solid var(--app-border-strong);
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+  font: 500 11px/1.2 var(--font-body);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: opacity 100ms ease;
+}
+
+[data-rail-label]:hover::after,
+[data-rail-label]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.acg-preview-dialog::backdrop {
+  background: rgba(10, 9, 8, 0.76);
+}

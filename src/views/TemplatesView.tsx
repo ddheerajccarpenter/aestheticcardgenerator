@@ -14,6 +14,7 @@ import {
 import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
 import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
+import { getTemplateAspectRatio } from '../utils/templateAspectRatio';
 import { LazyTemplateCard } from '../components/LazyTemplateCard';
 
 interface TemplatesViewProps {
@@ -58,9 +59,9 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Aesthetic Template Library — 56 Curated ID Passes, Pastel Cards & Minimal Folios',
+      title: 'Aesthetic Template Library — 70 Curated Card Designs',
       description:
-        'Explore 56 editable aesthetic card templates: Jennie crimson passes, Portoko grunge badges, vintage Tyler travel licenses, kawaii lace frames, and Swiss minimalist credentials.',
+        'Explore 70 editable card designs, including ID passes, pastel cards, vintage travel licenses, and minimalist credentials.',
       canonicalPath: '/templates',
       ogType: 'website',
       jsonLd: {
@@ -234,10 +235,11 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                   className="studio-panel overflow-hidden transition-all duration-200 hover:-translate-y-1 flex flex-col"
                 >
                   {/* Real Card Visual Artwork Preview (Unified with Archival Blueprint Lazy-Loading) */}
-                  <LazyTemplateCard aspectRatioClass="aspect-auto">
+                  <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="border border-[var(--app-border-subtle)]">
                     <UnifiedCardThumbnail
                       template={template}
                       isLight={isLight}
+                      className="h-full w-full"
                     />
                   </LazyTemplateCard>
 

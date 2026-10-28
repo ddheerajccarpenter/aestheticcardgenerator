@@ -3,7 +3,6 @@ import type { CardTemplate } from './types/card';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { MobileBottomNav } from './components/MobileBottomNav';
-import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { HomeView } from './views/HomeView';
 import { CreatorView } from './views/CreatorView';
@@ -345,11 +344,7 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Non-Intrusive Cookie & GDPR Privacy Consent Banner (Part VII.1) */}
-      <CookieConsentBanner
-        theme={theme}
-        onNavigate={navigate}
-      />      {/* Command Palette (⌘K) Modal */}
+      {/* Command Palette (⌘K) Modal */}
       {shortcutsOpen && (
         <div
           className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-start justify-center pt-20 p-4"
