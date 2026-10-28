@@ -16,7 +16,7 @@ export const Footer: React.FC<FooterProps> = ({ theme = 'dark' }) => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-3">
             <span className="font-brand text-lg font-extrabold tracking-tight text-[var(--app-text)]">ACG</span>
-            <span className="text-xs text-[var(--app-text-muted)]">
+            <span className="font-brand text-xs text-[var(--app-text-muted)]">
               Aesthetic Card Generator
             </span>
           </div>

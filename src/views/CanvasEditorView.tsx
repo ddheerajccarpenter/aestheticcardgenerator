@@ -2577,6 +2577,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 .map((obj) => {
                   if (!obj.visible) return null;
                   const isSelected = obj.id === selectedId && !exporting;
+                  const toolbarHalfWidth = Math.min(204, Math.max(0, doc.canvasWidth / 2 - 8));
+                  const toolbarCenterX = Math.min(
+                    doc.canvasWidth - toolbarHalfWidth - 8,
+                    Math.max(toolbarHalfWidth + 8, obj.x + obj.width / 2)
+                  );
 
                   return (
                     <div
@@ -2933,6 +2938,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             onMouseDown={(e) => e.stopPropagation()}
                             onPointerDown={(e) => e.stopPropagation()}
                             style={{
+                              left: `${toolbarCenterX - obj.x}px`,
                               top: obj.y >= 56
                                 ? undefined
                                 : obj.y + obj.height + 48 <= doc.canvasHeight
@@ -2963,10 +2969,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             </button>
                             <button
                               onClick={() => deleteObject(obj.id)}
+                              aria-label={`Delete ${obj.name}`}
                               title="Delete layer"
-                              className="p-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-white/10 transition-colors cursor-pointer"
+                              className="px-1.5 py-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-white/10 transition-colors cursor-pointer flex items-center gap-1 text-[10px] font-semibold"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
+                              <span>Delete</span>
                             </button>
                             <button
                               onClick={() => updateObject(obj.id, { locked: true })}

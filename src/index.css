@@ -194,7 +194,7 @@
   :root {
     /* Global Typography System (Part II) */
     --font-heading: 'Jungle Troubles', 'Caveat', cursive;
-    --font-subheading: 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-subheading: 'Designer', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-brand: 'Stretch Pro', Impact, 'Arial Narrow', sans-serif;
     --font-body: 'Designer', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
