@@ -930,8 +930,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       const deltaX = coords.x - drag.startX;
       const deltaY = coords.y - drag.startY;
 
-      if (animFrameId) cancelAnimationFrame(animFrameId);
+      if (animFrameId !== null) cancelAnimationFrame(animFrameId);
       animFrameId = requestAnimationFrame(() => {
+        animFrameId = null;
         if (drag.isDragging) {
           let newX = drag.startObjX + deltaX;
           let newY = drag.startObjY + deltaY;
@@ -1058,8 +1059,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       });
     };
 
-    const handlePointerUp = () => {
-      if (animFrameId) cancelAnimationFrame(animFrameId);
+    const finishPointerDrag = () => {
       const drag = dragRef.current;
       if (drag.isDragging || drag.isResizing || drag.isRotating) {
         drag.isDragging = false;
@@ -1072,11 +1072,19 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       }
     };
 
+    const handlePointerUp = () => {
+      if (animFrameId !== null) {
+        requestAnimationFrame(finishPointerDrag);
+        return;
+      }
+      finishPointerDrag();
+    };
+
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointercancel', handlePointerUp);
     return () => {
-      if (animFrameId) cancelAnimationFrame(animFrameId);
+      if (animFrameId !== null) cancelAnimationFrame(animFrameId);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('pointercancel', handlePointerUp);
@@ -1528,7 +1536,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // ───────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="canvas-editor w-full min-h-screen flex flex-col pt-0 transition-colors duration-200 bg-[var(--app-bg)] text-[var(--app-text)]">
+    <div className="canvas-editor w-full h-dvh min-h-0 overflow-hidden flex flex-col pt-0 transition-colors duration-200 bg-[var(--app-bg)] text-[var(--app-text)]">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl studio-panel shadow-2xl flex items-center gap-2 text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 text-[var(--app-text)]">
@@ -1992,7 +2000,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* ───────────────────────────────────────────────────────────────────── */}
       {/* MAIN WORKSPACE BODY                                                   */}
       {/* ───────────────────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 min-h-0 flex overflow-hidden relative">
         {/* LEFT TOOLBAR: Add Elements (Desktop) */}
         <aside
           className={`hidden lg:flex w-16 border-r flex-col items-center py-4 gap-2 shrink-0 transition-colors z-20 ${
@@ -2580,15 +2588,16 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                       onPointerDown={(e) => handleObjectPointerDown(e, obj)}
                       style={{
                         position: 'absolute',
-                        left: `${obj.x}px`,
-                        top: `${obj.y}px`,
+                        left: 0,
+                        top: 0,
                         width: `${obj.width}px`,
                         height: `${obj.height}px`,
-                        transform: `rotate(${obj.rotation || 0}deg)`,
+                        transform: `translate3d(${obj.x}px, ${obj.y}px, 0) rotate(${obj.rotation || 0}deg)`,
                         transformOrigin: 'center center',
                         zIndex: obj.zIndex,
                         cursor: obj.locked ? 'default' : editingTextId === obj.id ? 'text' : 'move',
                         touchAction: 'none',
+                        willChange: isSelected ? 'transform' : undefined,
                       }}
                       className="group"
                     >
@@ -2923,6 +2932,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           <div
                             onMouseDown={(e) => e.stopPropagation()}
                             onPointerDown={(e) => e.stopPropagation()}
+                            style={{
+                              top: obj.y >= 56
+                                ? undefined
+                                : obj.y + obj.height + 48 <= doc.canvasHeight
+                                  ? 'calc(100% + 8px)'
+                                  : 4,
+                            }}
                             className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-0.5 px-2 py-1 rounded-xl bg-[#171513]/95 backdrop-blur-md border border-[#39342d] shadow-2xl z-[10000] pointer-events-auto select-none"
                           >
                             {obj.type === 'text' && (
@@ -3106,7 +3122,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         {/* RIGHT SIDEBAR: Inspector & Layers (Desktop)                         */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         <aside
-          className={`hidden lg:flex w-80 border-l flex-col shrink-0 transition-colors z-20 ${
+          className={`hidden lg:flex min-h-0 w-80 border-l flex-col shrink-0 transition-colors z-20 ${
             isLight ? 'bg-white border-[#e3ddd3]' : 'bg-[#171513] border-[#29251f]'
           }`}
         >
@@ -3161,7 +3177,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               {selectedObject ? (
                 <>
                   {/* Object Header: Name & Quick Actions */}
-                  <div className="flex items-center justify-between pb-3 border-b border-[#39342d]/30">
+                  <div className="sticky top-0 z-10 -mx-4 px-4 py-2 flex items-center justify-between border-b border-[#39342d]/30 bg-[var(--app-surface)]">
                     <div>
                       <span className="text-[10px] font-mono uppercase tracking-wider text-[#81786d]">
                         {selectedObject.type} Layer
@@ -3201,12 +3217,14 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                       </button>
                       <button
                         onClick={() => deleteObject(selectedObject.id)}
-                        className={`p-1.5 rounded-lg border text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer ${
+                        aria-label={`Delete ${selectedObject.name}`}
+                        className={`px-2 py-1.5 rounded-lg border text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer flex items-center gap-1.5 text-xs ${
                           isLight ? 'border-[#e3ddd3]' : 'border-[#39342d]'
                         }`}
                         title="Delete layer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
                       </button>
                     </div>
                   </div>
@@ -3764,6 +3782,14 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               ) : (
                 /* B. Nothing Selected: CANVAS & DOCUMENT PROPERTIES */
                 <div className="flex flex-col gap-5">
+                  <div className={`border p-3 ${isLight ? 'border-[#e3ddd3] bg-[#f8f5ef]' : 'border-[#39342d] bg-[#211e19]'}`}>
+                    <h4 className="text-sm font-semibold text-[var(--app-text-primary)]">Quick start</h4>
+                    <ol className="mt-2 space-y-1.5 text-xs leading-relaxed text-[var(--app-text-secondary)]">
+                      <li><span className="font-semibold text-[var(--app-text-primary)]">1.</span> Choose <strong>Add</strong> to place text, a photo, or a shape.</li>
+                      <li><span className="font-semibold text-[var(--app-text-primary)]">2.</span> Select an item to edit it here or on the canvas.</li>
+                      <li><span className="font-semibold text-[var(--app-text-primary)]">3.</span> Use <strong>Delete</strong> to remove it, or Undo to restore it.</li>
+                    </ol>
+                  </div>
                   <div className="pb-3 border-b border-[#39342d]/30">
                     <h4 className="text-base font-semibold">Canvas</h4>
                   </div>
@@ -4576,17 +4602,19 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               {activeSidebarTab === 'inspector' ? (
                 selectedObject ? (
                   <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between pb-2 border-b border-current/10">
+                    <div className="sticky top-0 z-10 -mx-4 px-4 py-2 flex items-center justify-between border-b border-current/10 bg-[var(--app-surface)]">
                       <div>
                         <span className="text-[10px] font-mono text-[#81786d] uppercase">{selectedObject.type} Layer</span>
                         <h4 className="text-sm font-semibold truncate max-w-[200px]">{selectedObject.name}</h4>
                       </div>
                       <button
                         onClick={() => deleteObject(selectedObject.id)}
-                        className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10"
+                        aria-label={`Delete ${selectedObject.name}`}
+                        className="px-2 py-1.5 rounded-lg text-red-400 hover:bg-red-500/10 flex items-center gap-1.5 text-xs"
                         title="Delete layer"
                       >
                         <Trash2 className="w-4 h-4" />
+                        <span>Delete</span>
                       </button>
                     </div>
 

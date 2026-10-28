@@ -23,8 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Vercel
+# Vercel & Wrangler
 .vercel
+.wrangler
 
 # Reference Screenshots
 *.png
@@ -35,12 +36,5 @@ dist-ssr
 # Markdown files
 *.md
 **/*.md
-!README.md
-!DESIGN.md
-!DESIGN_STUDIO_REFERENCE.md
-!**/README.md
-!src/fix.md
-!AGENTS.md
-!page.md
-!.agents/**
+
 

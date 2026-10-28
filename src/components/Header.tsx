@@ -29,10 +29,11 @@ export const Header: React.FC<HeaderProps> = ({
     <>
       <aside aria-label="Desktop navigation" className="fixed inset-y-0 left-0 z-40 hidden w-16 flex-col items-center justify-between border-r border-[var(--app-border-subtle)] bg-[var(--app-bg)] py-4 md:flex">
         <div className="flex w-full flex-col items-center gap-5">
-          <a href="/" aria-label="ACG home" title="ACG" className="flex h-10 w-10 items-center justify-center text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+          <a href="/" aria-label="ACG home" title="ACG" className="flex h-12 w-10 flex-col items-center justify-center gap-1 text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
             <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-current" aria-hidden="true">
               <span className="h-2 w-2 rounded-full bg-current" />
             </span>
+            <span className="font-brand text-[9px] leading-none" aria-hidden="true">ACG</span>
           </a>
 
           <nav aria-label="Primary" className="flex w-full flex-col items-center gap-1 px-2">
@@ -65,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
       <header className="fixed left-0 right-0 top-0 z-40 flex h-13 items-center justify-between border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)] px-4 text-[var(--app-text-primary)] md:hidden">
         <a href="/" aria-label="ACG home" className="flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
           <span className="h-5 w-5 rounded-full border-2 border-current" aria-hidden="true" />
-          <span className="text-sm font-semibold tracking-tight">ACG</span>
+          <span className="font-brand text-sm font-semibold tracking-tight">ACG</span>
         </a>
         <div className="flex items-center gap-1">
           <button type="button" onClick={onOpenShortcuts} aria-label="Open quick search" className={`${toolClass} h-9 w-9`}>

@@ -193,9 +193,10 @@
 @layer base {
   :root {
     /* Global Typography System (Part II) */
-    --font-heading: 'Murecho', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: 'Jungle Troubles', 'Caveat', cursive;
     --font-subheading: 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-body: 'SamsungOne', 'One UI Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-brand: 'Stretch Pro', Impact, 'Arial Narrow', sans-serif;
+    --font-body: 'Designer', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
     /* Quiet neutral surfaces */
     --c60-dominant: #100f0e;
@@ -369,11 +370,11 @@
     font-weight: 700 !important;
   }
 
-  /* Main & Section Headings: Murecho (800) */
+  /* Page headings use the requested brush script where licensed fonts are installed. */
   h1, h2, .heading-main, .hero-title, .page-title {
     font-family: var(--font-heading) !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.025em;
+    font-weight: 700 !important;
+    letter-spacing: 0;
     line-height: 1.15;
   }
 
@@ -519,6 +520,7 @@ html:not(.light) .border-\[\#1f242c\],
 .font-reenie { font-family: 'Reenie Beanie', cursive; }
 .font-modern-sans { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
 .font-sans-clean { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+.font-brand { font-family: var(--font-brand) !important; letter-spacing: 0.025em; }
 
 /* Tactile Surface Finishes */
 .card-noise, .surface-finish-grain {
@@ -905,9 +907,9 @@ html.light .studio-input:focus {
 }
 
 .canvas-editor .editor-top-toolbar .doc-title-input {
-  font-family: 'Newsreader', Georgia, serif !important;
+  font-family: var(--font-brand) !important;
   font-size: 15px !important;
-  font-weight: 400 !important;
+  font-weight: 600 !important;
   letter-spacing: 0 !important;
 }
 

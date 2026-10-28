@@ -51,7 +51,7 @@ export const AboutView: React.FC<TrustViewBaseProps> = () => {
             <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
               Studio Colophon &amp; Manifesto
             </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
+            <h1 className="font-brand text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
               Aesthetic Card Studio
             </h1>
             <p className="text-sm md:text-base leading-relaxed text-[var(--app-text-secondary)] max-w-2xl font-body">
