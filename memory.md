@@ -1,9 +1,10 @@
 # ACG — System Memory & Engineering Decisions (`memory.md`)
 
-## 1. Hosting & Deployment Mandate
+## 1. Hosting, Deployment & Git Mandate
 - **Production Target**: Cloudflare Pages (`https://aestheticcardgenerator.pages.dev/`).
 - **Deployment Command**: `npm run deploy` (which triggers `npm run pages:deploy` / `wrangler pages deploy dist --project-name aestheticcardgenerator`).
 - **Rule**: Never deploy to Vercel. `vercel.json` and `.vercel/` are permanently removed.
+- **Git Push Rule**: **NEVER run `git push`**. Never push code to GitHub or any remote repository. The user manages and pushes all commits to remote repositories manually.
 
 ## 2. Cloudflare Pages Trailing Slash Architecture
 - Cloudflare Pages standardizes URLs with canonical trailing slashes (`/canvas/`, `/create/`, `/templates/`).

@@ -29,8 +29,9 @@ Take the first option that fully works:
 
 Never cut: validation at trust boundaries, error handling that prevents data loss, security, accessibility, the calibration real hardware needs, anything the user asked for.
 
-## Deployment
+## Deployment & Git
 
-Always deploy to Cloudflare Pages (`npm run deploy` via Wrangler), never Vercel.
+- Always deploy to Cloudflare Pages (`npm run deploy` via Wrangler), never Vercel.
+- **NEVER run `git push`**: Never push code to GitHub or any remote repository. The user will handle all git pushes manually every time.
 
 (Yes, this file also applies to agents working on the ponytail repo itself. Especially to them.)
