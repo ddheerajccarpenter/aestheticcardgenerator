@@ -20,6 +20,7 @@ import {
   Type,
   Palette,
   Sparkles,
+  Pipette,
 } from 'lucide-react';
 import { ASSET_AVATARS } from '../data/canvasAssets';
 import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
@@ -30,6 +31,8 @@ import {
   registerAndSaveCustomFont,
   type StoredCustomFont,
 } from '../services/customFontManager';
+import { MyFontsModal } from '../components/MyFontsModal';
+import { pickColorWithEyedropper, extractPaletteFromImage } from '../utils/colorExtractor';
 
 export interface CreatorViewProps {
   initialTemplate?: CardTemplate;
@@ -218,11 +221,13 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
     return 'editorial';
   });
   const [customFonts, setCustomFonts] = useState<StoredCustomFont[]>([]);
+  const [fontModalOpen, setFontModalOpen] = useState(false);
+  const [extractedColors, setExtractedColors] = useState<string[]>([]);
   const fontFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadAllFontsFromIndexedDB().then(setCustomFonts);
-  }, []);
+  }, [fontModalOpen]);
 
   const handleUploadFont = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -236,6 +241,17 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
       showToast(err?.message || 'Failed to upload font');
     }
     e.target.value = '';
+  };
+
+  const handleExtractFromPhoto = async () => {
+    if (!avatar) return;
+    try {
+      const { palette } = await extractPaletteFromImage(avatar, 6);
+      setExtractedColors(palette);
+      showToast('Extracted color swatches from photo');
+    } catch {
+      showToast('Could not extract colors');
+    }
   };
   const [fontSize, setFontSize] = useState(initialTemplate?.fontSize || 26);
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>(() => initialTemplate?.align || 'left');
@@ -840,6 +856,70 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                   </button>
                 ))}
               </div>
+
+              {/* Custom Tone & Eyedropper Controls */}
+              <div className="mt-3 pt-2.5 border-t border-[var(--app-border-subtle)] flex flex-col gap-2">
+                <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-[var(--app-text-muted)]">
+                  <span>Custom Swatches</span>
+                  <div className="flex items-center gap-1.5">
+                    {avatar && (
+                      <button
+                        type="button"
+                        onClick={handleExtractFromPhoto}
+                        className="text-[10px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                        title="Extract 5 colors from photo"
+                      >
+                        Extract from Photo
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const picked = await pickColorWithEyedropper();
+                        if (picked) {
+                          setTemplatePalette({
+                            id: 'eyedropper-bg',
+                            name: 'Eyedropper Tone',
+                            bg: picked,
+                            ink: isLight ? '#1c1b18' : '#ffffff',
+                            badge: 'PICKED',
+                            surface: 'warm-nano-texture-matte',
+                          });
+                          showToast(`Applied ${picked}`);
+                        }
+                      }}
+                      className="px-1.5 py-0.5 rounded border border-[var(--app-border-subtle)] hover:bg-[var(--app-surface-secondary)] flex items-center gap-1 text-[10px] cursor-pointer"
+                      title="Sample any color from screen"
+                    >
+                      <Pipette className="w-2.5 h-2.5" /> Eyedropper
+                    </button>
+                  </div>
+                </div>
+
+                {extractedColors.length > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    {extractedColors.map((color, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setTemplatePalette({
+                            id: `extracted-${idx}`,
+                            name: `Photo Tone ${idx + 1}`,
+                            bg: color,
+                            ink: isLight ? '#1c1b18' : '#ffffff',
+                            badge: 'PHOTO',
+                            surface: 'warm-nano-texture-matte',
+                          });
+                        }}
+                        className="h-6 flex-1 rounded border border-current/20 hover:scale-105 transition-transform cursor-pointer"
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Content Group based on mode */}
@@ -989,20 +1069,29 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                   Typography &amp; Layout
                 </label>
-                <button
-                  type="button"
-                  onClick={() => fontFileInputRef.current?.click()}
-                  className="text-[11px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <Upload className="w-3 h-3" /> + Upload Font
-                </button>
-                <input
-                  ref={fontFileInputRef}
-                  type="file"
-                  accept=".woff2,.woff,.ttf,.otf"
-                  onChange={handleUploadFont}
-                  className="hidden"
-                />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFontModalOpen(true)}
+                    className="text-[11px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <Type className="w-3 h-3" /> Library
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fontFileInputRef.current?.click()}
+                    className="text-[11px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <Upload className="w-3 h-3" /> + Upload
+                  </button>
+                  <input
+                    ref={fontFileInputRef}
+                    type="file"
+                    accept=".woff2,.woff,.ttf,.otf"
+                    onChange={handleUploadFont}
+                    className="hidden"
+                  />
+                </div>
               </div>
 
               {/* Standard Fonts */}
@@ -1143,6 +1232,17 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           </div>
         </aside>
       </div>
+
+      <MyFontsModal
+        isOpen={fontModalOpen}
+        onClose={() => setFontModalOpen(false)}
+        onSelectFont={(fam) => {
+          setFontFamily(fam);
+          showToast(`Applied custom font`);
+        }}
+        selectedFontFamily={fontFamily}
+        theme={theme}
+      />
     </div>
   );
 };

@@ -135,6 +135,24 @@ export async function registerAndSaveCustomFont(file: File): Promise<StoredCusto
 }
 
 /**
+ * Deletes a font from IndexedDB and unregisters its FontFace from the document
+ */
+export async function removeCustomFont(fontId: string, familyName?: string): Promise<void> {
+  await deleteFontFromIndexedDB(fontId);
+  if (familyName && typeof document !== 'undefined' && document.fonts) {
+    try {
+      document.fonts.forEach((face) => {
+        if (face.family === familyName) {
+          document.fonts.delete(face);
+        }
+      });
+    } catch (err) {
+      console.warn('Could not unregister FontFace from document:', err);
+    }
+  }
+}
+
+/**
  * Initializes and restores all previously saved custom fonts on application boot
  */
 export async function restoreSavedCustomFonts(): Promise<StoredCustomFont[]> {
