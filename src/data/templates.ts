@@ -9,6 +9,9 @@ export const ASPECT_RATIOS: AspectRatioPreset[] = [
 ];
 
 export const PALETTE_PRESETS: CardTheme[] = [
+  // Cinematic Emulsion & Paper
+  { id: 'projection-room', name: 'Projection Room (Cinematic)', bg: '#191715', ink: '#efe6d8', border: '#48413a', category: 'editorial' },
+  { id: 'archival-paper', name: 'Archival Paper (Muted)', bg: '#f1ebdd', ink: '#292620', border: '#c9beaf', category: 'editorial' },
   // Editorial Classics
   { id: 'st-germain', name: 'St. Germain', bg: '#f4ede4', ink: '#2c2825', category: 'editorial' },
   { id: 'cambridge-cream', name: 'Cream Linen', bg: '#f5e9d4', ink: '#181d26', category: 'editorial' },

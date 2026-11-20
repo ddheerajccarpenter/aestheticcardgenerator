@@ -40,6 +40,7 @@ import {
   Moon,
 } from 'lucide-react';
 import { restoreSavedCustomFonts } from './services/customFontManager';
+import { AmbientAtmosphereLayer } from './components/AmbientAtmosphereLayer';
 
 export const App: React.FC = () => {
   // Current route path normalized without trailing slashes
@@ -72,7 +73,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f3efe7' : '#171512');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f1ebdd' : '#191715');
     if (theme === 'light') {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
@@ -303,6 +304,8 @@ export const App: React.FC = () => {
       data-theme={theme}
       className="app-shell min-h-screen flex flex-col font-sans transition-colors duration-200 relative text-[var(--app-text-primary)]"
     >
+      {/* Background Ambient Atmosphere (Scroll-Reactive) */}
+      {!isEditor && <AmbientAtmosphereLayer theme={theme} />}
       {/* Global Header (shown across public marketing pages, hidden on standalone fullscreen studio) */}
       {!isEditor && (
         <Header

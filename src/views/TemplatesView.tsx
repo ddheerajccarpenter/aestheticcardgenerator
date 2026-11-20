@@ -10,12 +10,15 @@ import {
   FilePlus,
   FileQuestion,
   Layers,
+  Sparkles,
 } from 'lucide-react';
 import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
 import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 import { getTemplateAspectRatio } from '../utils/templateAspectRatio';
 import { LazyTemplateCard } from '../components/LazyTemplateCard';
+import { getTemplateAmbientTones } from '../utils/templateAmbient';
+import { setAmbientTones, setAmbientEnabled, getAmbientState } from '../engines/ambientAtmosphere';
 
 interface TemplatesViewProps {
   onNavigate?: (path: string) => void;
@@ -43,6 +46,13 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedForCompare, setSelectedForCompare] = useState<CardTemplate[]>([]);
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
+  const [ambientEnabled, setAmbientEnabledState] = useState<boolean>(() => getAmbientState().enabled);
+
+  const toggleAmbient = () => {
+    const next = !ambientEnabled;
+    setAmbientEnabledState(next);
+    setAmbientEnabled(next);
+  };
 
   const toggleCompareTemplate = (tmpl: CardTemplate) => {
     setSelectedForCompare((prev) => {
@@ -106,6 +116,56 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
     });
   }, [activeCategory, searchQuery]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !ambientEnabled) return;
+
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length === 0) return;
+
+        const viewportCenter = window.innerHeight / 2;
+        let closest = visible[0];
+        let minDiff = Infinity;
+
+        for (const entry of visible) {
+          const rect = entry.boundingClientRect;
+          const cardCenter = rect.top + rect.height / 2;
+          const diff = Math.abs(cardCenter - viewportCenter);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closest = entry;
+          }
+        }
+
+        const templateId = closest.target.getAttribute('data-template-id');
+        if (!templateId) return;
+
+        const matched = filteredTemplates.find((t) => t.id === templateId);
+        if (!matched) return;
+
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          const tones = getTemplateAmbientTones(matched, isLight ? 'light' : 'dark');
+          setAmbientTones(tones);
+        }, 120);
+      },
+      {
+        rootMargin: '-20% 0px -20% 0px',
+        threshold: [0.15, 0.45, 0.75],
+      }
+    );
+
+    const cards = document.querySelectorAll('.template-ambient-card');
+    cards.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+      if (timer) clearTimeout(timer);
+    };
+  }, [filteredTemplates, isLight, ambientEnabled]);
+
   return (
     <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 text-[var(--app-text-primary)] transition-colors duration-200">
       <div className="studio-container flex flex-col gap-8 sm:gap-10">
@@ -162,8 +222,24 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
               )}
             </div>
 
-            <div className="shrink-0 text-xs text-[var(--app-text-secondary)] font-subheading" aria-live="polite">
-              <strong className="text-[var(--app-text-primary)]">{filteredTemplates.length}</strong> of {PRESET_TEMPLATES.length} designs
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={toggleAmbient}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-colors cursor-pointer ${
+                  ambientEnabled
+                    ? 'border-[var(--app-accent)] bg-[var(--app-accent)]/10 text-[var(--app-accent)] font-semibold'
+                    : 'border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] hover:text-[var(--app-text-primary)]'
+                }`}
+                title="Toggle scroll-reactive ambient lighting atmosphere"
+                aria-pressed={ambientEnabled}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Atmosphere: {ambientEnabled ? 'On' : 'Off'}</span>
+              </button>
+              <div className="shrink-0 text-xs text-[var(--app-text-secondary)] font-subheading" aria-live="polite">
+                <strong className="text-[var(--app-text-primary)]">{filteredTemplates.length}</strong> of {PRESET_TEMPLATES.length} designs
+              </div>
             </div>
           </div>
 
@@ -231,7 +307,8 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
               return (
                 <article
                   key={template.id}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors hover:border-[var(--app-border-strong)]"
+                  data-template-id={template.id}
+                  className="template-ambient-card group flex flex-col overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors hover:border-[var(--app-border-strong)]"
                 >
                   {/* Real Card Visual Artwork Preview (Unified with Archival Blueprint Lazy-Loading) */}
                   <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="m-2 overflow-hidden rounded-xl border border-[var(--app-border-subtle)]">

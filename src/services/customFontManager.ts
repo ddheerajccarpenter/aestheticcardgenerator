@@ -1,4 +1,5 @@
 // src/services/customFontManager.ts
+// Client-side Custom Font Subsystem with IndexedDB & FontFace API
 
 export interface StoredCustomFont {
   id: string;
@@ -11,11 +12,12 @@ export interface StoredCustomFont {
 const DB_NAME = 'AestheticCardStudioFontsDB';
 const STORE_NAME = 'custom_fonts';
 const DB_VERSION = 1;
+const MAX_FONT_SIZE_BYTES = 15 * 1024 * 1024; // 15MB limit
 
 function openFontsDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (!('indexedDB' in window)) {
-      reject(new Error('IndexedDB not supported'));
+      reject(new Error('IndexedDB is not supported in this browser environment.'));
       return;
     }
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -68,15 +70,50 @@ export async function deleteFontFromIndexedDB(id: string): Promise<void> {
 }
 
 /**
+ * Validates font file format, size, and header magic bytes.
+ */
+export function validateFontFile(file: File, buffer: ArrayBuffer): void {
+  const ext = file.name.split('.').pop()?.toLowerCase();
+  const validExtensions = ['ttf', 'otf', 'woff', 'woff2'];
+  if (!ext || !validExtensions.includes(ext)) {
+    throw new Error(`Unsupported font format ".${ext}". Please upload .woff2, .woff, .ttf, or .otf.`);
+  }
+
+  if (file.size > MAX_FONT_SIZE_BYTES) {
+    throw new Error(`Font file exceeds 15MB limit (${(file.size / (1024 * 1024)).toFixed(1)}MB).`);
+  }
+
+  if (buffer.byteLength < 4) {
+    throw new Error('Corrupted or invalid font file structure.');
+  }
+
+  // Check magic bytes
+  const bytes = new Uint8Array(buffer.slice(0, 4));
+  const isWoff2 = bytes[0] === 0x77 && bytes[1] === 0x4f && bytes[2] === 0x46 && bytes[3] === 0x32; // wOF2
+  const isWoff = bytes[0] === 0x77 && bytes[1] === 0x4f && bytes[2] === 0x46 && bytes[3] === 0x46;  // wOFF
+  const isTrueType = (bytes[0] === 0x00 && bytes[1] === 0x01 && bytes[2] === 0x00 && bytes[3] === 0x00) ||
+                     (bytes[0] === 0x74 && bytes[1] === 0x72 && bytes[2] === 0x75 && bytes[3] === 0x65); // 0x00010000 or 'true'
+  const isOpenType = bytes[0] === 0x4f && bytes[1] === 0x54 && bytes[2] === 0x54 && bytes[3] === 0x4f; // OTTO
+
+  if (!isWoff2 && !isWoff && !isTrueType && !isOpenType) {
+    throw new Error('Unrecognized font signature. Please ensure the file is an uncorrupted font.');
+  }
+}
+
+/**
  * Registers an uploaded font file via the browser's FontFace API and saves to IndexedDB
  */
 export async function registerAndSaveCustomFont(file: File): Promise<StoredCustomFont> {
   const buffer = await file.arrayBuffer();
+  validateFontFile(file, buffer);
+
   const cleanName = file.name
     .replace(/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/, '')
-    .replace(/[-_]+/g, ' ')
-    .trim();
-  const familyName = `Custom_${cleanName.replace(/\s+/g, '_')}`;
+    .replace(/[^a-zA-Z0-9]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '') || 'CustomFont';
+
+  const familyName = `Custom_${cleanName}`;
 
   const fontFace = new FontFace(familyName, buffer, { style: 'normal', weight: '100 900' });
   const loadedFace = await fontFace.load();
@@ -86,7 +123,7 @@ export async function registerAndSaveCustomFont(file: File): Promise<StoredCusto
   }
 
   const record: StoredCustomFont = {
-    id: crypto.randomUUID(),
+    id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `cf_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     familyName,
     fileName: file.name,
     buffer,

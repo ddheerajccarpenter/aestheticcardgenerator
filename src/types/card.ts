@@ -68,6 +68,11 @@ export interface CardTemplate {
   surfaceFinish?: SurfaceFinish;
   textureIntensity?: number;
   isHolographic?: boolean;
+  ambient?: {
+    primary: string;
+    secondary: string;
+    neutral: string;
+  };
 }
 
 export interface CardState {

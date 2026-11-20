@@ -18,6 +18,11 @@ import {
   DEFAULT_CANVAS_FONT_FAMILY,
   resolveCanvasFontFamily,
 } from '../utils/canvasBuilder';
+import {
+  loadAllFontsFromIndexedDB,
+  registerAndSaveCustomFont,
+  type StoredCustomFont,
+} from '../services/customFontManager';
 import { updatePageSEO } from '../utils/seo';
 import { toPng, toJpeg, toBlob } from 'html-to-image';
 import {
@@ -319,6 +324,31 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [customFonts, setCustomFonts] = useState<StoredCustomFont[]>([]);
+  const fontUploadInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    loadAllFontsFromIndexedDB().then(setCustomFonts);
+  }, []);
+
+  const handleCustomFontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const meta = await registerAndSaveCustomFont(file);
+      setCustomFonts((prev) => [meta, ...prev.filter((f) => f.familyName !== meta.familyName)]);
+      if (selectedId) {
+        updateObject(selectedId, { fontFamily: meta.familyName });
+      }
+      setToastMessage(`Font "${meta.familyName.replace('Custom_', '').replace(/_/g, ' ')}" registered`);
+      setTimeout(() => setToastMessage(null), 3000);
+    } catch (err: any) {
+      setToastMessage(err?.message || 'Failed to upload font');
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+    e.target.value = '';
+  };
 
   // Template Picker Search & Filter State
   const [templateSearchQuery, setTemplateSearchQuery] = useState('');
@@ -1338,6 +1368,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         // Avoid external font stylesheet reads that can stall canvas downloads.
         skipFonts: true,
       };
+
+      if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
 
       let dataUrl: string;
       const isUltra = format === '4k' || format === '8k' || format === '16k';
@@ -3341,7 +3375,23 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                       {/* Font Family */}
                       <div className="flex flex-col gap-1">
-                        <label className="text-[11px] text-[#81786d]">Font Family</label>
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] text-[#81786d]">Font Family</label>
+                          <button
+                            type="button"
+                            onClick={() => fontUploadInputRef.current?.click()}
+                            className="text-[10px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                          >
+                            <Upload className="w-2.5 h-2.5" /> + Upload
+                          </button>
+                          <input
+                            ref={fontUploadInputRef}
+                            type="file"
+                            accept=".woff2,.woff,.ttf,.otf"
+                            onChange={handleCustomFontUpload}
+                            className="hidden"
+                          />
+                        </div>
                         <select
                           value={resolveCanvasFontFamily(selectedObject.fontFamily)}
                           onChange={(e) => updateObject(selectedObject.id, { fontFamily: e.target.value })}
@@ -3354,6 +3404,15 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           <option value="'Playfair Display', Georgia, serif">Playfair Display (Display Serif)</option>
                           <option value="'JetBrains Mono', monospace">JetBrains Mono (Technical)</option>
                           <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Geometric)</option>
+                          {customFonts.length > 0 && (
+                            <optgroup label="Uploaded Custom Fonts">
+                              {customFonts.map((f) => (
+                                <option key={f.familyName} value={f.familyName}>
+                                  {f.familyName.replace('Custom_', '').replace(/_/g, ' ')}
+                                </option>
+                              ))}
+                            </optgroup>
+                          )}
                         </select>
                       </div>
 

@@ -25,6 +25,11 @@ import { ASSET_AVATARS } from '../data/canvasAssets';
 import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
 import { ThreeDPreviewControls } from '../components/ThreeDPreviewControls';
 import { getBrandedExportFilename, triggerBrandedBlobDownload } from '../engines/brandedExportAndThreePng';
+import {
+  loadAllFontsFromIndexedDB,
+  registerAndSaveCustomFont,
+  type StoredCustomFont,
+} from '../services/customFontManager';
 
 export interface CreatorViewProps {
   initialTemplate?: CardTemplate;
@@ -207,11 +212,31 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
   const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>(() => getTemplateRatio(initialTemplate));
 
   // Typography & Appearance
-  const [fontFamily, setFontFamily] = useState<'editorial' | 'sans' | 'mono'>(() => {
+  const [fontFamily, setFontFamily] = useState<string>(() => {
     if (['mono', 'space-mono', 'pixel'].includes(initialTemplate?.font || '')) return 'mono';
     if (['sans', 'syne', 'space-grotesk', 'unbounded'].includes(initialTemplate?.font || '')) return 'sans';
     return 'editorial';
   });
+  const [customFonts, setCustomFonts] = useState<StoredCustomFont[]>([]);
+  const fontFileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    loadAllFontsFromIndexedDB().then(setCustomFonts);
+  }, []);
+
+  const handleUploadFont = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const meta = await registerAndSaveCustomFont(file);
+      setCustomFonts((prev) => [meta, ...prev.filter((f) => f.familyName !== meta.familyName)]);
+      setFontFamily(meta.familyName);
+      showToast(`Font "${meta.familyName.replace('Custom_', '').replace(/_/g, ' ')}" registered`);
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to upload font');
+    }
+    e.target.value = '';
+  };
   const [fontSize, setFontSize] = useState(initialTemplate?.fontSize || 26);
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>(() => initialTemplate?.align || 'left');
 
@@ -349,6 +374,9 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
     if (!cardRef.current) return;
     setIsExporting(true);
     try {
+      if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 2,
         cacheBust: true,
@@ -648,10 +676,13 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                             ? 'font-editorial'
                             : fontFamily === 'mono'
                             ? 'font-mono'
+                            : fontFamily.startsWith('Custom_')
+                            ? ''
                             : 'font-sans font-medium'
                         }`}
                         style={{
                           textAlign,
+                          fontFamily: fontFamily.startsWith('Custom_') ? fontFamily : undefined,
                           fontSize: `${quote.length > 180 ? Math.max(13, Math.floor(fontSize * Math.sqrt(180 / quote.length))) : fontSize}px`,
                         }}
                       >
@@ -954,9 +985,27 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
             {/* Typography & Alignment Group */}
             <div className={`pt-2 border-t border-[var(--app-border-subtle)] flex flex-col gap-3.5 ${mobileTab === 'type' ? 'block' : 'hidden md:block'}`}>
-              <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                Typography &amp; Layout
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                  Typography &amp; Layout
+                </label>
+                <button
+                  type="button"
+                  onClick={() => fontFileInputRef.current?.click()}
+                  className="text-[11px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <Upload className="w-3 h-3" /> + Upload Font
+                </button>
+                <input
+                  ref={fontFileInputRef}
+                  type="file"
+                  accept=".woff2,.woff,.ttf,.otf"
+                  onChange={handleUploadFont}
+                  className="hidden"
+                />
+              </div>
+
+              {/* Standard Fonts */}
               <div className="grid grid-cols-3 gap-1.5 text-xs">
                 <button
                   onClick={() => setFontFamily('editorial')}
@@ -988,6 +1037,61 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 >
                   Mono
                 </button>
+              </div>
+
+              {/* Custom Uploaded Fonts */}
+              {customFonts.length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--app-text-muted)]">
+                    My Uploaded Fonts ({customFonts.length})
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {customFonts.map((font) => (
+                      <button
+                        key={font.familyName}
+                        type="button"
+                        onClick={() => setFontFamily(font.familyName)}
+                        style={{ fontFamily: font.familyName }}
+                        className={`px-2 py-1 text-xs rounded-md border truncate max-w-[140px] cursor-pointer transition-colors ${
+                          fontFamily === font.familyName
+                            ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-medium'
+                            : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
+                        }`}
+                        title={font.familyName}
+                      >
+                        {font.familyName.replace('Custom_', '').replace(/_/g, ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Text Presets */}
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--app-text-muted)]">
+                  Presets
+                </span>
+                <div className="grid grid-cols-4 gap-1">
+                  {[
+                    { label: 'Editorial', font: 'editorial', size: 26, align: 'left' as const },
+                    { label: 'Minimal', font: 'sans', size: 20, align: 'left' as const },
+                    { label: 'Technical', font: 'mono', size: 18, align: 'left' as const },
+                    { label: 'Poetic', font: 'editorial', size: 24, align: 'center' as const },
+                  ].map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => {
+                        setFontFamily(preset.font);
+                        setFontSize(preset.size);
+                        setTextAlign(preset.align);
+                      }}
+                      className="py-1 text-[10px] font-mono uppercase rounded border border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)] transition-colors cursor-pointer text-center"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {mode === 'quote' && (
