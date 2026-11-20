@@ -9,9 +9,6 @@ export const ASPECT_RATIOS: AspectRatioPreset[] = [
 ];
 
 export const PALETTE_PRESETS: CardTheme[] = [
-  // Cinematic Emulsion & Paper
-  { id: 'projection-room', name: 'Projection Room (Cinematic)', bg: '#191715', ink: '#efe6d8', border: '#48413a', category: 'editorial' },
-  { id: 'archival-paper', name: 'Archival Paper (Muted)', bg: '#f1ebdd', ink: '#292620', border: '#c9beaf', category: 'editorial' },
   // Editorial Classics
   { id: 'st-germain', name: 'St. Germain', bg: '#f4ede4', ink: '#2c2825', category: 'editorial' },
   { id: 'cambridge-cream', name: 'Cream Linen', bg: '#f5e9d4', ink: '#181d26', category: 'editorial' },
@@ -39,6 +36,9 @@ export const PALETTE_PRESETS: CardTheme[] = [
   { id: 'vip-lanyard', name: 'VIP Obsidian Cyan', bg: '#101216', ink: '#22d3ee', category: 'badge' },
   { id: 'slate-editorial', name: 'Swiss Slate & Champagne', bg: '#0e1014', ink: '#f1f0ec', border: '#2d323c', category: 'editorial' },
   { id: 'high-tech-bone', name: 'High-Tech Editorial Bone', bg: '#15181e', ink: '#e2d9c8', border: '#383e4c', category: 'editorial' },
+  // Cinematic Emulsion & Paper
+  { id: 'projection-room', name: 'Projection Room (Cinematic)', bg: '#191715', ink: '#efe6d8', border: '#48413a', category: 'editorial' },
+  { id: 'archival-paper', name: 'Archival Paper (Muted)', bg: '#f1ebdd', ink: '#292620', border: '#c9beaf', category: 'editorial' },
 ];
 
 const ORIGINAL_TEMPLATES: CardTemplate[] = [
