@@ -132,3 +132,22 @@ Based on `Px and other things.mp4`:
 - Verified header magic bytes, 15MB file size limit, and IndexedDB persistence.
 - Added curated typography presets (Editorial, Minimal, Technical, Poetic).
 - Synchronized image exports with `document.fonts.ready` to ensure clean typography rendering.
+
+---
+
+## 5. Phase 2: Font Library Manager, Advanced Typography & Image Palette Extraction
+
+### 5.1 My Fonts Manager Modal (`MyFontsModal.tsx`)
+- Provides a compact, non-blocking modal in both Card Creator and Canvas Studio.
+- Displays installed custom fonts with preview rendered in the exact custom font.
+- Supports editable sample text, search filtering, font deletion (`removeCustomFont`), and one-click application to active text layers.
+
+### 5.2 Color Extraction & Eyedropper (`colorExtractor.ts`)
+- Client-side offscreen canvas image downsampling and color grouping extracts top 5 distinct tones from photos.
+- Integrated native `EyeDropper` API allows instant sampling from screen without external plugins.
+- Photo layers in Canvas Studio include a "Palette" action allowing instant canvas background recoloring.
+
+### 5.3 Advanced Typography Controls in Canvas Studio
+- Added live line-height (`lineHeight`) and letter-spacing (`letterSpacing`) sliders.
+- Added case transformation controls (`Aa`, `AA`, `aa`).
+- Retained full export fidelity with Retina PNG/JPEG/WebP downloads.

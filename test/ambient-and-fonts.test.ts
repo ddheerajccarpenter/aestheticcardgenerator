@@ -73,5 +73,18 @@ assert.throws(
   /Unrecognized font signature/i
 );
 
-console.log('✓ Custom font validation rules (format, size limits) verified.');
+// Valid magic byte signatures test
+const woff2Header = new Uint8Array([0x77, 0x4f, 0x46, 0x32, 0, 0, 0, 0]).buffer;
+const woff2File = new File([new Blob([new Uint8Array(100)])], 'inter.woff2');
+assert.doesNotThrow(() => validateFontFile(woff2File, woff2Header), 'Valid woff2 header must pass');
+
+const ttfHeader = new Uint8Array([0x00, 0x01, 0x00, 0x00, 0, 0, 0, 0]).buffer;
+const ttfFile = new File([new Blob([new Uint8Array(100)])], 'roboto.ttf');
+assert.doesNotThrow(() => validateFontFile(ttfFile, ttfHeader), 'Valid ttf header must pass');
+
+const otfHeader = new Uint8Array([0x4f, 0x54, 0x54, 0x4f, 0, 0, 0, 0]).buffer;
+const otfFile = new File([new Blob([new Uint8Array(100)])], 'playfair.otf');
+assert.doesNotThrow(() => validateFontFile(otfFile, otfHeader), 'Valid otf header must pass');
+
+console.log('✓ Custom font validation rules (format, size limits, and magic byte signatures) verified.');
 console.log('All Ambient Atmosphere, Font Engine & 70 Templates tests passed!');

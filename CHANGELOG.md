@@ -2,6 +2,26 @@
 
 All notable changes to the Aesthetic Card Generator (ACG) project are documented in this file.
 
+## [2.3.0] - 2026-11-20
+
+### Added
+- **"My Fonts" Font Library Manager (`MyFontsModal.tsx`)**:
+  - Full-featured compact font manager dialog in both Card Creator and Canvas Studio.
+  - Search/filter custom fonts by name or filename.
+  - Live preview with editable sample text rendered in the exact custom font.
+  - Font deletion with FontFace unregistration and IndexedDB cleanup (`removeCustomFont`).
+  - Direct font application to active text layers.
+- **Client-Side Color Extraction & Eyedropper Subsystem (`colorExtractor.ts`)**:
+  - Fast, client-side offscreen canvas palette extractor deriving 5 visually distinct swatches from uploaded images and avatars.
+  - Native browser `EyeDropper` API integration allowing one-click sampling from any visible pixel on screen.
+  - One-click palette extraction from photo layers in Canvas Studio to instantly recolor the canvas background.
+- **Advanced Typography Controls**:
+  - Live line height (`lineHeight`, 0.9x to 2.5x) and letter spacing (`letterSpacing`, -2px to +12px) range sliders for text layers.
+  - Instant text case transformations (`normal`, `uppercase`, `lowercase`).
+  - Double-click in-place text editing on canvas with retained typography properties.
+- **70-Template Audit Manifest (`template_audit_manifest.md`)**:
+  - Complete, itemized table of all 70 templates documenting typography, palette, ambient signatures, safe padding verification, and export capabilities.
+
 ## [2.2.0] - 2026-11-20
 
 ### Added

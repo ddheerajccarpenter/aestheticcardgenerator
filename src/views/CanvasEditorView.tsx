@@ -23,6 +23,8 @@ import {
   registerAndSaveCustomFont,
   type StoredCustomFont,
 } from '../services/customFontManager';
+import { MyFontsModal } from '../components/MyFontsModal';
+import { pickColorWithEyedropper, extractPaletteFromImage } from '../utils/colorExtractor';
 import { updatePageSEO } from '../utils/seo';
 import { toPng, toJpeg, toBlob } from 'html-to-image';
 import {
@@ -76,6 +78,7 @@ import {
   Search,
   X,
   Maximize2,
+  Pipette,
 } from 'lucide-react';
 import { processImageFilter } from '../utils/imageFilters';
 import { generateQrCodeSvg, generateBarcodeSvg } from '../utils/qrBarcodeGenerator';
@@ -326,11 +329,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [customFonts, setCustomFonts] = useState<StoredCustomFont[]>([]);
+  const [fontModalOpen, setFontModalOpen] = useState(false);
+  const [extractedImageColors, setExtractedImageColors] = useState<string[]>([]);
   const fontUploadInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadAllFontsFromIndexedDB().then(setCustomFonts);
-  }, []);
+  }, [fontModalOpen]);
 
   const handleCustomFontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -3377,13 +3382,22 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center justify-between">
                           <label className="text-[11px] text-[#81786d]">Font Family</label>
-                          <button
-                            type="button"
-                            onClick={() => fontUploadInputRef.current?.click()}
-                            className="text-[10px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
-                          >
-                            <Upload className="w-2.5 h-2.5" /> + Upload
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setFontModalOpen(true)}
+                              className="text-[10px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <Type className="w-2.5 h-2.5" /> Library
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => fontUploadInputRef.current?.click()}
+                              className="text-[10px] font-mono text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <Upload className="w-2.5 h-2.5" /> + Upload
+                            </button>
+                          </div>
                           <input
                             ref={fontUploadInputRef}
                             type="file"
@@ -3452,9 +3466,37 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         </div>
                       </div>
 
+                      {/* Line Height & Letter Spacing */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] text-[#81786d]">Line Height ({selectedObject.lineHeight || 1.3})</label>
+                          <input
+                            type="range"
+                            min={0.9}
+                            max={2.5}
+                            step={0.05}
+                            value={selectedObject.lineHeight || 1.3}
+                            onChange={(e) => updateObject(selectedObject.id, { lineHeight: Number(e.target.value) })}
+                            className="w-full accent-[var(--app-accent)]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] text-[#81786d]">Letter Spacing ({selectedObject.letterSpacing || 0}px)</label>
+                          <input
+                            type="range"
+                            min={-2}
+                            max={12}
+                            step={0.5}
+                            value={selectedObject.letterSpacing || 0}
+                            onChange={(e) => updateObject(selectedObject.id, { letterSpacing: Number(e.target.value) })}
+                            className="w-full accent-[var(--app-accent)]"
+                          />
+                        </div>
+                      </div>
+
                       {/* Color & Alignment */}
                       <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           <label className="text-[11px] text-[#81786d]">Color</label>
                           <input
                             type="color"
@@ -3462,6 +3504,17 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             onChange={(e) => updateObject(selectedObject.id, { color: e.target.value })}
                             className="w-7 h-7 rounded-lg border border-transparent cursor-pointer"
                           />
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              const picked = await pickColorWithEyedropper();
+                              if (picked) updateObject(selectedObject.id, { color: picked });
+                            }}
+                            className="p-1.5 rounded border border-current/15 hover:bg-current/10 cursor-pointer"
+                            title="Sample screen color with eyedropper"
+                          >
+                            <Pipette className="w-3 h-3 text-[#81786d]" />
+                          </button>
                         </div>
 
                         <div className="flex items-center gap-1 border rounded-lg p-0.5 border-[#39342d]/40">
@@ -3471,7 +3524,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               onClick={() => updateObject(selectedObject.id, { align })}
                               className={`px-2 py-1 rounded text-[11px] font-semibold capitalize transition-colors cursor-pointer ${
                                 selectedObject.align === align
-                                  ? isLight
+                                    ? isLight
                                     ? 'bg-[var(--app-accent)] text-white'
                                     : 'bg-[#29251f] text-white'
                                   : 'text-[#81786d]'
@@ -3483,16 +3536,34 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         </div>
                       </div>
 
-                      {/* Italic Toggle */}
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#81786d]">Italic Style</span>
+                      {/* Text Case & Italic */}
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-current/10">
+                        <div className="flex items-center gap-1">
+                          <span className="text-[11px] text-[#81786d] mr-1">Case:</span>
+                          {(['normal', 'uppercase', 'lowercase'] as const).map((c) => (
+                            <button
+                              key={c}
+                              type="button"
+                              onClick={() => {
+                                let newText = selectedObject.text;
+                                if (c === 'uppercase') newText = selectedObject.text.toUpperCase();
+                                else if (c === 'lowercase') newText = selectedObject.text.toLowerCase();
+                                updateObject(selectedObject.id, { text: newText });
+                              }}
+                              className="px-1.5 py-0.5 rounded border border-current/15 text-[10px] font-mono hover:bg-current/10 cursor-pointer"
+                            >
+                              {c === 'normal' ? 'Aa' : c === 'uppercase' ? 'AA' : 'aa'}
+                            </button>
+                          ))}
+                        </div>
                         <button
+                          type="button"
                           onClick={() =>
                             updateObject(selectedObject.id, {
                               fontStyle: selectedObject.fontStyle === 'italic' ? 'normal' : 'italic',
                             })
                           }
-                          className={`px-3 py-1 rounded-lg border text-xs font-semibold cursor-pointer ${
+                          className={`px-2.5 py-1 rounded-lg border text-xs font-semibold cursor-pointer ${
                             selectedObject.fontStyle === 'italic'
                               ? 'bg-[#E2D9C8] text-[#24211b] border-[#E2D9C8]'
                               : isLight
@@ -3500,7 +3571,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               : 'border-[#39342d]'
                           }`}
                         >
-                          {selectedObject.fontStyle === 'italic' ? 'Italic Active' : 'Normal'}
+                          {selectedObject.fontStyle === 'italic' ? 'Italic' : 'Normal'}
                         </button>
                       </div>
                     </div>
@@ -3529,8 +3600,51 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             <Upload className="w-3 h-3" />
                             <span>Replace</span>
                           </button>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const { palette } = await extractPaletteFromImage(selectedObject.src, 5);
+                                setExtractedImageColors(palette);
+                                setToastMessage(`Extracted ${palette.length} colors from photo`);
+                                setTimeout(() => setToastMessage(null), 3000);
+                              } catch {
+                                setToastMessage('Could not extract colors');
+                                setTimeout(() => setToastMessage(null), 3000);
+                              }
+                            }}
+                            className="text-[11px] font-semibold text-[var(--app-text-secondary)] hover:underline cursor-pointer flex items-center gap-1"
+                            title="Extract 5 colors from this photo to apply to canvas"
+                          >
+                            <Pipette className="w-3 h-3" />
+                            <span>Palette</span>
+                          </button>
                         </div>
                       </div>
+
+                      {extractedImageColors.length > 0 && (
+                        <div className="p-2.5 rounded-xl border border-current/15 bg-current/5 flex flex-col gap-1.5">
+                          <span className="text-[10px] font-mono opacity-70 uppercase tracking-wider">
+                            Extracted Photo Colors (Click to set canvas bg)
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            {extractedImageColors.map((col, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => {
+                                  commitDocumentChange({ ...doc, background: col });
+                                  setToastMessage(`Background updated to ${col}`);
+                                  setTimeout(() => setToastMessage(null), 3000);
+                                }}
+                                className="h-6 flex-1 rounded border border-current/20 hover:scale-105 transition-transform cursor-pointer"
+                                style={{ backgroundColor: col }}
+                                title={`Set canvas background to ${col}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {/* One-Click Aesthetic Filters */}
                       <div className="flex flex-col gap-1.5">
@@ -5040,6 +5154,20 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           </div>
         </div>
       )}
+
+      <MyFontsModal
+        isOpen={fontModalOpen}
+        onClose={() => setFontModalOpen(false)}
+        onSelectFont={(fam) => {
+          if (selectedId) {
+            updateObject(selectedId, { fontFamily: fam });
+            setToastMessage('Applied custom font to layer');
+            setTimeout(() => setToastMessage(null), 3000);
+          }
+        }}
+        selectedFontFamily={selectedObject?.type === 'text' ? selectedObject.fontFamily : undefined}
+        theme={isLight ? 'light' : 'dark'}
+      />
     </div>
   );
 };

@@ -81,3 +81,13 @@
 - Persisted in browser IndexedDB database `AestheticCardStudioFontsDB` (store: `fonts`).
 - Dynamically registers `@font-face` rules on document on boot and upload.
 - Prior to canvas/HTML rasterization (`toPng`, `toJpeg`), export functions must await `document.fonts.ready` to ensure uploaded typography is cleanly embedded in downloaded assets.
+
+## 9. Color Extraction & Eyedropper API Architecture
+- `src/utils/colorExtractor.ts` provides offline canvas-based palette extraction (`extractPaletteFromImage`) using 64x64 offscreen canvas downsampling and Euclidean color distance grouping.
+- Browser-native `EyeDropper` API (`window.EyeDropper`) is used when supported with non-blocking error handling fallback.
+- Extracted swatches and eyedropper values integrate seamlessly into Card Creator palettes and Canvas Studio document background/layer fills.
+
+## 10. Complete 70-Template Audit & Verification
+- Total template inventory: 70 templates across `src/data/templates.ts` (22) and `src/data/extendedTemplates.ts` (48).
+- Full audit manifest stored in `template_audit_manifest.md`.
+- All templates verified for safe padding, unique IDs, non-empty titles, custom font support, and Retina export fidelity.
