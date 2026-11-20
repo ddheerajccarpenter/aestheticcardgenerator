@@ -45,5 +45,7 @@ dist-ssr
 !page.md
 !AGENTS.md
 !README.md
+!SECURITY.md
+!template_audit_manifest.md
 
 

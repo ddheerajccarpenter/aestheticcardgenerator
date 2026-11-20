@@ -26,6 +26,18 @@ import {
 import { MyFontsModal } from '../components/MyFontsModal';
 import { pickColorWithEyedropper, extractPaletteFromImage } from '../utils/colorExtractor';
 import { updatePageSEO } from '../utils/seo';
+import {
+  sanitizeAndValidateCanvasDocument,
+  safeJsonParse,
+} from '../services/schemaValidator';
+import {
+  validateAndSanitizeImageFile,
+  dataUrlToBlob,
+} from '../services/imageSecurity';
+import {
+  safeLocalStorageGet,
+  safeLocalStorageSet,
+} from '../services/storageManager';
 import { toPng, toJpeg, toBlob } from 'html-to-image';
 import {
   Type,
@@ -185,27 +197,28 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     }
 
     if (!isBlank) {
-      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+      const saved = safeLocalStorageGet(STORAGE_KEY) || safeLocalStorageGet(LEGACY_STORAGE_KEY);
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
-          if (parsed && Array.isArray(parsed.objects) && parsed.objects.length > 0) {
+          const parsed = safeJsonParse(saved);
+          const sanitized = sanitizeAndValidateCanvasDocument(parsed);
+          if (sanitized && sanitized.objects.length > 0) {
             // Check if draft was collapsed by the previous dimension compounding bug
-            if (isDocumentCollapsed(parsed)) {
+            if (isDocumentCollapsed(sanitized)) {
               // Try to find the original template and restore it cleanly
               const matchedTemplate = PRESET_TEMPLATES.find(
                 (t) =>
-                  t.title.toLowerCase().trim() === parsed.title?.toLowerCase().trim() ||
-                  t.id === parsed.id
+                  t.title.toLowerCase().trim() === sanitized.title?.toLowerCase().trim() ||
+                  t.id === sanitized.id
               );
               if (matchedTemplate) {
                 return templateToCanvasDoc(matchedTemplate);
               }
               // Keep custom compositions intact. The collapse heuristic is only safe
               // when we can restore a known template with its original geometry.
-              return parsed;
+              return sanitized;
             }
-            return parsed;
+            return sanitized;
           }
         } catch {
           // ignore corrupted draft
@@ -246,8 +259,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // Saved Clips & Recycle Drawer (Leftover Item 6)
   const [savedClips, setSavedClips] = useState<CanvasObject[]>(() => {
     try {
-      const stored = localStorage.getItem('aesthetic_recycled_clips');
-      if (stored) return JSON.parse(stored);
+      const stored = safeLocalStorageGet('aesthetic_recycled_clips');
+      if (stored) {
+        const parsed = safeJsonParse<CanvasObject[]>(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch {
       // Fallback
     }
@@ -256,7 +272,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         id: 'clip-star-seal',
         name: '★ Holographic Pass Seal',
         type: 'shape',
-        shapeType: 'star',
+        shape: 'star',
         x: 40,
         y: 40,
         width: 64,
@@ -586,10 +602,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // Persist draft to localStorage (debounced)
   useEffect(() => {
     const timeout = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(doc));
-      } catch (err) {
-        console.warn('Storage quota exceeded or private mode:', err);
+      const res = safeLocalStorageSet(STORAGE_KEY, JSON.stringify(doc));
+      if (res.quotaExceeded) {
+        showToast('Storage quota reached. Consider removing high-res photos.');
       }
     }, 500);
     return () => clearTimeout(timeout);
@@ -1186,58 +1201,37 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // IMAGE UPLOAD HANDLER
   // ───────────────────────────────────────────────────────────────────────────
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.currentTarget.value = '';
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      showToast('Please select a valid image file (PNG, JPEG, WebP, SVG).');
-      return;
+    try {
+      const sanitized = await validateAndSanitizeImageFile(file);
+      const maxWidth = Math.min(docRef.current.canvasWidth * 0.45, 360);
+      const maxHeight = Math.min(docRef.current.canvasHeight * 0.6, 360);
+      const scale = Math.min(1, maxWidth / sanitized.width, maxHeight / sanitized.height);
+      const w = Math.max(1, Math.round(sanitized.width * scale));
+      const h = Math.max(1, Math.round(sanitized.height * scale));
+
+      const newImgObj = createImageObject(sanitized.safeDataUrl, {
+        name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || 'Uploaded Photo',
+        width: w,
+        height: h,
+        x: Math.round(docRef.current.canvasWidth / 2 - w / 2),
+        y: Math.round(docRef.current.canvasHeight / 2 - h / 2),
+        borderRadius: 12,
+      });
+
+      addObject(newImgObj);
+      showToast('Photo added to canvas!');
+    } catch (err: any) {
+      showToast(err?.message || 'Could not process image file.');
     }
-
-    if (file.size > 8 * 1024 * 1024) {
-      showToast('File size is too large (max 8MB). Please choose a smaller photo.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (!dataUrl) return;
-
-      const img = new Image();
-      img.onload = () => {
-        // Keep both wide and tall images inside a sensible first placement.
-        const maxWidth = Math.min(docRef.current.canvasWidth * 0.45, 360);
-        const maxHeight = Math.min(docRef.current.canvasHeight * 0.6, 360);
-        const scale = Math.min(1, maxWidth / img.naturalWidth, maxHeight / img.naturalHeight);
-        const w = Math.max(1, Math.round(img.naturalWidth * scale));
-        const h = Math.max(1, Math.round(img.naturalHeight * scale));
-
-        const newImgObj = createImageObject(dataUrl, {
-          name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || 'Uploaded Photo',
-          width: w,
-          height: h,
-          x: Math.round(docRef.current.canvasWidth / 2 - w / 2),
-          y: Math.round(docRef.current.canvasHeight / 2 - h / 2),
-          borderRadius: 12,
-        });
-
-        addObject(newImgObj);
-        showToast('Photo added to canvas!');
-      };
-      img.onerror = () => showToast('Could not open this image. Please try another file.');
-      img.src = dataUrl;
-    };
-    reader.onerror = () => {
-      showToast('Error reading image file. Please try another image.');
-    };
-    reader.readAsDataURL(file);
   };
 
   // In-Place Photo Replacement: Preserves all position coordinates, dimensions, rotation, clip masks, and z-index
-  const handleReplacePhotoInPlace = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleReplacePhotoInPlace = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const targetId = pendingReplaceLayerIdRef.current || selectedId;
     pendingReplaceLayerIdRef.current = null;
@@ -1247,41 +1241,19 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     const currentObj = docRef.current.objects.find((o) => o.id === targetId);
     if (!currentObj || currentObj.type !== 'image') return;
 
-    if (!file.type.startsWith('image/')) {
-      showToast('Please select a valid image file (PNG, JPEG, WebP, SVG).');
-      return;
+    try {
+      const sanitized = await validateAndSanitizeImageFile(file);
+      updateObject(targetId, {
+        src: sanitized.safeDataUrl,
+        filteredSrc: undefined,
+        naturalWidth: sanitized.width,
+        naturalHeight: sanitized.height,
+        name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || currentObj.name,
+      });
+      showToast('Photo replaced in-place while keeping layout intact!');
+    } catch (err: any) {
+      showToast(err?.message || 'Could not process image file.');
     }
-
-    if (file.size > 8 * 1024 * 1024) {
-      showToast('File size is too large (max 8MB). Please choose a smaller photo.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (!dataUrl) return;
-
-      const img = new Image();
-      img.onload = () => {
-        updateObject(targetId, {
-          src: dataUrl,
-          filteredSrc: undefined,
-          naturalWidth: img.naturalWidth || img.width,
-          naturalHeight: img.naturalHeight || img.height,
-          name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || currentObj.name,
-        });
-        showToast('Photo replaced in-place while keeping layout intact!');
-      };
-      img.onerror = () => {
-        showToast('Could not open this image. The current photo was kept.');
-      };
-      img.src = dataUrl;
-    };
-    reader.onerror = () => {
-      showToast('Error reading image file.');
-    };
-    reader.readAsDataURL(file);
   };
 
   // Offline AI Background Removal: Runs 100% locally via WASM/WebGPU with client-side chroma fallback
@@ -1399,16 +1371,23 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         isUltra ? (format.toUpperCase() as '4K' | '8K' | '16K') : undefined
       );
 
-      const exportBlob = await (await fetch(dataUrl)).blob();
+      const exportBlob = dataUrlToBlob(dataUrl);
       triggerBrandedBlobDownload(exportBlob, filename);
       if (actualFormat === 'webp') {
         window.setTimeout(() => URL.revokeObjectURL(dataUrl), 3000);
       }
 
       showToast(`Exported ${doc.title} (${Math.round(doc.canvasWidth * scale)}×${Math.round(doc.canvasHeight * scale)}px pure card isolate)!`);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Export failed:', err);
-      showToast('Export failed. Please try again.');
+      const msg = err?.message || String(err);
+      if (msg.includes('tainted') || msg.includes('CORS') || msg.includes('SecurityError')) {
+        showToast('Export blocked by cross-origin image. Try replacing external photos with uploaded files.');
+      } else if (msg.includes('memory') || msg.includes('allocation') || msg.includes('canvas')) {
+        showToast('Export exceeded browser memory limits. Try exporting at 2x or 4K instead.');
+      } else {
+        showToast('Export failed. Please try again.');
+      }
     } finally {
       setExporting(false);
     }

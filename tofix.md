@@ -151,3 +151,32 @@ Based on `Px and other things.mp4`:
 - Added live line-height (`lineHeight`) and letter-spacing (`letterSpacing`) sliders.
 - Added case transformation controls (`Aa`, `AA`, `aa`).
 - Retained full export fidelity with Retina PNG/JPEG/WebP downloads.
+
+---
+
+## 6. Phase 3: Application Security Audit, Bug Elimination & Architecture Hardening
+
+### 6.1 Content Security Policy & Edge Headers (`public/_headers`)
+- Configured edge Content Security Policy restricting execution to self and trusted font/image assets (`fonts.gstatic.com`, `openlibrary.org`, `itunes.apple.com`).
+- Disallowed plugin embeds (`object-src 'none'`) and eliminated clickjacking framing (`frame-ancestors 'none'` and `X-Frame-Options: DENY`).
+- Enforced `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy`.
+
+### 6.2 Prototype Pollution & Schema Validation (`schemaValidator.ts`)
+- Implemented recursive `isPrototypePolluted` detector blocking `__proto__`, `constructor`, and `prototype` payloads.
+- Implemented `safeJsonParse` with property stripping reviver.
+- Implemented `sanitizeAndValidateCanvasDocument` clamping dimensions (100–16384px), limiting layers to 500 max, and restricting image URLs to safe protocols.
+- Implemented `sanitizeAndValidateCardState` clamping string lengths and validating CSS colors.
+
+### 6.3 Image Security & SVG Sanitization (`imageSecurity.ts`)
+- Implemented 10MB file size ceiling and binary magic byte checks (PNG, JPEG, GIF, WebP, AVIF).
+- Implemented `sanitizeSvgMarkup` stripping all `<script>`, `<foreignObject>`, `<iframe>`, inline `on*` event handlers, and `javascript:` URIs.
+- Decompression bomb protection restricting dimensions to 16,384px and 67.1MP.
+- Memory-safe `dataUrlToBlob` converter replacing network-dependent `fetch(dataUrl)`.
+
+### 6.4 Storage Resilience & Error Recovery (`storageManager.ts`)
+- Trapped `QuotaExceededError` with automatic stale cache pruning.
+- Protected all storage reads/writes against private browsing mode security exceptions.
+
+### 6.5 Automated Security Verification (`test/security-hardening.test.ts`)
+- Added 5 test suites to `npm test` verifying prototype pollution resilience, schema bounds clamping, image/SVG sanitization, and header enforcement.
+- Created `SECURITY.md` establishing threat model and disclosure policy.

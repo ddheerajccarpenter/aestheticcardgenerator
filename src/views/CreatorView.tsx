@@ -33,6 +33,7 @@ import {
 } from '../services/customFontManager';
 import { MyFontsModal } from '../components/MyFontsModal';
 import { pickColorWithEyedropper, extractPaletteFromImage } from '../utils/colorExtractor';
+import { validateAndSanitizeImageFile, dataUrlToBlob } from '../services/imageSecurity';
 
 export interface CreatorViewProps {
   initialTemplate?: CardTemplate;
@@ -398,27 +399,33 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
         cacheBust: true,
         skipFonts: true,
       });
-      const blob = await (await fetch(dataUrl)).blob();
+      const blob = dataUrlToBlob(dataUrl);
       triggerBrandedBlobDownload(blob, getBrandedExportFilename('png'));
       showToast('Exported Retina PNG');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to export card image:', err);
-      showToast('Export failed. Please try again.');
+      const msg = err?.message || String(err);
+      if (msg.includes('tainted') || msg.includes('CORS') || msg.includes('SecurityError')) {
+        showToast('Export blocked by cross-origin image. Try replacing photo with an upload.');
+      } else {
+        showToast('Export failed. Please try again.');
+      }
     } finally {
       setIsExporting(false);
     }
   };
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setAvatar(event.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+    e.target.value = '';
+    if (!file) return;
+
+    try {
+      const sanitized = await validateAndSanitizeImageFile(file);
+      setAvatar(sanitized.safeDataUrl);
+      showToast('Avatar updated!');
+    } catch (err: any) {
+      showToast(err?.message || 'Could not process avatar image.');
     }
   };
 

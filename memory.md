@@ -91,3 +91,12 @@
 - Total template inventory: 70 templates across `src/data/templates.ts` (22) and `src/data/extendedTemplates.ts` (48).
 - Full audit manifest stored in `template_audit_manifest.md`.
 - All templates verified for safe padding, unique IDs, non-empty titles, custom font support, and Retina export fidelity.
+
+## 11. Application Security & Zero-Backend Trust Boundaries
+- **Content Security Policy (`public/_headers`)**: Enforces strict CSP with `frame-ancestors 'none'`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `object-src 'none'`.
+- **Zero-Backend Architecture**: 100% of data remains within the client's browser. No remote database or credentials.
+- **Prototype Pollution Defense (`src/services/schemaValidator.ts`)**: `isPrototypePolluted` detector and `safeJsonParse` reviver strip `__proto__` and `constructor` attacks.
+- **Schema Boundaries**: `sanitizeAndValidateCanvasDocument` caps dimensions at 16,384px, objects at 500 layers, and restricts image URLs to safe protocols.
+- **Image & SVG Sanitization (`src/services/imageSecurity.ts`)**: Enforces 10MB ceiling, validates binary magic bytes (PNG, JPEG, GIF, WebP, AVIF), and strips SVG script/event handler vectors via `sanitizeSvgMarkup`.
+- **Storage Quota Resilience (`src/services/storageManager.ts`)**: `safeLocalStorageSet` intercepts `QuotaExceededError` and prunes stale cache keys automatically.
+- **Memory-Safe Exports**: `dataUrlToBlob` performs direct Base64-to-Blob decoding bypassing WebKit/Safari `fetch(dataUrl)` length limits.

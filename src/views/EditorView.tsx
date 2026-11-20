@@ -8,6 +8,20 @@ import { parseRichText } from '../utils/richText';
 import { MediaImportModal, type MediaResult } from '../components/MediaImportModal';
 import { renderCardWithBackdrop, type BackdropSurface, type BackdropRatio } from '../utils/backdropExport';
 import {
+  sanitizeAndValidateCardState,
+  safeJsonParse,
+  sanitizeColor,
+} from '../services/schemaValidator';
+import {
+  validateAndSanitizeImageFile,
+} from '../services/imageSecurity';
+import {
+  safeLocalStorageGet,
+  safeLocalStorageSet,
+  safeLocalStorageRemove,
+  safeSessionStorageGet,
+} from '../services/storageManager';
+import {
   RotateCcw,
   Undo2,
   Redo2,
@@ -308,15 +322,17 @@ export const EditorView: React.FC<EditorViewProps> = ({
   // Initialize history with initial state or restored draft on mount, plus URL param & hero hydration
   useEffect(() => {
     // 1. Check local session storage from homepage mini studio
-    const heroImport = sessionStorage.getItem('aesthetic_card_studio_hero_quote');
+    const heroImport = safeSessionStorageGet('aesthetic_card_studio_hero_quote');
     if (heroImport) {
       try {
-        const data = JSON.parse(heroImport);
-        if (data.quote) setQuote(data.quote);
-        if (data.author) setAuthor(data.author);
-        if (data.tag) setTag(data.tag);
-        if (data.bg) setBgColor(data.bg);
-        if (data.ink) setInkColor(data.ink);
+        const data = safeJsonParse<any>(heroImport);
+        if (data && typeof data === 'object') {
+          if (data.quote && typeof data.quote === 'string') setQuote(data.quote.slice(0, 5000));
+          if (data.author && typeof data.author === 'string') setAuthor(data.author.slice(0, 500));
+          if (data.tag && typeof data.tag === 'string') setTag(data.tag.slice(0, 500));
+          if (data.bg && typeof data.bg === 'string') setBgColor(sanitizeColor(data.bg, '#24211e'));
+          if (data.ink && typeof data.ink === 'string') setInkColor(sanitizeColor(data.ink, '#efe6d8'));
+        }
         sessionStorage.removeItem('aesthetic_card_studio_hero_quote');
         showToast('Loaded custom quote from homepage mini-studio!');
         const snap = getCurrentSnapshot();
@@ -373,38 +389,41 @@ export const EditorView: React.FC<EditorViewProps> = ({
     }
 
     // 3. Check local draft
-    const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+    const savedDraft = safeLocalStorageGet(DRAFT_STORAGE_KEY);
     if (!initialTemplate && savedDraft) {
       try {
-        const parsed: CardState = JSON.parse(savedDraft);
-        setDocTitle(parsed.docTitle || 'My Card');
-        setQuote(parsed.quote);
-        setAuthor(parsed.author);
-        setTag(parsed.tag);
-        setBadge(parsed.badge);
-        setBgColor(parsed.bgColor);
-        setInkColor(parsed.inkColor);
-        setFontChoice(parsed.fontChoice);
-        setFontSize(parsed.fontSize);
-        if (parsed.lineHeight !== undefined) setLineHeight(parsed.lineHeight);
-        if (parsed.letterSpacing !== undefined) setLetterSpacing(parsed.letterSpacing);
-        if (parsed.verticalAlign !== undefined) setVerticalAlign(parsed.verticalAlign);
-        if (parsed.surfaceFinish !== undefined) setSurfaceFinish(parsed.surfaceFinish);
-        if (parsed.textureIntensity !== undefined) setTextureIntensity(parsed.textureIntensity);
-        if (parsed.isHolographic !== undefined) setIsHolographic(parsed.isHolographic);
-        setAlign(parsed.align);
-        setPadding(parsed.padding);
-        setBorderRadius(parsed.borderRadius);
-        setShowGrain(parsed.showGrain);
-        setShowBorder(parsed.showBorder);
-        setShowIcon(parsed.showIcon);
-        setIconName(parsed.iconName);
-        setAspectRatio(parsed.aspectRatio);
+        const parsed = safeJsonParse(savedDraft);
+        const sanitized = sanitizeAndValidateCardState(parsed);
+        if (sanitized) {
+          setDocTitle(sanitized.docTitle || 'My Card');
+          setQuote(sanitized.quote);
+          setAuthor(sanitized.author);
+          setTag(sanitized.tag);
+          setBadge(sanitized.badge);
+          setBgColor(sanitized.bgColor);
+          setInkColor(sanitized.inkColor);
+          setFontChoice(sanitized.fontChoice);
+          setFontSize(sanitized.fontSize);
+          if (sanitized.lineHeight !== undefined) setLineHeight(sanitized.lineHeight);
+          if (sanitized.letterSpacing !== undefined) setLetterSpacing(sanitized.letterSpacing);
+          if (sanitized.verticalAlign !== undefined) setVerticalAlign(sanitized.verticalAlign);
+          if (sanitized.surfaceFinish !== undefined) setSurfaceFinish(sanitized.surfaceFinish);
+          if (sanitized.textureIntensity !== undefined) setTextureIntensity(sanitized.textureIntensity);
+          if (sanitized.isHolographic !== undefined) setIsHolographic(sanitized.isHolographic);
+          setAlign(sanitized.align);
+          setPadding(sanitized.padding);
+          setBorderRadius(sanitized.borderRadius);
+          setShowGrain(sanitized.showGrain);
+          setShowBorder(sanitized.showBorder);
+          setShowIcon(sanitized.showIcon);
+          setIconName(sanitized.iconName);
+          setAspectRatio((parsed as any)?.aspectRatio || '1:1');
 
-        setHistory([parsed]);
-        setHistoryIndex(0);
-        showToast('Restored your previous local draft');
-        return;
+          setHistory([sanitized as any]);
+          setHistoryIndex(0);
+          showToast('Restored your previous local draft');
+          return;
+        }
       } catch (e) {
         console.warn('Failed to parse local draft:', e);
       }
@@ -481,13 +500,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
       pushHistorySnapshot(snap);
 
       // Save to localStorage
-      try {
-        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(snap));
+      const saveRes = safeLocalStorageSet(DRAFT_STORAGE_KEY, JSON.stringify(snap));
+      if (saveRes.success) {
         const now = new Date();
         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         setDraftSavedTimestamp(`Saved at ${timeStr}`);
-      } catch (err) {
-        console.error('LocalStorage draft save error:', err);
       }
     }, 450);
 
@@ -822,7 +839,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   // Clear local draft from browser storage
   const handleClearDraft = () => {
     if (window.confirm('Clear saved draft from browser storage?')) {
-      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      safeLocalStorageRemove(DRAFT_STORAGE_KEY);
       setDraftSavedTimestamp('Draft cleared');
       showToast('Local draft storage cleared');
     }
@@ -1909,18 +1926,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 if (!file) return;
                 setIsExtractingPalette(true);
                 try {
-                  const reader = new FileReader();
-                  reader.onload = async (evt) => {
-                    const dataUrl = evt.target?.result as string;
-                    const pal = await extractPaletteFromImage(dataUrl);
-                    setExtractedPalette(pal);
-                    setIsExtractingPalette(false);
-                    showToast('Palette extracted! Click swatches or "Apply".');
-                  };
-                  reader.readAsDataURL(file);
-                } catch {
+                  const sanitized = await validateAndSanitizeImageFile(file);
+                  const pal = await extractPaletteFromImage(sanitized.safeDataUrl);
+                  setExtractedPalette(pal);
                   setIsExtractingPalette(false);
-                  showToast('Failed to extract colors from image');
+                  showToast('Palette extracted! Click swatches or "Apply".');
+                } catch (err: any) {
+                  setIsExtractingPalette(false);
+                  showToast(err?.message || 'Failed to extract colors from image');
                 }
                 e.target.value = '';
               }}

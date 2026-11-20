@@ -1,9 +1,10 @@
 # Global security and privacy headers
 /*
   X-Content-Type-Options: nosniff
-  X-Frame-Options: SAMEORIGIN
+  X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data: blob:; img-src 'self' data: blob: https:; connect-src 'self' https://openlibrary.org https://covers.openlibrary.org https://itunes.apple.com https://*.mzstatic.com data: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
 
 # Cache hashed build assets for 1 year with immutable tag on Cloudflare Edge
 /_astro/*

@@ -2,6 +2,34 @@
 
 All notable changes to the Aesthetic Card Generator (ACG) project are documented in this file.
 
+## [2.4.0] - 2026-11-20
+
+### Security & Architecture Hardening
+- **Strict Content Security Policy (CSP) & HTTP Security Headers (`public/_headers`)**:
+  - Enforced comprehensive CSP restricting script, font, image, and network connection origins.
+  - Eliminated clickjacking vectors via `frame-ancestors 'none'` and `X-Frame-Options: DENY`.
+  - Enforced `X-Content-Type-Options: nosniff` and restricted browser permissions via `Permissions-Policy`.
+- **Prototype Pollution Prevention Subsystem (`schemaValidator.ts`)**:
+  - `isPrototypePolluted`: Deep recursive detection blocking `__proto__`, `constructor`, and `prototype` payload injections.
+  - `safeJsonParse`: Reviver parser that safely strips polluted keys during JSON deserialization.
+  - `sanitizeAndValidateCanvasDocument`: Hardened schema validator enforcing strict integer canvas bounds (100px to 16,384px), capping layer counts at 500 objects, and stripping non-whitelist types or malicious protocols.
+  - `sanitizeAndValidateCardState`: Validates quote and draft state from localStorage and URL parameters, capping text lengths and sanitizing color expressions.
+- **Image & SVG Sanitization Engine (`imageSecurity.ts`)**:
+  - Enforced 10MB file size limit on all user image uploads.
+  - Binary magic byte validation verifying authentic headers for PNG, JPEG, GIF, WebP, and AVIF, rejecting disguised executable payloads.
+  - `sanitizeSvgMarkup`: Strips all `<script>`, `<foreignObject>`, `<iframe>`, `<embed>`, and `<object>` elements, inline event handlers (`onload`, `onclick`, `onmouseover`), and `javascript:` URIs.
+  - Decompression bomb guard verifying natural dimensions within 16,384px and 67.1 Megapixels.
+  - `dataUrlToBlob`: Memory-safe, synchronous Base64-to-Blob decoding bypassing WebKit/Safari `fetch(dataUrl)` URL length constraints.
+- **Storage Resilience & Quota Recovery (`storageManager.ts`)**:
+  - `safeLocalStorageSet`: Gracefully traps `QuotaExceededError` / `NS_ERROR_DOM_QUOTA_REACHED`, prunes legacy and temporary cache keys, and retries writes without crashing React components.
+  - Hardened IndexedDB project storage in `localProjectStore.ts` with input schema sanitization and quota handling.
+- **Supply-Chain Dependency Audits**:
+  - Upgraded `astro` from 7.4.3 to 7.4.13, resolving GHSA-mh32-jxcr-mh9f.
+- **Automated Security Verification Test Suite (`test/security-hardening.test.ts`)**:
+  - Added 5 automated security test suites to `npm test` verifying prototype pollution resilience, schema boundary clamping, image/SVG sanitization, and header enforcement.
+- **Documentation**:
+  - Created `SECURITY.md` establishing the threat model, zero-backend trust boundaries, and vulnerability disclosure policy.
+
 ## [2.3.0] - 2026-11-20
 
 ### Added
