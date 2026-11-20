@@ -17,9 +17,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
   onClose,
   templates,
   onOpenTemplate,
-  theme = 'dark',
 }) => {
-  const isLight = theme === 'light';
 
   // Live test input state that injects into all compared templates simultaneously
   const [testQuote, setTestQuote] = useState(
@@ -34,21 +32,19 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
   const isQuad = templates.length === 4;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col p-4 md:p-8 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col p-3 sm:p-6 md:p-8 overflow-y-auto">
       <div
-        className={`w-full max-w-6xl mx-auto my-auto rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
-          isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#2a303c] text-[#f4f1ea]'
-        }`}
+        className="w-full max-w-6xl mx-auto my-auto rounded-3xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-primary)] shadow-2xl overflow-hidden flex flex-col"
       >
         {/* Top Header Bar */}
-        <div className={`p-4 md:p-6 border-b flex items-center justify-between gap-4 ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
+        <div className="p-4 md:p-6 border-b border-[var(--app-border-subtle)] flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <SquareDuotoneIcon name="compare" size="md" />
             <div>
-              <h2 className="text-lg md:text-xl font-bold tracking-tight">
+              <h2 className="text-lg md:text-xl font-bold tracking-tight font-heading">
                 Side-by-Side Template Comparison
               </h2>
-              <p className="text-xs text-[#707a8a]">
+              <p className="text-xs text-[var(--app-text-muted)]">
                 Comparing {templates.length} curated styles with live synchronized test copy
               </p>
             </div>
@@ -56,18 +52,17 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
 
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg border transition-colors cursor-pointer ${
-              isLight ? 'border-[#cbd5e1] hover:bg-slate-100' : 'border-[#262c36] hover:bg-[#181d24]'
-            }`}
+            className="p-2 rounded-xl border border-[var(--app-border-subtle)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] transition-colors cursor-pointer"
             title="Close Comparison"
+            aria-label="Close Comparison"
           >
             <SquareDuotoneIcon name="close" size="sm" />
           </button>
         </div>
 
         {/* Live Synchronized Test Quote & Photo Bar */}
-        <div className={`p-4 border-b flex flex-col md:flex-row items-center gap-3 text-xs ${isLight ? 'bg-slate-50 border-[#e2e8f0]' : 'bg-[#161920] border-[#222731]'}`}>
-          <span className="font-bold text-[#E2D9C8] dark:text-[#E2D9C8] shrink-0 uppercase tracking-wider">
+        <div className="p-4 border-b border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex flex-col md:flex-row items-stretch md:items-center gap-2.5 sm:gap-3 text-xs">
+          <span className="font-bold text-[var(--app-accent)] shrink-0 uppercase tracking-wider font-subheading">
             Test Content:
           </span>
           <input
@@ -75,46 +70,38 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
             value={testTag}
             onChange={(e) => setTestTag(e.target.value)}
             placeholder="Header tag..."
-            className={`w-full md:w-36 px-2.5 py-1.5 rounded-lg border outline-none font-mono ${
-              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#2e3543] text-white'
-            }`}
+            className="w-full md:w-36 px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] outline-none font-mono focus:border-[var(--app-accent)]"
           />
           <input
             type="text"
             value={testQuote}
             onChange={(e) => setTestQuote(e.target.value)}
             placeholder="Type your quote to test in both styles..."
-            className={`flex-1 w-full px-3 py-1.5 rounded-lg border outline-none font-medium ${
-              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#2e3543] text-white'
-            }`}
+            className="flex-1 w-full px-3 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] outline-none font-medium focus:border-[var(--app-accent)]"
           />
           <input
             type="text"
             value={testAuthor}
             onChange={(e) => setTestAuthor(e.target.value)}
             placeholder="Author attribution..."
-            className={`w-full md:w-44 px-3 py-1.5 rounded-lg border outline-none font-medium ${
-              isLight ? 'bg-white border-[#cbd5e1] text-[#0f172a]' : 'bg-[#12151b] border-[#2e3543] text-white'
-            }`}
+            className="w-full md:w-44 px-3 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] outline-none font-medium focus:border-[var(--app-accent)]"
           />
         </div>
 
         {/* Comparison Grid: Strict 2-Column or 4-Column Layout */}
-        <div className={`p-6 grid gap-6 ${isQuad ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2'}`}>
+        <div className={`p-4 sm:p-6 grid gap-4 sm:gap-6 ${isQuad ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2'}`}>
           {templates.map((tmpl) => {
             const isIdStyle = tmpl.hasPhotoArea || tmpl.category === 'id-card';
 
             return (
               <div
                 key={tmpl.id}
-                className={`flex flex-col rounded-2xl border overflow-hidden shadow-lg ${
-                  isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'
-                }`}
+                className="flex flex-col rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-bg)] overflow-hidden shadow-lg"
               >
                 {/* Live Card Render Preview */}
                 <div
                   style={{ backgroundColor: tmpl.theme.bg, color: tmpl.theme.ink }}
-                  className="p-6 min-h-[280px] flex flex-col justify-between border-b border-black/10 relative overflow-hidden"
+                  className="p-5 sm:p-6 min-h-[260px] sm:min-h-[280px] flex flex-col justify-between border-b border-black/10 relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between text-[11px] font-mono opacity-75">
                     <span>{testTag || tmpl.tag || tmpl.categoryLabel}</span>
@@ -160,11 +147,11 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                     <strong className="font-bold">{tmpl.title}</strong>
                   </div>
                   <div className="flex items-center justify-between border-b pb-1.5 border-current/10">
-                    <span className="text-[#707a8a]">Vibe / Category:</span>
+                    <span className="text-[var(--app-text-muted)]">Vibe / Category:</span>
                     <span className="font-medium">{tmpl.categoryLabel}</span>
                   </div>
                   <div className="flex items-center justify-between border-b pb-1.5 border-current/10">
-                    <span className="text-[#707a8a]">Palette Swatch:</span>
+                    <span className="text-[var(--app-text-muted)]">Palette Swatch:</span>
                     <div className="flex items-center gap-1.5">
                       <span
                         style={{ backgroundColor: tmpl.theme.bg }}
@@ -179,7 +166,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                     </div>
                   </div>
                   <div className="flex items-center justify-between border-b pb-1.5 border-current/10">
-                    <span className="text-[#707a8a]">Surface Tooth:</span>
+                    <span className="text-[var(--app-text-muted)]">Surface Tooth:</span>
                     <span className="font-mono text-[11px]">{tmpl.surfaceFinish || 'Archival Cotton'}</span>
                   </div>
 
@@ -188,11 +175,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                       onClose();
                       onOpenTemplate(tmpl);
                     }}
-                    className={`mt-2 w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                      isLight
-                        ? 'bg-[#111417] text-white hover:bg-[#222730]'
-                        : 'bg-[#E2D9C8] text-[#111417] hover:bg-[#ECE5D8]'
-                    }`}
+                    className="mt-2 w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 btn-editorial-primary"
                   >
                     <span>Open This Style in Studio →</span>
                   </button>

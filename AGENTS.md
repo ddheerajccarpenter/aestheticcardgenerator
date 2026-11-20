@@ -29,4 +29,8 @@ Take the first option that fully works:
 
 Never cut: validation at trust boundaries, error handling that prevents data loss, security, accessibility, the calibration real hardware needs, anything the user asked for.
 
+## Deployment
+
+Always deploy to Cloudflare Pages (`npm run deploy` via Wrangler), never Vercel.
+
 (Yes, this file also applies to agents working on the ponytail repo itself. Especially to them.)

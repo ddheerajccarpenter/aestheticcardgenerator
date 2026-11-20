@@ -192,11 +192,11 @@
 
 @layer base {
   :root {
-    /* Global Typography System (Part II) */
-    --font-heading: 'Jungle Troubles', 'Bebas Neue', 'Caveat', sans-serif;
-    --font-subheading: 'Designer', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-brand: 'Stretch Pro', 'Bebas Neue', Impact, sans-serif;
-    --font-body: 'Designer', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Global Typography System */
+    --font-heading: 'Murecho', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-subheading: 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-brand: 'Murecho', 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Plus Jakarta Sans', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
     /* Warm graphite and paper with a single accessible vermilion accent. */
     --c60-dominant: #171512;
@@ -377,11 +377,11 @@
     font-weight: 700 !important;
   }
 
-  /* Page headings use the requested brush script where licensed fonts are installed. */
+  /* Page headings */
   h1, h2, .heading-main, .hero-title, .page-title {
     font-family: var(--font-heading) !important;
     font-weight: 700 !important;
-    letter-spacing: 0;
+    letter-spacing: -0.025em;
     line-height: 1.15;
   }
 
@@ -690,7 +690,8 @@ html.light .studio-btn-secondary:hover {
   color: var(--app-text-primary);
   border-radius: var(--app-radius-control);
   font-size: 0.8125rem;
-  padding: 0.5625rem 0.875rem;
+  padding-block: 0.5625rem;
+  padding-inline: 0.875rem;
   outline: none;
   transition: border-color 140ms ease, box-shadow 140ms ease;
 }
@@ -859,6 +860,16 @@ html.light .studio-input:focus {
 
 .guides-book-leaf.is-turning-next {
   transform: rotateY(-180deg);
+}
+
+@media (max-width: 767px) {
+  .guides-book-leaf {
+    transform-origin: center center !important;
+  }
+  .guides-book-leaf.is-turning-next {
+    transform: translateX(-16px) !important;
+    opacity: 0 !important;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

@@ -130,11 +130,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1580px] px-4 pb-16 pt-24 text-[var(--app-text-primary)] sm:px-6 md:px-8 md:pb-12">
-      <section aria-labelledby="home-title" className="home-hero grid min-h-[min(76vh,760px)] items-center gap-6 overflow-hidden rounded-[2rem] border border-[var(--app-border-subtle)] bg-[var(--app-surface)] px-5 py-8 sm:px-8 md:px-12 lg:grid-cols-[0.88fr_1.12fr] lg:px-14 lg:py-12">
+    <div className="mx-auto w-full max-w-[1580px] px-3 pb-24 pt-4 sm:px-6 sm:pt-8 md:px-8 md:pb-16 text-[var(--app-text-primary)]">
+      <section aria-labelledby="home-title" className="home-hero grid min-h-[min(76vh,760px)] items-center gap-6 overflow-hidden rounded-2xl sm:rounded-[2rem] border border-[var(--app-border-subtle)] bg-[var(--app-surface)] px-5 py-8 sm:px-8 md:px-12 lg:grid-cols-[0.88fr_1.12fr] lg:px-14 lg:py-12">
         <div className="relative z-10 max-w-2xl py-2 lg:py-8">
           <p className="editorial-kicker">A small studio for card design</p>
-          <h1 id="home-title" className="mt-5 max-w-[12ch] text-[clamp(3.5rem,7.6vw,7.8rem)] font-heading leading-[0.9] tracking-tight">
+          <h1 id="home-title" className="mt-5 max-w-[14ch] text-[clamp(2.5rem,6vw,5.5rem)] font-heading leading-[0.95] tracking-tight">
             Make something <span className="font-editorial font-normal italic text-[var(--app-accent)]">worth keeping.</span>
           </h1>
           <p className="mt-6 max-w-lg text-sm leading-7 text-[var(--app-text-secondary)] sm:text-base">
@@ -155,34 +155,34 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
           </div>
         </div>
 
-        <div aria-label="Featured card designs" className="relative mx-auto min-h-[330px] w-full max-w-[760px] sm:min-h-[430px] lg:min-h-[560px]">
-          <div className="absolute inset-x-[8%] bottom-[7%] top-[7%] rounded-[2rem] border border-[var(--app-border-subtle)] bg-[var(--app-bg)]" aria-hidden="true" />
+        <div aria-label="Featured card designs" className="relative mx-auto min-h-[300px] w-full max-w-[760px] sm:min-h-[430px] lg:min-h-[560px]">
+          <div className="absolute inset-x-[4%] sm:inset-x-[8%] bottom-[7%] top-[7%] rounded-[2rem] border border-[var(--app-border-subtle)] bg-[var(--app-bg)]" aria-hidden="true" />
           {heroTemplates[1] && (
-            <button type="button" aria-label={`Preview ${heroTemplates[1].title}`} onClick={(event) => openPreview(heroTemplates[1], event)} className="absolute left-[3%] top-[24%] z-10 w-[40%] -rotate-[8deg] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+            <button type="button" aria-label={`Preview ${heroTemplates[1].title}`} onClick={(event) => openPreview(heroTemplates[1], event)} className="hidden sm:block absolute left-[3%] top-[24%] z-10 w-[40%] -rotate-[8deg] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
               <LazyTemplateCard aspectRatio={getTemplateAspectRatio(heroTemplates[1])}>
                 <UnifiedCardThumbnail template={heroTemplates[1]} className="h-full w-full" />
               </LazyTemplateCard>
             </button>
           )}
           {heroTemplates[3] && (
-            <button type="button" aria-label={`Preview ${heroTemplates[3].title}`} onClick={(event) => openPreview(heroTemplates[3], event)} className="absolute bottom-[8%] right-[2%] z-20 w-[35%] rotate-[6deg] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+            <button type="button" aria-label={`Preview ${heroTemplates[3].title}`} onClick={(event) => openPreview(heroTemplates[3], event)} className="hidden sm:block absolute bottom-[8%] right-[2%] z-20 w-[35%] rotate-[6deg] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
               <LazyTemplateCard aspectRatio={getTemplateAspectRatio(heroTemplates[3])}>
                 <UnifiedCardThumbnail template={heroTemplates[3]} className="h-full w-full" />
               </LazyTemplateCard>
             </button>
           )}
           {heroTemplates[0] && (
-            <button type="button" aria-label={`Preview ${heroTemplates[0].title}`} onClick={(event) => openPreview(heroTemplates[0], event)} className="absolute left-[22%] top-[14%] z-10 w-[70%] -rotate-[1.5deg] overflow-hidden rounded-2xl border border-[var(--app-border-strong)] shadow-[0_32px_80px_rgba(0,0,0,0.38)] transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+            <button type="button" aria-label={`Preview ${heroTemplates[0].title}`} onClick={(event) => openPreview(heroTemplates[0], event)} className="relative sm:absolute mx-auto sm:left-[20%] sm:top-[12%] z-10 w-[88%] sm:w-[70%] sm:-rotate-[1.5deg] overflow-hidden rounded-2xl border border-[var(--app-border-strong)] shadow-[0_32px_80px_rgba(0,0,0,0.38)] transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
               <LazyTemplateCard aspectRatio={getTemplateAspectRatio(heroTemplates[0])}>
                 <UnifiedCardThumbnail template={heroTemplates[0]} className="h-full w-full" />
               </LazyTemplateCard>
             </button>
           )}
-          <div className="glass-surface absolute bottom-[5%] left-[5%] z-30 rounded-xl px-3 py-2 text-[9px] uppercase tracking-[0.12em] text-[var(--app-text-primary)] sm:px-4 sm:py-3">
-            <span className="block text-[var(--app-accent)]">From the archive</span>
-            <span className="mt-1 block">01 / {String(PRESET_TEMPLATES.length).padStart(2, '0')} designs</span>
+          <div className="glass-surface absolute bottom-[3%] sm:bottom-[5%] left-[3%] sm:left-[5%] z-30 rounded-xl px-3 py-1.5 sm:py-2 text-[9px] uppercase tracking-[0.12em] text-[var(--app-text-primary)]">
+            <span className="block text-[var(--app-accent)] font-semibold">From the archive</span>
+            <span className="mt-0.5 block">01 / {String(PRESET_TEMPLATES.length).padStart(2, '0')} designs</span>
           </div>
-          <span className="absolute right-[9%] top-[6%] font-mono text-[10px] tracking-[0.14em] text-[var(--app-text-muted)]">ACG — 2026</span>
+          <span className="absolute right-[6%] sm:right-[9%] top-[4%] sm:top-[6%] font-mono text-[10px] tracking-[0.14em] text-[var(--app-text-muted)]">ACG — 2026</span>
         </div>
       </section>
 
@@ -206,47 +206,65 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
         <div className="mb-6 flex flex-wrap items-end justify-between gap-5">
           <div>
             <p className="editorial-kicker">The collection · {filteredCards.length} designs</p>
-            <h2 id="gallery-heading" className="mt-2 text-4xl font-heading leading-none sm:text-5xl">Find your starting point</h2>
+            <h2 id="gallery-heading" className="mt-2 text-3xl font-heading leading-none sm:text-5xl">Find your starting point</h2>
           </div>
           <a href="/templates" className="inline-flex h-10 items-center gap-2 rounded-xl border border-[var(--app-border-strong)] px-4 text-xs font-medium text-[var(--app-text-primary)] transition-colors hover:bg-[var(--app-surface-secondary)]">
             All templates <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
         </div>
 
-        <section aria-label="Design gallery controls" className="mb-5 space-y-4 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-3 sm:p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div role="group" aria-label="Filter designs by category" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto scrollbar-none">
+        <section aria-label="Design gallery controls" className="mb-6 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div role="group" aria-label="Filter designs by category" className="flex min-w-0 items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
               {FILTERS.map((filter) => (
                 <button
                   key={filter.id}
                   type="button"
                   aria-pressed={activeCategory === filter.id}
                   onClick={() => setActiveCategory(filter.id)}
-                  className={`shrink-0 rounded-xl px-3 py-2 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-accent)] ${activeCategory === filter.id ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)]' : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)]'}`}
+                  className={`shrink-0 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
+                    activeCategory === filter.id
+                      ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] shadow-xs'
+                      : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)]'
+                  }`}
                 >
                   {filter.label}
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-1 rounded-xl border border-[var(--app-border-subtle)] p-1" role="group" aria-label="Gallery density">
-              {(['roomy', 'compact'] as const).map((layout) => (
-                <button key={layout} type="button" aria-pressed={galleryLayout === layout} onClick={() => {
-                  setGalleryLayout(layout);
-                  try { window.localStorage.setItem('acg-gallery-layout', layout); } catch { /* Storage is optional. */ }
-                }} className={`rounded-lg px-2.5 py-2 text-[10px] capitalize transition-colors ${galleryLayout === layout ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'text-[var(--app-text-muted)] hover:text-[var(--app-text-primary)]'}`}>
-                  {layout}
-                </button>
-              ))}
+
+            <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--app-border-subtle)]">
+              <div className="flex items-center gap-1 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-bg)] p-1" role="group" aria-label="Gallery density">
+                {(['roomy', 'compact'] as const).map((layout) => (
+                  <button
+                    key={layout}
+                    type="button"
+                    aria-pressed={galleryLayout === layout}
+                    onClick={() => {
+                      setGalleryLayout(layout);
+                      try { window.localStorage.setItem('acg-gallery-layout', layout); } catch { /* Storage is optional. */ }
+                    }}
+                    className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-colors ${
+                      galleryLayout === layout
+                        ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] shadow-xs'
+                        : 'text-[var(--app-text-muted)] hover:text-[var(--app-text-primary)]'
+                    }`}
+                  >
+                    {layout}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSearchOpen((open) => !open)}
+                aria-expanded={searchOpen}
+                aria-label={searchOpen ? 'Close design search' : 'Search designs'}
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+              >
+                {searchOpen ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setSearchOpen((open) => !open)}
-              aria-expanded={searchOpen}
-              aria-label={searchOpen ? 'Close design search' : 'Search designs'}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
-            >
-              {searchOpen ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
-            </button>
           </div>
 
           {searchOpen && (

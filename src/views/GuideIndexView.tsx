@@ -190,7 +190,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
   }, [currentSpreadIndex]);
 
   return (
-    <div className="w-full min-h-screen pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container flex flex-col items-center gap-8">
         {/* Book Header Bar */}
         <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4 border-[var(--app-border-subtle)]">

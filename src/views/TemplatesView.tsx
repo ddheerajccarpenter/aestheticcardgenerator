@@ -107,7 +107,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
   }, [activeCategory, searchQuery]);
 
   return (
-    <div className="w-full pt-24 pb-20 text-[var(--app-text-primary)] transition-colors duration-200">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 text-[var(--app-text-primary)] transition-colors duration-200">
       <div className="studio-container flex flex-col gap-8 sm:gap-10">
         {/* Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="studio-breadcrumb glass-surface w-fit rounded-full px-3 py-2">
@@ -149,7 +149,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by name, quote, or style"
-                className="studio-input w-full pl-10 pr-9"
+                className="studio-input w-full !pl-10 !pr-9"
               />
               {searchQuery && (
                 <button
@@ -168,7 +168,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           </div>
 
           {/* Primary Category Filter Tabs */}
-          <div role="group" aria-label="Filter templates by category" className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <div role="group" aria-label="Filter templates by category" className="flex items-center gap-2 overflow-x-auto pb-1 pr-4 scrollbar-none">
             {CATEGORY_TABS.map((tab) => {
               const count =
                 tab.id === 'all'
@@ -267,7 +267,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-2 pt-1 min-[420px]:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-2 pt-1">
                       <a
                         href={`/canvas?template=${template.id}`}
                         className="studio-btn-primary min-h-10 !py-2 !text-xs !rounded-xl"

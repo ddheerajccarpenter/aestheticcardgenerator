@@ -47,7 +47,7 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
   }, [selectedCategory, featuredPost.slug]);
 
   return (
-    <div className="w-full min-h-screen pt-24 pb-20 bg-[var(--app-bg)] text-[var(--app-text)] transition-colors duration-200">
+    <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 bg-[var(--app-bg)] text-[var(--app-text)] transition-colors duration-200">
       <div className="studio-container flex flex-col gap-10">
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
@@ -237,7 +237,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
   const otherPosts = BLOG_POSTS.filter((p) => p.slug !== blog.slug).slice(0, 4);
 
   return (
-    <div className="w-full min-h-screen pt-24 pb-20 bg-[var(--app-bg)] text-[var(--app-text)] transition-colors duration-200">
+    <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 bg-[var(--app-bg)] text-[var(--app-text)] transition-colors duration-200">
       <div className="studio-container-narrow flex flex-col gap-10">
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">

@@ -69,7 +69,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
   }, [category]);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container flex flex-col gap-12">
         {/* Semantic Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
@@ -190,21 +190,32 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
                 </div>
 
                 {/* Action Bar */}
-                <div className="p-4 flex items-center justify-between bg-[var(--app-surface-secondary)] border-t border-[var(--app-border-subtle)] mt-auto">
-                  <div>
-                    <h3 className="text-sm font-bold font-heading text-[var(--app-text-primary)]">
+                <div className="p-4 flex flex-col gap-3 bg-[var(--app-surface-secondary)] border-t border-[var(--app-border-subtle)] mt-auto">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold font-heading text-[var(--app-text-primary)] truncate">
                       {template.title}
                     </h3>
-                    <span className="text-[11px] text-[var(--app-text-muted)] font-subheading">{template.categoryLabel}</span>
+                    <span className="text-[10px] text-[var(--app-text-muted)] font-subheading uppercase shrink-0">{template.categoryLabel}</span>
                   </div>
 
-                  <a
-                    href={`/create?template=${template.id}`}
-                    className="studio-btn-primary !py-1.5 !px-3 !text-xs !rounded-lg"
-                  >
-                    <span>Use Style</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <a
+                      href={`/canvas?template=${template.id}`}
+                      className="studio-btn-primary min-h-9 !py-1.5 !px-2.5 !text-xs !rounded-xl"
+                      title="Open in Canvas Studio"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Canvas</span>
+                    </a>
+                    <a
+                      href={`/create?template=${template.id}`}
+                      className="studio-btn-secondary min-h-9 !py-1.5 !px-2.5 !text-xs !rounded-xl"
+                      title="Open in Card Creator"
+                    >
+                      <span>Creator</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
               </article>
             ))}

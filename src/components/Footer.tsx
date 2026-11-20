@@ -10,7 +10,7 @@ export const Footer: React.FC<FooterProps> = ({ theme = 'dark' }) => {
   const isLight = theme === 'light';
 
   return (
-    <footer className="w-full border-t border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text)] transition-colors duration-200 mt-16 pb-20 md:pb-8">
+    <footer className="w-full border-t border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text)] transition-colors duration-200 mt-16 pb-28 md:pb-8">
       <div className="studio-container py-8 flex flex-col gap-6">
         {/* Wireframe Primary Row: ACG brand on left, About / How to Use / FAQ / Contact on right */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-[var(--app-border-subtle)]">

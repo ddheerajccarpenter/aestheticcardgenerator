@@ -69,7 +69,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
   }, [guide]);
 
   return (
-    <article className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <article className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-10">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="studio-breadcrumb overflow-x-auto whitespace-nowrap">

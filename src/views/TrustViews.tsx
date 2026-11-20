@@ -35,7 +35,7 @@ export const AboutView: React.FC<TrustViewBaseProps> = () => {
   }, []);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -142,7 +142,7 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
   }, []);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -280,7 +280,7 @@ export const FaqView: React.FC<TrustViewBaseProps> = () => {
   ];
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -338,7 +338,7 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
   }, []);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -436,7 +436,7 @@ export const TermsView: React.FC<TrustViewBaseProps> = () => {
   }, []);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -504,7 +504,7 @@ export const CookieView: React.FC<TrustViewBaseProps> = () => {
   }, []);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -566,7 +566,7 @@ export const DisclaimerView: React.FC<TrustViewBaseProps> = () => {
   }, []);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -654,7 +654,7 @@ export const AccessibilityView: React.FC<TrustViewBaseProps> = () => {
   }, []);
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -764,7 +764,7 @@ export const CreditsView: React.FC<TrustViewBaseProps> = () => {
   ];
 
   return (
-    <div className="w-full pt-20 pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="studio-container-narrow flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">Home</a>
@@ -837,7 +837,7 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen pt-20 pb-20 flex flex-col transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 flex flex-col transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <div className="studio-panel w-full max-w-2xl overflow-hidden shadow-2xl">
           <div className="h-0.5 w-full bg-[var(--app-accent)]/40" />
@@ -927,7 +927,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
   }, []);
 
   return (
-    <div className="w-full min-h-screen pt-20 pb-20 flex flex-col transition-colors duration-200 text-[var(--app-text-primary)]">
+    <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 flex flex-col transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <div className="studio-panel w-full max-w-xl overflow-hidden shadow-2xl">
           <div className="h-1.5 w-full bg-[var(--app-accent)]" />

@@ -1568,30 +1568,30 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* ───────────────────────────────────────────────────────────────────── */}
       <header className="editor-top-toolbar h-13 sm:h-14 border-b border-[var(--app-border-subtle)] px-2 sm:px-4 flex items-center justify-between shrink-0 transition-colors z-30 pt-[env(safe-area-inset-top,0px)] bg-[var(--app-surface)] text-[var(--app-text)]">
         {/* Left: Back & Title */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 min-w-0">
           <button
             onClick={() => {
               if (onNavigateHome) onNavigateHome();
               else window.location.href = '/templates';
             }}
-            className="p-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] hover:border-[var(--app-accent)]/40 text-[var(--app-text)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] hover:border-[var(--app-accent)]/40 text-[var(--app-text)] transition-colors cursor-pointer shrink-0"
             title="Return to Studio Home / Templates"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 min-w-0">
             <input
               type="text"
               value={doc.title}
               onChange={(e) => setDoc((prev) => ({ ...prev, title: e.target.value }))}
               onBlur={(e) => commitDocumentChange({ ...doc, title: e.target.value })}
-              className={`doc-title-input text-xs sm:text-sm font-semibold tracking-tight bg-transparent border-b border-transparent hover:border-[#81786d] focus:border-[#24211b] dark:focus:border-[#E2D9C8] focus:outline-none px-1 py-0.5 rounded transition-all max-w-[90px] sm:max-w-[160px] md:max-w-xs ${
+              className={`doc-title-input text-xs sm:text-sm font-semibold tracking-tight bg-transparent border-b border-transparent hover:border-[#81786d] focus:border-[#24211b] dark:focus:border-[#E2D9C8] focus:outline-none px-1 py-0.5 rounded transition-all max-w-[75px] sm:max-w-[160px] md:max-w-xs truncate ${
                 isLight ? 'text-[var(--app-accent)]' : 'text-white'
               }`}
               title="Click to rename document"
             />
-            <span className="hidden xl:inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-[#81786d]/10 text-[#81786d]">
+            <span className="hidden xl:inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-[#81786d]/10 text-[#81786d] shrink-0">
               {doc.canvasWidth} × {doc.canvasHeight} px
             </span>
           </div>

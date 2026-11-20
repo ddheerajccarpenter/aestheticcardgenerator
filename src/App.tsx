@@ -42,8 +42,10 @@ import {
 import { restoreSavedCustomFonts } from './services/customFontManager';
 
 export const App: React.FC = () => {
-  // Current route path
+  // Current route path normalized without trailing slashes
   const currentPath = window.location.pathname || '/';
+  const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/+$/, '') || '/';
+  const isEditor = normalizedPath.startsWith('/create') || normalizedPath.startsWith('/canvas');
 
   // Active template state with URL param / session restoration
   const activeTemplate: CardTemplate | undefined = (() => {
@@ -87,13 +89,12 @@ export const App: React.FC = () => {
 
   // Apply route-editor class to body for mobile layout fixes (Screenshot 1 & 2)
   useEffect(() => {
-    const isEditor = currentPath.startsWith('/create') || currentPath.startsWith('/canvas');
     if (isEditor) {
       document.body.classList.add('route-editor', 'is-editor-route');
     } else {
       document.body.classList.remove('route-editor', 'is-editor-route');
     }
-  }, [currentPath]);
+  }, [isEditor]);
 
   // Restore saved fonts for locally stored designs.
   useEffect(() => {
@@ -145,7 +146,7 @@ export const App: React.FC = () => {
 
   // Route Resolver
   const renderCurrentRoute = () => {
-    const path = currentPath === '/' ? '/' : currentPath.replace(/\/$/, '');
+    const path = normalizedPath;
 
     // 1. Gallery Homepage
     if (path === '/') {
@@ -164,6 +165,7 @@ export const App: React.FC = () => {
       return (
         <CreatorView
           theme={theme}
+          onToggleTheme={toggleTheme}
           initialTemplate={activeTemplate}
           onNavigateHome={() => navigate('/')}
         />
@@ -302,9 +304,9 @@ export const App: React.FC = () => {
       className="app-shell min-h-screen flex flex-col font-sans transition-colors duration-200 relative text-[var(--app-text-primary)]"
     >
       {/* Global Header (shown across public marketing pages, hidden on standalone fullscreen studio) */}
-      {currentPath !== '/canvas' && (
+      {!isEditor && (
         <Header
-          currentPath={currentPath}
+          currentPath={normalizedPath}
           theme={theme}
           onToggleTheme={toggleTheme}
           onNavigate={navigate}
@@ -313,16 +315,12 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main
-        className={`flex-1 transition-all duration-200 ${
-          currentPath === '/create' || currentPath === '/canvas' ? '' : 'pb-24 md:pb-0'
-        }`}
-      >
+      <main className="flex-1 transition-all duration-200">
         {renderCurrentRoute()}
       </main>
 
       {/* Global Footer (shown on all public pages except fullscreen editors) */}
-      {currentPath !== '/create' && currentPath !== '/canvas' && (
+      {!isEditor && (
         <div className="transition-all duration-200">
           <Footer
             theme={theme}
@@ -332,9 +330,9 @@ export const App: React.FC = () => {
       )}
 
       {/* 4-Item Mobile Bottom Navigation */}
-      {currentPath !== '/canvas' && currentPath !== '/create' && (
+      {!isEditor && (
         <MobileBottomNav
-          currentPath={currentPath}
+          currentPath={normalizedPath}
           theme={theme}
           onNavigate={navigate}
           hideWhenTyping={isEditorSheetOpen}

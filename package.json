@@ -10,7 +10,9 @@
     "dev": "astro dev",
     "build": "tsc -b && astro build",
     "lint": "oxlint",
+    "test": "node test/ui-ux-integrity.test.mjs",
     "preview": "astro preview",
+    "deploy": "npm run pages:deploy",
     "pages:deploy": "npm run build && wrangler pages deploy dist --project-name=aestheticcardgenerator --branch=main",
     "pages:preview": "npm run build && wrangler pages deploy dist --project-name=aestheticcardgenerator"
   },

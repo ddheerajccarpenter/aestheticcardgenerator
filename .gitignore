@@ -38,5 +38,12 @@ dist-ssr
 *.md
 **/*.md
 !done.md
+!tofix.md
+!memory.md
+!CHANGELOG.md
+!design.md
+!page.md
+!AGENTS.md
+!README.md
 
 

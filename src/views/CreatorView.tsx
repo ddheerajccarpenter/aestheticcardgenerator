@@ -14,6 +14,12 @@ import {
   AlignRight,
   Upload,
   Crop,
+  Sun,
+  Moon,
+  ChevronDown,
+  Type,
+  Palette,
+  Sparkles,
 } from 'lucide-react';
 import { ASSET_AVATARS } from '../data/canvasAssets';
 import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
@@ -24,6 +30,7 @@ export interface CreatorViewProps {
   initialTemplate?: CardTemplate;
   theme?: 'dark' | 'light';
   onNavigateHome?: () => void;
+  onToggleTheme?: () => void;
 }
 
 interface PaletteOption {
@@ -166,7 +173,11 @@ const getTemplateAvatar = (template?: CardTemplate) =>
 
 export const CreatorView: React.FC<CreatorViewProps> = ({
   initialTemplate,
+  theme = 'dark',
+  onNavigateHome,
+  onToggleTheme,
 }) => {
+  const isLight = theme === 'light';
 
   useEffect(() => {
     updatePageSEO({
@@ -182,6 +193,10 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
     if (initialTemplate?.category === 'id-card' || initialTemplate?.hasPhotoArea) return 'id';
     return 'quote';
   });
+
+  // Mobile navigation tab inside drawer
+  const [mobileTab, setMobileTab] = useState<'content' | 'palette' | 'type'>('content');
+  const [aspectMenuOpen, setAspectMenuOpen] = useState(false);
 
   // Palette selection
   const [paletteIndex, setPaletteIndex] = useState(() => Math.max(0, findTemplatePalette(initialTemplate)));
@@ -396,51 +411,67 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
   const getAspectDimensions = () => {
     switch (aspectRatio) {
       case '8:5':
-        return 'aspect-[8/5] max-w-[560px]';
+        return 'aspect-[8/5] max-w-[560px] max-h-[38vh] md:max-h-[68vh]';
       case '16:9':
-        return 'aspect-video max-w-[640px]';
+        return 'aspect-video max-w-[620px] max-h-[38vh] md:max-h-[68vh]';
       case '1:1':
-        return 'aspect-square max-w-[440px]';
+        return 'aspect-square max-w-[420px] max-h-[38vh] md:max-h-[68vh]';
       case '2:3':
-        return 'aspect-[2/3] max-w-[340px]';
+        return 'aspect-[2/3] max-w-[320px] max-h-[38vh] md:max-h-[72vh]';
       case '9:16':
-        return 'aspect-[9/16] max-w-[300px]';
+        return 'aspect-[9/16] max-w-[280px] max-h-[38vh] md:max-h-[72vh]';
       case '4:5':
       default:
-        return 'aspect-[4/5] max-w-[390px]';
+        return 'aspect-[4/5] max-w-[360px] max-h-[38vh] md:max-h-[70vh]';
     }
   };
 
   return (
-    <div className="creator-workspace w-full flex-1 flex flex-col pt-14 min-h-[calc(100vh-56px)] bg-[var(--app-bg)] text-[var(--app-text-primary)] transition-colors duration-200">
+    <div className="creator-workspace w-full h-[100dvh] max-h-[100dvh] flex flex-col overflow-hidden bg-[var(--app-bg)] text-[var(--app-text-primary)] transition-colors duration-200">
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* WORKSPACE TOOLBAR                                                   */}
       {/* ─────────────────────────────────────────────────────────────────── */}
-      <div className="h-12 border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0">
-        {/* Left: Back to Gallery + Mode Switcher */}
-        <div className="flex items-center gap-3">
+      <header className="h-13 sm:h-14 border-b border-[var(--app-border-subtle)] bg-[var(--app-surface)] px-3 sm:px-5 flex items-center justify-between gap-2 shrink-0 z-20">
+        {/* Left: Back to Gallery + Quick Studio switch + Mode Switcher */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <a
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] transition-colors cursor-pointer mr-1"
+            onClick={(e) => {
+              if (onNavigateHome) {
+                e.preventDefault();
+                onNavigateHome();
+              }
+            }}
+            className="inline-flex items-center gap-1.5 text-xs text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] transition-colors cursor-pointer py-1"
+            title="Return to Gallery"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Gallery</span>
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline font-medium">Gallery</span>
           </a>
 
-          <div className="flex p-0.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-xs">
+          <a
+            href="/canvas"
+            className="hidden md:inline-flex items-center gap-1 text-xs text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] transition-colors cursor-pointer px-2 py-1 rounded-md hover:bg-[var(--app-surface-secondary)]"
+            title="Switch to Canvas Studio"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[var(--app-accent)]" />
+            <span>Canvas</span>
+          </a>
+
+          <div className="flex p-0.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-xs">
             <button
               onClick={() => handleModeChange('quote')}
-              className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1 rounded-md font-medium transition-colors cursor-pointer text-xs ${
                 mode === 'quote'
                   ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold shadow-xs'
                   : 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
               }`}
             >
-              Quote Card
+              Quote
             </button>
             <button
               onClick={() => handleModeChange('id')}
-              className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1 rounded-md font-medium transition-colors cursor-pointer text-xs ${
                 mode === 'id'
                   ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold shadow-xs'
                   : 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
@@ -451,11 +482,11 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           </div>
         </div>
 
-        {/* Right: Format, 3D Preview, Duplicate, Export */}
-        <div className="flex items-center gap-2">
-          {/* Format Selector */}
-          <div className="flex items-center border border-[var(--app-border-subtle)] bg-[var(--app-surface)] rounded-lg p-0.5 text-xs">
-            <span className="hidden sm:inline pl-2 pr-1 text-[11px] text-[var(--app-text-secondary)] flex items-center gap-1">
+        {/* Right: Format, 3D Preview, Copy, Theme, Export */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Format Selector: Desktop pill list */}
+          <div className="hidden lg:flex items-center border border-[var(--app-border-subtle)] bg-[var(--app-bg)] rounded-lg p-0.5 text-xs">
+            <span className="pl-2 pr-1 text-[11px] text-[var(--app-text-secondary)] flex items-center gap-1">
               <Crop className="w-3 h-3" />
               <span>Ratio:</span>
             </span>
@@ -474,13 +505,47 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
             ))}
           </div>
 
+          {/* Format Selector: Mobile dropdown */}
+          <div className="relative lg:hidden">
+            <button
+              onClick={() => setAspectMenuOpen(!aspectMenuOpen)}
+              className="h-8 px-2 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-xs font-mono flex items-center gap-1 cursor-pointer text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]"
+              title="Change Aspect Ratio"
+            >
+              <Crop className="w-3.5 h-3.5" />
+              <span>{aspectRatio}</span>
+              <ChevronDown className="w-3 h-3 opacity-60" />
+            </button>
+            {aspectMenuOpen && (
+              <div className="absolute right-0 top-full mt-1.5 z-50 w-32 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-1.5 shadow-xl flex flex-col gap-0.5 animate-in fade-in zoom-in-95">
+                {(['8:5', '16:9', '4:5', '1:1', '2:3', '9:16'] as AspectRatioOption[]).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => {
+                      setAspectRatio(r);
+                      setAspectMenuOpen(false);
+                    }}
+                    className={`px-2.5 py-1.5 text-xs rounded-lg font-mono text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      aspectRatio === r
+                        ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                        : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)]'
+                    }`}
+                  >
+                    <span>{r}</span>
+                    {aspectRatio === r && <Check className="w-3 h-3" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* 3D Preview Control */}
           <button
             onClick={() => setIs3DMode(!is3DMode)}
-            className={`h-8 px-2.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+            className={`h-8 px-2 sm:px-2.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
               is3DMode
                 ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
-                : 'border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
+                : 'border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
             }`}
             title="Toggle 3D Physical Preview"
           >
@@ -488,343 +553,79 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
             <span className="hidden sm:inline">3D</span>
           </button>
 
-          {/* Duplicate / Copy Action */}
+          {/* Copy Text Action */}
           <button
             onClick={handleCopy}
-            className="h-8 px-2.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-8 px-2 sm:px-2.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
             title="Copy Text to Clipboard"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[var(--app-accent)]" /> : <Copy className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
+          {/* Theme Toggle Button */}
+          {onToggleTheme && (
+            <button
+              onClick={onToggleTheme}
+              className="h-8 w-8 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center justify-center transition-colors cursor-pointer"
+              title="Toggle theme"
+            >
+              {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+            </button>
+          )}
+
           {/* Export Action */}
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="h-8 px-4 rounded-lg bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+            className="h-8 px-3 sm:px-4 rounded-lg bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
             title="Download Retina PNG"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>{isExporting ? 'Exporting...' : 'Export PNG'}</span>
+            <span>{isExporting ? 'Exporting...' : 'Export'}</span>
           </button>
         </div>
-      </div>
+      </header>
 
       {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* WORKSPACE BODY: LEFT EDITING PANEL + PROMINENT CANVAS STAGE         */}
+      {/* WORKSPACE BODY: RESPONSIVE SPLIT STAGE & CONTROLS                   */}
+      {/* Mobile: Stage on top (order-1), Controls tabs below (order-2)       */}
+      {/* Desktop: Controls on left (order-1), Stage on right (order-2)       */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        {/* Left-side Compact Editing Panel */}
-        <aside className="w-full md:w-80 lg:w-88 border-b md:border-b-0 md:border-r border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-4 sm:p-5 flex flex-col gap-5 overflow-y-auto shrink-0 max-h-[48vh] md:max-h-[calc(100vh-104px)]">
-          {/* Palette Preset Group */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                Palette
-              </label>
-              <span className="text-[11px] text-[var(--app-text-secondary)]">
-                {currentPalette.name}
-              </span>
-            </div>
-            <div className="grid grid-cols-7 gap-1.5">
-              {sourceTemplatePalette && !templatePalette && (
-                <button
-                  type="button"
-                  onClick={() => setTemplatePalette(sourceTemplatePalette)}
-                  className="h-7 rounded border border-[var(--app-border-subtle)] ring-2 ring-[var(--app-accent)] relative flex items-center justify-center"
-                  style={{ backgroundColor: sourceTemplatePalette.bg }}
-                  title={`Original: ${sourceTemplatePalette.name}`}
-                  aria-label={`Use original ${sourceTemplatePalette.name} palette`}
-                >
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: sourceTemplatePalette.ink }} />
-                </button>
-              )}
-              {PALETTES.map((p, idx) => (
-                <button
-                  key={p.id}
-                  onClick={() => { setPaletteIndex(idx); setTemplatePalette(null); }}
-                  className={`h-7 rounded border transition-all cursor-pointer relative flex items-center justify-center ${
-                    !templatePalette && paletteIndex === idx
-                      ? 'ring-2 ring-[var(--app-accent)] scale-105 border-transparent shadow-xs'
-                      : 'border-[var(--app-border-subtle)] hover:opacity-80'
-                  }`}
-                  style={{ backgroundColor: p.bg }}
-                  title={p.name}
-                  aria-label={p.name}
-                >
-                  {!templatePalette && paletteIndex === idx && (
-                    <div
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: p.ink }}
-                    />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Content Group based on mode */}
-          {mode === 'quote' ? (
-            <div className="flex flex-col gap-4">
-              {/* Quote Text */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                    Quote Body
-                  </label>
-                  <button
-                    onClick={handleShuffleQuote}
-                    className="text-[11px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
-                  >
-                    <Shuffle className="w-3 h-3" />
-                    <span>Inspire</span>
-                  </button>
-                </div>
-                <textarea
-                  value={quote}
-                  onChange={(e) => setQuote(e.target.value)}
-                  rows={4}
-                  className="w-full text-xs leading-relaxed p-2.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors resize-none"
-                  placeholder="Enter quote or text..."
-                />
-              </div>
-
-              {/* Author */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                  Author / Source
-                </label>
-                <input
-                  type="text"
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
-                  placeholder="e.g. Albert Camus"
-                />
-              </div>
-
-              {/* Header Tag */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                  Header Tag
-                </label>
-                <input
-                  type="text"
-                  value={tag}
-                  onChange={(e) => setTag(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
-                  placeholder="e.g. FIELD NOTES — 001"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {/* ID Name */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={idName}
-                  onChange={(e) => setIdName(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
-                  placeholder="e.g. Dan Valentini"
-                />
-              </div>
-
-              {/* ID Role */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                  Role / Title
-                </label>
-                <input
-                  type="text"
-                  value={idRole}
-                  onChange={(e) => setIdRole(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
-                  placeholder="e.g. Vision Architect"
-                />
-              </div>
-
-              {/* Clearance / Status */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                  Clearance / Access
-                </label>
-                <input
-                  type="text"
-                  value={idClearance}
-                  onChange={(e) => setIdClearance(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
-                  placeholder="e.g. ALL-ACCESS • TIER 01"
-                />
-              </div>
-
-              {/* Avatar Selection */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                  Portrait / Avatar
-                </label>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setAvatar(ASSET_AVATARS.grungeDan)}
-                    className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-all ${
-                      avatar === ASSET_AVATARS.grungeDan
-                        ? 'ring-2 ring-[var(--app-accent)] border-transparent'
-                        : 'border-[var(--app-border-subtle)] opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={ASSET_AVATARS.grungeDan} alt="Dan" className="w-full h-full object-cover grayscale" />
-                  </button>
-                  <button
-                    onClick={() => setAvatar(ASSET_AVATARS.jenniePretty)}
-                    className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-all ${
-                      avatar === ASSET_AVATARS.jenniePretty
-                        ? 'ring-2 ring-[var(--app-accent)] border-transparent'
-                        : 'border-[var(--app-border-subtle)] opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={ASSET_AVATARS.jenniePretty} alt="Jennie" className="w-full h-full object-cover" />
-                  </button>
-                  <label className="h-11 px-2.5 rounded border border-dashed border-[var(--app-border-subtle)] hover:border-[var(--app-accent)] bg-[var(--app-bg)] text-[10px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center justify-center gap-1 cursor-pointer transition-colors">
-                    <Upload className="w-3 h-3" />
-                    <span>Upload</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarUpload}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Typography & Alignment Group */}
-          <div className="pt-2 border-t border-[var(--app-border-subtle)] flex flex-col gap-3">
-            <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-              Typography &amp; Layout
-            </label>
-            <div className="grid grid-cols-3 gap-1.5 text-xs">
-              <button
-                onClick={() => setFontFamily('editorial')}
-                className={`py-1.5 rounded-md border text-center transition-colors cursor-pointer ${
-                  fontFamily === 'editorial'
-                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
-                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
-                }`}
-              >
-                Serif
-              </button>
-              <button
-                onClick={() => setFontFamily('sans')}
-                className={`py-1.5 rounded-md border text-center transition-colors cursor-pointer ${
-                  fontFamily === 'sans'
-                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
-                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
-                }`}
-              >
-                Sans
-              </button>
-              <button
-                onClick={() => setFontFamily('mono')}
-                className={`py-1.5 rounded-md border text-center transition-colors cursor-pointer ${
-                  fontFamily === 'mono'
-                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
-                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
-                }`}
-              >
-                Mono
-              </button>
-            </div>
-
-            {mode === 'quote' && (
-              <div className="flex flex-col gap-1">
-                <label htmlFor="creator-font-size" className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)]">
-                  <span>Quote size</span><span>{fontSize}px</span>
-                </label>
-                <input id="creator-font-size" type="range" min="14" max="48" step="1" value={fontSize} onChange={(event) => setFontSize(Number(event.target.value))} className="w-full accent-[var(--app-accent)]" />
-              </div>
-            )}
-
-            {/* Alignment Buttons */}
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setTextAlign('left')}
-                className={`flex-1 py-1 rounded border flex items-center justify-center cursor-pointer transition-colors ${
-                  textAlign === 'left'
-                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
-                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)]'
-                }`}
-                title="Left Align"
-              >
-                <AlignLeft className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setTextAlign('center')}
-                className={`flex-1 py-1 rounded border flex items-center justify-center cursor-pointer transition-colors ${
-                  textAlign === 'center'
-                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
-                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)]'
-                }`}
-                title="Center Align"
-              >
-                <AlignCenter className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setTextAlign('right')}
-                className={`flex-1 py-1 rounded border flex items-center justify-center cursor-pointer transition-colors ${
-                  textAlign === 'right'
-                    ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
-                    : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)]'
-                }`}
-                title="Right Align"
-              >
-                <AlignRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </aside>
-
-        {/* Center Canvas Stage */}
+        {/* Center Canvas Stage (Visual preview first on mobile!) */}
         <main
-          className="flex-1 p-4 sm:p-8 md:p-12 flex flex-col items-center justify-center overflow-auto relative bg-[var(--app-surface-secondary)]"
+          className="order-1 md:order-2 h-[42vh] sm:h-[48vh] md:h-auto md:flex-1 p-3 sm:p-6 md:p-10 flex flex-col items-center justify-center overflow-auto relative bg-[var(--app-surface-secondary)] border-b md:border-b-0"
         >
           {/* Subtle feedback toast */}
           {feedbackMessage && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-md bg-[var(--app-surface)] border border-[var(--app-border-subtle)] text-xs text-[var(--app-text-primary)] shadow-md animate-fade-in flex items-center gap-2">
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-md bg-[var(--app-surface)] border border-[var(--app-border-subtle)] text-xs text-[var(--app-text-primary)] shadow-md animate-fade-in flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--app-accent)]" />
               <span>{feedbackMessage}</span>
             </div>
           )}
 
-          {is3DMode && (
-            <div className="w-full h-full min-h-[380px] flex flex-col items-center justify-center">
-              <div
-                className="relative w-full max-w-md h-[420px]"
-              >
+          {is3DMode ? (
+            <div className="w-full h-full min-h-[260px] flex flex-col items-center justify-center">
+              <div className="relative w-full max-w-md h-[300px] sm:h-[380px]">
                 <div ref={threeMountRef} className="h-full w-full cursor-grab active:cursor-grabbing" />
                 <ThreeDPreviewControls controllerRef={threeStageRef} />
               </div>
-              <span className="text-[11px] font-mono text-[var(--app-text-secondary)] mt-2">
-                Drag to rotate · Scroll or pinch to zoom
+              <span className="text-[11px] font-mono text-[var(--app-text-secondary)] mt-1">
+                Drag to rotate · Scroll to zoom
               </span>
             </div>
-          )}
-          <div
-            aria-hidden={is3DMode}
-            className={`w-full flex items-center justify-center p-2 ${is3DMode ? 'pointer-events-none absolute -left-[10000px] top-0' : ''}`}
-          >
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center p-2"
+            >
               <div
                 ref={cardRef}
                 style={{
                   backgroundColor: currentPalette.bg,
                   color: currentPalette.ink,
                 }}
-                className={`w-full ${getAspectDimensions()} p-6 sm:p-8 rounded-xl shadow-md transition-colors duration-200 flex flex-col justify-between border border-black/15 overflow-hidden relative select-text`}
+                className={`w-full ${getAspectDimensions()} p-5 sm:p-8 rounded-xl shadow-md transition-colors duration-200 flex flex-col justify-between border border-black/15 overflow-hidden relative select-text`}
               >
                 {/* Subtle paper grain texture */}
                 <div className="absolute inset-0 card-noise opacity-25 pointer-events-none" />
@@ -832,36 +633,39 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 {mode === 'quote' ? (
                   <>
                     {/* Header Tag Bar */}
-                    <div className="flex items-center justify-between pb-3 border-b border-current/15 text-[10px] font-mono tracking-wider opacity-75 relative z-10">
-                      <span className="font-semibold tracking-wider uppercase">{tag}</span>
-                      <span className="px-1.5 py-0.5 rounded border border-current/25 font-mono text-[9px] font-bold">
+                    <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-current/15 text-[10px] font-mono tracking-wider opacity-75 relative z-10 shrink-0">
+                      <span className="font-semibold tracking-wider uppercase truncate max-w-[70%]">{tag}</span>
+                      <span className="px-1.5 py-0.5 rounded border border-current/25 font-mono text-[9px] font-bold shrink-0">
                         {currentPalette.badge}
                       </span>
                     </div>
 
                     {/* Central Quote Body */}
-                    <div className="my-auto py-4 relative z-10">
+                    <div className="my-auto py-3 sm:py-4 relative z-10 overflow-hidden">
                       <p
-                        className={`text-xl sm:text-2xl leading-relaxed tracking-tight ${
+                        className={`leading-relaxed tracking-tight ${
                           fontFamily === 'editorial'
                             ? 'font-editorial'
                             : fontFamily === 'mono'
-                            ? 'font-mono text-base'
+                            ? 'font-mono'
                             : 'font-sans font-medium'
                         }`}
-                      style={{ textAlign, fontSize: `${quote.length > 180 ? Math.max(14, Math.floor(fontSize * Math.sqrt(180 / quote.length))) : fontSize}px` }}
+                        style={{
+                          textAlign,
+                          fontSize: `${quote.length > 180 ? Math.max(13, Math.floor(fontSize * Math.sqrt(180 / quote.length))) : fontSize}px`,
+                        }}
                       >
                         {quote}
                       </p>
                     </div>
 
                     {/* Footer Attribution */}
-                    <div className="pt-3 border-t border-current/15 flex items-center justify-between relative z-10">
-                      <div className="flex items-center gap-1.5">
+                    <div className="pt-2.5 sm:pt-3 border-t border-current/15 flex items-center justify-between relative z-10 shrink-0">
+                      <div className="flex items-center gap-1.5 truncate max-w-[70%]">
                         <span className="opacity-50 text-xs">—</span>
-                        <span className="text-xs font-semibold opacity-90">{author}</span>
+                        <span className="text-xs font-semibold opacity-90 truncate">{author}</span>
                       </div>
-                      <span className="text-[9px] font-mono opacity-50 uppercase tracking-widest">
+                      <span className="text-[9px] font-mono opacity-50 uppercase tracking-widest shrink-0">
                         {currentPalette.name}
                       </span>
                     </div>
@@ -869,7 +673,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 ) : (
                   <>
                     {/* ID Pass Header */}
-                    <div className="relative z-10 flex flex-col items-center">
+                    <div className="relative z-10 flex flex-col items-center shrink-0">
                       <div className="w-10 h-1.5 rounded-full bg-black/25 border border-current/30 mb-2" />
                       <div className="w-full flex items-center justify-between pb-2 border-b border-current/15 text-[9px] font-mono tracking-widest opacity-85">
                         <span className="font-bold uppercase tracking-wider">CREATIVE ID PASS</span>
@@ -880,8 +684,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                     </div>
 
                     {/* ID Pass Body */}
-                    <div className="my-auto py-3 flex items-center gap-4 relative z-10">
-                      <div className="w-20 h-24 rounded-lg overflow-hidden border border-current/30 shadow-md shrink-0 bg-black/10">
+                    <div className="my-auto py-3 flex items-center gap-3 sm:gap-4 relative z-10">
+                      <div className="w-16 h-20 sm:w-20 sm:h-24 rounded-lg overflow-hidden border border-current/30 shadow-md shrink-0 bg-black/10">
                         <img
                           src={avatar}
                           alt="ID Portrait"
@@ -889,18 +693,18 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                         />
                       </div>
 
-                      <div className="flex-1 flex flex-col gap-1.5 font-mono text-xs">
+                      <div className="flex-1 flex flex-col gap-1 sm:gap-1.5 font-mono text-xs overflow-hidden">
                         <div>
                           <span className="text-[8px] uppercase tracking-wider opacity-60 block">NAME</span>
-                          <span className="font-bold text-sm block leading-tight">{idName}</span>
+                          <span className="font-bold text-xs sm:text-sm block leading-tight truncate">{idName}</span>
                         </div>
                         <div>
                           <span className="text-[8px] uppercase tracking-wider opacity-60 block">ROLE</span>
-                          <span className="text-xs opacity-90 block">{idRole}</span>
+                          <span className="text-[11px] sm:text-xs opacity-90 block truncate">{idRole}</span>
                         </div>
                         <div>
                           <span className="text-[8px] uppercase tracking-wider opacity-60 block">STATUS</span>
-                          <span className="text-[10px] font-semibold opacity-80 block tracking-wide">
+                          <span className="text-[9px] sm:text-[10px] font-semibold opacity-80 block tracking-wide truncate">
                             {idClearance}
                           </span>
                         </div>
@@ -908,15 +712,332 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                     </div>
 
                     {/* ID Pass Barcode Footer */}
-                    <div className="pt-2 border-t border-current/15 flex items-center justify-between text-[9px] font-mono opacity-75 relative z-10">
+                    <div className="pt-2 border-t border-current/15 flex items-center justify-between text-[9px] font-mono opacity-75 relative z-10 shrink-0">
                       <span className="tracking-tight font-bold">||||| | |||| ||| |||||||</span>
                       <span className="uppercase font-bold tracking-widest text-[8px]">VERIFIED PASS</span>
                     </div>
                   </>
                 )}
               </div>
-          </div>
+            </div>
+          )}
         </main>
+
+        {/* Controls Panel (Order-2 on mobile, Order-1 on desktop) */}
+        <aside className="order-2 md:order-1 flex-1 md:flex-none md:w-80 lg:w-88 border-r-0 md:border-r border-[var(--app-border-subtle)] bg-[var(--app-surface)] flex flex-col overflow-hidden">
+          {/* Mobile segment tabs for phone view */}
+          <div className="md:hidden flex items-center border-b border-[var(--app-border-subtle)] bg-[var(--app-surface)] shrink-0 px-2 py-1.5 gap-1">
+            <button
+              onClick={() => setMobileTab('content')}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                mobileTab === 'content'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] shadow-xs'
+                  : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)]'
+              }`}
+            >
+              <Type className="w-3.5 h-3.5" />
+              <span>Words</span>
+            </button>
+            <button
+              onClick={() => setMobileTab('palette')}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                mobileTab === 'palette'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] shadow-xs'
+                  : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)]'
+              }`}
+            >
+              <Palette className="w-3.5 h-3.5" />
+              <span>Palette</span>
+            </button>
+            <button
+              onClick={() => setMobileTab('type')}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                mobileTab === 'type'
+                  ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] shadow-xs'
+                  : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Style</span>
+            </button>
+          </div>
+
+          {/* Controls Body: Scrollable area */}
+          <div className="flex-1 p-4 sm:p-5 flex flex-col gap-5 overflow-y-auto">
+            {/* Palette Preset Group */}
+            <div className={mobileTab === 'palette' ? 'block' : 'hidden md:block'}>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                  Color Palette
+                </label>
+                <span className="text-[11px] text-[var(--app-text-secondary)] font-medium">
+                  {currentPalette.name}
+                </span>
+              </div>
+              <div className="grid grid-cols-7 gap-1.5">
+                {sourceTemplatePalette && !templatePalette && (
+                  <button
+                    type="button"
+                    onClick={() => setTemplatePalette(sourceTemplatePalette)}
+                    className="h-8 rounded-lg border border-[var(--app-border-subtle)] ring-2 ring-[var(--app-accent)] relative flex items-center justify-center cursor-pointer"
+                    style={{ backgroundColor: sourceTemplatePalette.bg }}
+                    title={`Original: ${sourceTemplatePalette.name}`}
+                    aria-label={`Use original ${sourceTemplatePalette.name} palette`}
+                  >
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: sourceTemplatePalette.ink }} />
+                  </button>
+                )}
+                {PALETTES.map((p, idx) => (
+                  <button
+                    key={p.id}
+                    onClick={() => { setPaletteIndex(idx); setTemplatePalette(null); }}
+                    className={`h-8 rounded-lg border transition-all cursor-pointer relative flex items-center justify-center ${
+                      !templatePalette && paletteIndex === idx
+                        ? 'ring-2 ring-[var(--app-accent)] scale-105 border-transparent shadow-xs'
+                        : 'border-[var(--app-border-subtle)] hover:opacity-85'
+                    }`}
+                    style={{ backgroundColor: p.bg }}
+                    title={p.name}
+                    aria-label={p.name}
+                  >
+                    {!templatePalette && paletteIndex === idx && (
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: p.ink }}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Content Group based on mode */}
+            <div className={mobileTab === 'content' ? 'block' : 'hidden md:block'}>
+              {mode === 'quote' ? (
+                <div className="flex flex-col gap-4">
+                  {/* Quote Text */}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                        Quote Body
+                      </label>
+                      <button
+                        onClick={handleShuffleQuote}
+                        className="text-[11px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Shuffle className="w-3 h-3" />
+                        <span>Inspire</span>
+                      </button>
+                    </div>
+                    <textarea
+                      value={quote}
+                      onChange={(e) => setQuote(e.target.value)}
+                      rows={3}
+                      className="w-full text-xs leading-relaxed p-2.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors resize-none"
+                      placeholder="Enter quote or text..."
+                    />
+                  </div>
+
+                  {/* Author */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                      Author / Source
+                    </label>
+                    <input
+                      type="text"
+                      value={author}
+                      onChange={(e) => setAuthor(e.target.value)}
+                      className="w-full text-xs px-2.5 py-2 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
+                      placeholder="e.g. Albert Camus"
+                    />
+                  </div>
+
+                  {/* Header Tag */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                      Header Tag
+                    </label>
+                    <input
+                      type="text"
+                      value={tag}
+                      onChange={(e) => setTag(e.target.value)}
+                      className="w-full text-xs px-2.5 py-2 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
+                      placeholder="e.g. FIELD NOTES — 001"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {/* ID Name */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={idName}
+                      onChange={(e) => setIdName(e.target.value)}
+                      className="w-full text-xs px-2.5 py-2 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
+                      placeholder="e.g. Dan Valentini"
+                    />
+                  </div>
+
+                  {/* ID Role */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                      Role / Title
+                    </label>
+                    <input
+                      type="text"
+                      value={idRole}
+                      onChange={(e) => setIdRole(e.target.value)}
+                      className="w-full text-xs px-2.5 py-2 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
+                      placeholder="e.g. Vision Architect"
+                    />
+                  </div>
+
+                  {/* Clearance / Status */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                      Clearance / Access
+                    </label>
+                    <input
+                      type="text"
+                      value={idClearance}
+                      onChange={(e) => setIdClearance(e.target.value)}
+                      className="w-full text-xs px-2.5 py-2 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
+                      placeholder="e.g. ALL-ACCESS • TIER 01"
+                    />
+                  </div>
+
+                  {/* Avatar Selection */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                      Portrait / Avatar
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setAvatar(ASSET_AVATARS.grungeDan)}
+                        className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-all ${
+                          avatar === ASSET_AVATARS.grungeDan
+                            ? 'ring-2 ring-[var(--app-accent)] border-transparent'
+                            : 'border-[var(--app-border-subtle)] opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <img src={ASSET_AVATARS.grungeDan} alt="Dan" className="w-full h-full object-cover grayscale" />
+                      </button>
+                      <button
+                        onClick={() => setAvatar(ASSET_AVATARS.jenniePretty)}
+                        className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-all ${
+                          avatar === ASSET_AVATARS.jenniePretty
+                            ? 'ring-2 ring-[var(--app-accent)] border-transparent'
+                            : 'border-[var(--app-border-subtle)] opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <img src={ASSET_AVATARS.jenniePretty} alt="Jennie" className="w-full h-full object-cover" />
+                      </button>
+                      <label className="h-11 px-2.5 rounded border border-dashed border-[var(--app-border-subtle)] hover:border-[var(--app-accent)] bg-[var(--app-bg)] text-[10px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center justify-center gap-1 cursor-pointer transition-colors">
+                        <Upload className="w-3 h-3" />
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAvatarUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Typography & Alignment Group */}
+            <div className={`pt-2 border-t border-[var(--app-border-subtle)] flex flex-col gap-3.5 ${mobileTab === 'type' ? 'block' : 'hidden md:block'}`}>
+              <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                Typography &amp; Layout
+              </label>
+              <div className="grid grid-cols-3 gap-1.5 text-xs">
+                <button
+                  onClick={() => setFontFamily('editorial')}
+                  className={`py-1.5 rounded-lg border text-center transition-colors cursor-pointer ${
+                    fontFamily === 'editorial'
+                      ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                      : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
+                  }`}
+                >
+                  Serif
+                </button>
+                <button
+                  onClick={() => setFontFamily('sans')}
+                  className={`py-1.5 rounded-lg border text-center transition-colors cursor-pointer ${
+                    fontFamily === 'sans'
+                      ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                      : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
+                  }`}
+                >
+                  Sans
+                </button>
+                <button
+                  onClick={() => setFontFamily('mono')}
+                  className={`py-1.5 rounded-lg border text-center transition-colors cursor-pointer ${
+                    fontFamily === 'mono'
+                      ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)] font-semibold'
+                      : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
+                  }`}
+                >
+                  Mono
+                </button>
+              </div>
+
+              {mode === 'quote' && (
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="creator-font-size" className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)]">
+                    <span>Quote size</span><span>{fontSize}px</span>
+                  </label>
+                  <input id="creator-font-size" type="range" min="14" max="48" step="1" value={fontSize} onChange={(event) => setFontSize(Number(event.target.value))} className="w-full accent-[var(--app-accent)]" />
+                </div>
+              )}
+
+              {/* Alignment Buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setTextAlign('left')}
+                  className={`flex-1 py-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-colors ${
+                    textAlign === 'left'
+                      ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
+                      : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
+                  }`}
+                  title="Left Align"
+                >
+                  <AlignLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setTextAlign('center')}
+                  className={`flex-1 py-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-colors ${
+                    textAlign === 'center'
+                      ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
+                      : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
+                  }`}
+                  title="Center Align"
+                >
+                  <AlignCenter className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setTextAlign('right')}
+                  className={`flex-1 py-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-colors ${
+                    textAlign === 'right'
+                      ? 'bg-[var(--app-accent)] border-[var(--app-accent)] text-[var(--app-accent-ink)]'
+                      : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
+                  }`}
+                  title="Right Align"
+                >
+                  <AlignRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );
