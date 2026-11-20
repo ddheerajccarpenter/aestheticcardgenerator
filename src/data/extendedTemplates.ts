@@ -912,6 +912,11 @@ export const PINTEREST_POSTER_TEMPLATES: CardTemplate[] = [
     hasPhotoArea: true,
     layoutHint: 'square',
     accentColor: '#38bdf8',
+    ambient: {
+      primary: '#d97706',
+      secondary: '#2563eb',
+      neutral: '#11141c',
+    },
     description: 'Iconic Pinterest 33rpm vinyl record player card with spinning grooved disc, track scrubber, live audio waveform, and typography lyric fragment.',
     canvasDoc: docPinterestVinyl,
   },
@@ -938,6 +943,11 @@ export const PINTEREST_POSTER_TEMPLATES: CardTemplate[] = [
     hasPhotoArea: true,
     layoutHint: 'vertical',
     accentColor: '#588157',
+    ambient: {
+      primary: '#4d7c0f',
+      secondary: '#84cc16',
+      neutral: '#172016',
+    },
     description: 'Cute Tokyo aesthetic thermal cafe receipt featuring iced ceremonial matcha illustration, itemized pricing, 5-star rating, and barcode.',
     canvasDoc: docPinterestMatcha,
   },

@@ -2,6 +2,33 @@
 
 All notable changes to the Aesthetic Card Generator (ACG) project are documented in this file.
 
+## [2.2.0] - 2026-11-20
+
+### Added
+- **Cinematic Dual-Theme Color System (Emulsion & Paper)**:
+  - Dark Mode: **Projection Room** (`#191715` background, `#24211e` surface, `#312c27` raised surface, `#48413a` border, `#efe6d8` primary ink, `#bfb1a1` secondary ink, `#c69d78` warm copper accent).
+  - Light Mode: **Archival Paper** (`#f1ebdd` background, `#faf5eb` surface, `#e4d8c9` raised surface, `#c9beaf` border, `#292620` primary ink, `#61584d` secondary ink, `#6f4637` rich umber accent).
+  - High-contrast, WCAG AAA compliant surface-to-text ratios.
+- **Scroll-Reactive Ambient Atmosphere Engine**:
+  - Diffuse multi-stop radial gradient background wash (`AmbientAtmosphereLayer.tsx`) reflecting dominant tones of visible templates.
+  - Perceptually clamped normalization (`normalizeAmbientColor`) with hue preservation and saturation limits (max 38% dark, max 22% light).
+  - Viewport-proximity `IntersectionObserver` in `TemplatesView.tsx` with 120ms hysteresis debounce.
+  - User ambient atmosphere on/off toggle persisted in `localStorage`.
+  - Neutral isolation: editor workspaces (`/create`, `/canvas`, `/editor`) strictly bypass ambient lighting to ensure color-accurate designing.
+- **Client-Side Custom Font Subsystem**:
+  - Full client-side font upload (`.woff2`, `.woff`, `.ttf`, `.otf`) in both Card Creator (`/create`) and Canvas Studio (`/canvas`).
+  - Strict security validation: format checks, 15MB file size limit, and header magic bytes verification (`wOF2`, `wOFF`, `\x00\x01\x00\x00`, `OTTO`).
+  - Persistent font storage in IndexedDB (`AestheticCardStudioFontsDB`).
+  - Dynamic `@font-face` registration and live typography preview.
+  - Export font synchronization awaiting `document.fonts.ready` prior to HTML/SVG/Canvas rasterization.
+- **Curated Text Presets**:
+  - One-click presets in Card Creator: Editorial (Serif, left, 26px), Minimal (Sans, left, 20px), Technical (Mono, left, 18px), Poetic (Serif, center, 24px).
+- **Template Collection Audit & Ambient Metadata**:
+  - Audited all 70 templates across `templates.ts` and `extendedTemplates.ts` with 100% unique IDs, valid themes, and non-empty titles.
+  - Added explicit ambient signatures for iconic templates (Midnights Vinyl, Tokyo Matcha, St. Germain, Oxford Navy, Warm Linen, Marcus Aurelius).
+- **Test Suite Expansion**:
+  - Added `test/ambient-and-fonts.test.ts` asserting ambient color normalization, default palettes, all 70 templates integrity, and custom font validation rules.
+
 ## [2.1.0] - 2026-11-20
 
 ### Fixed

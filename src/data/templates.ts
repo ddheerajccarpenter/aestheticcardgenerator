@@ -61,6 +61,11 @@ const ORIGINAL_TEMPLATES: CardTemplate[] = [
     showBorder: true,
     showIcon: true,
     iconName: 'format_quote',
+    ambient: {
+      primary: '#c69d78',
+      secondary: '#8c7b6d',
+      neutral: '#24211e',
+    },
   },
   {
     id: 'oxford-navy-journal',
@@ -81,6 +86,11 @@ const ORIGINAL_TEMPLATES: CardTemplate[] = [
     showBorder: false,
     showIcon: true,
     iconName: 'bookmark',
+    ambient: {
+      primary: '#2d4a6e',
+      secondary: '#6080a8',
+      neutral: '#181d26',
+    },
   },
   {
     id: 'camus-summer',
@@ -101,6 +111,11 @@ const ORIGINAL_TEMPLATES: CardTemplate[] = [
     showBorder: false,
     showIcon: true,
     iconName: 'auto_awesome',
+    ambient: {
+      primary: '#d48842',
+      secondary: '#aa5522',
+      neutral: '#2b231d',
+    },
   },
   {
     id: 'aurelius-meditations',
@@ -121,6 +136,11 @@ const ORIGINAL_TEMPLATES: CardTemplate[] = [
     showBorder: true,
     showIcon: true,
     iconName: 'auto_awesome',
+    ambient: {
+      primary: '#b89f7a',
+      secondary: '#78654c',
+      neutral: '#25211b',
+    },
   },
   {
     id: 'obsidian-monochrome',

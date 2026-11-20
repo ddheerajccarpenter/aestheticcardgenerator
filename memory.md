@@ -38,9 +38,45 @@
   This ensures utility classes like `!pl-10` can override horizontal padding without being clobbered by 4-way shorthands.
 
 ## 5. Automated Integrity Testing
-- `test/ui-ux-integrity.test.mjs` verifies:
+- `test/ui-ux-integrity.test.mjs` and `test/ambient-and-fonts.test.ts` verify:
   1. All 12 critical HTML entrypoints exist in `dist/` with responsive viewport meta tags.
-  2. Dark and light theme initialization tokens.
+  2. Dark and light theme initialization tokens (Projection Room `#191715`, Archival Paper `#f1ebdd`).
   3. Sitemap integrity with 36 indexed routes.
   4. Compiled CSS responsive breakpoints (`40rem`/640px, `48rem`/768px, `64rem`/1024px) and design system tokens.
   5. Source architectural rules: `!isEditor` gating, `sticky top-0` header, docked `bottom-0` bottom nav with safe-area support, and side-by-side card action buttons.
+  6. Ambient color normalization, default presets, and 70-template metadata integrity.
+  7. Custom font validation limits (15MB ceiling, supported extensions, magic byte headers).
+
+## 6. Dual-Theme Color System (Emulsion & Paper)
+- **Dark Mode (Projection Room)**:
+  - `--app-bg`: `#191715` (warm near-black cinema foundation)
+  - `--app-surface`: `#24211e`
+  - `--app-surface-secondary`: `#312c27`
+  - `--app-border-subtle`: `#48413a`
+  - `--app-text-primary`: `#efe6d8`
+  - `--app-text-secondary`: `#bfb1a1`
+  - `--app-accent`: `#c69d78`
+- **Light Mode (Archival Paper)**:
+  - `--app-bg`: `#f1ebdd` (warm muted archival paper)
+  - `--app-surface`: `#faf5eb`
+  - `--app-surface-secondary`: `#e4d8c9`
+  - `--app-border-subtle`: `#c9beaf`
+  - `--app-text-primary`: `#292620`
+  - `--app-text-secondary`: `#61584d`
+  - `--app-accent`: `#6f4637`
+
+## 7. Ambient Atmosphere System
+- Implemented in `src/engines/ambientAtmosphere.ts` and `src/components/AmbientAtmosphereLayer.tsx`.
+- Diffuse multi-stop radial wash rendered via fixed `pointer-events-none` layer behind content (`z-0`).
+- Responsive to scrolling cards in `TemplatesView.tsx` via `IntersectionObserver` targeting viewport center proximity.
+- Color normalization (`normalizeAmbientColor`) clamps lightness and saturation to prevent garish or oversaturated washes.
+- **Editor Neutrality Rule**: Gated strictly by `!isEditor` in `App.tsx` so `/canvas`, `/create`, and `/editor` remain 100% color-accurate and distraction-free.
+- Ambient toggle state persisted in `localStorage` (`acg_ambient_enabled`).
+
+## 8. Client-Side Custom Font Subsystem
+- Located in `src/services/customFontManager.ts`.
+- Supports `.woff2`, `.woff`, `.ttf`, and `.otf` font uploads up to 15MB.
+- Security-hardened: validates magic bytes (`wOF2`, `wOFF`, `\x00\x01\x00\x00`, `OTTO`).
+- Persisted in browser IndexedDB database `AestheticCardStudioFontsDB` (store: `fonts`).
+- Dynamically registers `@font-face` rules on document on boot and upload.
+- Prior to canvas/HTML rasterization (`toPng`, `toJpeg`), export functions must await `document.fonts.ready` to ensure uploaded typography is cleanly embedded in downloaded assets.

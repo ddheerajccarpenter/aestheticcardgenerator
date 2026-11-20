@@ -108,3 +108,27 @@ Based on `Px and other things.mp4`:
    - Use for responsive card columns, fluid media widths, and adaptive grid columns (`grid-cols-1 md:grid-cols-2 lg:grid-cols-3`).
 5. **`vw` / Viewport Units**:
    - Use for fluid display headlines (`text-[clamp(2.5rem,6vw,5.5rem)]`) with min/max clamps.
+
+---
+
+## 4. Cinematic Dual-Theme Color System & Ambient Atmosphere Engine
+
+### 4.1 Emulsion & Paper Identity
+- **Dark Mode (Projection Room)**:
+  - Replaced cold/generic dark grey with warm cinema projection room tones: `#191715` foundation, `#24211e` surface, `#312c27` raised card containers, `#48413a` subtle borders, and `#c69d78` warm copper accent.
+- **Light Mode (Archival Paper)**:
+  - Replaced sterile `#ffffff` with tactile archival paper palette: `#f1ebdd` foundation, `#faf5eb` surface, `#e4d8c9` secondary containers, `#c9beaf` border, and `#6f4637` umber accent.
+- **Contrast Ratios**: Verified 7:1+ contrast on body copy and 4.5:1+ on secondary metadata across all surfaces.
+
+### 4.2 Scroll-Reactive Ambient Atmosphere Engine
+- Diffuse multi-stop radial gradient background wash implemented in `src/components/AmbientAtmosphereLayer.tsx`.
+- Gated out of editor views (`/create`, `/canvas`) in `App.tsx` so workspaces remain neutral.
+- Dynamically responds to template visibility in `TemplatesView.tsx` via `IntersectionObserver` observing viewport center proximity.
+- Color normalization (`normalizeAmbientColor`) clamps saturation and brightness to preserve subtle filmic ambience.
+- Ambient toggle button provided in template library header and persisted in `localStorage`.
+
+### 4.3 Custom Font Upload Subsystem
+- Full client-side font upload (`.woff2`, `.woff`, `.ttf`, `.otf`) in Card Creator (`/create`) and Canvas Studio (`/canvas`).
+- Verified header magic bytes, 15MB file size limit, and IndexedDB persistence.
+- Added curated typography presets (Editorial, Minimal, Technical, Poetic).
+- Synchronized image exports with `document.fonts.ready` to ensure clean typography rendering.

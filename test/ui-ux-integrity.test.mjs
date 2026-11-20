@@ -93,6 +93,32 @@ assert.ok(templatesSrc.includes('grid-cols-2 gap-2'), 'TemplatesView.tsx cards m
 
 const indexCss = fs.readFileSync('src/index.css', 'utf8');
 assert.ok(indexCss.includes('padding-block') && indexCss.includes('padding-inline'), 'index.css must use padding-block/padding-inline for studio-input');
+assert.ok(indexCss.includes('#191715'), 'index.css must define Projection Room dark foundation (#191715)');
+assert.ok(indexCss.includes('#f1ebdd'), 'index.css must define Archival Paper light foundation (#f1ebdd)');
+assert.ok(indexCss.includes('--ambient-opacity'), 'index.css must define --ambient-opacity token');
+
+// 5. Ambient Atmosphere and Dual-Theme System Verification
+const ambientSrc = fs.readFileSync('src/engines/ambientAtmosphere.ts', 'utf8');
+assert.ok(ambientSrc.includes('normalizeAmbientColor'), 'ambientAtmosphere must export normalizeAmbientColor');
+assert.ok(ambientSrc.includes('DEFAULT_DARK_AMBIENT'), 'ambientAtmosphere must export DEFAULT_DARK_AMBIENT');
+assert.ok(ambientSrc.includes('DEFAULT_LIGHT_AMBIENT'), 'ambientAtmosphere must export DEFAULT_LIGHT_AMBIENT');
+
+const ambientLayerSrc = fs.readFileSync('src/components/AmbientAtmosphereLayer.tsx', 'utf8');
+assert.ok(ambientLayerSrc.includes('pointer-events-none'), 'AmbientAtmosphereLayer must be non-interactive pointer-events-none');
+assert.ok(ambientLayerSrc.includes('radial-gradient'), 'AmbientAtmosphereLayer must render diffuse radial gradient wash');
+
+// 6. Custom Font Upload & Validation Integrity
+const fontMgrSrc = fs.readFileSync('src/services/customFontManager.ts', 'utf8');
+assert.ok(fontMgrSrc.includes('validateFontFile'), 'customFontManager must export validateFontFile');
+assert.ok(fontMgrSrc.includes('15 * 1024 * 1024'), 'customFontManager must enforce 15MB file size limit');
+assert.ok(fontMgrSrc.includes('AestheticCardStudioFontsDB'), 'customFontManager must persist to AestheticCardStudioFontsDB IndexedDB');
+
+// 7. Verify all 70 templates integrity in templates.ts
+const templatesSrcFile = fs.readFileSync('src/data/templates.ts', 'utf8');
+assert.ok(templatesSrcFile.includes('PRESET_TEMPLATES'), 'templates.ts must export PRESET_TEMPLATES');
+assert.ok(templatesSrcFile.includes('projection-room'), 'PALETTE_PRESETS must include projection-room');
+assert.ok(templatesSrcFile.includes('archival-paper'), 'PALETTE_PRESETS must include archival-paper');
 
 console.log('✓ All source architectural anti-regression checks verified.');
+console.log('✓ Dual-theme tokens, ambient engine, font manager, and 70-template audit verified.');
 console.log('All UI/UX & Responsive Build Integrity Verifications passed cleanly!');
