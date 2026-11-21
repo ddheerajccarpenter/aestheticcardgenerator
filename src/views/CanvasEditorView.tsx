@@ -4887,50 +4887,354 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               {activeSidebarTab === 'inspector' ? (
                 selectedObject ? (
                   <div className="flex flex-col gap-4">
+                    {/* Mobile Inspector Header with Quick Layer Switcher */}
                     <div className="sticky top-0 z-10 -mx-4 px-4 py-2 flex items-center justify-between border-b border-current/10 bg-[var(--app-surface)]">
-                      <div>
-                        <span className="text-[10px] font-mono text-[#81786d] uppercase">{selectedObject.type} Layer</span>
-                        <h4 className="text-sm font-semibold truncate max-w-[200px]">{selectedObject.name}</h4>
+                      <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
+                        <select
+                          value={selectedObject.id}
+                          onChange={(e) => setSelectedId(e.target.value)}
+                          className={`text-xs font-semibold rounded-lg px-2 py-1.5 border max-w-[170px] truncate cursor-pointer ${
+                            isLight ? 'bg-white border-[#d4cdbf] text-[var(--app-accent)]' : 'bg-[#1a1713] border-[#39342d] text-white'
+                          }`}
+                          aria-label="Switch selected layer"
+                        >
+                          {doc.objects.map((o) => (
+                            <option key={o.id} value={o.id}>
+                              {o.name} ({o.type})
+                            </option>
+                          ))}
+                        </select>
                       </div>
-                      <button
-                        onClick={() => deleteObject(selectedObject.id)}
-                        aria-label={`Delete ${selectedObject.name}`}
-                        className="px-2 py-1.5 rounded-lg text-red-400 hover:bg-red-500/10 flex items-center gap-1.5 text-xs"
-                        title="Delete layer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        <span>Delete</span>
-                      </button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => updateObject(selectedObject.id, { locked: !selectedObject.locked })}
+                          aria-label={selectedObject.locked ? `Unlock ${selectedObject.name}` : `Lock ${selectedObject.name}`}
+                          className={`p-2 rounded-lg border transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center ${
+                            selectedObject.locked
+                              ? isLight ? 'bg-[#24211b] text-white border-[#24211b]' : 'bg-[#E2D9C8] text-[#24211b] border-[#E2D9C8]'
+                              : isLight ? 'border-[#e3ddd3] text-[#81786d]' : 'border-[#39342d] text-[#81786d]'
+                          }`}
+                          title={selectedObject.locked ? 'Unlock' : 'Lock position'}
+                        >
+                          {selectedObject.locked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                        </button>
+                        <button
+                          onClick={() => duplicateObject(selectedObject.id)}
+                          aria-label={`Duplicate ${selectedObject.name}`}
+                          className={`p-2 rounded-lg border transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center ${
+                            isLight ? 'border-[#e3ddd3] text-[#81786d]' : 'border-[#39342d] text-[#81786d]'
+                          }`}
+                          title="Duplicate layer"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => deleteObject(selectedObject.id)}
+                          aria-label={`Delete ${selectedObject.name}`}
+                          className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer"
+                          title="Delete layer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
 
+                    {/* TEXT EDITING CONTROLS */}
                     {selectedObject.type === 'text' && (
-                      <div className="flex flex-col gap-2">
-                        <label className="text-xs font-semibold">Text Content</label>
-                        <textarea
-                          value={(selectedObject as TextCanvasObject).text}
-                          onChange={(e) => updateObject(selectedObject.id, { text: e.target.value })}
-                          rows={2}
-                          className={`w-full rounded-xl p-2.5 text-xs border focus:outline-none ${
-                            isLight ? 'bg-white border-[#d4cdbf]' : 'bg-[#211e19] border-[#39342d]'
-                          }`}
-                        />
+                      <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-xs font-semibold">Text Content</label>
+                          <textarea
+                            value={(selectedObject as TextCanvasObject).text}
+                            onChange={(e) => updateObject(selectedObject.id, { text: e.target.value })}
+                            rows={2}
+                            className={`w-full rounded-xl p-2.5 text-xs border focus:outline-none ${
+                              isLight ? 'bg-white border-[#d4cdbf]' : 'bg-[#211e19] border-[#39342d]'
+                            }`}
+                          />
+                        </div>
+
+                        {/* Font Family */}
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] font-semibold text-[#81786d]">Font Family</label>
+                          <select
+                            value={resolveCanvasFontFamily((selectedObject as TextCanvasObject).fontFamily)}
+                            onChange={(e) => updateObject(selectedObject.id, { fontFamily: e.target.value })}
+                            className={`w-full p-2 rounded-lg text-xs border focus:outline-none ${
+                              isLight ? 'bg-[#f8f5ef] border-[#d4cdbf]' : 'bg-[#211e19] border-[#39342d]'
+                            }`}
+                          >
+                            <option value={DEFAULT_CANVAS_FONT_FAMILY}>System Sans (Local)</option>
+                            <option value="'Newsreader', Georgia, serif">Newsreader (Editorial Serif)</option>
+                            <option value="'Playfair Display', Georgia, serif">Playfair Display (Display Serif)</option>
+                            <option value="'JetBrains Mono', monospace">JetBrains Mono (Technical)</option>
+                            <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Geometric)</option>
+                            {customFonts.length > 0 && (
+                              <optgroup label="Uploaded Custom Fonts">
+                                {customFonts.map((f) => (
+                                  <option key={f.familyName} value={f.familyName}>
+                                    {f.familyName.replace('Custom_', '').replace(/_/g, ' ')}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            )}
+                          </select>
+                        </div>
+
+                        {/* Size & Weight */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[11px] text-[#81786d]">Size ({(selectedObject as TextCanvasObject).fontSize}px)</label>
+                            <input
+                              type="range"
+                              min={10}
+                              max={96}
+                              value={(selectedObject as TextCanvasObject).fontSize}
+                              onChange={(e) => updateObject(selectedObject.id, { fontSize: Number(e.target.value) })}
+                              className="w-full accent-[var(--app-accent)]"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[11px] text-[#81786d]">Weight</label>
+                            <select
+                              value={(selectedObject as TextCanvasObject).fontWeight}
+                              onChange={(e) =>
+                                updateObject(selectedObject.id, {
+                                  fontWeight: e.target.value as TextCanvasObject['fontWeight'],
+                                })
+                              }
+                              className={`w-full p-1.5 rounded-lg text-xs border focus:outline-none ${
+                                isLight ? 'bg-[#f8f5ef] border-[#d4cdbf]' : 'bg-[#211e19] border-[#39342d]'
+                              }`}
+                            >
+                              <option value="400">Regular (400)</option>
+                              <option value="500">Medium (500)</option>
+                              <option value="600">Semibold (600)</option>
+                              <option value="700">Bold (700)</option>
+                              <option value="800">Extra Bold (800)</option>
+                              <option value="900">Black (900)</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Color & Alignment */}
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-1.5">
+                            <label className="text-[11px] text-[#81786d]">Color</label>
+                            <input
+                              type="color"
+                              value={(selectedObject as TextCanvasObject).color}
+                              onChange={(e) => updateObject(selectedObject.id, { color: e.target.value })}
+                              className="w-7 h-7 rounded-lg border border-transparent cursor-pointer"
+                            />
+                          </div>
+
+                          <div className="flex items-center gap-1 border rounded-lg p-0.5 border-current/20">
+                            {(['left', 'center', 'right'] as const).map((align) => (
+                              <button
+                                key={align}
+                                onClick={() => updateObject(selectedObject.id, { align })}
+                                className={`px-2 py-1 rounded text-[11px] font-semibold capitalize transition-colors cursor-pointer ${
+                                  (selectedObject as TextCanvasObject).align === align
+                                    ? isLight ? 'bg-[var(--app-accent)] text-white' : 'bg-[#29251f] text-white'
+                                    : 'text-[#81786d]'
+                                }`}
+                              >
+                                {align}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="flex flex-col gap-1">
-                        <span>X: {selectedObject.x}px</span>
-                        <span>Y: {selectedObject.y}px</span>
+                    {/* SHAPE EDITING CONTROLS */}
+                    {selectedObject.type === 'shape' && (
+                      <div className="flex flex-col gap-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex items-center gap-2">
+                            <label className="text-[11px] text-[#81786d]">Fill Color</label>
+                            <input
+                              type="color"
+                              value={(selectedObject as any).fill || '#ffffff'}
+                              onChange={(e) => updateObject(selectedObject.id, { fill: e.target.value } as any)}
+                              className="w-7 h-7 rounded-lg cursor-pointer"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <label className="text-[11px] text-[#81786d]">Border Color</label>
+                            <input
+                              type="color"
+                              value={(selectedObject as any).stroke || '#000000'}
+                              onChange={(e) => updateObject(selectedObject.id, { stroke: e.target.value } as any)}
+                              className="w-7 h-7 rounded-lg cursor-pointer"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] text-[#81786d]">
+                            Border Width ({(selectedObject as any).strokeWidth || 0}px)
+                          </label>
+                          <input
+                            type="range"
+                            min={0}
+                            max={20}
+                            value={(selectedObject as any).strokeWidth || 0}
+                            onChange={(e) => updateObject(selectedObject.id, { strokeWidth: Number(e.target.value) } as any)}
+                            className="w-full accent-[var(--app-accent)]"
+                          />
+                        </div>
+
+                        {((selectedObject as any).shape === 'rect' || (selectedObject as any).shape === 'rounded-rect') && (
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[11px] text-[#81786d]">
+                              Corner Radius ({(selectedObject as any).borderRadius || 0}px)
+                            </label>
+                            <input
+                              type="range"
+                              min={0}
+                              max={60}
+                              value={(selectedObject as any).borderRadius || 0}
+                              onChange={(e) => updateObject(selectedObject.id, { borderRadius: Number(e.target.value) } as any)}
+                              className="w-full accent-[var(--app-accent)]"
+                            />
+                          </div>
+                        )}
                       </div>
-                      <div className="flex flex-col gap-1">
-                        <span>Width: {selectedObject.width}px</span>
-                        <span>Height: {selectedObject.height}px</span>
+                    )}
+
+                    {/* IMAGE EDITING CONTROLS */}
+                    {selectedObject.type === 'image' && (
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-[#81786d]">Image Layer</span>
+                          <button
+                            onClick={() => replaceFileInputRef.current?.click()}
+                            className="text-xs font-semibold text-[var(--app-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                          >
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Replace Photo</span>
+                          </button>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] text-[#81786d]">
+                            Opacity ({Math.round(((selectedObject as any).opacity ?? 1) * 100)}%)
+                          </label>
+                          <input
+                            type="range"
+                            min={0.1}
+                            max={1}
+                            step={0.05}
+                            value={(selectedObject as any).opacity ?? 1}
+                            onChange={(e) => updateObject(selectedObject.id, { opacity: Number(e.target.value) } as any)}
+                            className="w-full accent-[var(--app-accent)]"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] text-[#81786d]">
+                            Corner Radius ({(selectedObject as any).borderRadius || 0}px)
+                          </label>
+                          <input
+                            type="range"
+                            min={0}
+                            max={60}
+                            value={(selectedObject as any).borderRadius || 0}
+                            onChange={(e) => updateObject(selectedObject.id, { borderRadius: Number(e.target.value) } as any)}
+                            className="w-full accent-[var(--app-accent)]"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* EDITABLE TRANSFORM & DIMENSIONS */}
+                    <div className="flex flex-col gap-2 pt-2 border-t border-current/10">
+                      <span className="text-xs font-semibold text-[#81786d]">Position & Size</span>
+                      <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                        <div className="flex items-center gap-2 p-2 rounded-lg border border-current/15">
+                          <span className="text-[#81786d]">X</span>
+                          <input
+                            type="number"
+                            value={selectedObject.x}
+                            onChange={(e) => updateObject(selectedObject.id, { x: Number(e.target.value) || 0 })}
+                            className="w-full bg-transparent focus:outline-none"
+                            aria-label="X coordinate"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 p-2 rounded-lg border border-current/15">
+                          <span className="text-[#81786d]">Y</span>
+                          <input
+                            type="number"
+                            value={selectedObject.y}
+                            onChange={(e) => updateObject(selectedObject.id, { y: Number(e.target.value) || 0 })}
+                            className="w-full bg-transparent focus:outline-none"
+                            aria-label="Y coordinate"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 p-2 rounded-lg border border-current/15">
+                          <span className="text-[#81786d]">W</span>
+                          <input
+                            type="number"
+                            value={selectedObject.width}
+                            onChange={(e) => updateObject(selectedObject.id, { width: Math.max(10, Number(e.target.value) || 10) })}
+                            className="w-full bg-transparent focus:outline-none"
+                            aria-label="Layer width"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 p-2 rounded-lg border border-current/15">
+                          <span className="text-[#81786d]">H</span>
+                          <input
+                            type="number"
+                            value={selectedObject.height}
+                            onChange={(e) => updateObject(selectedObject.id, { height: Math.max(10, Number(e.target.value) || 10) })}
+                            className="w-full bg-transparent focus:outline-none"
+                            aria-label="Layer height"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Rotation Slider */}
+                      <div className="flex items-center justify-between gap-3 text-xs pt-1">
+                        <span className="text-[#81786d]">Rotate</span>
+                        <div className="flex items-center gap-2 flex-1 max-w-[200px]">
+                          <input
+                            type="range"
+                            min={-180}
+                            max={180}
+                            value={selectedObject.rotation || 0}
+                            onChange={(e) => updateObject(selectedObject.id, { rotation: Number(e.target.value) })}
+                            className="w-full accent-[var(--app-accent)]"
+                            aria-label="Rotation angle"
+                          />
+                          <span className="font-mono text-[11px] w-10 text-right">{selectedObject.rotation || 0}°</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-xs text-[#81786d]">
-                    Tap any layer on the canvas to inspect its properties.
+                  <div className="flex flex-col gap-3 py-2">
+                    <span className="text-xs font-semibold text-[#81786d]">
+                      Select a layer to inspect &amp; edit:
+                    </span>
+                    <div className="flex flex-col gap-1.5 max-h-[50vh] overflow-y-auto">
+                      {doc.objects.map((obj) => (
+                        <button
+                          key={obj.id}
+                          onClick={() => setSelectedId(obj.id)}
+                          className={`p-2.5 rounded-xl border text-left flex items-center justify-between text-xs transition-colors cursor-pointer ${
+                            isLight ? 'bg-white hover:bg-slate-50 border-slate-200' : 'bg-[#211e19] hover:bg-[#2b2721] border-[#39342d]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[var(--app-accent)]" />
+                            <span className="font-medium truncate max-w-[200px]">{obj.name}</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-[#81786d] uppercase">{obj.type}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )
               ) : (
@@ -4947,25 +5251,40 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             : isLight ? 'bg-white border-[#e3ddd3]' : 'bg-[#171513] border-[#39342d]'
                         }`}
                       >
-                        <span className="text-xs font-medium truncate max-w-[180px]">{obj.name}</span>
-                        <div className="flex items-center gap-1">
+                        <span className="text-xs font-medium truncate max-w-[160px]">{obj.name}</span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateObject(obj.id, { locked: !obj.locked });
+                            }}
+                            aria-label={obj.locked ? `Unlock layer ${obj.name}` : `Lock layer ${obj.name}`}
+                            className="p-2 min-w-[38px] min-h-[38px] flex items-center justify-center rounded-lg text-[#81786d] hover:bg-black/10 cursor-pointer"
+                            title={obj.locked ? 'Unlock' : 'Lock'}
+                          >
+                            {obj.locked ? <Lock className="w-4 h-4 text-[var(--app-accent)]" /> : <Unlock className="w-4 h-4" />}
+                          </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               updateObject(obj.id, { visible: !obj.visible });
                             }}
-                            className="p-1 text-[#81786d]"
+                            aria-label={obj.visible ? `Hide layer ${obj.name}` : `Show layer ${obj.name}`}
+                            className="p-2 min-w-[38px] min-h-[38px] flex items-center justify-center rounded-lg text-[#81786d] hover:bg-black/10 cursor-pointer"
+                            title={obj.visible ? 'Hide' : 'Show'}
                           >
-                            {obj.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                            {obj.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               deleteObject(obj.id);
                             }}
-                            className="p-1 text-red-400"
+                            aria-label={`Delete layer ${obj.name}`}
+                            className="p-2 min-w-[38px] min-h-[38px] flex items-center justify-center rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer"
+                            title="Delete"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>

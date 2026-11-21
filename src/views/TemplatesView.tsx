@@ -301,7 +301,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
             </button>
           </div>
         ) : (
-          <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 sm:gap-6">
+          <div className="columns-1 md:columns-2 xl:columns-3 gap-5 [column-fill:_balance]">
             {filteredTemplates.map((template) => {
               const isSelected = selectedForCompare.some((t) => t.id === template.id);
 
@@ -309,19 +309,21 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                 <article
                   key={template.id}
                   data-template-id={template.id}
-                  className="template-ambient-card group flex flex-col overflow-hidden rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors hover:border-[var(--app-border-strong)]"
+                  className="break-inside-avoid mb-5 template-ambient-card group flex flex-col overflow-hidden rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors hover:border-[var(--app-border-strong)]"
                 >
-                  {/* Real Card Visual Artwork Preview (Unified with Archival Blueprint Lazy-Loading) */}
-                  <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="m-3 overflow-hidden rounded-sm border border-[var(--app-border-subtle)]">
-                    <UnifiedCardThumbnail
-                      template={template}
-                      isLight={isLight}
-                      className="h-full w-full"
-                    />
-                  </LazyTemplateCard>
+                  {/* Real Card Visual Artwork Preview (Safely container-padded to prevent right edge clipping) */}
+                  <div className="p-3 pb-0">
+                    <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="w-full overflow-hidden rounded-sm border border-[var(--app-border-subtle)]">
+                      <UnifiedCardThumbnail
+                        template={template}
+                        isLight={isLight}
+                        className="h-full w-full"
+                      />
+                    </LazyTemplateCard>
+                  </div>
 
                   {/* Card Footer Bar with actions */}
-                  <div className="mt-auto flex flex-col gap-3 border-t border-[var(--app-border-subtle)] p-4">
+                  <div className="flex flex-col gap-3 border-t border-[var(--app-border-subtle)] p-4 mt-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <h3 className="truncate text-base font-semibold text-[var(--app-text-primary)]">
