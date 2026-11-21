@@ -9,6 +9,7 @@ import {
   Maximize2,
   RotateCcw,
   Check,
+  Stamp,
 } from 'lucide-react';
 
 export type CharacterMood = 'idle' | 'happy' | 'surprised' | 'winking' | 'thinking' | 'celebrating';
@@ -28,52 +29,50 @@ export const COMPANION_ROSTER: CompanionMeta[] = [
     name: 'Archie',
     badge: '🐻',
     role: 'Archival Bear',
-    greeting: 'Hi! I’m Archie, your archival bear. Ready to craft something timeless?',
+    greeting: 'Hi! Ready to craft something timeless?',
   },
   {
     id: 'pip',
     name: 'Pip',
     badge: '🤖',
     role: 'Pixel Mascot',
-    greeting: 'Beep boop! Pip online. Let’s arrange some pixel-perfect cards!',
+    greeting: 'Beep boop! Let’s make a clean layout.',
   },
   {
     id: 'emulsion',
     name: 'Emulsion',
     badge: '🐱',
     role: 'Studio Cat',
-    greeting: 'Purr... I’m Emulsion. Let’s capture the light and frame your story.',
+    greeting: 'Purr... Let’s frame your words nicely.',
   },
   {
     id: 'komorebi',
     name: 'Komorebi',
     badge: '🐰',
     role: 'Forest Bunny',
-    greeting: 'Hello! I’m Komorebi. Take a peaceful breath — design at your own pace.',
+    greeting: 'Take a calm breath — design at your pace.',
   },
   {
     id: 'cosmo',
     name: 'Cosmo',
     badge: '🚀',
     role: 'Star Astronaut',
-    greeting: 'Greetings from orbit! Cosmo here. Let’s make your card shine across the stars!',
+    greeting: 'Greetings! Let’s make your card shine.',
   },
   {
     id: 'mochi',
     name: 'Mochi',
     badge: '☁️',
     role: 'Cozy Cloud',
-    greeting: 'Warm hugs! I’m Mochi. Soft thoughts and cozy colors make everything brighter.',
+    greeting: 'Soft colors make everything feel warmer.',
   },
 ];
 
 const DESIGN_INSPIRATIONS = [
-  { text: '“Less, but better.”', author: 'Dieter Rams', tip: 'Try reducing font sizes to give negative space room to breathe.' },
-  { text: '“The details are not the details. They make the design.”', author: 'Charles Eames', tip: 'Hairline borders (1px) create refined editorial frames.' },
-  { text: '“In the depth of winter, I finally learned that within me lay an invincible summer.”', author: 'Albert Camus', tip: 'Pair an archival serif headline with warm muted paper tones.' },
-  { text: '“Simplicity is about subtracting the obvious and adding the meaningful.”', author: 'John Maeda', tip: 'Pick two contrasting weights from the same type family.' },
-  { text: '“Good design is as little design as possible.”', author: 'Dieter Rams', tip: 'Try the Projection Room dark mode for high-contrast focus.' },
-  { text: '“Typography is two-dimensional architecture.”', author: 'Hermann Zapf', tip: 'Increase line-height to 1.5x on longer reflective quotes.' },
+  { text: '“Less, but better.”', author: 'Dieter Rams', tip: 'Use generous negative space.' },
+  { text: '“The details are not the details. They make the design.”', author: 'Charles Eames', tip: 'Hairline borders give quiet structure.' },
+  { text: '“Simplicity is about subtracting the obvious and adding the meaningful.”', author: 'John Maeda', tip: 'Pick two contrasting weights from one family.' },
+  { text: '“Typography is two-dimensional architecture.”', author: 'Hermann Zapf', tip: 'Try 1.5x line height for quotes.' },
 ];
 
 const PALETTE_INSPIRATIONS = [
@@ -102,6 +101,7 @@ export const StudioCompanion: React.FC = () => {
   const [mood, setMood] = useState<CharacterMood>('idle');
   const [isOpen, setIsOpen] = useState(false);
   const [copiedPalette, setCopiedPalette] = useState(false);
+  const [stampedCanvas, setStampedCanvas] = useState(false);
   const [isMinimized, setIsMinimized] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('acg_companion_minimized') === 'true';
@@ -134,16 +134,23 @@ export const StudioCompanion: React.FC = () => {
     return window.innerWidth >= 768 ? 96 : 64;
   }, []);
 
-  // Clamp position to viewport bounds
+  // Strict boundary limit: cannot be dragged over top navbar or behind bottom nav
   const clampCoordinates = useCallback((x: number, y: number): Position => {
     if (typeof window === 'undefined') return { x, y };
     const size = getCompanionSize();
-    const margin = 10;
-    const maxX = Math.max(margin, window.innerWidth - size - margin);
-    const maxY = Math.max(margin, window.innerHeight - size - margin);
+    // Top boundary constraint: never overlap the top header/navbar
+    const minY = 72;
+    // Bottom boundary constraint: on mobile, stay above bottom navigation bar
+    const bottomSafety = window.innerWidth < 768 ? 84 : 20;
+    const maxY = Math.max(minY, window.innerHeight - size - bottomSafety);
+
+    // Left and right boundary constraints
+    const minX = 12;
+    const maxX = Math.max(minX, window.innerWidth - size - 12);
+
     return {
-      x: Math.min(Math.max(margin, x), maxX),
-      y: Math.min(Math.max(margin, y), maxY),
+      x: Math.min(Math.max(minX, x), maxX),
+      y: Math.min(Math.max(minY, y), maxY),
     };
   }, [getCompanionSize]);
 
@@ -226,10 +233,10 @@ export const StudioCompanion: React.FC = () => {
     setCharacter(newChar);
     const meta = COMPANION_ROSTER.find((c) => c.id === newChar) || COMPANION_ROSTER[0];
     setSpeechText(meta.greeting);
-    setSpeechAuthor(meta.role);
+    setSpeechAuthor('');
     setMood('happy');
     localStorage.setItem('acg_companion_char', newChar);
-    setTimeout(() => setMood('idle'), 1500);
+    setTimeout(() => setMood('idle'), 1200);
   };
 
   // Reset companion to default bottom-right position
@@ -293,34 +300,19 @@ export const StudioCompanion: React.FC = () => {
       localStorage.setItem('acg_companion_pos', JSON.stringify(position));
     }
 
-    // If it was a tap/click (not a drag), trigger reaction
+    // Normal tap toggles options dialog, NEVER triggers cheering
     if (!wasMoved) {
       handleCharacterClick();
     }
   };
 
-  // Handle companion click / tap
+  // Handle character click / tap: Toggles dialog cleanly without cheering
   const handleCharacterClick = () => {
-    const moods: CharacterMood[] = ['happy', 'surprised', 'winking', 'celebrating'];
-    const nextMood = moods[Math.floor(Math.random() * moods.length)];
-    setMood(nextMood);
-
-    if (nextMood === 'celebrating') {
-      confetti({
-        particleCount: 40,
-        spread: 60,
-        origin: { y: 0.85, x: 0.88 },
-        colors: ['#c69d78', '#efe6d8', '#312c27', '#faf5eb'],
-      });
-    }
-
-    if (!isOpen && !isMinimized) {
-      setIsOpen(true);
-    }
-
+    setMood('happy');
+    setIsOpen((prev) => !prev);
     setTimeout(() => {
       setMood('idle');
-    }, 1800);
+    }, 1200);
   };
 
   const handleInspireQuote = () => {
@@ -334,10 +326,9 @@ export const StudioCompanion: React.FC = () => {
   const handleRandomPalette = async () => {
     const pal = PALETTE_INSPIRATIONS[Math.floor(Math.random() * PALETTE_INSPIRATIONS.length)];
     setSpeechText(`Try "${pal.name}": Foundation ${pal.bg}, Ink ${pal.ink}, Accent ${pal.accent}.`);
-    setSpeechAuthor('Palette Preset');
+    setSpeechAuthor('Palette');
     setMood('thinking');
 
-    // Real clipboard write with immediate visual feedback
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(`${pal.bg}, ${pal.ink}, ${pal.accent}`);
@@ -349,13 +340,31 @@ export const StudioCompanion: React.FC = () => {
     setTimeout(() => setMood('idle'), 1500);
   };
 
+  // Stamp character directly onto card canvas
+  const handleAddToCanvas = () => {
+    window.dispatchEvent(
+      new CustomEvent('acg:add-mascot-sticker', {
+        detail: { character },
+      })
+    );
+    localStorage.setItem('acg_staged_sticker', character);
+    setStampedCanvas(true);
+    setSpeechText(`Added ${currentMeta.name} to card!`);
+    setMood('happy');
+    setTimeout(() => {
+      setStampedCanvas(false);
+      setMood('idle');
+    }, 2000);
+  };
+
+  // Explicit Cheer: ONLY triggers when clicking this specific button
   const handleCheer = () => {
     setMood('celebrating');
-    setSpeechText('You’re making something worth keeping! Keep designing!');
-    setSpeechAuthor('ACG Cheer');
+    setSpeechText('You’re making something worth keeping!');
+    setSpeechAuthor('');
     confetti({
-      particleCount: 50,
-      spread: 70,
+      particleCount: 45,
+      spread: 60,
       origin: { y: 0.8, x: 0.85 },
       colors: ['#c69d78', '#efe6d8', '#6f4637', '#ffffff'],
     });
@@ -380,7 +389,7 @@ export const StudioCompanion: React.FC = () => {
   return (
     <aside
       ref={companionRef}
-      aria-label="Interactive Studio Mascot"
+      aria-label="Interactive Studio Companion"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -404,28 +413,36 @@ export const StudioCompanion: React.FC = () => {
             isNearTop ? 'top-full mt-2' : 'bottom-full mb-2'
           } ${
             isRightSide ? 'right-0' : 'left-0'
-          } w-72 sm:w-80 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 backdrop-blur-md shadow-2xl p-3.5 text-xs text-[var(--app-text)] animate-in fade-in slide-in-from-bottom-2`}
+          } w-72 sm:w-80 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 backdrop-blur-md shadow-2xl p-3 text-xs text-[var(--app-text)] animate-in fade-in slide-in-from-bottom-2`}
         >
-          {/* Header */}
+          {/* Header with Close, Reset, and Minimize */}
           <div className="flex items-center justify-between border-b border-[var(--app-border-subtle)] pb-2 mb-2">
             <div className="flex items-center gap-1.5 font-semibold text-[11px] uppercase tracking-wider text-[var(--app-text-secondary)]">
               <Sparkles className="w-3.5 h-3.5 text-[var(--app-accent)]" />
-              <span>Studio Assistant</span>
+              <span>Studio Companion</span>
             </div>
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={handleResetPosition}
-                className="p-1 rounded hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] cursor-pointer"
-                title="Reset mascot position"
+                className="p-1 rounded hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] hover:text-[var(--app-text)] cursor-pointer"
+                title="Reset position"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
               <button
                 type="button"
+                onClick={() => toggleMinimize(true)}
+                className="p-1 rounded hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] hover:text-[var(--app-text)] cursor-pointer"
+                title="Minimize"
+              >
+                <Minimize2 className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] cursor-pointer"
-                title="Close Bubble"
+                className="p-1 rounded hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] hover:text-[var(--app-text)] cursor-pointer"
+                title="Close"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -433,7 +450,7 @@ export const StudioCompanion: React.FC = () => {
           </div>
 
           {/* Character Switcher Roster (6 Joyful companions) */}
-          <div className="flex items-center justify-between gap-1 mb-2.5 p-1 rounded-xl bg-[var(--app-surface-secondary)]/50 border border-[var(--app-border-subtle)]">
+          <div className="flex items-center justify-between gap-1 mb-2 p-1 rounded-xl bg-[var(--app-surface-secondary)]/50 border border-[var(--app-border-subtle)]">
             {COMPANION_ROSTER.map((item) => (
               <button
                 key={item.id}
@@ -453,7 +470,7 @@ export const StudioCompanion: React.FC = () => {
           </div>
 
           {/* Dialogue Message */}
-          <p className="leading-relaxed mb-2 text-[var(--app-text)] font-normal">{speechText}</p>
+          <p className="leading-snug mb-2 text-[var(--app-text)] font-normal">{speechText}</p>
           {speechAuthor && (
             <p className="text-[10px] font-mono text-[var(--app-accent)] -mt-1 mb-2">
               — {speechAuthor}
@@ -461,26 +478,41 @@ export const StudioCompanion: React.FC = () => {
           )}
 
           {/* Quick Action Buttons */}
-          <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-[var(--app-border-subtle)] text-[11px]">
+          <div className="grid grid-cols-4 gap-1 pt-1.5 border-t border-[var(--app-border-subtle)] text-[10px]">
+            <button
+              type="button"
+              onClick={handleAddToCanvas}
+              className={`py-1 px-1 rounded-lg border flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors ${
+                stampedCanvas
+                  ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/40'
+                  : 'bg-[var(--app-surface-secondary)] text-[var(--app-text)] border-[var(--app-border-subtle)] hover:bg-[var(--app-surface-secondary)]/80'
+              }`}
+              title="Add this character as a sticker on your card"
+            >
+              {stampedCanvas ? <Check className="w-3 h-3 text-emerald-500" /> : <Stamp className="w-3 h-3 text-[var(--app-accent)]" />}
+              <span>{stampedCanvas ? 'Added!' : 'Add to Card'}</span>
+            </button>
+
             <button
               type="button"
               onClick={handleInspireQuote}
-              className="py-1 px-1.5 rounded-lg bg-[var(--app-surface-secondary)] hover:bg-[var(--app-surface-secondary)]/80 text-[var(--app-text)] border border-[var(--app-border-subtle)] flex items-center justify-center gap-1 cursor-pointer transition-colors"
+              className="py-1 px-1 rounded-lg bg-[var(--app-surface-secondary)] hover:bg-[var(--app-surface-secondary)]/80 text-[var(--app-text)] border border-[var(--app-border-subtle)] flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors"
               title="Get a design quote"
             >
               <Sparkles className="w-3 h-3 text-[var(--app-accent)]" />
               <span>Inspire</span>
             </button>
+
             <button
               type="button"
               onClick={handleRandomPalette}
-              className="py-1 px-1.5 rounded-lg bg-[var(--app-surface-secondary)] hover:bg-[var(--app-surface-secondary)]/80 text-[var(--app-text)] border border-[var(--app-border-subtle)] flex items-center justify-center gap-1 cursor-pointer transition-colors"
-              title="Get color suggestion and copy to clipboard"
+              className="py-1 px-1 rounded-lg bg-[var(--app-surface-secondary)] hover:bg-[var(--app-surface-secondary)]/80 text-[var(--app-text)] border border-[var(--app-border-subtle)] flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors"
+              title="Copy color palette"
             >
               {copiedPalette ? (
                 <>
                   <Check className="w-3 h-3 text-emerald-500" />
-                  <span className="text-emerald-500 font-medium">Copied!</span>
+                  <span className="text-emerald-500">Copied!</span>
                 </>
               ) : (
                 <>
@@ -489,11 +521,12 @@ export const StudioCompanion: React.FC = () => {
                 </>
               )}
             </button>
+
             <button
               type="button"
               onClick={handleCheer}
-              className="py-1 px-1.5 rounded-lg bg-[var(--app-accent)]/15 hover:bg-[var(--app-accent)]/25 text-[var(--app-accent)] border border-[var(--app-accent)]/30 flex items-center justify-center gap-1 cursor-pointer transition-colors font-medium"
-              title="Celebrate"
+              className="py-1 px-1 rounded-lg bg-[var(--app-accent)]/15 hover:bg-[var(--app-accent)]/25 text-[var(--app-accent)] border border-[var(--app-accent)]/30 flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors font-medium"
+              title="Celebrate with confetti"
             >
               <Smile className="w-3 h-3" />
               <span>Cheer!</span>
@@ -502,7 +535,7 @@ export const StudioCompanion: React.FC = () => {
         </div>
       )}
 
-      {/* Mascot Container */}
+      {/* Mascot Container - Clean Avatar with NO overlying buttons on the character */}
       <div className="flex items-end justify-end gap-2">
         {/* Minimized Pill Toggle */}
         {isMinimized ? (
@@ -517,12 +550,14 @@ export const StudioCompanion: React.FC = () => {
             <Maximize2 className="w-3 h-3 text-[var(--app-text-muted)]" />
           </button>
         ) : (
-          <div className="relative group">
-            {/* Interactive Character Avatar (Responsive sizing: w-16 h-16 on mobile, w-24 h-24 on laptop) */}
+          <div className="relative">
+            {/* Clean Interactive Character Avatar (NO floating buttons sitting on it) */}
             <div
-              onDoubleClick={() => setIsOpen((prev) => !prev)}
-              aria-label={`Interactive ${currentMeta.name} mascot`}
-              className="relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl border-2 border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:shadow-2xl hover:border-[var(--app-accent)]/60 overflow-hidden transition-transform duration-200 active:scale-95 flex items-center justify-center select-none"
+              onClick={handleCharacterClick}
+              role="button"
+              tabIndex={0}
+              aria-label={`Interactive ${currentMeta.name} companion. Click to open options.`}
+              className="relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl border-2 border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:shadow-2xl hover:border-[var(--app-accent)]/60 overflow-hidden transition-transform duration-200 active:scale-95 flex items-center justify-center cursor-pointer select-none"
               style={{
                 transform: `rotate(${headTilt}rad)`,
               }}
@@ -594,7 +629,7 @@ export const StudioCompanion: React.FC = () => {
                 <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
                   <rect width="100" height="100" fill="var(--app-surface-secondary, #24211e)" />
                   <polygon points="22,40 32,18 48,32" fill="#191715" stroke="#48413a" strokeWidth="1" />
-                  <polygon points="78,40 68,18 52,32" fill="#191715" stroke="#48413a" strokeWidth="1" />
+                  <polygon points="74,38 66,18 52,32" fill="#191715" stroke="#48413a" strokeWidth="1" />
                   <polygon points="26,36 34,24 44,32" fill="#c69d78" opacity="0.6" />
                   <polygon points="70,34 64,24 56,32" fill="#c69d78" opacity="0.6" />
                   <ellipse cx="50" cy="52" rx="34" ry="28" fill="#191715" stroke="#312c27" strokeWidth="1.5" />
@@ -703,26 +738,6 @@ export const StudioCompanion: React.FC = () => {
                   <polygon points="50,22 52,27 57,27 53,30 55,35 50,32 45,35 47,30 43,27 48,27" fill="#fbbf24" />
                 </svg>
               )}
-            </div>
-
-            {/* Quick Toggle Controls Overlay */}
-            <div className="absolute -top-2 -right-2 flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setIsOpen((prev) => !prev)}
-                className="w-5 h-5 rounded-full bg-[var(--app-surface)] border border-[var(--app-border-subtle)] text-[var(--app-text)] shadow-sm hover:scale-110 flex items-center justify-center text-[10px] cursor-pointer"
-                title={isOpen ? 'Hide Speech' : 'Show Speech Bubble'}
-              >
-                💬
-              </button>
-              <button
-                type="button"
-                onClick={() => toggleMinimize(true)}
-                className="w-5 h-5 rounded-full bg-[var(--app-surface)] border border-[var(--app-border-subtle)] text-[var(--app-text-muted)] shadow-sm hover:scale-110 flex items-center justify-center cursor-pointer"
-                title="Minimize Companion"
-              >
-                <Minimize2 className="w-2.5 h-2.5" />
-              </button>
             </div>
           </div>
         )}

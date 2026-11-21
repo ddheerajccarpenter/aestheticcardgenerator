@@ -190,13 +190,21 @@
   --color-rose-950: var(--color-stone-950);
 }
 
+@font-face {
+  font-family: 'Starborn';
+  src: url('/fonts/Starborn.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     /* Global Typography System */
-    --font-heading: 'Murecho', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-subheading: 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-brand: 'Murecho', 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Plus Jakarta Sans', 'Funnel Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: 'Starborn', 'Comfortaa', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-subheading: 'Comfortaa', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-brand: 'Starborn', 'Comfortaa', sans-serif;
+    --font-body: 'Comfortaa', -apple-system, BlinkMacSystemFont, sans-serif;
 
     /* Warm graphite and paper with a single accessible vermilion accent. */
     --c60-dominant: #171512;
@@ -362,7 +370,7 @@
     color: var(--color-ink);
   }
 
-  /* Base Body Rule: Elegant, high-readability editorial typography */
+  /* Base Body Rule: Elegant Comfortaa medium rounded typography */
   body, p, span, li, input, textarea, select, button, label {
     font-family: var(--font-body);
     font-weight: 500;
@@ -375,23 +383,23 @@
   }
 
   p, .body-regular {
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1.6;
   }
 
   strong, b, .font-bold {
-    font-weight: 700 !important;
+    font-weight: 600 !important;
   }
 
-  /* Page headings */
+  /* Page headings: Starborn */
   h1, h2, .heading-main, .hero-title, .page-title {
     font-family: var(--font-heading) !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
+    font-weight: 400 !important;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
   }
 
-  /* Subheadings, Nav & UI Tabs: Funnel Sans (600) */
+  /* Subheadings, Nav & UI Tabs: Comfortaa (500-600) */
   h3, h4, h5, h6, nav a, .subheading, .section-eyebrow, .tab-trigger, .pill-badge {
     font-family: var(--font-subheading) !important;
     font-weight: 600 !important;

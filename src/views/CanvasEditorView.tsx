@@ -523,8 +523,30 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         };
         img.src = rawDataUrl;
       } catch (err) {
-        console.error('Three.js canvas init error', err);
-        if (isMounted) setIs3DMode(false);
+        console.error('Three.js canvas init fallback', err);
+        if (!isMounted || !threeMountRef.current) return;
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = 600;
+        offCanvas.height = Math.round(600 * (doc.canvasHeight / doc.canvasWidth));
+        const ctx = offCanvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = doc.background || '#191715';
+          ctx.fillRect(0, 0, offCanvas.width, offCanvas.height);
+          ctx.strokeStyle = '#c69d78';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(16, 16, offCanvas.width - 32, offCanvas.height - 32);
+        }
+        if (threeCleanupRef.current) {
+          threeCleanupRef.current.updateTexture(offCanvas, 'cotton-rag-300gsm');
+        } else {
+          threeCleanupRef.current = createThreeCardPreviewScene(
+            threeMountRef.current,
+            offCanvas,
+            doc.canvasWidth,
+            doc.canvasHeight,
+            'cotton-rag-300gsm'
+          );
+        }
       }
     }, 180);
 
@@ -969,6 +991,74 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
     showToast(`Imported ${item.title} onto canvas!`);
   };
+
+  // Listen for companion "Add to Card" event from StudioCompanion or staged sticker
+  useEffect(() => {
+    const handleAddMascotSticker = (e: Event) => {
+      const customEvent = e as CustomEvent<{ character?: string }>;
+      const charId = customEvent.detail?.character || 'archie';
+      const stickerMap: Record<string, string> = {
+        archie: ASSET_STICKERS.archieMascot,
+        pip: ASSET_STICKERS.pipMascot,
+        emulsion: ASSET_STICKERS.emulsionCat,
+        komorebi: (ASSET_STICKERS as any).komorebiBunny,
+        cosmo: (ASSET_STICKERS as any).cosmoStar,
+        mochi: (ASSET_STICKERS as any).mochiCloud,
+      };
+      const svg = stickerMap[charId] || ASSET_STICKERS.archieMascot;
+      const charNames: Record<string, string> = {
+        archie: 'Archie Bear',
+        pip: 'Pip Pixel',
+        emulsion: 'Emulsion Cat',
+        komorebi: 'Komorebi Bunny',
+        cosmo: 'Cosmo Star',
+        mochi: 'Mochi Cloud',
+      };
+      const stickerName = `${charNames[charId] || 'Mascot'} Sticker`;
+      const size = 120;
+      addObject(
+        createImageObject(svg, {
+          name: stickerName,
+          width: size,
+          height: size,
+          x: Math.round(doc.canvasWidth / 2 - size / 2),
+          y: Math.round(doc.canvasHeight / 2 - size / 2),
+        })
+      );
+      showToast(`Added ${charNames[charId] || 'Mascot'} to card!`);
+    };
+
+    window.addEventListener('acg:add-mascot-sticker', handleAddMascotSticker);
+
+    // Also check if user staged a companion sticker before navigating to canvas
+    const staged = localStorage.getItem('acg_staged_sticker');
+    if (staged) {
+      localStorage.removeItem('acg_staged_sticker');
+      const stickerMap: Record<string, string> = {
+        archie: ASSET_STICKERS.archieMascot,
+        pip: ASSET_STICKERS.pipMascot,
+        emulsion: ASSET_STICKERS.emulsionCat,
+        komorebi: (ASSET_STICKERS as any).komorebiBunny,
+        cosmo: (ASSET_STICKERS as any).cosmoStar,
+        mochi: (ASSET_STICKERS as any).mochiCloud,
+      };
+      const svg = stickerMap[staged];
+      if (svg) {
+        addObject(
+          createImageObject(svg, {
+            name: `${staged.charAt(0).toUpperCase() + staged.slice(1)} Mascot Sticker`,
+            width: 120,
+            height: 120,
+            x: Math.round(doc.canvasWidth / 2 - 60),
+            y: Math.round(doc.canvasHeight / 2 - 60),
+          })
+        );
+        showToast('Pasted companion sticker onto card!');
+      }
+    }
+
+    return () => window.removeEventListener('acg:add-mascot-sticker', handleAddMascotSticker);
+  }, [doc.canvasWidth, doc.canvasHeight]);
 
   // Global pointer move & up handlers (Supports mouse, touch, and stylus)
   useEffect(() => {
@@ -2585,6 +2675,84 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     </div>
                     <Smile className="w-4 h-4 text-[var(--app-accent)]" />
                   </button>
+
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createImageObject((ASSET_STICKERS as any).komorebiBunny, {
+                          name: 'Komorebi Bunny',
+                          width: 90,
+                          height: 90,
+                          x: Math.round(doc.canvasWidth / 2 - 45),
+                          y: Math.round(doc.canvasHeight / 2 - 45),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    aria-label="Add Komorebi Bunny Mascot"
+                    data-close-add-menu
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Komorebi Bunny</span>
+                      <span className="text-[10px] text-[#81786d]">Peaceful forest companion</span>
+                    </div>
+                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createImageObject((ASSET_STICKERS as any).cosmoStar, {
+                          name: 'Cosmo Star',
+                          width: 90,
+                          height: 90,
+                          x: Math.round(doc.canvasWidth / 2 - 45),
+                          y: Math.round(doc.canvasHeight / 2 - 45),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    aria-label="Add Cosmo Star Astronaut"
+                    data-close-add-menu
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Cosmo Star</span>
+                      <span className="text-[10px] text-[#81786d]">Cosmic astronaut companion</span>
+                    </div>
+                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createImageObject((ASSET_STICKERS as any).mochiCloud, {
+                          name: 'Mochi Cloud',
+                          width: 90,
+                          height: 90,
+                          x: Math.round(doc.canvasWidth / 2 - 45),
+                          y: Math.round(doc.canvasHeight / 2 - 45),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    aria-label="Add Mochi Cloud Mascot"
+                    data-close-add-menu
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Mochi Cloud</span>
+                      <span className="text-[10px] text-[#81786d]">Warm, uplifting pastel cloud</span>
+                    </div>
+                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
+                  </button>
                 </div>
               </div>
             )}
@@ -2615,19 +2783,15 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         >
           {is3DMode && (
             <div
-              className="relative flex items-center justify-center"
-              style={{
-                width: `${Math.min(doc.canvasWidth, 680)}px`,
-                height: `${Math.min(doc.canvasHeight, 680)}px`,
-              }}
+              className="relative flex items-center justify-center w-full max-w-xl aspect-[4/3] sm:aspect-square rounded-3xl overflow-hidden border border-[var(--app-border-strong)] bg-gradient-to-b from-black/20 to-black/60 backdrop-blur-xl shadow-2xl p-2 sm:p-4 my-auto"
             >
               <div ref={threeMountRef} className="h-full w-full" />
-              <ThreeDPreviewControls controllerRef={threeCleanupRef} />
+              <ThreeDPreviewControls controllerRef={threeCleanupRef} onExit={() => setIs3DMode(false)} />
             </div>
           )}
           <div
             aria-hidden={is3DMode}
-            className={is3DMode ? 'pointer-events-none absolute -left-[10000px] top-0' : ''}
+            className={is3DMode ? 'pointer-events-none absolute opacity-0 -z-10' : ''}
           >
             {/* Zoom Wrapper */}
             <div

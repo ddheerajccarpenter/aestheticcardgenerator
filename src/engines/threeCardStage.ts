@@ -76,24 +76,35 @@ export function createThreeCardPreviewScene(
     cardWidth,
     cardHeight,
     cardDepth,
-    3,
-    Math.min(cardDepth / 2, Math.min(cardWidth, cardHeight) * 0.018)
+    4,
+    Math.min(cardDepth / 2, Math.min(cardWidth, cardHeight) * 0.024)
   );
   const frontMaterial = new THREE.MeshPhysicalMaterial({
     map: cardTexture,
     ...getThreeMaterialForSurface(surfaceId),
     toneMapped: false,
   });
-  const edgeMaterial = new THREE.MeshStandardMaterial({ color: 0xe5ded2, roughness: 0.72 });
+  const edgeMaterial = new THREE.MeshStandardMaterial({
+    color: 0xe8e2d5,
+    roughness: 0.65,
+    metalness: 0.08,
+  });
   const card = new THREE.Mesh(geometry, [edgeMaterial, edgeMaterial, edgeMaterial, edgeMaterial, frontMaterial, edgeMaterial]);
+  // Initial 3D angle so card immediately looks beveled and sculptural
+  card.rotation.set(-0.14, 0.22, -0.02);
   scene.add(card);
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
-  const keyLight = new THREE.DirectionalLight(0xfff6e9, 1.8);
-  keyLight.position.set(2.5, 3.2, 4);
-  const fillLight = new THREE.DirectionalLight(0xe3ddd3, 0.7);
-  fillLight.position.set(-3, -2, 2);
-  scene.add(ambientLight, keyLight, fillLight);
+  // 4-Point Studio Lighting (Key, Fill, Rim & Under-glow)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+  const keyLight = new THREE.DirectionalLight(0xfff6e9, 2.0);
+  keyLight.position.set(2.8, 3.5, 4.2);
+  const fillLight = new THREE.DirectionalLight(0xdcd5c9, 0.8);
+  fillLight.position.set(-3.2, -2.0, 2.5);
+  const rimLight = new THREE.DirectionalLight(0xffffff, 1.3);
+  rimLight.position.set(0, 3.5, -4);
+  const underLight = new THREE.DirectionalLight(0xc69d78, 0.4);
+  underLight.position.set(0, -3.2, 1.5);
+  scene.add(ambientLight, keyLight, fillLight, rimLight, underLight);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -222,6 +233,7 @@ export function createThreeCardPreviewScene(
 
   const resetView = () => {
     controls.target.set(0, 0, 0);
+    card.rotation.set(-0.14, 0.22, -0.02);
     camera.position.set(0, 0, baseDistance);
     camera.up.set(0, 1, 0);
     controls.update();

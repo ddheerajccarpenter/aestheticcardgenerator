@@ -27,9 +27,65 @@ test('Studio Companion: 6 joyful characters with metadata and persistent positio
   assert.ok(companionSrc.includes('w-16 h-16'), 'Must be optimized size w-16 h-16 on mobile screen');
 });
 
+test('Studio Companion: Boundary limits, clean avatar, no click cheering, and canvas stamping', () => {
+  const companionSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/components/StudioCompanion.tsx'), 'utf8');
+
+  // 1. Boundary limits: never cross top navbar or bottom navigation
+  assert.ok(companionSrc.includes('minY = 72'), 'minY constraint must be at least 72 to never cross top navbar');
+  assert.ok(companionSrc.includes('bottomSafety = window.innerWidth < 768 ? 84 : 20'), 'Must enforce bottom navigation clearance on mobile');
+
+  // 2. Clean character avatar: no floating buttons sitting on character
+  assert.ok(!companionSrc.includes('absolute -top-2 -right-2 flex items-center gap-1'), 'Must not have floating buttons on character avatar');
+
+  // 3. Cheering does NOT happen on normal character click
+  const clickHandlerMatch = companionSrc.match(/const handleCharacterClick = \(\) => \{([\s\S]*?)\};/);
+  assert.ok(clickHandlerMatch, 'Must define handleCharacterClick');
+  assert.ok(!clickHandlerMatch[1].includes('confetti('), 'Normal character click must NEVER trigger confetti or celebratory cheer');
+
+  // 4. Stamping on canvas
+  assert.ok(companionSrc.includes('acg:add-mascot-sticker'), 'Must dispatch acg:add-mascot-sticker event to add companion to canvas');
+  assert.ok(companionSrc.includes('handleAddToCanvas'), 'Must define handleAddToCanvas');
+
+  // Check CanvasEditorView listener for companion sticker
+  const canvasEditorSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/views/CanvasEditorView.tsx'), 'utf8');
+  assert.ok(canvasEditorSrc.includes('acg:add-mascot-sticker'), 'CanvasEditorView must listen for acg:add-mascot-sticker');
+  assert.ok(canvasEditorSrc.includes('acg_staged_sticker'), 'CanvasEditorView must restore staged sticker if opened after');
+});
+
+test('Typography: Comfortaa medium bold and Starborn display headings', () => {
+  // Check Starborn font file exists in public/fonts
+  const starbornPath = path.resolve(process.cwd(), 'public/fonts/Starborn.ttf');
+  assert.ok(fs.existsSync(starbornPath), 'Starborn.ttf must exist in public/fonts');
+
+  // Check SiteLayout.astro font links
+  const layoutSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/layouts/SiteLayout.astro'), 'utf8');
+  assert.ok(layoutSrc.includes('Comfortaa'), 'SiteLayout must include Google Font Comfortaa');
+  assert.ok(layoutSrc.includes('/fonts/Starborn.ttf'), 'SiteLayout must preload Starborn.ttf');
+
+  // Check index.css font definitions
+  const cssSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/index.css'), 'utf8');
+  assert.ok(cssSrc.includes("@font-face {\n  font-family: 'Starborn';"), 'index.css must define @font-face for Starborn');
+  assert.ok(cssSrc.includes("--font-heading: 'Starborn'"), 'index.css must set --font-heading to Starborn');
+  assert.ok(cssSrc.includes("--font-body: 'Comfortaa'"), 'index.css must set --font-body to Comfortaa');
+  assert.ok(cssSrc.includes('font-weight: 500;'), 'index.css must set medium weight 500 for body typography');
+});
+
+test('3D Stage Engine: Tilt rotation, lighting and UI controls', () => {
+  const threeStageSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/engines/threeCardStage.ts'), 'utf8');
+  assert.ok(threeStageSrc.includes('card.rotation.set(-0.14, 0.22, -0.02)'), 'Must have initial realistic 3D tilt rotation');
+  assert.ok(threeStageSrc.includes('rimLight'), 'Must feature rim lighting for dimensional bevels');
+
+  const controlsSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/components/ThreeDPreviewControls.tsx'), 'utf8');
+  assert.ok(controlsSrc.includes('Exit 3D'), 'Must provide an explicit Exit 3D button in controls');
+  assert.ok(controlsSrc.includes('onExit'), 'Controls must accept onExit callback');
+
+  const canvasEditorSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/views/CanvasEditorView.tsx'), 'utf8');
+  assert.ok(canvasEditorSrc.includes('onExit={() => setIs3DMode(false)}'), 'CanvasEditorView must pass onExit handler to ThreeDPreviewControls');
+  assert.ok(canvasEditorSrc.includes('aspect-[4/3] sm:aspect-square'), '3D container must have responsive aspect ratio');
+});
+
 test('Export Engine: WebP export uses direct WebP Blob and does not pass blob URLs to dataUrlToBlob', () => {
   const canvasEditorSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/views/CanvasEditorView.tsx'), 'utf8');
-  // Confirm WebP handling does NOT use dataUrlToBlob(dataUrl) when dataUrl is a blob: URL
   assert.ok(canvasEditorSrc.includes("actualFormat === 'webp'"), 'Must handle webp format branch');
   assert.ok(
     canvasEditorSrc.includes("type: 'image/webp'"),
