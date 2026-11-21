@@ -42,6 +42,7 @@ import {
 import { restoreSavedCustomFonts } from './services/customFontManager';
 import { AmbientAtmosphereLayer } from './components/AmbientAtmosphereLayer';
 import { StudioCompanion } from './components/StudioCompanion';
+import { SkeletonLoader } from './components/SkeletonLoader';
 
 export const App: React.FC = () => {
   // Current route path normalized without trailing slashes
@@ -103,8 +104,59 @@ export const App: React.FC = () => {
     restoreSavedCustomFonts();
   }, []);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  const toggleTheme = (e?: React.MouseEvent | { clientX: number; clientY: number } | any) => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+
+    const dispatchThemeEvent = (t: 'dark' | 'light') => {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('acg:theme-switched', { detail: { theme: t } }));
+      }
+    };
+
+    const isReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof document === 'undefined' || !(document as any).startViewTransition || isReduced) {
+      setTheme(nextTheme);
+      dispatchThemeEvent(nextTheme);
+      return;
+    }
+
+    // Coordinates of click, fallback to top-right where header theme button sits
+    let x = window.innerWidth - 60;
+    let y = 30;
+    if (e && typeof e.clientX === 'number' && e.clientX > 0) {
+      x = e.clientX;
+      y = e.clientY;
+    } else if (e?.currentTarget?.getBoundingClientRect) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    const transition = (document as any).startViewTransition(() => {
+      setTheme(nextTheme);
+      dispatchThemeEvent(nextTheme);
+    });
+
+    transition.ready?.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`
+          ],
+        },
+        {
+          duration: 450,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          pseudoElement: '::view-transition-new(root)',
+        }
+      );
+    });
   };
 
   // Full browser navigation: reloads on every navigation for multi-page behavior
@@ -306,6 +358,9 @@ export const App: React.FC = () => {
       data-theme={theme}
       className="app-shell min-h-screen flex flex-col font-sans transition-colors duration-200 relative text-[var(--app-text-primary)]"
     >
+      {/* 1.5 - 2.0s Skeleton Screen on Initial Webpage Load */}
+      <SkeletonLoader durationMs={1600} />
+
       {/* Background Ambient Atmosphere (Scroll-Reactive) */}
       {!isEditor && <AmbientAtmosphereLayer theme={theme} />}
       {/* Global Header (shown across public marketing pages, hidden on standalone fullscreen studio) */}

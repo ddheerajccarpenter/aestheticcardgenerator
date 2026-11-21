@@ -127,6 +127,10 @@ export const StudioCompanion: React.FC = () => {
     origY: number;
     hasMoved: boolean;
   } | null>(null);
+  const lastInteractionTime = useRef(0);
+  const hasTriggeredEndScroll = useRef(false);
+  const [clickAnim, setClickAnim] = useState(false);
+  const [emote, setEmote] = useState<string | null>(null);
 
   // Measure companion size based on screen
   const getCompanionSize = useCallback(() => {
@@ -228,6 +232,65 @@ export const StudioCompanion: React.FC = () => {
     return () => clearInterval(blinkInterval);
   }, [mood]);
 
+  // Scroll to bottom reaction: celebrated once per visit to page end
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (ticking || document.visibilityState === 'hidden') return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const scrollBottom = window.innerHeight + window.scrollY;
+        const totalHeight = document.documentElement.scrollHeight;
+        if (totalHeight > window.innerHeight + 100 && scrollBottom >= totalHeight - 90) {
+          if (!hasTriggeredEndScroll.current) {
+            hasTriggeredEndScroll.current = true;
+            setMood('celebrating');
+            setEmote('🎉');
+            setSpeechText('You reached the bottom! Ready to craft your card? ✨');
+            setSpeechAuthor('');
+            setClickAnim(true);
+            setTimeout(() => {
+              setClickAnim(false);
+              setEmote(null);
+              setMood('idle');
+            }, 2500);
+          }
+        } else if (scrollBottom < totalHeight - 240) {
+          hasTriggeredEndScroll.current = false;
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Theme change celebration: react delightfully when lighting changes
+  useEffect(() => {
+    const handleThemeSwitched = (e: any) => {
+      const nextTheme = e?.detail?.theme;
+      setMood('surprised');
+      setEmote(nextTheme === 'light' ? '☀️' : '🌙');
+      setClickAnim(true);
+      setSpeechText(
+        nextTheme === 'light'
+          ? 'Switched to clean daytime editorial tone! ☀️'
+          : 'Switched to cinematic projection dark mode! 🌙'
+      );
+      setSpeechAuthor('');
+      setTimeout(() => {
+        setClickAnim(false);
+        setEmote(null);
+        setMood('happy');
+        setTimeout(() => setMood('idle'), 1200);
+      }, 1600);
+    };
+
+    window.addEventListener('acg:theme-switched', handleThemeSwitched);
+    return () => window.removeEventListener('acg:theme-switched', handleThemeSwitched);
+  }, []);
+
   // Handle character switch
   const handleSelectCharacter = (newChar: CharacterType) => {
     setCharacter(newChar);
@@ -306,13 +369,36 @@ export const StudioCompanion: React.FC = () => {
     }
   };
 
-  // Handle character click / tap: Toggles dialog cleanly without cheering
+  const EMOTE_LIST = ['✨', '💖', '🎨', '💡', '🌟', '🎉'];
+
+  // Handle character click / tap: Debounced against double-fire pointerup+click events, cycles expressions, triggers squash-and-stretch
   const handleCharacterClick = () => {
-    setMood('happy');
+    const now = Date.now();
+    if (now - lastInteractionTime.current < 280) return;
+    lastInteractionTime.current = now;
+
+    // Trigger squash & stretch bounce animation
+    setClickAnim(true);
+    setTimeout(() => setClickAnim(false), 400);
+
+    // Pick a floating emote
+    const nextEmote = EMOTE_LIST[Math.floor(Math.random() * EMOTE_LIST.length)];
+    setEmote(nextEmote);
+    setTimeout(() => setEmote(null), 900);
+
+    // Playfully cycle expression mood
+    setMood((prev) => {
+      if (prev === 'idle') return 'happy';
+      if (prev === 'happy') return 'winking';
+      if (prev === 'winking') return 'surprised';
+      if (prev === 'surprised') return 'thinking';
+      return 'happy';
+    });
+
     setIsOpen((prev) => !prev);
     setTimeout(() => {
       setMood('idle');
-    }, 1200);
+    }, 1400);
   };
 
   const handleInspireQuote = () => {
@@ -551,13 +637,32 @@ export const StudioCompanion: React.FC = () => {
           </button>
         ) : (
           <div className="relative">
+            {/* Floating Emote on Click, Scroll, or Theme Change */}
+            {emote && (
+              <div
+                aria-hidden="true"
+                className="absolute -top-7 left-1/2 -translate-x-1/2 text-xl pointer-events-none animate-float-emote z-30"
+              >
+                {emote}
+              </div>
+            )}
+
             {/* Clean Interactive Character Avatar (NO floating buttons sitting on it) */}
             <div
               onClick={handleCharacterClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleCharacterClick();
+                }
+              }}
               role="button"
               tabIndex={0}
               aria-label={`Interactive ${currentMeta.name} companion. Click to open options.`}
-              className="relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl border-2 border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:shadow-2xl hover:border-[var(--app-accent)]/60 overflow-hidden transition-transform duration-200 active:scale-95 flex items-center justify-center cursor-pointer select-none"
+              aria-expanded={isOpen}
+              className={`relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl border-2 border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:shadow-2xl hover:border-[var(--app-accent)]/60 overflow-hidden transition-all duration-200 flex items-center justify-center cursor-pointer select-none ${
+                clickAnim ? 'animate-companion-squash' : !isDragging ? 'animate-companion-breathe' : ''
+              }`}
               style={{
                 transform: `rotate(${headTilt}rad)`,
               }}

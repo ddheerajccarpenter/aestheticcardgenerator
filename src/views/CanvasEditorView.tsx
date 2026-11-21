@@ -176,6 +176,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const [mobileAddSheetOpen, setMobileAddSheetOpen] = useState(false);
   const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false);
   const addMenuRef = useRef<HTMLDetailsElement>(null);
+  const moreMenuRef = useRef<HTMLDetailsElement>(null);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
   const isLight = theme === 'light';
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -346,6 +348,20 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (moreMenuRef.current && moreMenuRef.current.hasAttribute('open') && !moreMenuRef.current.contains(target)) {
+        moreMenuRef.current.removeAttribute('open');
+      }
+      if (exportDropdownOpen && exportMenuRef.current && !exportMenuRef.current.contains(target)) {
+        setExportDropdownOpen(false);
+      }
+    };
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, [exportDropdownOpen]);
 
   const [customFonts, setCustomFonts] = useState<StoredCustomFont[]>([]);
   const [fontModalOpen, setFontModalOpen] = useState(false);
@@ -1877,7 +1893,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <span>Templates</span>
           </button>
 
-          <details className="relative">
+          <details ref={moreMenuRef} className="relative">
             <summary className={`list-none inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
               isLight
                 ? 'bg-white border-[#e3ddd3] text-[var(--app-accent)] hover:bg-[#f8f5ef]'
@@ -1886,7 +1902,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               <span>More</span>
               <ChevronDown className="w-3 h-3" />
             </summary>
-            <div className={`absolute right-0 top-full mt-2 w-52 rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 canvas-utility-popover ${
+            <div className={`absolute right-0 top-full mt-2 w-52 max-w-[calc(100vw-16px)] rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 canvas-utility-popover ${
               isLight ? 'bg-white border-[#e3ddd3]' : 'bg-[#211e19] border-[#39342d]'
             }`}>
               <button
@@ -1956,7 +1972,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           </details>
 
           {/* Export Dropdown */}
-          <div className="relative">
+          <div ref={exportMenuRef} className="relative">
             <button
               onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
               disabled={exporting}
@@ -1973,7 +1989,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
             {exportDropdownOpen && (
               <div
-                className={`absolute right-0 top-full mt-2 w-52 rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 canvas-utility-popover ${
+                className={`absolute right-0 top-full mt-2 w-52 max-w-[calc(100vw-16px)] rounded-xl border p-1 shadow-2xl z-50 flex flex-col gap-0.5 canvas-utility-popover ${
                   isLight ? 'bg-white border-[#e3ddd3]' : 'bg-[#211e19] border-[#39342d]'
                 }`}
               >

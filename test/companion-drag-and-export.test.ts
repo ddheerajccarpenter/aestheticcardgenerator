@@ -123,3 +123,68 @@ test('Antislop Verification: No generic AI marketing clichés in content data', 
   assert.ok(!guidesSrc.includes('intellectual resonance'), 'guides.ts must not contain "intellectual resonance"');
   assert.ok(!extendedTemplatesSrc.includes('tactile digital aesthetic cards'), 'extendedTemplates.ts must not contain "tactile digital aesthetic cards"');
 });
+
+test('Canvas Popovers: "More" and "Export" menus feature outside-click dismissal, boundary clamping, and toolbar overflow:visible', () => {
+  const canvasEditorSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/views/CanvasEditorView.tsx'), 'utf8');
+  const cssSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/index.css'), 'utf8');
+
+  // Verify refs and click-outside dismissal
+  assert.ok(canvasEditorSrc.includes('moreMenuRef'), 'Must declare moreMenuRef for More menu');
+  assert.ok(canvasEditorSrc.includes('exportMenuRef'), 'Must declare exportMenuRef for Export dropdown');
+  assert.ok(canvasEditorSrc.includes('moreMenuRef.current.removeAttribute(\'open\')'), 'Must dismiss More menu on outside click');
+  assert.ok(canvasEditorSrc.includes('setExportDropdownOpen(false)'), 'Must dismiss Export dropdown on outside click');
+
+  // Verify popovers have boundary clamping
+  assert.ok(canvasEditorSrc.includes('max-w-[calc(100vw-16px)]'), 'Popovers must be clamped so they never overflow screen edges');
+
+  // Verify CSS toolbar allows popovers to overflow over canvas without clipping
+  assert.ok(cssSrc.includes('.editor-top-toolbar {\n    width: 100vw !important;\n    max-width: 100vw !important;\n    padding: 0 10px !important;\n    gap: 6px !important;\n    overflow: visible !important;'), 'Toolbar must have overflow: visible to render popovers cleanly');
+});
+
+test('Studio Companion: Click debouncing, expressions cycle, squash animation, floating emote, scroll celebration & theme switch', () => {
+  const companionSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/components/StudioCompanion.tsx'), 'utf8');
+  const cssSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/index.css'), 'utf8');
+
+  // Debouncing against duplicate pointerup + synthetic click
+  assert.ok(companionSrc.includes('lastInteractionTime'), 'Must declare lastInteractionTime to debounce clicks');
+  assert.ok(companionSrc.includes('now - lastInteractionTime.current < 280'), 'Must ignore duplicate click events within 280ms');
+
+  // Squash bounce & floating emote
+  assert.ok(companionSrc.includes('setClickAnim(true)'), 'Click must trigger squash animation');
+  assert.ok(companionSrc.includes('EMOTE_LIST'), 'Must pick from playful emote list');
+  assert.ok(companionSrc.includes('animate-float-emote'), 'Must render floating emote particle');
+  assert.ok(companionSrc.includes('animate-companion-breathe'), 'Must feature gentle idle breathing animation');
+
+  // Expression cycling
+  assert.ok(companionSrc.includes("if (prev === 'idle') return 'happy';"), 'Click must playfully cycle companion expressions');
+
+  // Page end scroll celebration
+  assert.ok(companionSrc.includes('hasTriggeredEndScroll'), 'Must track scroll trigger state');
+  assert.ok(companionSrc.includes('scrollBottom >= totalHeight - 90'), 'Must detect reaching page bottom');
+  assert.ok(companionSrc.includes('You reached the bottom!'), 'Must greet user when reaching bottom of page');
+
+  // Theme switch reaction
+  assert.ok(companionSrc.includes('acg:theme-switched'), 'Must listen to acg:theme-switched event');
+
+  // CSS animations definitions
+  assert.ok(cssSrc.includes('@keyframes companion-squash'), 'index.css must define @keyframes companion-squash');
+  assert.ok(cssSrc.includes('@keyframes companion-float-emote'), 'index.css must define @keyframes companion-float-emote');
+  assert.ok(cssSrc.includes('@keyframes companion-breathe'), 'index.css must define @keyframes companion-breathe');
+});
+
+test('Skeleton Screen & Telegram Theme Switch View Transition', () => {
+  const skeletonSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/components/SkeletonLoader.tsx'), 'utf8');
+  const appSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/App.tsx'), 'utf8');
+  const cssSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/index.css'), 'utf8');
+
+  // SkeletonLoader component
+  assert.ok(skeletonSrc.includes('durationMs = 1600'), 'SkeletonLoader must default to ~1.6s duration');
+  assert.ok(skeletonSrc.includes('animate-pulse'), 'SkeletonLoader must render subtle pulsing placeholders');
+  assert.ok(appSrc.includes('<SkeletonLoader durationMs={1600} />'), 'App must render SkeletonLoader on initial mount');
+
+  // Telegram-style view transition
+  assert.ok(appSrc.includes('startViewTransition'), 'App must use document.startViewTransition');
+  assert.ok(appSrc.includes('circle(0px at'), 'App must animate expanding circle clip-path from click origin');
+  assert.ok(cssSrc.includes('::view-transition-old(root)'), 'index.css must style view transition root elements');
+  assert.ok(cssSrc.includes('::view-transition-new(root)'), 'index.css must style view transition new element');
+});
