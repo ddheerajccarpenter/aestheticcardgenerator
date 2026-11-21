@@ -130,6 +130,8 @@ export const StudioCompanion: React.FC = () => {
   const lastInteractionTime = useRef(0);
   const hasTriggeredEndScroll = useRef(false);
   const [clickAnim, setClickAnim] = useState(false);
+  const [stampAnim, setStampAnim] = useState(false);
+  const [wiggleAnim, setWiggleAnim] = useState(false);
   const [emote, setEmote] = useState<string | null>(null);
 
   // Measure companion size based on screen
@@ -188,33 +190,41 @@ export const StudioCompanion: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [clampCoordinates]);
 
-  // Pointer tracking with smooth eye interpolation (paused when tab hidden)
+  // Pointer tracking with smooth eye interpolation (RAF-throttled to 60/120fps, paused when tab hidden)
   useEffect(() => {
+    let rafId: number | null = null;
+
     const handlePointerMove = (e: MouseEvent | TouchEvent) => {
       if (document.visibilityState === 'hidden') return;
-      if (!companionRef.current) return;
-      const rect = companionRef.current.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
+      if (rafId !== null) return;
 
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-      const dx = clientX - centerX;
-      const dy = clientY - centerY;
-      const dist = Math.hypot(dx, dy) || 1;
-      const maxDist = 320;
-      const clampDist = Math.min(dist, maxDist) / maxDist;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (!companionRef.current) return;
+        const rect = companionRef.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
 
-      setPointer({
-        x: (dx / dist) * clampDist,
-        y: (dy / dist) * clampDist,
+        const dx = clientX - centerX;
+        const dy = clientY - centerY;
+        const dist = Math.hypot(dx, dy) || 1;
+        const maxDist = 320;
+        const clampDist = Math.min(dist, maxDist) / maxDist;
+
+        setPointer({
+          x: (dx / dist) * clampDist,
+          y: (dy / dist) * clampDist,
+        });
       });
     };
 
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
     window.addEventListener('touchmove', handlePointerMove, { passive: true });
     return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('touchmove', handlePointerMove);
     };
@@ -231,6 +241,18 @@ export const StudioCompanion: React.FC = () => {
     }, 4500 + Math.random() * 2000);
     return () => clearInterval(blinkInterval);
   }, [mood]);
+
+  // Idle curiosity wiggle (paused when tab hidden or dragging)
+  useEffect(() => {
+    const wiggleInterval = setInterval(() => {
+      if (document.visibilityState === 'hidden') return;
+      if (mood === 'idle' && !isDragging) {
+        setWiggleAnim(true);
+        setTimeout(() => setWiggleAnim(false), 520);
+      }
+    }, 9000 + Math.random() * 4000);
+    return () => clearInterval(wiggleInterval);
+  }, [mood, isDragging]);
 
   // Scroll to bottom reaction: celebrated once per visit to page end
   useEffect(() => {
@@ -426,7 +448,7 @@ export const StudioCompanion: React.FC = () => {
     setTimeout(() => setMood('idle'), 1500);
   };
 
-  // Stamp character directly onto card canvas
+  // Stamp character directly onto card canvas with tactile stamp animation
   const handleAddToCanvas = () => {
     window.dispatchEvent(
       new CustomEvent('acg:add-mascot-sticker', {
@@ -435,11 +457,15 @@ export const StudioCompanion: React.FC = () => {
     );
     localStorage.setItem('acg_staged_sticker', character);
     setStampedCanvas(true);
+    setStampAnim(true);
+    setEmote('🎨');
     setSpeechText(`Added ${currentMeta.name} to card!`);
     setMood('happy');
+    setTimeout(() => setStampAnim(false), 440);
     setTimeout(() => {
       setStampedCanvas(false);
       setMood('idle');
+      setEmote(null);
     }, 2000);
   };
 
@@ -448,13 +474,19 @@ export const StudioCompanion: React.FC = () => {
     setMood('celebrating');
     setSpeechText('You’re making something worth keeping!');
     setSpeechAuthor('');
+    setEmote('🎉');
+    setClickAnim(true);
+    setTimeout(() => setClickAnim(false), 400);
     confetti({
       particleCount: 45,
       spread: 60,
       origin: { y: 0.8, x: 0.85 },
       colors: ['#c69d78', '#efe6d8', '#6f4637', '#ffffff'],
     });
-    setTimeout(() => setMood('idle'), 2000);
+    setTimeout(() => {
+      setMood('idle');
+      setEmote(null);
+    }, 2000);
   };
 
   const toggleMinimize = (min: boolean) => {
@@ -487,19 +519,21 @@ export const StudioCompanion: React.FC = () => {
         bottom: position ? undefined : '5rem',
         right: position ? undefined : '1rem',
         touchAction: 'none',
+        transition: isDragging ? 'none' : 'left 0.28s cubic-bezier(0.25, 1, 0.5, 1), top 0.28s cubic-bezier(0.25, 1, 0.5, 1)',
+        willChange: isDragging ? 'left, top' : undefined,
       }}
       className={`fixed z-40 select-none font-sans transition-shadow ${
         isDragging ? 'cursor-grabbing' : 'cursor-grab'
       }`}
     >
-      {/* Speech / Dialogue Bubble (Intelligently placed above or below) */}
+      {/* Speech / Dialogue Bubble (Intelligently placed above or below with spring pop entrance) */}
       {isOpen && !isMinimized && (
         <div
           className={`absolute ${
             isNearTop ? 'top-full mt-2' : 'bottom-full mb-2'
           } ${
             isRightSide ? 'right-0' : 'left-0'
-          } w-72 sm:w-80 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 backdrop-blur-md shadow-2xl p-3 text-xs text-[var(--app-text)] animate-in fade-in slide-in-from-bottom-2`}
+          } w-72 sm:w-80 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 backdrop-blur-md shadow-2xl p-3 text-xs text-[var(--app-text)] animate-bubble-pop`}
         >
           {/* Header with Close, Reset, and Minimize */}
           <div className="flex items-center justify-between border-b border-[var(--app-border-subtle)] pb-2 mb-2">
@@ -661,7 +695,15 @@ export const StudioCompanion: React.FC = () => {
               aria-label={`Interactive ${currentMeta.name} companion. Click to open options.`}
               aria-expanded={isOpen}
               className={`relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl border-2 border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:shadow-2xl hover:border-[var(--app-accent)]/60 overflow-hidden transition-all duration-200 flex items-center justify-center cursor-pointer select-none ${
-                clickAnim ? 'animate-companion-squash' : !isDragging ? 'animate-companion-breathe' : ''
+                stampAnim
+                  ? 'animate-companion-stamp'
+                  : clickAnim
+                  ? 'animate-companion-squash'
+                  : wiggleAnim
+                  ? 'animate-companion-wiggle'
+                  : !isDragging
+                  ? 'animate-companion-breathe'
+                  : ''
               }`}
               style={{
                 transform: `rotate(${headTilt}rad)`,

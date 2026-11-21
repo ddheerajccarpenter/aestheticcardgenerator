@@ -299,14 +299,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
         ) : (
           <div className={`grid items-start ${galleryLayout === 'compact' ? 'grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1 gap-x-6 gap-y-9 min-[520px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'}`}>
             {filteredCards.map((card) => (
-              <article key={card.id} className="group relative min-w-0">
+              <article key={card.id} className="group relative min-w-0 animate-card-entrance">
                 <button
                   type="button"
                   aria-label={`Preview ${card.title}`}
                   onClick={(event) => openPreview(card, event)}
                   className="block w-full rounded-2xl text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-accent)]"
                 >
-                  <LazyTemplateCard aspectRatio={getTemplateAspectRatio(card)} className="overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-transform duration-300 group-hover:-translate-y-1">
+                  <LazyTemplateCard aspectRatio={getTemplateAspectRatio(card)} className="overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] card-editorial-hover">
                     <UnifiedCardThumbnail template={card} className="h-full w-full" />
                   </LazyTemplateCard>
                   <div className="flex items-baseline justify-between gap-3 pt-3">
@@ -317,10 +317,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
                 </button>
 
                 <div className="mt-3 flex items-center gap-2">
-                  <button type="button" onClick={() => handleUseTemplate(card)} className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--app-border-strong)] bg-[var(--app-surface)] px-3 text-xs font-medium text-[var(--app-text-primary)] transition-colors hover:bg-[var(--app-surface-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+                  <button type="button" onClick={() => handleUseTemplate(card)} className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--app-border-strong)] bg-[var(--app-surface)] px-3 text-xs font-medium text-[var(--app-text-primary)] transition-colors hover:bg-[var(--app-surface-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] interactive-tactile">
                     Use template <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </button>
-                  <button type="button" onClick={() => void handleCopyText(card)} aria-label={copiedId === card.id ? 'Quote copied' : `Copy quote from ${card.title}`} title={copiedId === card.id ? 'Copied' : 'Copy quote'} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--app-border-strong)] bg-[var(--app-surface)] text-[var(--app-text-primary)] transition-colors hover:bg-[var(--app-surface-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+                  <button type="button" onClick={() => void handleCopyText(card)} aria-label={copiedId === card.id ? 'Quote copied' : `Copy quote from ${card.title}`} title={copiedId === card.id ? 'Copied' : 'Copy quote'} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--app-border-strong)] bg-[var(--app-surface)] text-[var(--app-text-primary)] transition-colors hover:bg-[var(--app-surface-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] interactive-tactile">
                     {copiedId === card.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </button>
                 </div>

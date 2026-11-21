@@ -166,10 +166,22 @@ test('Studio Companion: Click debouncing, expressions cycle, squash animation, f
   // Theme switch reaction
   assert.ok(companionSrc.includes('acg:theme-switched'), 'Must listen to acg:theme-switched event');
 
+  // RAF throttled pointer tracking & drag spring settle
+  assert.ok(companionSrc.includes('rafId = requestAnimationFrame'), 'Pointer tracking must be RAF-throttled to 60/120fps');
+  assert.ok(companionSrc.includes("isDragging ? 'none' : 'left 0.28s"), 'Must provide smooth spring settle when releasing drag');
+  assert.ok(companionSrc.includes('animate-companion-stamp'), 'Must support stamp impact animation');
+  assert.ok(companionSrc.includes('animate-companion-wiggle'), 'Must support curiosity wiggle animation');
+  assert.ok(companionSrc.includes('animate-bubble-pop'), 'Must support springy dialogue pop animation');
+
   // CSS animations definitions
   assert.ok(cssSrc.includes('@keyframes companion-squash'), 'index.css must define @keyframes companion-squash');
   assert.ok(cssSrc.includes('@keyframes companion-float-emote'), 'index.css must define @keyframes companion-float-emote');
   assert.ok(cssSrc.includes('@keyframes companion-breathe'), 'index.css must define @keyframes companion-breathe');
+  assert.ok(cssSrc.includes('@keyframes companion-wiggle'), 'index.css must define @keyframes companion-wiggle');
+  assert.ok(cssSrc.includes('@keyframes companion-stamp-down'), 'index.css must define @keyframes companion-stamp-down');
+  assert.ok(cssSrc.includes('@keyframes companion-bubble-pop'), 'index.css must define @keyframes companion-bubble-pop');
+  assert.ok(cssSrc.includes('@keyframes shimmer-sweep'), 'index.css must define @keyframes shimmer-sweep');
+  assert.ok(cssSrc.includes('@keyframes card-fade-in-up'), 'index.css must define @keyframes card-fade-in-up');
 });
 
 test('Skeleton Screen & Telegram Theme Switch View Transition', () => {
@@ -180,6 +192,7 @@ test('Skeleton Screen & Telegram Theme Switch View Transition', () => {
   // SkeletonLoader component
   assert.ok(skeletonSrc.includes('durationMs = 1600'), 'SkeletonLoader must default to ~1.6s duration');
   assert.ok(skeletonSrc.includes('animate-pulse'), 'SkeletonLoader must render subtle pulsing placeholders');
+  assert.ok(skeletonSrc.includes('animate-shimmer-sweep'), 'SkeletonLoader must render diagonal shimmer sweep');
   assert.ok(appSrc.includes('<SkeletonLoader durationMs={1600} />'), 'App must render SkeletonLoader on initial mount');
 
   // Telegram-style view transition

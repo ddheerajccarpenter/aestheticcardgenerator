@@ -309,7 +309,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                 <article
                   key={template.id}
                   data-template-id={template.id}
-                  className="break-inside-avoid mb-5 template-ambient-card group flex flex-col overflow-hidden rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors hover:border-[var(--app-border-strong)]"
+                  className="break-inside-avoid mb-5 template-ambient-card group flex flex-col overflow-hidden rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-all card-editorial-hover animate-card-entrance"
                 >
                   {/* Real Card Visual Artwork Preview (Safely container-padded to prevent right edge clipping) */}
                   <div className="p-3 pb-0">

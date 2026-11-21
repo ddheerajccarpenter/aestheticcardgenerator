@@ -1237,22 +1237,52 @@ html.light .studio-input:focus {
   100% { transform: scale(1, 1); }
 }
 
+@keyframes companion-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-5deg) scale(1.03); }
+  40% { transform: rotate(4deg) scale(1.03); }
+  60% { transform: rotate(-2.5deg); }
+  80% { transform: rotate(1.5deg); }
+}
+
+@keyframes companion-stamp-down {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.86) translateY(5px); }
+  70% { transform: scale(1.06) translateY(-2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes companion-bubble-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.93) translateY(8px);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.015) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 @keyframes companion-float-emote {
   0% {
     opacity: 0;
-    transform: translateY(0) scale(0.6);
+    transform: translateY(0) scale(0.5);
   }
   20% {
     opacity: 1;
-    transform: translateY(-12px) scale(1.15);
+    transform: translateY(-14px) scale(1.15);
   }
-  80% {
-    opacity: 0.9;
-    transform: translateY(-28px) scale(1);
+  75% {
+    opacity: 0.95;
+    transform: translateY(-30px) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateY(-38px) scale(0.85);
+    transform: translateY(-44px) scale(0.8);
   }
 }
 
@@ -1261,16 +1291,68 @@ html.light .studio-input:focus {
   50% { transform: translateY(-4px); }
 }
 
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(150%); }
+}
+
+@keyframes card-fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .animate-companion-squash {
   animation: companion-squash 380ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.animate-companion-wiggle {
+  animation: companion-wiggle 500ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.animate-companion-stamp {
+  animation: companion-stamp-down 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-bubble-pop {
+  animation: companion-bubble-pop 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .animate-float-emote {
-  animation: companion-float-emote 900ms ease-out forwards;
+  animation: companion-float-emote 950ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-companion-breathe {
   animation: companion-breathe 4s ease-in-out infinite;
+}
+
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-card-entrance {
+  animation: card-fade-in-up 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Tactile micro-interactions for buttons and interactive cards */
+.interactive-tactile {
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1), box-shadow 180ms ease, opacity 180ms ease;
+}
+.interactive-tactile:active {
+  transform: scale(0.975);
+}
+
+.card-editorial-hover {
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease, border-color 260ms ease;
+}
+.card-editorial-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.18);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1279,8 +1361,16 @@ html.light .studio-input:focus {
     animation: none !important;
   }
   .animate-companion-squash,
+  .animate-companion-wiggle,
+  .animate-companion-stamp,
+  .animate-bubble-pop,
   .animate-float-emote,
-  .animate-companion-breathe {
+  .animate-companion-breathe,
+  .animate-shimmer-sweep,
+  .animate-card-entrance,
+  .interactive-tactile:active,
+  .card-editorial-hover:hover {
     animation: none !important;
+    transform: none !important;
   }
 }

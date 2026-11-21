@@ -68,15 +68,16 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ durationMs = 160
 
         {/* Studio Stage / Featured Hero Card Wireframe */}
         <div className="w-full h-64 sm:h-80 rounded-2xl border border-[var(--app-border-subtle,rgba(255,255,255,0.08))] bg-[var(--app-surface,rgba(255,255,255,0.03))] p-6 flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 dark:via-white/5 to-transparent animate-shimmer-sweep pointer-events-none" />
+          <div className="flex items-center justify-between relative z-10">
             <div className="h-4 w-32 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.06))] animate-pulse" />
             <div className="h-6 w-16 rounded-full bg-[var(--app-surface-secondary,rgba(255,255,255,0.05))] animate-pulse" />
           </div>
-          <div className="flex flex-col gap-3 my-auto max-w-lg">
+          <div className="flex flex-col gap-3 my-auto max-w-lg relative z-10">
             <div className="h-6 w-3/4 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.08))] animate-pulse" />
             <div className="h-4 w-1/2 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.05))] animate-pulse" />
           </div>
-          <div className="flex items-center justify-between pt-4 border-t border-[var(--app-border-subtle,rgba(255,255,255,0.05))]">
+          <div className="flex items-center justify-between pt-4 border-t border-[var(--app-border-subtle,rgba(255,255,255,0.05))] relative z-10">
             <div className="h-3 w-24 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.05))] animate-pulse" />
             <div className="h-7 w-24 rounded-lg bg-[var(--app-surface-secondary,rgba(255,255,255,0.06))] animate-pulse" />
           </div>
@@ -87,11 +88,12 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ durationMs = 160
           {[1, 2, 3].map((idx) => (
             <div
               key={idx}
-              className="h-44 rounded-xl border border-[var(--app-border-subtle,rgba(255,255,255,0.06))] bg-[var(--app-surface,rgba(255,255,255,0.02))] p-4 flex flex-col justify-between"
+              className="h-44 rounded-xl border border-[var(--app-border-subtle,rgba(255,255,255,0.06))] bg-[var(--app-surface,rgba(255,255,255,0.02))] p-4 flex flex-col justify-between relative overflow-hidden"
             >
-              <div className="h-4 w-28 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.05))] animate-pulse" />
-              <div className="h-8 w-4/5 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.07))] animate-pulse my-auto" />
-              <div className="h-3 w-20 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.04))] animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/8 dark:via-white/4 to-transparent animate-shimmer-sweep pointer-events-none" style={{ animationDelay: `${idx * 150}ms` }} />
+              <div className="h-4 w-28 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.05))] animate-pulse relative z-10" />
+              <div className="h-8 w-4/5 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.07))] animate-pulse my-auto relative z-10" />
+              <div className="h-3 w-20 rounded bg-[var(--app-surface-secondary,rgba(255,255,255,0.04))] animate-pulse relative z-10" />
             </div>
           ))}
         </div>
