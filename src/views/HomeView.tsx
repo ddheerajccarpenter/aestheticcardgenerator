@@ -100,7 +100,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
       return;
     }
     sessionStorage.setItem('aesthetic_card_studio_selected_template', template.id);
-    window.location.href = `/create?template=${encodeURIComponent(template.id)}`;
+    const targetPath = template.canvasDoc?.objects?.length ? '/canvas' : '/create';
+    window.location.href = `${targetPath}?template=${encodeURIComponent(template.id)}`;
   };
 
   const handleCopyText = async (template: CardTemplate) => {

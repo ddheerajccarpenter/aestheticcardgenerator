@@ -130,7 +130,8 @@ export const App: React.FC = () => {
 
   const handleOpenEditorWithTemplate = (template: CardTemplate) => {
     sessionStorage.setItem('aesthetic_card_studio_selected_template', template.id);
-    window.location.href = `/create?template=${template.id}`;
+    const targetPath = template.canvasDoc?.objects?.length ? '/canvas' : '/create';
+    window.location.href = `${targetPath}?template=${encodeURIComponent(template.id)}`;
   };
 
   // Filter templates for ⌘K palette

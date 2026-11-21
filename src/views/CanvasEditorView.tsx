@@ -25,6 +25,7 @@ import {
   type StoredCustomFont,
 } from '../services/customFontManager';
 import { MyFontsModal } from '../components/MyFontsModal';
+import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 import { pickColorWithEyedropper, extractPaletteFromImage } from '../utils/colorExtractor';
 import { updatePageSEO } from '../utils/seo';
 import {
@@ -5139,48 +5140,40 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     return (
                       <div
                         key={tmpl.id}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Select template: ${tmpl.title}`}
                         onClick={() => handleApplyTemplate(tmpl)}
-                        className={`group rounded-2xl p-4 flex flex-col justify-between border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl cursor-pointer relative overflow-hidden ${
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleApplyTemplate(tmpl);
+                          }
+                        }}
+                        className={`group rounded-2xl p-4 flex flex-col justify-between border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl cursor-pointer relative overflow-hidden focus-visible:ring-2 focus-visible:ring-[var(--app-accent)] focus-visible:outline-none ${
                           isLight
                             ? 'bg-[#f8f5ef] border-[#e3ddd3] hover:border-[#d4cdbf] hover:bg-white'
                             : 'bg-[#1a1713] border-[#39342d] hover:border-[#4a4339] hover:bg-[#211e19]'
                         }`}
                       >
-                        {/* Top Preview Card */}
-                        <div
-                          style={{ backgroundColor: tmpl.theme.bg, color: tmpl.theme.ink }}
-                          className="h-36 rounded-xl p-3.5 flex flex-col justify-between mb-3.5 border border-black/10 relative overflow-hidden shadow-inner select-none"
-                        >
+                        {/* Real Visual Artwork Preview */}
+                        <div className="relative h-36 mb-3.5 rounded-xl overflow-hidden border border-black/10 shadow-inner select-none bg-black/10">
                           {/* Pinterest Pick Floating Badge */}
                           {isPinterest && (
-                            <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black/70 text-[#E2D9C8] border border-[#E2D9C8]/40 backdrop-blur-xs flex items-center gap-1 shadow-sm">
+                            <div className="absolute top-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black/70 text-[#E2D9C8] border border-[#E2D9C8]/40 backdrop-blur-xs flex items-center gap-1 shadow-sm">
                               <Sparkles className="w-2.5 h-2.5 text-[var(--app-accent)]" />
                               <span>Pinterest</span>
                             </div>
                           )}
 
-                          <div className="flex items-center gap-2 font-mono text-[9px] opacity-75 max-w-[70%] truncate">
-                            <span className="font-semibold">{tmpl.tag}</span>
-                          </div>
-
-                          <div className="my-auto">
-                            <h4 className="font-bold text-xs sm:text-sm line-clamp-2 leading-tight">
-                              {tmpl.title}
-                            </h4>
-                            {tmpl.quote && (
-                              <p className="text-[10px] opacity-75 line-clamp-2 mt-1 italic font-serif leading-snug">
-                                “{tmpl.quote.slice(0, 80)}…”
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="flex items-center justify-between font-mono text-[9px] opacity-75 border-t border-current/10 pt-1.5">
-                            <span>{tmpl.badge}</span>
-                            <span className="uppercase text-[8px] tracking-wider">{tmpl.categoryLabel}</span>
-                          </div>
+                          <UnifiedCardThumbnail
+                            template={tmpl}
+                            isLight={isLight}
+                            className="w-full h-full"
+                          />
 
                           {/* Hover Overlay Button */}
-                          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity flex items-center justify-center z-10">
                             <span className={`px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-lg flex items-center gap-1.5 transform group-hover:scale-105 transition-transform ${
                               isLight ? 'bg-[#24211b] text-white' : 'bg-[#E2D9C8] text-[#24211b]'
                             }`}>

@@ -607,7 +607,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           {/* Copy Text Action */}
           <button
             onClick={handleCopy}
-            className="h-8 px-2 sm:px-2.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="hidden sm:flex h-8 px-2 sm:px-2.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] text-xs font-medium items-center gap-1.5 transition-colors cursor-pointer"
             title="Copy Text to Clipboard"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[var(--app-accent)]" /> : <Copy className="w-3.5 h-3.5" />}
@@ -618,7 +618,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           {onToggleTheme && (
             <button
               onClick={onToggleTheme}
-              className="h-8 w-8 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center justify-center transition-colors cursor-pointer"
+              className="hidden sm:flex h-8 w-8 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] items-center justify-center transition-colors cursor-pointer"
               title="Toggle theme"
             >
               {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
@@ -629,7 +629,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="h-8 px-3 sm:px-4 rounded-lg bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+            className="h-8 px-2.5 sm:px-4 rounded-lg bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50 shrink-0"
             title="Download Retina PNG"
           >
             <Download className="w-3.5 h-3.5" />
@@ -714,13 +714,13 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                     </div>
 
                     {/* Footer Attribution */}
-                    <div className="pt-2.5 sm:pt-3 border-t border-current/15 flex items-center justify-between relative z-10 shrink-0">
-                      <div className="flex items-center gap-1.5 truncate max-w-[70%]">
-                        <span className="opacity-50 text-xs">—</span>
-                        <span className="text-xs font-semibold opacity-90 truncate">{author}</span>
+                    <div className="pt-2 sm:pt-2.5 border-t border-current/15 flex items-center justify-between gap-2 relative z-10 shrink-0">
+                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                        <span className="opacity-50 text-xs shrink-0">—</span>
+                        <span className="text-[11px] sm:text-xs font-semibold opacity-90 leading-tight break-words">{author}</span>
                       </div>
-                      <span className="text-[9px] font-mono opacity-50 uppercase tracking-widest shrink-0">
-                        {currentPalette.name}
+                      <span className="text-[9px] font-mono opacity-50 uppercase tracking-widest shrink-0 whitespace-nowrap">
+                        {currentPalette.badge || currentPalette.name}
                       </span>
                     </div>
                   </>
@@ -939,13 +939,23 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                       <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
                         Quote Body
                       </label>
-                      <button
-                        onClick={handleShuffleQuote}
-                        className="text-[11px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
-                      >
-                        <Shuffle className="w-3 h-3" />
-                        <span>Inspire</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={handleCopy}
+                          className="text-[11px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
+                          title="Copy quote text"
+                        >
+                          {copied ? <Check className="w-3 h-3 text-[var(--app-accent)]" /> : <Copy className="w-3 h-3" />}
+                          <span>{copied ? 'Copied' : 'Copy'}</span>
+                        </button>
+                        <button
+                          onClick={handleShuffleQuote}
+                          className="text-[11px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          <Shuffle className="w-3 h-3" />
+                          <span>Inspire</span>
+                        </button>
+                      </div>
                     </div>
                     <textarea
                       value={quote}
