@@ -89,7 +89,7 @@ assert.ok(navSrc.includes('env(safe-area-inset-bottom'), 'MobileBottomNav.tsx mu
 
 const templatesSrc = fs.readFileSync('src/views/TemplatesView.tsx', 'utf8');
 assert.ok(templatesSrc.includes('!pl-10'), 'TemplatesView.tsx search input must use !pl-10 to prevent icon overlap');
-assert.ok(templatesSrc.includes('grid-cols-2 gap-2'), 'TemplatesView.tsx cards must use side-by-side action buttons');
+assert.ok(templatesSrc.includes("template.canvasDoc ? 'grid-cols-1' : 'grid-cols-2'"), 'TemplatesView.tsx cards must route layered designs to the canvas and keep two actions for text cards');
 
 const indexCss = fs.readFileSync('src/index.css', 'utf8');
 assert.ok(indexCss.includes('padding-block') && indexCss.includes('padding-inline'), 'index.css must use padding-block/padding-inline for studio-input');

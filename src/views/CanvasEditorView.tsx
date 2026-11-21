@@ -5,6 +5,7 @@ import type {
   TextCanvasObject,
   CardTemplate,
 } from '../types/card';
+import { getDocumentColors, replaceDocumentColor } from '../utils/documentColors';
 import { PRESET_TEMPLATES } from '../data/templates';
 import { ASSET_AVATARS, ASSET_STICKERS } from '../data/canvasAssets';
 import {
@@ -91,6 +92,7 @@ import {
   X,
   Maximize2,
   Pipette,
+  Smile,
 } from 'lucide-react';
 import { processImageFilter } from '../utils/imageFilters';
 import { generateQrCodeSvg, generateBarcodeSvg } from '../utils/qrBarcodeGenerator';
@@ -2503,6 +2505,84 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     </div>
                     <QrCode className="w-4 h-4 text-[var(--app-text-secondary)]" />
                   </button>
+
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createImageObject(ASSET_STICKERS.archieMascot, {
+                          name: 'Archie Bear Mascot',
+                          width: 100,
+                          height: 100,
+                          x: Math.round(doc.canvasWidth / 2 - 50),
+                          y: Math.round(doc.canvasHeight / 2 - 50),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    aria-label="Add Archie Bear Mascot"
+                    data-close-add-menu
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Archie Bear Mascot</span>
+                      <span className="text-[10px] text-[#81786d]">Archival Studio Companion</span>
+                    </div>
+                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createImageObject(ASSET_STICKERS.pipMascot, {
+                          name: 'Pip Pixel Mascot',
+                          width: 90,
+                          height: 90,
+                          x: Math.round(doc.canvasWidth / 2 - 45),
+                          y: Math.round(doc.canvasHeight / 2 - 45),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    aria-label="Add Pip Pixel Mascot"
+                    data-close-add-menu
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Pip Pixel Mascot</span>
+                      <span className="text-[10px] text-[#81786d]">Retro 8-bit studio buddy</span>
+                    </div>
+                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      addObject(
+                        createImageObject(ASSET_STICKERS.emulsionCat, {
+                          name: 'Emulsion Cat',
+                          width: 90,
+                          height: 90,
+                          x: Math.round(doc.canvasWidth / 2 - 45),
+                          y: Math.round(doc.canvasHeight / 2 - 45),
+                        })
+                      );
+                      setStampsDrawerOpen(false);
+                    }}
+                    aria-label="Add Emulsion Cat Mascot"
+                    data-close-add-menu
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
+                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Emulsion Cat</span>
+                      <span className="text-[10px] text-[#81786d]">Feline film studio companion</span>
+                    </div>
+                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
+                  </button>
                 </div>
               </div>
             )}
@@ -4055,6 +4135,26 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     </div>
                   </details>
 
+                  <section className="flex flex-col gap-3" aria-label="Design colors">
+                    <div>
+                      <h3 className="text-xs font-semibold text-[var(--app-text-primary)]">Design colors</h3>
+                      <p className="mt-1 text-xs text-[var(--app-text-secondary)]">Replace a color across all layers. Photos stay as they are.</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {getDocumentColors(doc).map(color => (
+                        <label key={color} className="flex items-center gap-2 rounded-md border border-[var(--app-border-subtle)] p-2">
+                          <input type="color" defaultValue={color} aria-label={`Replace ${color} throughout design`}
+                            onBlur={e => {
+                              if (e.currentTarget.value !== color) commitDocumentChange(replaceDocumentColor(doc, color, e.currentTarget.value));
+                            }}
+                            className="h-8 w-8 shrink-0 cursor-pointer" />
+                          <span className="font-mono text-[10px] text-[var(--app-text-secondary)]">{color}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-[var(--app-text-muted)]">Choose a color, then click outside to apply. Undo restores it.</p>
+                  </section>
+
                   {/* Background Color */}
                   <div className="flex flex-col gap-2">
                     <label className="text-xs font-semibold text-[#81786d]">Canvas Background</label>
@@ -4708,6 +4808,28 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               >
                 <QrCode className="w-5 h-5 text-[var(--app-accent)]" />
                 <span className="text-xs font-medium">QR Code</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createImageObject(ASSET_STICKERS.archieMascot, { name: 'Archie Bear Mascot', width: 80, height: 80 }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#24211b] dark:hover:border-[#E2D9C8]"
+              >
+                <Smile className="w-5 h-5 text-[var(--app-accent)]" />
+                <span className="text-xs font-medium">Archie</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  addObject(createImageObject(ASSET_STICKERS.emulsionCat, { name: 'Emulsion Cat', width: 80, height: 80 }));
+                  setMobileAddSheetOpen(false);
+                }}
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#24211b] dark:hover:border-[#E2D9C8]"
+              >
+                <Smile className="w-5 h-5 text-[var(--app-accent)]" />
+                <span className="text-xs font-medium">Emulsion</span>
               </button>
             </div>
           </div>

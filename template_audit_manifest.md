@@ -83,3 +83,21 @@ This manifest records the exhaustive inspection, responsive verification, and mo
 - **Text Truncation & Margins**: Verified safe padding across mobile viewports (320px–420px) and desktop
 - **Custom Font Compatibility**: All templates support dynamically uploaded custom fonts without distortion
 - **Export Verification**: All 70 templates synchronize with `document.fonts.ready` before rasterization
+
+## 2026-11-20 addition — Studio collection
+Current inventory: **74 templates**. The original audit above covers the prior 70.
+
+| Template ID | Title | Format |
+|---|---|---|
+| studio-form-study | Form Study | 800 × 1000 poster |
+| studio-after-hours | After Hours | 800 × 1000 poster |
+| studio-side-a | Side A | 800 × 800 sleeve |
+| studio-visitor | Studio Visitor | 960 × 600 pass |
+
+These four have editable native text and shape layers. Automated checks cover document cloning, object bounds, palette replacement, source immutability, and metadata. Visual browser and export verification remain pending.
+
+## Template-only follow-up — 76 total
+- Refined the four Studio collection designs with type, film perforations, record grooves, and pass details.
+- Added `studio-night-ticket` / Night Shift (960 × 600) and `studio-reading-room` / Reading Room (800 × 1000).
+- Checked desktop Firefox gallery rendering and Night Shift canvas initialization. Template bounds, immutability, metadata, and build checks pass. Export and mobile-device checks remain pending.
+- Website UI files unchanged in this follow-up; no deployment or push.

@@ -100,3 +100,15 @@
 - **Image & SVG Sanitization (`src/services/imageSecurity.ts`)**: Enforces 10MB ceiling, validates binary magic bytes (PNG, JPEG, GIF, WebP, AVIF), and strips SVG script/event handler vectors via `sanitizeSvgMarkup`.
 - **Storage Quota Resilience (`src/services/storageManager.ts`)**: `safeLocalStorageSet` intercepts `QuotaExceededError` and prunes stale cache keys automatically.
 - **Memory-Safe Exports**: `dataUrlToBlob` performs direct Base64-to-Blob decoding bypassing WebKit/Safari `fetch(dataUrl)` length limits.
+
+## 2026-11-20 — Studio collection and design colors
+- Inventory is now 74: the existing 70 plus four native canvas designs in `src/data/studioTemplates.ts` (Form Study, After Hours, Side A, Studio Visitor).
+- Gallery includes Posters and routes layered templates to Customize; the quick text editor cannot preserve multi-layer compositions.
+- Canvas properties expose Design colors when no layer is selected. Choose a color and move focus outside to replace matching hex colors across text, shapes, strokes and canvas background. Existing history supports undo; photos are unchanged.
+- Build, metadata/security tests, and new template/color tests passed. Lint reports existing warnings outside modified files. Browser/export checks were not run: this session cannot bind a localhost port (EPERM).
+
+## 2026-11-20 — Template-only follow-up
+- User constraint: no deployment, no push, and no website UI changes. Keep future visual work within template artwork unless explicitly authorized otherwise.
+- Refined Form Study, After Hours, Side A, and Studio Visitor; added Night Shift (editable ticket) and Reading Room (journal cover). Inventory is 76.
+- Reference direction: Poster House, The Swiss Grid (https://swissgrid.posterhouse.org/), and historic Swiss music exhibition posters. Compositions are original native text/shape layers; no reference artwork copied into assets.
+- Verified Firefox gallery at localhost:4321 and opened Night Shift in Canvas (32 layers). Build and template tests pass. All views/components/CSS match their contents at the start of this follow-up. Mobile devices and exported files were not checked.

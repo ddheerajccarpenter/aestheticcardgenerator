@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { restoreSavedCustomFonts } from './services/customFontManager';
 import { AmbientAtmosphereLayer } from './components/AmbientAtmosphereLayer';
+import { StudioCompanion } from './components/StudioCompanion';
 
 export const App: React.FC = () => {
   // Current route path normalized without trailing slashes
@@ -341,6 +342,9 @@ export const App: React.FC = () => {
           hideWhenTyping={isEditorSheetOpen}
         />
       )}
+
+      {/* Interactive Studio Companion Mascots */}
+      <StudioCompanion />
 
       {/* Command Palette (⌘K) Modal */}
       {shortcutsOpen && (

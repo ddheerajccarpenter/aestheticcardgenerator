@@ -167,6 +167,65 @@ export const ASSET_AVATARS = {
     <!-- Red French lip -->
     <path d="M188 226 Q200 234 212 226 Q200 222 188 226 Z" fill="%23c1121f" />
   </svg>`,
+
+  archieBear: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%2324211e" stroke="%233a342d" stroke-width="2" />
+    <circle cx="28" cy="28" r="14" fill="%23c69d78" />
+    <circle cx="28" cy="28" r="8" fill="%23a87c56" />
+    <circle cx="72" cy="28" r="14" fill="%23c69d78" />
+    <circle cx="72" cy="28" r="8" fill="%23a87c56" />
+    <ellipse cx="50" cy="26" rx="28" ry="12" fill="%23a8513b" />
+    <circle cx="50" cy="14" r="5" fill="%23e8927c" />
+    <circle cx="50" cy="54" r="30" fill="%23c69d78" />
+    <ellipse cx="50" cy="62" rx="15" ry="11" fill="%23efe6d8" />
+    <ellipse cx="50" cy="56" rx="5" ry="3.5" fill="%2324211e" />
+    <path d="M 46 64 Q 50 67 54 64" fill="none" stroke="%2324211e" stroke-width="1.8" stroke-linecap="round" />
+    <circle cx="34" cy="62" r="5" fill="%23e8927c" opacity="0.6" />
+    <circle cx="66" cy="62" r="5" fill="%23e8927c" opacity="0.6" />
+    <circle cx="41" cy="50" r="8" fill="none" stroke="%2324211e" stroke-width="2" />
+    <circle cx="59" cy="50" r="8" fill="none" stroke="%2324211e" stroke-width="2" />
+    <line x1="49" y1="50" x2="51" y2="50" stroke="%2324211e" stroke-width="2" />
+    <circle cx="41" cy="50" r="3" fill="%2324211e" />
+    <circle cx="59" cy="50" r="3" fill="%2324211e" />
+    <circle cx="43" cy="48" r="1.2" fill="%23ffffff" />
+    <circle cx="61" cy="48" r="1.2" fill="%23ffffff" />
+  </svg>`,
+
+  pipPixel: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%231e2420" stroke="%232f3832" stroke-width="2" />
+    <rect x="47" y="14" width="6" height="10" fill="%2397ab9b" />
+    <rect x="44" y="8" width="12" height="6" fill="%23e6ede8" />
+    <rect x="22" y="24" width="56" height="50" rx="8" fill="%232f3832" />
+    <rect x="28" y="30" width="44" height="38" rx="4" fill="%23141715" />
+    <rect x="36" y="42" width="8" height="8" fill="%2397ab9b" />
+    <rect x="56" y="42" width="8" height="8" fill="%2397ab9b" />
+    <rect x="38" y="44" width="3" height="3" fill="%23ffffff" />
+    <rect x="58" y="44" width="3" height="3" fill="%23ffffff" />
+    <rect x="40" y="56" width="4" height="3" fill="%2397ab9b" />
+    <rect x="44" y="59" width="12" height="3" fill="%2397ab9b" />
+    <rect x="56" y="56" width="4" height="3" fill="%2397ab9b" />
+  </svg>`,
+
+  emulsionCat: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%23191715" stroke="%23312c27" stroke-width="2" />
+    <polygon points="26,38 34,18 48,32" fill="%2324211e" stroke="%2348413a" stroke-width="1.5" />
+    <polygon points="74,38 66,18 52,32" fill="%2324211e" stroke="%2348413a" stroke-width="1.5" />
+    <polygon points="30,34 36,24 44,32" fill="%23c69d78" opacity="0.6" />
+    <polygon points="70,34 64,24 56,32" fill="%23c69d78" opacity="0.6" />
+    <ellipse cx="50" cy="54" rx="32" ry="26" fill="%2324211e" stroke="%23312c27" stroke-width="1.5" />
+    <ellipse cx="38" cy="50" rx="7" ry="8" fill="%23c69d78" />
+    <ellipse cx="62" cy="50" rx="7" ry="8" fill="%23c69d78" />
+    <ellipse cx="38" cy="50" rx="2.5" ry="6" fill="%23191715" />
+    <ellipse cx="62" cy="50" rx="2.5" ry="6" fill="%23191715" />
+    <circle cx="39" cy="48" r="1.5" fill="%23ffffff" />
+    <circle cx="63" cy="48" r="1.5" fill="%23ffffff" />
+    <line x1="20" y1="56" x2="32" y2="58" stroke="%2348413a" stroke-width="1.5" />
+    <line x1="20" y1="62" x2="32" y2="61" stroke="%2348413a" stroke-width="1.5" />
+    <line x1="80" y1="56" x2="68" y2="58" stroke="%2348413a" stroke-width="1.5" />
+    <line x1="80" y1="62" x2="68" y2="61" stroke="%2348413a" stroke-width="1.5" />
+    <polygon points="48,58 52,58 50,61" fill="%23c69d78" />
+    <path d="M 46 62 Q 50 65 54 62" fill="none" stroke="%23c69d78" stroke-width="1.2" stroke-linecap="round" />
+  </svg>`,
 };
 
 export const ASSET_STICKERS = {
@@ -303,6 +362,65 @@ export const ASSET_STICKERS = {
     <path d="M25 65 Q25 73 33 73 Q25 73 25 81 Q25 73 17 73 Q25 73 25 65 Z" fill="%234cc9f0" />
     <circle cx="50" cy="78" r="3" fill="%23ffffff" />
     <circle cx="76" cy="28" r="2.5" fill="%23ffffff" />
+  </svg>`,
+
+  archieMascot: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%2324211e" stroke="%233a342d" stroke-width="2" />
+    <circle cx="28" cy="28" r="14" fill="%23c69d78" />
+    <circle cx="28" cy="28" r="8" fill="%23a87c56" />
+    <circle cx="72" cy="28" r="14" fill="%23c69d78" />
+    <circle cx="72" cy="28" r="8" fill="%23a87c56" />
+    <ellipse cx="50" cy="26" rx="28" ry="12" fill="%23a8513b" />
+    <circle cx="50" cy="14" r="5" fill="%23e8927c" />
+    <circle cx="50" cy="54" r="30" fill="%23c69d78" />
+    <ellipse cx="50" cy="62" rx="15" ry="11" fill="%23efe6d8" />
+    <ellipse cx="50" cy="56" rx="5" ry="3.5" fill="%2324211e" />
+    <path d="M 46 64 Q 50 67 54 64" fill="none" stroke="%2324211e" stroke-width="1.8" stroke-linecap="round" />
+    <circle cx="34" cy="62" r="5" fill="%23e8927c" opacity="0.6" />
+    <circle cx="66" cy="62" r="5" fill="%23e8927c" opacity="0.6" />
+    <circle cx="41" cy="50" r="8" fill="none" stroke="%2324211e" stroke-width="2" />
+    <circle cx="59" cy="50" r="8" fill="none" stroke="%2324211e" stroke-width="2" />
+    <line x1="49" y1="50" x2="51" y2="50" stroke="%2324211e" stroke-width="2" />
+    <circle cx="41" cy="50" r="3" fill="%2324211e" />
+    <circle cx="59" cy="50" r="3" fill="%2324211e" />
+    <circle cx="43" cy="48" r="1.2" fill="%23ffffff" />
+    <circle cx="61" cy="48" r="1.2" fill="%23ffffff" />
+  </svg>`,
+
+  pipMascot: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%231e2420" stroke="%232f3832" stroke-width="2" />
+    <rect x="47" y="14" width="6" height="10" fill="%2397ab9b" />
+    <rect x="44" y="8" width="12" height="6" fill="%23e6ede8" />
+    <rect x="22" y="24" width="56" height="50" rx="8" fill="%232f3832" />
+    <rect x="28" y="30" width="44" height="38" rx="4" fill="%23141715" />
+    <rect x="36" y="42" width="8" height="8" fill="%2397ab9b" />
+    <rect x="56" y="42" width="8" height="8" fill="%2397ab9b" />
+    <rect x="38" y="44" width="3" height="3" fill="%23ffffff" />
+    <rect x="58" y="44" width="3" height="3" fill="%23ffffff" />
+    <rect x="40" y="56" width="4" height="3" fill="%2397ab9b" />
+    <rect x="44" y="59" width="12" height="3" fill="%2397ab9b" />
+    <rect x="56" y="56" width="4" height="3" fill="%2397ab9b" />
+  </svg>`,
+
+  emulsionCat: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%23191715" stroke="%23312c27" stroke-width="2" />
+    <polygon points="26,38 34,18 48,32" fill="%2324211e" stroke="%2348413a" stroke-width="1.5" />
+    <polygon points="74,38 66,18 52,32" fill="%2324211e" stroke="%2348413a" stroke-width="1.5" />
+    <polygon points="30,34 36,24 44,32" fill="%23c69d78" opacity="0.6" />
+    <polygon points="70,34 64,24 56,32" fill="%23c69d78" opacity="0.6" />
+    <ellipse cx="50" cy="54" rx="32" ry="26" fill="%2324211e" stroke="%23312c27" stroke-width="1.5" />
+    <ellipse cx="38" cy="50" rx="7" ry="8" fill="%23c69d78" />
+    <ellipse cx="62" cy="50" rx="7" ry="8" fill="%23c69d78" />
+    <ellipse cx="38" cy="50" rx="2.5" ry="6" fill="%23191715" />
+    <ellipse cx="62" cy="50" rx="2.5" ry="6" fill="%23191715" />
+    <circle cx="39" cy="48" r="1.5" fill="%23ffffff" />
+    <circle cx="63" cy="48" r="1.5" fill="%23ffffff" />
+    <line x1="20" y1="56" x2="32" y2="58" stroke="%2348413a" stroke-width="1.5" />
+    <line x1="20" y1="62" x2="32" y2="61" stroke="%2348413a" stroke-width="1.5" />
+    <line x1="80" y1="56" x2="68" y2="58" stroke="%2348413a" stroke-width="1.5" />
+    <line x1="80" y1="62" x2="68" y2="61" stroke="%2348413a" stroke-width="1.5" />
+    <polygon points="48,58 52,58 50,61" fill="%23c69d78" />
+    <path d="M 46 62 Q 50 65 54 62" fill="none" stroke="%23c69d78" stroke-width="1.2" stroke-linecap="round" />
   </svg>`,
 };
 

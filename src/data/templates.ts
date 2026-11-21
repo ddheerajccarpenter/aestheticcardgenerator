@@ -1,4 +1,5 @@
 import type { AspectRatioPreset, CardTheme, CardTemplate } from '../types/card';
+import { STUDIO_TEMPLATES } from './studioTemplates';
 import { EXTENDED_AESTHETIC_TEMPLATES } from './extendedTemplates';
 
 export const ASPECT_RATIOS: AspectRatioPreset[] = [
@@ -533,6 +534,7 @@ export const REFERENCE_SHOWCASE_CARDS: CardTemplate[] = [
 ];
 
 export const PRESET_TEMPLATES: CardTemplate[] = [
+  ...STUDIO_TEMPLATES,
   ...REFERENCE_SHOWCASE_CARDS,
   ...EXTENDED_AESTHETIC_TEMPLATES,
   ...ORIGINAL_TEMPLATES,

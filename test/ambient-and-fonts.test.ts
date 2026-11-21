@@ -4,7 +4,7 @@ import { PRESET_TEMPLATES } from '../src/data/templates';
 import { getTemplateAmbientTones } from '../src/utils/templateAmbient';
 import { validateFontFile } from '../src/services/customFontManager';
 
-console.log('--- Running Ambient Atmosphere, Font Engine & 70 Templates Audit ---');
+console.log('--- Running Ambient Atmosphere, Font Engine & 76 Templates Audit ---');
 
 // 1. Ambient Color Normalization
 const testColors = ['#ff0000', '#00ff00', '#0000ff', '#18191c', '#f1ebdd', '#c69d78'];
@@ -23,8 +23,8 @@ assert.strictEqual(DEFAULT_DARK_AMBIENT.primary, '#c69d78');
 assert.strictEqual(DEFAULT_LIGHT_AMBIENT.primary, '#6f4637');
 console.log('✓ Default dark and light ambient palettes verified.');
 
-// 3. 70 Templates Full Audit
-assert.strictEqual(PRESET_TEMPLATES.length, 70, `Expected 70 templates, found ${PRESET_TEMPLATES.length}`);
+// 3. 76 Templates Full Audit
+assert.strictEqual(PRESET_TEMPLATES.length, 76, `Expected 76 templates, found ${PRESET_TEMPLATES.length}`);
 
 const seenIds = new Set<string>();
 for (const tmpl of PRESET_TEMPLATES) {
@@ -87,4 +87,4 @@ const otfFile = new File([new Blob([new Uint8Array(100)])], 'playfair.otf');
 assert.doesNotThrow(() => validateFontFile(otfFile, otfHeader), 'Valid otf header must pass');
 
 console.log('✓ Custom font validation rules (format, size limits, and magic byte signatures) verified.');
-console.log('All Ambient Atmosphere, Font Engine & 70 Templates tests passed!');
+console.log('All Ambient Atmosphere, Font Engine & 76 Templates tests passed!');

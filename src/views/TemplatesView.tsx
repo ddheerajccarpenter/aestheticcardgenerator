@@ -27,12 +27,13 @@ interface TemplatesViewProps {
 }
 
 const CATEGORY_TABS = [
-  { id: 'all', label: 'All Styles' },
-  { id: 'id-card', label: 'Aesthetic ID Passes' },
+  { id: 'all', label: 'All designs' },
+  { id: 'poster', label: 'Posters' },
+  { id: 'id-card', label: 'ID & passes' },
   { id: 'pastel', label: 'Cute & Pastel' },
   { id: 'vintage', label: 'Vintage & Retro' },
   { id: 'fan', label: 'Fan & Character' },
-  { id: 'minimal', label: 'Minimalist (No Stars)' },
+  { id: 'minimal', label: 'Minimal' },
   { id: 'school', label: 'School & Academy' },
   { id: 'quote', label: 'Editorial Quotes' },
 ];
@@ -69,9 +70,9 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Aesthetic Template Library — 70 Curated Card Designs',
+      title: 'Aesthetic Template Library — Editable Card Designs',
       description:
-        'Explore 70 editable card designs, including ID passes, pastel cards, vintage travel licenses, and minimalist credentials.',
+        'Explore editable card designs, including ID passes, pastel cards, vintage travel licenses, and minimalist credentials.',
       canonicalPath: '/templates',
       ogType: 'website',
       jsonLd: {
@@ -180,12 +181,12 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
 
         <header className="grid gap-6 border-b border-[var(--app-border-subtle)] pb-8 lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="max-w-3xl">
-            <span className="editorial-kicker mb-3 block">The design archive · {PRESET_TEMPLATES.length} starting points</span>
+            <span className="editorial-kicker mb-3 block">Templates / {PRESET_TEMPLATES.length} starting points</span>
             <h1 className="font-heading text-5xl leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
-              A style for every story.
+              Make it your own.
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--app-text-secondary)] sm:text-base">
-              Browse quote cards, identity passes, posters, and scrapbook layouts. Compare a few, then open one in the editor.
+              Posters, passes, and small printed things. Pick a layout; change every layer.
             </p>
           </div>
           <a
@@ -308,10 +309,10 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                 <article
                   key={template.id}
                   data-template-id={template.id}
-                  className="template-ambient-card group flex flex-col overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors hover:border-[var(--app-border-strong)]"
+                  className="template-ambient-card group flex flex-col overflow-hidden rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors hover:border-[var(--app-border-strong)]"
                 >
                   {/* Real Card Visual Artwork Preview (Unified with Archival Blueprint Lazy-Loading) */}
-                  <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="m-2 overflow-hidden rounded-xl border border-[var(--app-border-subtle)]">
+                  <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="m-3 overflow-hidden rounded-sm border border-[var(--app-border-subtle)]">
                     <UnifiedCardThumbnail
                       template={template}
                       isLight={isLight}
@@ -344,17 +345,17 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-1">
+                    <div className={`grid ${template.canvasDoc ? 'grid-cols-1' : 'grid-cols-2'} gap-2 pt-1`}>
                       <a
                         href={`/canvas?template=${template.id}`}
                         className="studio-btn-primary min-h-10 !py-2 !text-xs !rounded-xl"
                         title="Open in Freeform Canvas Studio"
                       >
                         <Layers className="w-3.5 h-3.5" />
-                        <span>Canvas Studio</span>
+                        <span>Customize</span>
                       </a>
 
-                      <a
+                      {!template.canvasDoc && <a
                         href={`/create?template=${template.id}`}
                         onClick={(e) => {
                           if (onOpenEditorWithTemplate) {
@@ -365,9 +366,9 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                         className="studio-btn-secondary min-h-10 !py-2 !text-xs !rounded-xl"
                         title="Open in classic text typesetting editor"
                       >
-                        <span>Card Creator</span>
+                        <span>Quick text card</span>
                         <ArrowRight className="w-3 h-3" />
-                      </a>
+                      </a>}
                     </div>
                   </div>
                 </article>
