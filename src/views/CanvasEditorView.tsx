@@ -1353,18 +1353,23 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         await document.fonts.ready;
       }
 
-      let dataUrl: string;
+      let exportBlob: Blob;
       const isUltra = format === '4k' || format === '8k' || format === '16k';
       const actualFormat = isUltra ? 'png' : format;
 
       if (actualFormat === 'png') {
-        dataUrl = await toPng(node, options);
+        const dataUrl = await toPng(node, options);
+        exportBlob = dataUrlToBlob(dataUrl);
       } else if (actualFormat === 'jpeg') {
-        dataUrl = await toJpeg(node, { ...options, backgroundColor: doc.background || '#ffffff' });
-      } else {
+        const dataUrl = await toJpeg(node, { ...options, backgroundColor: doc.background || '#ffffff' });
+        exportBlob = dataUrlToBlob(dataUrl);
+      } else if (actualFormat === 'webp') {
         const blob = await toBlob(node, { ...options, type: 'image/webp' });
         if (!blob) throw new Error('WebP blob creation failed');
-        dataUrl = URL.createObjectURL(blob);
+        exportBlob = blob;
+      } else {
+        const dataUrl = await toPng(node, options);
+        exportBlob = dataUrlToBlob(dataUrl);
       }
 
       // MANDATORY FILENAME RULE: Always starts with aestheticcardgenerator.com
@@ -1374,11 +1379,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         isUltra ? (format.toUpperCase() as '4K' | '8K' | '16K') : undefined
       );
 
-      const exportBlob = dataUrlToBlob(dataUrl);
       triggerBrandedBlobDownload(exportBlob, filename);
-      if (actualFormat === 'webp') {
-        window.setTimeout(() => URL.revokeObjectURL(dataUrl), 3000);
-      }
 
       showToast(`Exported ${doc.title} (${Math.round(doc.canvasWidth * scale)}×${Math.round(doc.canvasHeight * scale)}px pure card isolate)!`);
     } catch (err: any) {

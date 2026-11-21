@@ -77,7 +77,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         heading: '2. Granular Leading and Tracking Calibrations',
-        body: 'Generators often default to cramped line heights that choke long quotes. In the Type tab, set Line Height between 1.45 and 1.65. For uppercase citations and tags, boost Letter Spacing to +0.08em to establish typographic dignity.',
+        body: 'Generators often default to cramped line heights that choke long quotes. In the Type tab, set Line Height between 1.45 and 1.65. For uppercase citations and tags, boost Letter Spacing to +0.08em to keep typography legible and open.',
         callout: {
           title: 'The 45-65 Rule',
           text: 'Aim for 45 to 65 characters per line. If a line stretches longer, increase canvas padding to tighten the reading measure.',

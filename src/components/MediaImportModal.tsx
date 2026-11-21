@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Search, Book, Music, X, Loader2, ArrowRight } from 'lucide-react';
 
 export interface BookResult {
@@ -38,23 +38,71 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
   const [activeTab, setActiveTab] = useState<'book' | 'music'>('book');
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState<MediaResult[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Cancel any active in-flight request
+  const cancelActiveRequest = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  }, []);
+
+  // Cleanup on unmount or when modal closes
+  useEffect(() => {
+    return () => {
+      cancelActiveRequest();
+    };
+  }, [cancelActiveRequest]);
+
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        cancelActiveRequest();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose, cancelActiveRequest]);
+
   if (!isOpen) return null;
+
+  const handleTabChange = (newTab: 'book' | 'music') => {
+    if (newTab === activeTab) return;
+    cancelActiveRequest();
+    setActiveTab(newTab);
+    setResults([]);
+    setError(null);
+    setHasSearched(false);
+    setIsLoading(false);
+  };
 
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!query.trim()) return;
+    const trimmed = query.trim();
+    if (!trimmed) return;
+
+    cancelActiveRequest();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     setIsLoading(true);
     setError(null);
     setResults([]);
+    setHasSearched(true);
 
     try {
       if (activeTab === 'book') {
         const res = await fetch(
-          `https://openlibrary.org/search.json?q=${encodeURIComponent(query.trim())}&limit=8`
+          `https://openlibrary.org/search.json?q=${encodeURIComponent(trimmed)}&limit=8`,
+          { signal: controller.signal }
         );
         if (!res.ok) throw new Error('Failed to query Open Library API');
         const data = await res.json();
@@ -69,7 +117,8 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
         setResults(mapped);
       } else {
         const res = await fetch(
-          `https://itunes.apple.com/search?term=${encodeURIComponent(query.trim())}&entity=song&limit=8`
+          `https://itunes.apple.com/search?term=${encodeURIComponent(trimmed)}&entity=song&limit=8`,
+          { signal: controller.signal }
         );
         if (!res.ok) throw new Error('Failed to query iTunes Search API');
         const data = await res.json();
@@ -84,6 +133,10 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
         setResults(mapped);
       }
     } catch (err: any) {
+      if (err.name === 'AbortError') {
+        // Request was cancelled intentionally, do not display error
+        return;
+      }
       console.error('Search error:', err);
       setError('Could not connect to metadata service. Please check connection and try again.');
     } finally {
@@ -91,8 +144,18 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
     }
   };
 
+  const handleCloseModal = () => {
+    cancelActiveRequest();
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="media-import-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+    >
       <div
         className={`w-full max-w-lg rounded-2xl border shadow-2xl flex flex-col overflow-hidden transition-all ${
           isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
@@ -102,13 +165,15 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
         <div className={`p-4 border-b flex items-center justify-between ${isLight ? 'border-[#e2e8f0]' : 'border-[#262c36]'}`}>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#E2D9C8]" />
-            <h2 className={`text-sm font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+            <h2 id="media-import-title" className={`text-sm font-bold tracking-tight ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
               Import Book / Song Metadata
             </h2>
           </div>
           <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-[#707a8a] hover:text-current hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            type="button"
+            onClick={handleCloseModal}
+            aria-label="Close dialog"
+            className="p-1 rounded-lg text-[#707a8a] hover:text-current hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -117,10 +182,8 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
         {/* Tab switcher: Books vs Songs */}
         <div className={`p-3 border-b flex items-center gap-2 ${isLight ? 'bg-[#f8fafc] border-[#e2e8f0]' : 'bg-[#181d24] border-[#262c36]'}`}>
           <button
-            onClick={() => {
-              setActiveTab('book');
-              setResults([]);
-            }}
+            type="button"
+            onClick={() => handleTabChange('book')}
             className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'book'
                 ? isLight
@@ -133,10 +196,8 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
             <span>Open Library Books</span>
           </button>
           <button
-            onClick={() => {
-              setActiveTab('music');
-              setResults([]);
-            }}
+            type="button"
+            onClick={() => handleTabChange('music')}
             className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'music'
                 ? isLight
@@ -188,10 +249,17 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
             </div>
           )}
 
-          {results.length === 0 && !isLoading && !error && (
+          {results.length === 0 && !isLoading && !error && !hasSearched && (
             <div className="p-6 text-center text-xs text-[#707a8a] flex flex-col items-center gap-1">
               <span>Type a title, author, or track name above and press Search.</span>
               <span className="text-[10px] opacity-75">Data is loaded directly in your browser without tracking.</span>
+            </div>
+          )}
+
+          {results.length === 0 && !isLoading && !error && hasSearched && (
+            <div className="p-6 text-center text-xs text-[#707a8a] flex flex-col items-center gap-1">
+              <span>No results found for “{query}”.</span>
+              <span className="text-[10px] opacity-75">Try searching with a different title, author, or artist keyword.</span>
             </div>
           )}
 
@@ -200,7 +268,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
               key={idx}
               onClick={() => {
                 onSelect(item);
-                onClose();
+                handleCloseModal();
               }}
               className={`p-2.5 rounded-xl border flex items-center gap-3 transition-all cursor-pointer group ${
                 isLight

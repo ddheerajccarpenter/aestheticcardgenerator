@@ -143,7 +143,7 @@ const docPixelStudioPass: CanvasDocument = buildDoc('pixel_studio_pass', 'Cyber 
   createTextObject({ name: 'Role Val', text: 'BRAND IDENTITY & VISUAL CURATION', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: '700', color: '#ff007f', x: 360, y: 300, width: 480, height: 28, zIndex: 10 }),
   createTextObject({ name: 'Contact Label', text: 'CLEARANCE LEVEL', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: '700', color: '#888888', x: 360, y: 350, width: 200, height: 20, zIndex: 10 }),
   createTextObject({ name: 'Contact Val', text: 'LEVEL #1111 • ALL ACCESS CREW', fontFamily: "'JetBrains Mono', monospace", fontSize: 17, fontWeight: '700', color: '#111111', x: 360, y: 370, width: 480, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Motto', text: 'Turning vision into tactile digital aesthetic cards.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 16, fontStyle: 'italic', color: '#555555', x: 360, y: 430, width: 480, height: 35, zIndex: 10 }),
+  createTextObject({ name: 'Motto', text: 'Turning thoughts into clean, memorable cards.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 16, fontStyle: 'italic', color: '#555555', x: 360, y: 430, width: 480, height: 35, zIndex: 10 }),
 ]);
 
 const docArtistCredential: CanvasDocument = buildDoc('artist_credential', 'Independent Creator ID', 960, 600, '#eaf4ee', [
@@ -2006,7 +2006,7 @@ export const EXTENDED_AESTHETIC_TEMPLATES: CardTemplate[] = [
     hasPhotoArea: false,
     layoutHint: 'horizontal',
     accentColor: '#57524b',
-    description: 'Clean Nordic linen background with centered title, calm margins, and pure typographic dignity.',
+    description: 'Clean Nordic linen background with centered title, calm margins, and balanced editorial proportions.',
     canvasDoc: docMinimalNordicLinen,
   },
 

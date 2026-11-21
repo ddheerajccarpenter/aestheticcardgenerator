@@ -226,6 +226,72 @@ export const ASSET_AVATARS = {
     <polygon points="48,58 52,58 50,61" fill="%23c69d78" />
     <path d="M 46 62 Q 50 65 54 62" fill="none" stroke="%23c69d78" stroke-width="1.2" stroke-linecap="round" />
   </svg>`,
+
+  komorebiBunny: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%231e2621" stroke="%23303d35" stroke-width="2" />
+    <!-- Bunny Ears -->
+    <ellipse cx="36" cy="24" rx="8" ry="18" fill="%23e8ede9" stroke="%23303d35" stroke-width="1.5" />
+    <ellipse cx="64" cy="24" rx="8" ry="18" fill="%23e8ede9" stroke="%23303d35" stroke-width="1.5" />
+    <ellipse cx="36" cy="25" rx="4.5" ry="12" fill="%23f4b8b8" opacity="0.6" />
+    <ellipse cx="64" cy="25" rx="4.5" ry="12" fill="%23f4b8b8" opacity="0.6" />
+    <!-- Sprout on Head -->
+    <path d="M 48 30 Q 42 22 47 16 Q 52 22 48 30 Z" fill="%2397ab9b" />
+    <path d="M 50 30 Q 56 20 52 14 Q 48 20 50 30 Z" fill="%2384a98c" />
+    <!-- Head -->
+    <ellipse cx="50" cy="56" rx="30" ry="24" fill="%23e8ede9" stroke="%23303d35" stroke-width="1.5" />
+    <!-- Eyes -->
+    <ellipse cx="38" cy="54" rx="4" ry="5.5" fill="%231a201c" />
+    <ellipse cx="62" cy="54" rx="4" ry="5.5" fill="%231a201c" />
+    <circle cx="39.5" cy="52" r="1.5" fill="%23ffffff" />
+    <circle cx="63.5" cy="52" r="1.5" fill="%23ffffff" />
+    <!-- Cheeks -->
+    <circle cx="31" cy="61" r="5" fill="%23f4b8b8" opacity="0.7" />
+    <circle cx="69" cy="61" r="5" fill="%23f4b8b8" opacity="0.7" />
+    <!-- Nose & Mouth -->
+    <polygon points="48,59 52,59 50,62" fill="%23e07a7a" />
+    <path d="M 46 64 Q 50 67 54 64" fill="none" stroke="%23303d35" stroke-width="1.4" stroke-linecap="round" />
+  </svg>`,
+
+  cosmoStar: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%23131722" stroke="%232b354f" stroke-width="2" />
+    <!-- Star antenna -->
+    <line x1="50" y1="12" x2="50" y2="24" stroke="%23fbbf24" stroke-width="2" />
+    <polygon points="50,6 52,11 57,11 53,14 55,19 50,16 45,19 47,14 43,11 48,11" fill="%23fbbf24" />
+    <!-- Helmet Outer -->
+    <rect x="20" y="24" width="60" height="54" rx="20" fill="%23242c40" stroke="%233d4b6c" stroke-width="1.5" />
+    <!-- Gold Visor Screen -->
+    <rect x="26" y="30" width="48" height="34" rx="14" fill="%231a2030" stroke="%23fbbf24" stroke-width="1.2" />
+    <!-- Visor Sheen Glow -->
+    <path d="M 32 34 Q 50 32 64 38" fill="none" stroke="%23ffffff" stroke-width="1.5" opacity="0.4" stroke-linecap="round" />
+    <!-- Astro Eyes inside Visor -->
+    <circle cx="40" cy="46" r="4.5" fill="%2360a5fa" />
+    <circle cx="60" cy="46" r="4.5" fill="%2360a5fa" />
+    <circle cx="41.5" cy="44.5" r="1.5" fill="%23ffffff" />
+    <circle cx="61.5" cy="44.5" r="1.5" fill="%23ffffff" />
+    <path d="M 46 54 Q 50 58 54 54" fill="none" stroke="%23fbbf24" stroke-width="1.6" stroke-linecap="round" />
+    <!-- Little Chest Badge -->
+    <circle cx="50" cy="70" r="3" fill="%23ef4444" />
+  </svg>`,
+
+  mochiCloud: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%23241b22" stroke="%23452f3d" stroke-width="2" />
+    <!-- Cloud Puffs -->
+    <circle cx="34" cy="54" r="18" fill="%23fdfaf6" />
+    <circle cx="66" cy="54" r="18" fill="%23fdfaf6" />
+    <circle cx="44" cy="40" r="18" fill="%23fdfaf6" />
+    <circle cx="58" cy="40" r="16" fill="%23fdfaf6" />
+    <rect x="34" y="48" width="32" height="24" fill="%23fdfaf6" />
+    <!-- Cheerful Eyes -->
+    <path d="M 36 50 Q 41 44 46 50" fill="none" stroke="%23382732" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M 54 50 Q 59 44 64 50" fill="none" stroke="%23382732" stroke-width="2.4" stroke-linecap="round" />
+    <!-- Blush -->
+    <circle cx="33" cy="57" r="5" fill="%23f472b6" opacity="0.6" />
+    <circle cx="67" cy="57" r="5" fill="%23f472b6" opacity="0.6" />
+    <!-- Smile -->
+    <path d="M 46 57 Q 50 63 54 57" fill="none" stroke="%23e11d48" stroke-width="2" stroke-linecap="round" />
+    <!-- Sparkle on head -->
+    <polygon points="50,22 52,27 57,27 53,30 55,35 50,32 45,35 47,30 43,27 48,27" fill="%23fbbf24" />
+  </svg>`,
 };
 
 export const ASSET_STICKERS = {
@@ -421,6 +487,72 @@ export const ASSET_STICKERS = {
     <line x1="80" y1="62" x2="68" y2="61" stroke="%2348413a" stroke-width="1.5" />
     <polygon points="48,58 52,58 50,61" fill="%23c69d78" />
     <path d="M 46 62 Q 50 65 54 62" fill="none" stroke="%23c69d78" stroke-width="1.2" stroke-linecap="round" />
+  </svg>`,
+
+  komorebiBunny: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%231e2621" stroke="%23303d35" stroke-width="2" />
+    <!-- Bunny Ears -->
+    <ellipse cx="36" cy="24" rx="8" ry="18" fill="%23e8ede9" stroke="%23303d35" stroke-width="1.5" />
+    <ellipse cx="64" cy="24" rx="8" ry="18" fill="%23e8ede9" stroke="%23303d35" stroke-width="1.5" />
+    <ellipse cx="36" cy="25" rx="4.5" ry="12" fill="%23f4b8b8" opacity="0.6" />
+    <ellipse cx="64" cy="25" rx="4.5" ry="12" fill="%23f4b8b8" opacity="0.6" />
+    <!-- Sprout on Head -->
+    <path d="M 48 30 Q 42 22 47 16 Q 52 22 48 30 Z" fill="%2397ab9b" />
+    <path d="M 50 30 Q 56 20 52 14 Q 48 20 50 30 Z" fill="%2384a98c" />
+    <!-- Head -->
+    <ellipse cx="50" cy="56" rx="30" ry="24" fill="%23e8ede9" stroke="%23303d35" stroke-width="1.5" />
+    <!-- Eyes -->
+    <ellipse cx="38" cy="54" rx="4" ry="5.5" fill="%231a201c" />
+    <ellipse cx="62" cy="54" rx="4" ry="5.5" fill="%231a201c" />
+    <circle cx="39.5" cy="52" r="1.5" fill="%23ffffff" />
+    <circle cx="63.5" cy="52" r="1.5" fill="%23ffffff" />
+    <!-- Cheeks -->
+    <circle cx="31" cy="61" r="5" fill="%23f4b8b8" opacity="0.7" />
+    <circle cx="69" cy="61" r="5" fill="%23f4b8b8" opacity="0.7" />
+    <!-- Nose & Mouth -->
+    <polygon points="48,59 52,59 50,62" fill="%23e07a7a" />
+    <path d="M 46 64 Q 50 67 54 64" fill="none" stroke="%23303d35" stroke-width="1.4" stroke-linecap="round" />
+  </svg>`,
+
+  cosmoStar: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%23131722" stroke="%232b354f" stroke-width="2" />
+    <!-- Star antenna -->
+    <line x1="50" y1="12" x2="50" y2="24" stroke="%23fbbf24" stroke-width="2" />
+    <polygon points="50,6 52,11 57,11 53,14 55,19 50,16 45,19 47,14 43,11 48,11" fill="%23fbbf24" />
+    <!-- Helmet Outer -->
+    <rect x="20" y="24" width="60" height="54" rx="20" fill="%23242c40" stroke="%233d4b6c" stroke-width="1.5" />
+    <!-- Gold Visor Screen -->
+    <rect x="26" y="30" width="48" height="34" rx="14" fill="%231a2030" stroke="%23fbbf24" stroke-width="1.2" />
+    <!-- Visor Sheen Glow -->
+    <path d="M 32 34 Q 50 32 64 38" fill="none" stroke="%23ffffff" stroke-width="1.5" opacity="0.4" stroke-linecap="round" />
+    <!-- Astro Eyes inside Visor -->
+    <circle cx="40" cy="46" r="4.5" fill="%2360a5fa" />
+    <circle cx="60" cy="46" r="4.5" fill="%2360a5fa" />
+    <circle cx="41.5" cy="44.5" r="1.5" fill="%23ffffff" />
+    <circle cx="61.5" cy="44.5" r="1.5" fill="%23ffffff" />
+    <path d="M 46 54 Q 50 58 54 54" fill="none" stroke="%23fbbf24" stroke-width="1.6" stroke-linecap="round" />
+    <!-- Little Chest Badge -->
+    <circle cx="50" cy="70" r="3" fill="%23ef4444" />
+  </svg>`,
+
+  mochiCloud: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="%23241b22" stroke="%23452f3d" stroke-width="2" />
+    <!-- Cloud Puffs -->
+    <circle cx="34" cy="54" r="18" fill="%23fdfaf6" />
+    <circle cx="66" cy="54" r="18" fill="%23fdfaf6" />
+    <circle cx="44" cy="40" r="18" fill="%23fdfaf6" />
+    <circle cx="58" cy="40" r="16" fill="%23fdfaf6" />
+    <rect x="34" y="48" width="32" height="24" fill="%23fdfaf6" />
+    <!-- Cheerful Eyes -->
+    <path d="M 36 50 Q 41 44 46 50" fill="none" stroke="%23382732" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M 54 50 Q 59 44 64 50" fill="none" stroke="%23382732" stroke-width="2.4" stroke-linecap="round" />
+    <!-- Blush -->
+    <circle cx="33" cy="57" r="5" fill="%23f472b6" opacity="0.6" />
+    <circle cx="67" cy="57" r="5" fill="%23f472b6" opacity="0.6" />
+    <!-- Smile -->
+    <path d="M 46 57 Q 50 63 54 57" fill="none" stroke="%23e11d48" stroke-width="2" stroke-linecap="round" />
+    <!-- Sparkle on head -->
+    <polygon points="50,22 52,27 57,27 53,30 55,35 50,32 45,35 47,30 43,27 48,27" fill="%23fbbf24" />
   </svg>`,
 };
 

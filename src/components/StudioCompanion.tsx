@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import {
   Sparkles,
@@ -7,10 +7,65 @@ import {
   Smile,
   Minimize2,
   Maximize2,
+  RotateCcw,
+  Check,
 } from 'lucide-react';
 
 export type CharacterMood = 'idle' | 'happy' | 'surprised' | 'winking' | 'thinking' | 'celebrating';
-export type CharacterType = 'archie' | 'pip' | 'emulsion';
+export type CharacterType = 'archie' | 'pip' | 'emulsion' | 'komorebi' | 'cosmo' | 'mochi';
+
+export interface CompanionMeta {
+  id: CharacterType;
+  name: string;
+  badge: string;
+  role: string;
+  greeting: string;
+}
+
+export const COMPANION_ROSTER: CompanionMeta[] = [
+  {
+    id: 'archie',
+    name: 'Archie',
+    badge: '🐻',
+    role: 'Archival Bear',
+    greeting: 'Hi! I’m Archie, your archival bear. Ready to craft something timeless?',
+  },
+  {
+    id: 'pip',
+    name: 'Pip',
+    badge: '🤖',
+    role: 'Pixel Mascot',
+    greeting: 'Beep boop! Pip online. Let’s arrange some pixel-perfect cards!',
+  },
+  {
+    id: 'emulsion',
+    name: 'Emulsion',
+    badge: '🐱',
+    role: 'Studio Cat',
+    greeting: 'Purr... I’m Emulsion. Let’s capture the light and frame your story.',
+  },
+  {
+    id: 'komorebi',
+    name: 'Komorebi',
+    badge: '🐰',
+    role: 'Forest Bunny',
+    greeting: 'Hello! I’m Komorebi. Take a peaceful breath — design at your own pace.',
+  },
+  {
+    id: 'cosmo',
+    name: 'Cosmo',
+    badge: '🚀',
+    role: 'Star Astronaut',
+    greeting: 'Greetings from orbit! Cosmo here. Let’s make your card shine across the stars!',
+  },
+  {
+    id: 'mochi',
+    name: 'Mochi',
+    badge: '☁️',
+    role: 'Cozy Cloud',
+    greeting: 'Warm hugs! I’m Mochi. Soft thoughts and cozy colors make everything brighter.',
+  },
+];
 
 const DESIGN_INSPIRATIONS = [
   { text: '“Less, but better.”', author: 'Dieter Rams', tip: 'Try reducing font sizes to give negative space room to breathe.' },
@@ -30,26 +85,102 @@ const PALETTE_INSPIRATIONS = [
   { name: 'St. Germain', bg: '#231e1a', ink: '#f8f4ee', accent: '#d97706' },
 ];
 
+interface Position {
+  x: number;
+  y: number;
+}
+
 export const StudioCompanion: React.FC = () => {
-  const [character, setCharacter] = useState<CharacterType>('archie');
+  const [character, setCharacter] = useState<CharacterType>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('acg_companion_char') as CharacterType;
+      if (saved && COMPANION_ROSTER.some((c) => c.id === saved)) return saved;
+    }
+    return 'archie';
+  });
+
   const [mood, setMood] = useState<CharacterMood>('idle');
   const [isOpen, setIsOpen] = useState(false);
+  const [copiedPalette, setCopiedPalette] = useState(false);
   const [isMinimized, setIsMinimized] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('acg_companion_minimized') === 'true';
     }
     return false;
   });
-  const [speechText, setSpeechText] = useState('Hi! I’m Archie, your studio companion. Move your cursor to see me look around!');
+
+  const currentMeta = COMPANION_ROSTER.find((c) => c.id === character) || COMPANION_ROSTER[0];
+  const [speechText, setSpeechText] = useState(currentMeta.greeting);
   const [speechAuthor, setSpeechAuthor] = useState('');
+
+  // Position state (persisted across reloads and tab closures)
+  const [position, setPosition] = useState<Position | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Pointer tracking coordinates (-1 to 1 normalized)
   const [pointer, setPointer] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const companionRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    origX: number;
+    origY: number;
+    hasMoved: boolean;
+  } | null>(null);
 
-  // Mouse / Pointer tracking with smooth interpolation
+  // Measure companion size based on screen
+  const getCompanionSize = useCallback(() => {
+    if (typeof window === 'undefined') return 64;
+    return window.innerWidth >= 768 ? 96 : 64;
+  }, []);
+
+  // Clamp position to viewport bounds
+  const clampCoordinates = useCallback((x: number, y: number): Position => {
+    if (typeof window === 'undefined') return { x, y };
+    const size = getCompanionSize();
+    const margin = 10;
+    const maxX = Math.max(margin, window.innerWidth - size - margin);
+    const maxY = Math.max(margin, window.innerHeight - size - margin);
+    return {
+      x: Math.min(Math.max(margin, x), maxX),
+      y: Math.min(Math.max(margin, y), maxY),
+    };
+  }, [getCompanionSize]);
+
+  // Load saved position on mount, or initialize default bottom-right
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const size = getCompanionSize();
+    const saved = localStorage.getItem('acg_companion_pos');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+          setPosition(clampCoordinates(parsed.x, parsed.y));
+          return;
+        }
+      } catch {}
+    }
+
+    // Default position: bottom-right
+    const defaultX = window.innerWidth - size - (window.innerWidth >= 768 ? 24 : 16);
+    const defaultY = window.innerHeight - size - (window.innerWidth >= 768 ? 24 : 96);
+    setPosition(clampCoordinates(defaultX, defaultY));
+  }, [clampCoordinates, getCompanionSize]);
+
+  // Keep within bounds on window resize or orientation change
+  useEffect(() => {
+    const handleResize = () => {
+      setPosition((prev) => (prev ? clampCoordinates(prev.x, prev.y) : null));
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
+  }, [clampCoordinates]);
+
+  // Pointer tracking with smooth eye interpolation (paused when tab hidden)
   useEffect(() => {
     const handlePointerMove = (e: MouseEvent | TouchEvent) => {
+      if (document.visibilityState === 'hidden') return;
       if (!companionRef.current) return;
       const rect = companionRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
@@ -61,7 +192,7 @@ export const StudioCompanion: React.FC = () => {
       const dx = clientX - centerX;
       const dy = clientY - centerY;
       const dist = Math.hypot(dx, dy) || 1;
-      const maxDist = 300;
+      const maxDist = 320;
       const clampDist = Math.min(dist, maxDist) / maxDist;
 
       setPointer({
@@ -78,9 +209,10 @@ export const StudioCompanion: React.FC = () => {
     };
   }, []);
 
-  // Natural idle blinking loop
+  // Natural idle blinking loop (paused when tab hidden)
   useEffect(() => {
     const blinkInterval = setInterval(() => {
+      if (document.visibilityState === 'hidden') return;
       if (mood === 'idle') {
         setMood('winking');
         setTimeout(() => setMood('idle'), 220);
@@ -88,6 +220,84 @@ export const StudioCompanion: React.FC = () => {
     }, 4500 + Math.random() * 2000);
     return () => clearInterval(blinkInterval);
   }, [mood]);
+
+  // Handle character switch
+  const handleSelectCharacter = (newChar: CharacterType) => {
+    setCharacter(newChar);
+    const meta = COMPANION_ROSTER.find((c) => c.id === newChar) || COMPANION_ROSTER[0];
+    setSpeechText(meta.greeting);
+    setSpeechAuthor(meta.role);
+    setMood('happy');
+    localStorage.setItem('acg_companion_char', newChar);
+    setTimeout(() => setMood('idle'), 1500);
+  };
+
+  // Reset companion to default bottom-right position
+  const handleResetPosition = () => {
+    const size = getCompanionSize();
+    const defaultX = window.innerWidth - size - (window.innerWidth >= 768 ? 24 : 16);
+    const defaultY = window.innerHeight - size - (window.innerWidth >= 768 ? 24 : 96);
+    const clamped = clampCoordinates(defaultX, defaultY);
+    setPosition(clamped);
+    localStorage.setItem('acg_companion_pos', JSON.stringify(clamped));
+  };
+
+  // Drag interaction handlers
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Ignore drags triggered on interactive bubble inputs/buttons
+    if ((e.target as HTMLElement).closest('button, input, textarea, a')) return;
+
+    const currentPos = position || {
+      x: window.innerWidth - 100,
+      y: window.innerHeight - 100,
+    };
+
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: currentPos.x,
+      origY: currentPos.y,
+      hasMoved: false,
+    };
+
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {}
+    setIsDragging(true);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
+
+    if (Math.hypot(dx, dy) > 4) {
+      dragRef.current.hasMoved = true;
+    }
+
+    const next = clampCoordinates(dragRef.current.origX + dx, dragRef.current.origY + dy);
+    setPosition(next);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return;
+    const wasMoved = dragRef.current.hasMoved;
+    dragRef.current = null;
+    setIsDragging(false);
+
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+
+    if (position) {
+      localStorage.setItem('acg_companion_pos', JSON.stringify(position));
+    }
+
+    // If it was a tap/click (not a drag), trigger reaction
+    if (!wasMoved) {
+      handleCharacterClick();
+    }
+  };
 
   // Handle companion click / tap
   const handleCharacterClick = () => {
@@ -121,11 +331,21 @@ export const StudioCompanion: React.FC = () => {
     setTimeout(() => setMood('idle'), 1500);
   };
 
-  const handleRandomPalette = () => {
+  const handleRandomPalette = async () => {
     const pal = PALETTE_INSPIRATIONS[Math.floor(Math.random() * PALETTE_INSPIRATIONS.length)];
-    setSpeechText(`Try "${pal.name}": Foundation ${pal.bg}, Ink ${pal.ink}, Accent ${pal.accent}. Click to copy!`);
+    setSpeechText(`Try "${pal.name}": Foundation ${pal.bg}, Ink ${pal.ink}, Accent ${pal.accent}.`);
     setSpeechAuthor('Palette Preset');
     setMood('thinking');
+
+    // Real clipboard write with immediate visual feedback
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(`${pal.bg}, ${pal.ink}, ${pal.accent}`);
+        setCopiedPalette(true);
+        setTimeout(() => setCopiedPalette(false), 2000);
+      }
+    } catch {}
+
     setTimeout(() => setMood('idle'), 1500);
   };
 
@@ -153,14 +373,39 @@ export const StudioCompanion: React.FC = () => {
   const pupilOffsetY = pointer.y * 6;
   const headTilt = pointer.x * 0.08;
 
+  // Determine speech bubble placement so it never runs off-screen
+  const isNearTop = (position?.y ?? 600) < 220;
+  const isRightSide = typeof window !== 'undefined' ? (position?.x ?? 300) > window.innerWidth / 2 : true;
+
   return (
     <aside
+      ref={companionRef}
       aria-label="Interactive Studio Mascot"
-      className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 select-none transition-all duration-300 font-sans"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      style={{
+        position: 'fixed',
+        left: position ? `${position.x}px` : undefined,
+        top: position ? `${position.y}px` : undefined,
+        bottom: position ? undefined : '5rem',
+        right: position ? undefined : '1rem',
+        touchAction: 'none',
+      }}
+      className={`fixed z-40 select-none font-sans transition-shadow ${
+        isDragging ? 'cursor-grabbing' : 'cursor-grab'
+      }`}
     >
-      {/* Speech / Dialogue Bubble */}
+      {/* Speech / Dialogue Bubble (Intelligently placed above or below) */}
       {isOpen && !isMinimized && (
-        <div className="mb-3 w-72 sm:w-80 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 backdrop-blur-md shadow-2xl p-3.5 text-xs text-[var(--app-text)] animate-in fade-in slide-in-from-bottom-2">
+        <div
+          className={`absolute ${
+            isNearTop ? 'top-full mt-2' : 'bottom-full mb-2'
+          } ${
+            isRightSide ? 'right-0' : 'left-0'
+          } w-72 sm:w-80 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 backdrop-blur-md shadow-2xl p-3.5 text-xs text-[var(--app-text)] animate-in fade-in slide-in-from-bottom-2`}
+        >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[var(--app-border-subtle)] pb-2 mb-2">
             <div className="flex items-center gap-1.5 font-semibold text-[11px] uppercase tracking-wider text-[var(--app-text-secondary)]">
@@ -170,11 +415,11 @@ export const StudioCompanion: React.FC = () => {
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => setCharacter(character === 'archie' ? 'pip' : character === 'pip' ? 'emulsion' : 'archie')}
-                className="p-1 rounded hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-secondary)] text-[10px] font-mono cursor-pointer"
-                title="Switch Mascot"
+                onClick={handleResetPosition}
+                className="p-1 rounded hover:bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] cursor-pointer"
+                title="Reset mascot position"
               >
-                Switch: {character === 'archie' ? 'Archie' : character === 'pip' ? 'Pip' : 'Emulsion'}
+                <RotateCcw className="w-3.5 h-3.5" />
               </button>
               <button
                 type="button"
@@ -187,10 +432,30 @@ export const StudioCompanion: React.FC = () => {
             </div>
           </div>
 
+          {/* Character Switcher Roster (6 Joyful companions) */}
+          <div className="flex items-center justify-between gap-1 mb-2.5 p-1 rounded-xl bg-[var(--app-surface-secondary)]/50 border border-[var(--app-border-subtle)]">
+            {COMPANION_ROSTER.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleSelectCharacter(item.id)}
+                className={`flex-1 py-1 px-1 rounded-lg text-[10px] font-medium flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
+                  character === item.id
+                    ? 'bg-[var(--app-surface)] text-[var(--app-accent)] shadow-xs border border-[var(--app-accent)]/30 scale-105'
+                    : 'text-[var(--app-text-muted)] hover:text-[var(--app-text)]'
+                }`}
+                title={`${item.name} (${item.role})`}
+              >
+                <span className="text-xs leading-none">{item.badge}</span>
+                <span className="truncate max-w-full text-[9px]">{item.name}</span>
+              </button>
+            ))}
+          </div>
+
           {/* Dialogue Message */}
-          <p className="leading-relaxed mb-3 text-[var(--app-text)] font-normal">{speechText}</p>
+          <p className="leading-relaxed mb-2 text-[var(--app-text)] font-normal">{speechText}</p>
           {speechAuthor && (
-            <p className="text-[10px] font-mono text-[var(--app-accent)] -mt-2 mb-3">
+            <p className="text-[10px] font-mono text-[var(--app-accent)] -mt-1 mb-2">
               — {speechAuthor}
             </p>
           )}
@@ -210,10 +475,19 @@ export const StudioCompanion: React.FC = () => {
               type="button"
               onClick={handleRandomPalette}
               className="py-1 px-1.5 rounded-lg bg-[var(--app-surface-secondary)] hover:bg-[var(--app-surface-secondary)]/80 text-[var(--app-text)] border border-[var(--app-border-subtle)] flex items-center justify-center gap-1 cursor-pointer transition-colors"
-              title="Get color suggestion"
+              title="Get color suggestion and copy to clipboard"
             >
-              <Shuffle className="w-3 h-3 text-[var(--app-accent)]" />
-              <span>Palette</span>
+              {copiedPalette ? (
+                <>
+                  <Check className="w-3 h-3 text-emerald-500" />
+                  <span className="text-emerald-500 font-medium">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Shuffle className="w-3 h-3 text-[var(--app-accent)]" />
+                  <span>Palette</span>
+                </>
+              )}
             </button>
             <button
               type="button"
@@ -228,11 +502,8 @@ export const StudioCompanion: React.FC = () => {
         </div>
       )}
 
-      {/* Mascot Trigger Container */}
-      <div
-        ref={companionRef}
-        className="flex items-end justify-end gap-2"
-      >
+      {/* Mascot Container */}
+      <div className="flex items-end justify-end gap-2">
         {/* Minimized Pill Toggle */}
         {isMinimized ? (
           <button
@@ -241,63 +512,43 @@ export const StudioCompanion: React.FC = () => {
             className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-lg hover:border-[var(--app-accent)]/50 text-xs text-[var(--app-text)] transition-transform hover:scale-105 cursor-pointer"
             title="Expand Studio Companion"
           >
-            <span className="w-2 h-2 rounded-full bg-[var(--app-accent)] animate-pulse" />
-            <span className="font-medium text-[11px]">Mascot</span>
+            <span className="text-xs">{currentMeta.badge}</span>
+            <span className="font-medium text-[11px]">{currentMeta.name}</span>
             <Maximize2 className="w-3 h-3 text-[var(--app-text-muted)]" />
           </button>
         ) : (
           <div className="relative group">
-            {/* Interactive Character Avatar */}
-            <button
-              type="button"
-              onClick={handleCharacterClick}
+            {/* Interactive Character Avatar (Responsive sizing: w-16 h-16 on mobile, w-24 h-24 on laptop) */}
+            <div
               onDoubleClick={() => setIsOpen((prev) => !prev)}
-              aria-label={`Interactive ${character} mascot`}
-              className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl border-2 border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:shadow-2xl hover:border-[var(--app-accent)]/60 cursor-pointer overflow-hidden transition-all duration-200 active:scale-95 flex items-center justify-center"
+              aria-label={`Interactive ${currentMeta.name} mascot`}
+              className="relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl border-2 border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:shadow-2xl hover:border-[var(--app-accent)]/60 overflow-hidden transition-transform duration-200 active:scale-95 flex items-center justify-center select-none"
               style={{
                 transform: `rotate(${headTilt}rad)`,
               }}
             >
               {character === 'archie' && (
-                <svg
-                  viewBox="0 0 100 100"
-                  className="w-full h-full"
-                  aria-hidden="true"
-                >
-                  {/* Background Ambient */}
+                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
                   <rect width="100" height="100" fill="var(--app-surface-secondary, #24211e)" />
-
-                  {/* Beret / Cap */}
                   <ellipse cx="50" cy="24" rx="30" ry="10" fill="#c69d78" />
                   <circle cx="50" cy="18" r="4" fill="#efe6d8" />
-
-                  {/* Ears */}
                   <polygon points="26,30 36,16 42,32" fill="#c69d78" stroke="#312c27" strokeWidth="1" />
                   <polygon points="74,30 64,16 58,32" fill="#c69d78" stroke="#312c27" strokeWidth="1" />
-
-                  {/* Head */}
                   <rect x="20" y="28" width="60" height="52" rx="26" fill="#efe6d8" stroke="#312c27" strokeWidth="1.5" />
-
-                  {/* Rosy Cheeks */}
                   <ellipse cx="28" cy="56" rx="6" ry="3.5" fill="#c69d78" opacity="0.6" />
                   <ellipse cx="72" cy="56" rx="6" ry="3.5" fill="#c69d78" opacity="0.6" />
-
-                  {/* Eyes / Pupils with dynamic tracking */}
                   {mood === 'happy' || mood === 'celebrating' ? (
-                    // Happy Crescent Eyes
                     <>
                       <path d="M 32 50 Q 38 43 44 50" fill="none" stroke="#191715" strokeWidth="2.5" strokeLinecap="round" />
                       <path d="M 56 50 Q 62 43 68 50" fill="none" stroke="#191715" strokeWidth="2.5" strokeLinecap="round" />
                     </>
                   ) : mood === 'winking' ? (
-                    // Winking Eye
                     <>
                       <path d="M 32 50 Q 38 43 44 50" fill="none" stroke="#191715" strokeWidth="2.5" strokeLinecap="round" />
                       <circle cx={62 + pupilOffsetX} cy={48 + pupilOffsetY} r="6" fill="#191715" />
                       <circle cx={64 + pupilOffsetX} cy={46 + pupilOffsetY} r="2" fill="#ffffff" />
                     </>
                   ) : (
-                    // Normal Round Eyes with Tracking Pupils
                     <>
                       <circle cx="38" cy="48" r="7.5" fill="#ffffff" stroke="#191715" strokeWidth="1" />
                       <circle cx="62" cy="48" r="7.5" fill="#ffffff" stroke="#191715" strokeWidth="1" />
@@ -307,36 +558,23 @@ export const StudioCompanion: React.FC = () => {
                       <circle cx={63 + pupilOffsetX} cy={46 + pupilOffsetY} r="1.5" fill="#ffffff" />
                     </>
                   )}
-
-                  {/* Nose & Mouth */}
                   <ellipse cx="50" cy="54" rx="3.5" ry="2.5" fill="#6f4637" />
                   {mood === 'surprised' ? (
                     <circle cx="50" cy="62" r="3.5" fill="#6f4637" />
                   ) : (
                     <path d="M 46 58 Q 50 63 54 58" fill="none" stroke="#6f4637" strokeWidth="1.5" strokeLinecap="round" />
                   )}
-
-                  {/* Archival Badge Tie */}
                   <rect x="44" y="74" width="12" height="10" rx="2" fill="#c69d78" />
                 </svg>
               )}
 
               {character === 'pip' && (
-                <svg
-                  viewBox="0 0 100 100"
-                  className="w-full h-full"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
                   <rect width="100" height="100" fill="var(--app-surface-secondary, #24211e)" />
-                  {/* Antenna */}
                   <line x1="50" y1="20" x2="50" y2="30" stroke="#c69d78" strokeWidth="2.5" />
                   <circle cx="50" cy="18" r="3.5" fill="#fbbf24" className="animate-pulse" />
-
-                  {/* Robot Head */}
                   <rect x="22" y="30" width="56" height="48" rx="8" fill="#312c27" stroke="#48413a" strokeWidth="2" />
                   <rect x="28" y="36" width="44" height="28" rx="4" fill="#191715" />
-
-                  {/* Pixel Eyes */}
                   {mood === 'happy' || mood === 'celebrating' ? (
                     <>
                       <path d="M 33 50 L 38 44 L 43 50" fill="none" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="square" />
@@ -348,29 +586,18 @@ export const StudioCompanion: React.FC = () => {
                       <rect x={58 + pupilOffsetX * 0.8} y={44 + pupilOffsetY * 0.8} width="8" height="8" rx="1" fill="#fbbf24" />
                     </>
                   )}
-
-                  {/* Pixel Mouth */}
                   <rect x="42" y="70" width="16" height="3" fill="#c69d78" />
                 </svg>
               )}
 
               {character === 'emulsion' && (
-                <svg
-                  viewBox="0 0 100 100"
-                  className="w-full h-full"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
                   <rect width="100" height="100" fill="var(--app-surface-secondary, #24211e)" />
-                  {/* Cat Ears */}
-                  <polygon points="22,40 32,18 48,34" fill="#191715" stroke="#48413a" strokeWidth="1" />
-                  <polygon points="78,40 68,18 52,34" fill="#191715" stroke="#48413a" strokeWidth="1" />
-                  <polygon points="26,36 34,24 44,34" fill="#c69d78" opacity="0.6" />
-                  <polygon points="74,36 66,24 56,34" fill="#c69d78" opacity="0.6" />
-
-                  {/* Head */}
+                  <polygon points="22,40 32,18 48,32" fill="#191715" stroke="#48413a" strokeWidth="1" />
+                  <polygon points="78,40 68,18 52,32" fill="#191715" stroke="#48413a" strokeWidth="1" />
+                  <polygon points="26,36 34,24 44,32" fill="#c69d78" opacity="0.6" />
+                  <polygon points="70,34 64,24 56,32" fill="#c69d78" opacity="0.6" />
                   <ellipse cx="50" cy="52" rx="34" ry="28" fill="#191715" stroke="#312c27" strokeWidth="1.5" />
-
-                  {/* Cat Eyes */}
                   {mood === 'happy' || mood === 'celebrating' ? (
                     <>
                       <path d="M 32 50 Q 40 44 46 50" fill="none" stroke="#c69d78" strokeWidth="2.5" strokeLinecap="round" />
@@ -384,19 +611,99 @@ export const StudioCompanion: React.FC = () => {
                       <ellipse cx={62 + pupilOffsetX} cy={48 + pupilOffsetY} rx="2.5" ry="6" fill="#191715" />
                     </>
                   )}
-
-                  {/* Whiskers */}
                   <line x1="18" y1="56" x2="32" y2="58" stroke="#48413a" strokeWidth="1" />
                   <line x1="18" y1="62" x2="32" y2="61" stroke="#48413a" strokeWidth="1" />
                   <line x1="82" y1="56" x2="68" y2="58" stroke="#48413a" strokeWidth="1" />
                   <line x1="82" y1="62" x2="68" y2="61" stroke="#48413a" strokeWidth="1" />
-
-                  {/* Nose & Mouth */}
                   <polygon points="48,58 52,58 50,61" fill="#c69d78" />
                   <path d="M 46 62 Q 50 65 54 62" fill="none" stroke="#c69d78" strokeWidth="1" />
                 </svg>
               )}
-            </button>
+
+              {character === 'komorebi' && (
+                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
+                  <rect width="100" height="100" fill="var(--app-surface-secondary, #1e2621)" />
+                  <ellipse cx="36" cy="24" rx="8" ry="18" fill="#e8ede9" stroke="#303d35" strokeWidth="1.5" />
+                  <ellipse cx="64" cy="24" rx="8" ry="18" fill="#e8ede9" stroke="#303d35" strokeWidth="1.5" />
+                  <ellipse cx="36" cy="25" rx="4.5" ry="12" fill="#f4b8b8" opacity="0.6" />
+                  <ellipse cx="64" cy="25" rx="4.5" ry="12" fill="#f4b8b8" opacity="0.6" />
+                  <path d="M 48 30 Q 42 22 47 16 Q 52 22 48 30 Z" fill="#97ab9b" />
+                  <path d="M 50 30 Q 56 20 52 14 Q 48 20 50 30 Z" fill="#84a98c" />
+                  <ellipse cx="50" cy="56" rx="30" ry="24" fill="#e8ede9" stroke="#303d35" strokeWidth="1.5" />
+                  {mood === 'happy' || mood === 'celebrating' ? (
+                    <>
+                      <path d="M 33 54 Q 38 48 43 54" fill="none" stroke="#1a201c" strokeWidth="2.5" strokeLinecap="round" />
+                      <path d="M 57 54 Q 62 48 67 54" fill="none" stroke="#1a201c" strokeWidth="2.5" strokeLinecap="round" />
+                    </>
+                  ) : (
+                    <>
+                      <ellipse cx={38 + pupilOffsetX * 0.6} cy={54 + pupilOffsetY * 0.6} rx="4" ry="5.5" fill="#1a201c" />
+                      <ellipse cx={62 + pupilOffsetX * 0.6} cy={54 + pupilOffsetY * 0.6} rx="4" ry="5.5" fill="#1a201c" />
+                      <circle cx={39.5 + pupilOffsetX * 0.6} cy={52 + pupilOffsetY * 0.6} r="1.5" fill="#ffffff" />
+                      <circle cx={63.5 + pupilOffsetX * 0.6} cy={52 + pupilOffsetY * 0.6} r="1.5" fill="#ffffff" />
+                    </>
+                  )}
+                  <circle cx="31" cy="61" r="5" fill="#f4b8b8" opacity="0.7" />
+                  <circle cx="69" cy="61" r="5" fill="#f4b8b8" opacity="0.7" />
+                  <polygon points="48,59 52,59 50,62" fill="#e07a7a" />
+                  <path d="M 46 64 Q 50 67 54 64" fill="none" stroke="#303d35" strokeWidth="1.4" strokeLinecap="round" />
+                </svg>
+              )}
+
+              {character === 'cosmo' && (
+                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
+                  <rect width="100" height="100" fill="var(--app-surface-secondary, #131722)" />
+                  <line x1="50" y1="12" x2="50" y2="24" stroke="#fbbf24" strokeWidth="2" />
+                  <polygon points="50,6 52,11 57,11 53,14 55,19 50,16 45,19 47,14 43,11 48,11" fill="#fbbf24" />
+                  <rect x="20" y="24" width="60" height="54" rx="20" fill="#242c40" stroke="#3d4b6c" strokeWidth="1.5" />
+                  <rect x="26" y="30" width="48" height="34" rx="14" fill="#1a2030" stroke="#fbbf24" strokeWidth="1.2" />
+                  <path d="M 32 34 Q 50 32 64 38" fill="none" stroke="#ffffff" strokeWidth="1.5" opacity="0.4" strokeLinecap="round" />
+                  {mood === 'happy' || mood === 'celebrating' ? (
+                    <>
+                      <path d="M 35 47 Q 40 41 45 47" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" />
+                      <path d="M 55 47 Q 60 41 65 47" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" />
+                    </>
+                  ) : (
+                    <>
+                      <circle cx={40 + pupilOffsetX * 0.6} cy={46 + pupilOffsetY * 0.6} r="4.5" fill="#60a5fa" />
+                      <circle cx={60 + pupilOffsetX * 0.6} cy={46 + pupilOffsetY * 0.6} r="4.5" fill="#60a5fa" />
+                      <circle cx={41.5 + pupilOffsetX * 0.6} cy={44.5 + pupilOffsetY * 0.6} r="1.5" fill="#ffffff" />
+                      <circle cx={61.5 + pupilOffsetX * 0.6} cy={44.5 + pupilOffsetY * 0.6} r="1.5" fill="#ffffff" />
+                    </>
+                  )}
+                  <path d="M 46 54 Q 50 58 54 54" fill="none" stroke="#fbbf24" strokeWidth="1.6" strokeLinecap="round" />
+                  <circle cx="50" cy="70" r="3" fill="#ef4444" />
+                </svg>
+              )}
+
+              {character === 'mochi' && (
+                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
+                  <rect width="100" height="100" fill="var(--app-surface-secondary, #241b22)" />
+                  <circle cx="34" cy="54" r="18" fill="#fdfaf6" />
+                  <circle cx="66" cy="54" r="18" fill="#fdfaf6" />
+                  <circle cx="44" cy="40" r="18" fill="#fdfaf6" />
+                  <circle cx="58" cy="40" r="16" fill="#fdfaf6" />
+                  <rect x="34" y="48" width="32" height="24" fill="#fdfaf6" />
+                  {mood === 'happy' || mood === 'celebrating' ? (
+                    <>
+                      <path d="M 35 48 Q 40 42 45 48" fill="none" stroke="#382732" strokeWidth="2.5" strokeLinecap="round" />
+                      <path d="M 55 48 Q 60 42 65 48" fill="none" stroke="#382732" strokeWidth="2.5" strokeLinecap="round" />
+                    </>
+                  ) : (
+                    <>
+                      <circle cx={38 + pupilOffsetX * 0.6} cy={48 + pupilOffsetY * 0.6} r="3.5" fill="#382732" />
+                      <circle cx={62 + pupilOffsetX * 0.6} cy={48 + pupilOffsetY * 0.6} r="3.5" fill="#382732" />
+                      <circle cx={39 + pupilOffsetX * 0.6} cy={47 + pupilOffsetY * 0.6} r="1.2" fill="#ffffff" />
+                      <circle cx={63 + pupilOffsetX * 0.6} cy={47 + pupilOffsetY * 0.6} r="1.2" fill="#ffffff" />
+                    </>
+                  )}
+                  <circle cx="33" cy="57" r="5" fill="#f472b6" opacity="0.6" />
+                  <circle cx="67" cy="57" r="5" fill="#f472b6" opacity="0.6" />
+                  <path d="M 46 57 Q 50 63 54 57" fill="none" stroke="#e11d48" strokeWidth="2" strokeLinecap="round" />
+                  <polygon points="50,22 52,27 57,27 53,30 55,35 50,32 45,35 47,30 43,27 48,27" fill="#fbbf24" />
+                </svg>
+              )}
+            </div>
 
             {/* Quick Toggle Controls Overlay */}
             <div className="absolute -top-2 -right-2 flex items-center gap-1">

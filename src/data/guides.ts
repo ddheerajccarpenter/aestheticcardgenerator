@@ -199,7 +199,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       {
         heading: '1. Shifting from Promotional Collages to Thought Cards',
         body:
-          'Bookstagram feeds are crowded with staged coffee cups and cluttered book jackets. What readers actually seek is intellectual resonance—a single passage or perspective shift that changes how they perceive the world. A book review card isolates this passage and presents it with literary dignity.',
+          'Bookstagram feeds are crowded with staged coffee cups and cluttered book jackets. What readers notice is a thoughtful passage—a single line or reflection that sticks with them. A book card isolates that sentence and presents it cleanly.',
       },
       {
         heading: '2. Structuring Your Review Layout',
