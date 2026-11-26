@@ -102,15 +102,15 @@ export const BingoView: React.FC<BingoViewProps> = () => {
 
   return (
     <div className="mx-auto w-full max-w-[1380px] px-3 pb-32 pt-6 sm:px-6 md:px-8 md:pb-16 text-[var(--app-text-primary)]">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3 animate-card-entrance">
         <div>
-          <p className="editorial-kicker">4 Card Editions · Local Export</p>
-          <h1 className="mt-2 text-3xl font-heading leading-tight sm:text-4xl">
+          <p className="editorial-kicker">4 Card Editions · Free Export</p>
+          <h1 className="mt-1.5 text-3xl font-heading leading-tight sm:text-4xl">
             Bingo Card Generator
           </h1>
         </div>
         <p className="text-xs text-[var(--app-text-secondary)]">
-          Pick a kind, shuffle or edit squares, stamp as you play, and export PNG.
+          Shuffle squares, stamp live, export PNG.
         </p>
       </div>
 

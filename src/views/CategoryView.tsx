@@ -97,19 +97,21 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
             {category.subtitle}
           </p>
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            <button
-              onClick={() => onOpenEditorWithTemplate(displayTemplates[0])}
-              className="studio-btn-primary"
+            {displayTemplates[0] && (
+              <a
+                href={`/canvas?template=${encodeURIComponent(displayTemplates[0].id)}`}
+                className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px]"
+              >
+                <PenTool className="w-4 h-4" />
+                <span>Create with Style</span>
+              </a>
+            )}
+            <a
+              href="/templates"
+              className="studio-btn-secondary interactive-tactile min-h-[44px]"
             >
-              <PenTool className="w-4 h-4" />
-              <span>Create with this Style</span>
-            </button>
-            <button
-              onClick={() => onNavigate('/templates')}
-              className="studio-btn-secondary"
-            >
-              <span>View All 8 Categories</span>
-            </button>
+              <span>All Categories</span>
+            </a>
           </div>
         </header>
 
@@ -164,16 +166,17 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayTemplates.map((template) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {displayTemplates.map((template, idx) => (
               <article
                 key={template.id}
-                className="studio-panel flex flex-col overflow-hidden transition-all duration-200 hover:-translate-y-1 shadow-md"
+                style={{ '--stagger-i': idx % 9 } as React.CSSProperties}
+                className="studio-panel group flex flex-col overflow-hidden card-editorial-hover animate-card-entrance shadow-md"
               >
-                {/* Visual Preview */}
-                <div
+                <a
+                  href={`/card/${template.id}`}
                   style={{ backgroundColor: template.theme.bg, color: template.theme.ink }}
-                  className="relative p-6 min-h-[220px] flex flex-col justify-between border-b border-black/10"
+                  className="relative p-6 min-h-[200px] flex flex-col justify-between border-b border-black/10"
                 >
                   <div className="flex items-center justify-between text-[10px] font-mono opacity-70">
                     <span>{template.tag}</span>
@@ -187,21 +190,20 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
                   <cite className="not-italic text-[11px] font-medium opacity-80 truncate">
                     — {template.author}
                   </cite>
-                </div>
+                </a>
 
-                {/* Action Bar */}
                 <div className="p-4 flex flex-col gap-3 bg-[var(--app-surface-secondary)] border-t border-[var(--app-border-subtle)] mt-auto">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold font-heading text-[var(--app-text-primary)] truncate">
+                  <a href={`/card/${template.id}`} className="flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-bold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors truncate">
                       {template.title}
                     </h3>
                     <span className="text-[10px] text-[var(--app-text-muted)] font-subheading uppercase shrink-0">{template.categoryLabel}</span>
-                  </div>
+                  </a>
 
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <a
                       href={`/canvas?template=${template.id}`}
-                      className="studio-btn-primary min-h-9 !py-1.5 !px-2.5 !text-xs !rounded-xl"
+                      className="studio-btn-primary interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
                       title="Open in Canvas Studio"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
@@ -209,7 +211,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
                     </a>
                     <a
                       href={`/create?template=${template.id}`}
-                      className="studio-btn-secondary min-h-9 !py-1.5 !px-2.5 !text-xs !rounded-xl"
+                      className="studio-btn-secondary interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
                       title="Open in Card Creator"
                     >
                       <span>Creator</span>

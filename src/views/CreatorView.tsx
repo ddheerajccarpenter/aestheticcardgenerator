@@ -522,12 +522,6 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <a
             href="/"
-            onClick={(e) => {
-              if (onNavigateHome) {
-                e.preventDefault();
-                onNavigateHome();
-              }
-            }}
             className="inline-flex items-center gap-1.5 text-xs text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] transition-colors cursor-pointer py-1"
             title="Return to Gallery"
           >

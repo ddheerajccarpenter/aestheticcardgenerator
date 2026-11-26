@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { updatePageSEO } from '../utils/seo';
 import { SquareDuotoneIcon } from '../components/SquareDuotoneIcon';
+import { GUIDE_ARTICLES } from '../data/guides';
+import { AdSlot } from '../components/AdSlot';
 
 interface GuideIndexViewProps {
   onNavigate?: (path: string) => void;
@@ -379,14 +381,14 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
       </div>
 
         {/* Spread Navigation Controls */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <button
             onClick={handlePrev}
             disabled={currentSpreadIndex === 0}
-            className="studio-btn-secondary !text-xs !py-2 disabled:opacity-30 cursor-pointer"
+            className="studio-btn-secondary interactive-tactile min-h-[44px] !text-xs !py-2 disabled:opacity-30 cursor-pointer"
           >
             <SquareDuotoneIcon name="arrow-left" size="sm" />
-            <span>← Previous Spread</span>
+            <span>Prev Spread</span>
           </button>
 
           <span className="text-xs font-mono font-bold text-[var(--app-text-primary)]">
@@ -396,12 +398,41 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
           <button
             onClick={handleNext}
             disabled={currentSpreadIndex === totalSpreads - 1}
-            className="studio-btn-secondary !text-xs !py-2 disabled:opacity-30 cursor-pointer"
+            className="studio-btn-secondary interactive-tactile min-h-[44px] !text-xs !py-2 disabled:opacity-30 cursor-pointer"
           >
-            <span>Next Spread →</span>
+            <span>Next Spread</span>
             <SquareDuotoneIcon name="arrow-right" size="sm" />
           </button>
         </div>
+
+        <section aria-labelledby="direct-guides-heading" className="w-full max-w-5xl border-t border-[var(--app-border-subtle)] pt-8">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <h2 id="direct-guides-heading" className="text-xl sm:text-2xl font-heading">
+              Design Guides
+            </h2>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--app-text-muted)]">
+              {GUIDE_ARTICLES.length} articles
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {GUIDE_ARTICLES.map((article, idx) => (
+              <a
+                key={article.slug}
+                href={article.path}
+                style={{ '--stagger-i': idx } as React.CSSProperties}
+                className="studio-panel group flex flex-col justify-between gap-2 p-4 card-editorial-hover animate-card-entrance"
+              >
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--app-accent)]">
+                  {article.category} · {article.readTime}
+                </span>
+                <span className="text-sm font-bold text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors line-clamp-2">
+                  {article.title}
+                </span>
+              </a>
+            ))}
+          </div>
+          <AdSlot slotId="guides-index-bottom" format="horizontal" />
+        </section>
       </div>
     </div>
   );

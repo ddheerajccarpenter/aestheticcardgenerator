@@ -479,6 +479,51 @@ export function resolveRouteSeo(rawPath: string): RouteSeoData {
     };
   }
 
+  if (path.startsWith('/card/')) {
+    const cardId = path.replace('/card/', '');
+    const tmpl = PRESET_TEMPLATES.find((t) => t.id === cardId);
+    if (tmpl) {
+      const cardDesc = tmpl.description || `Edit "${tmpl.title}" in Canvas Studio and download free without watermarks.`;
+      return {
+        title: `${tmpl.title} - Free Editable Card Template | ACG`,
+        description: cardDesc,
+        ogType: 'website',
+        robots: 'index, follow, max-image-preview:large, max-snippet:-1',
+        structuredData: [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: `${PRODUCTION_DOMAIN}/` },
+              { '@type': 'ListItem', position: 2, name: 'Templates', item: `${PRODUCTION_DOMAIN}/templates` },
+              { '@type': 'ListItem', position: 3, name: tmpl.title, item: canonicalUrl },
+            ],
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'CreativeWork',
+            name: tmpl.title,
+            description: cardDesc,
+            url: canonicalUrl,
+            isAccessibleForFree: true,
+          },
+        ],
+        fallback: {
+          eyebrow: `${tmpl.categoryLabel} · Free Template`,
+          heading: tmpl.title,
+          lead: cardDesc,
+          paragraphs: [
+            `Customize "${tmpl.title}" directly in your browser and download high-resolution PNG, JPEG, or WebP files free of charge.`,
+          ],
+          links: [
+            { label: `Customize ${tmpl.title}`, href: `/canvas?template=${tmpl.id}` },
+            ...defaultLinks,
+          ],
+        },
+      };
+    }
+  }
+
   return {
     title: 'Page Not Found - Aesthetic Card Generator',
     description: 'The requested page could not be found. Browse free templates and launch the editor.',

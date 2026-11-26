@@ -1808,16 +1808,14 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       <header className="editor-top-toolbar h-13 sm:h-14 border-b border-[var(--app-border-subtle)] px-2 sm:px-4 flex items-center justify-between gap-1.5 sm:gap-2 shrink-0 transition-colors z-30 pt-[env(safe-area-inset-top,0px)] bg-[var(--app-surface)] text-[var(--app-text)]">
         {/* Left: Back & Title */}
         <div className="flex items-center gap-1 sm:gap-2.5 flex-1 min-w-0">
-          <button
-            onClick={() => {
-              if (onNavigateHome) onNavigateHome();
-              else window.location.href = '/templates';
-            }}
-            className="p-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] hover:border-[var(--app-accent)]/40 text-[var(--app-text)] transition-colors cursor-pointer shrink-0"
+          <a
+            href="/templates"
+            className="p-2 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] hover:border-[var(--app-accent)]/40 text-[var(--app-text)] transition-colors cursor-pointer shrink-0 inline-flex items-center justify-center"
             title="Return to Studio Home / Templates"
+            aria-label="Return to Templates"
           >
             <ArrowLeft className="w-4 h-4" />
-          </button>
+          </a>
 
           <div className="flex items-center gap-1.5 min-w-0 flex-1">
             <input

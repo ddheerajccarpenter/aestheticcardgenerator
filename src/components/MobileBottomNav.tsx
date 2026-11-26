@@ -10,7 +10,6 @@ interface MobileBottomNavProps {
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   currentPath,
-  onNavigate,
   hideWhenTyping = false,
 }) => {
   const normalized = currentPath === '/' ? '/' : currentPath.replace(/\/+$/, '') || '/';
@@ -23,12 +22,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     { label: 'Canvas', path: '/canvas', icon: Layers, isActive: normalized.startsWith('/canvas') },
     { label: 'Create', path: '/create', icon: Plus, isActive: normalized.startsWith('/create') },
   ];
-
-  const handleItemClick = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => {
-    event.preventDefault();
-    if (onNavigate) onNavigate(path);
-    else window.location.assign(path);
-  };
 
   return (
     <nav
@@ -43,7 +36,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             <a
               key={item.path}
               href={item.path}
-              onClick={(event) => handleItemClick(event, item.path)}
               aria-current={active ? 'page' : undefined}
               aria-label={item.label === 'Create' ? 'Create new card' : item.label}
               className={`relative flex min-h-[48px] flex-col items-center justify-center gap-0.5 px-1 py-1 text-[10px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${

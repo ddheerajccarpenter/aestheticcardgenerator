@@ -69,10 +69,10 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
             </span>
           </div>
           <h1 className="font-heading text-3xl md:text-5xl font-extrabold tracking-tight text-[var(--app-text)]">
-            Studio Blog &amp; Typesetting Essays
+            Studio Blog
           </h1>
-          <p className="font-body text-base md:text-lg max-w-3xl leading-relaxed text-[var(--app-text-muted)]">
-            Deep explorations of aesthetic ID cards, vintage passport passes, literary typesetting, paper texture psychology, and the future of client-side creative tools.
+          <p className="font-body text-sm md:text-base max-w-xl leading-relaxed text-[var(--app-text-muted)]">
+            Short essays on typography, paper palettes, and client-side design.
           </p>
         </header>
 
@@ -143,11 +143,12 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
         </div>
 
         {/* Articles Grid: Strict 2-Column Rule */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-          {gridPosts.map((post: BlogPost) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          {gridPosts.map((post: BlogPost, idx: number) => (
             <article
               key={post.slug}
-              className="studio-panel flex flex-col justify-between p-6 rounded-2xl group transition-all duration-200 hover:-translate-y-1"
+              style={{ '--stagger-i': idx } as React.CSSProperties}
+              className="studio-panel flex flex-col justify-between p-5 sm:p-6 rounded-2xl group card-editorial-hover animate-card-entrance"
             >
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between text-xs">
@@ -311,23 +312,13 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
             </div>
 
             <div className="shrink-0">
-              {onOpenEditorWithTemplate ? (
-                <button
-                  onClick={() => onOpenEditorWithTemplate(featuredTemplate)}
-                  className="studio-btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs cursor-pointer"
-                >
-                  <PenTool className="w-3.5 h-3.5" />
-                  <span>Open Style in Studio</span>
-                </button>
-              ) : (
-                <a
-                  href={featuredTemplate.canvasDoc?.objects.length ? `/canvas?template=${featuredTemplate.id}` : `/create?template=${featuredTemplate.id}`}
-                  className="studio-btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs cursor-pointer"
-                >
-                  <PenTool className="w-3.5 h-3.5" />
-                  <span>Open Style in Studio</span>
-                </a>
-              )}
+              <a
+                href={featuredTemplate.canvasDoc?.objects.length ? `/canvas?template=${featuredTemplate.id}` : `/create?template=${featuredTemplate.id}`}
+                className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px] w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs cursor-pointer"
+              >
+                <PenTool className="w-3.5 h-3.5" />
+                <span>Open in Studio</span>
+              </a>
             </div>
           </div>
         )}

@@ -297,5 +297,14 @@ test('SEO, GEO, AEO, and AdSense readiness configuration & built SSR output', ()
     assert.ok(indexHtml.includes('"@type":"FAQPage"'), 'Home static HTML must include FAQPage schema for AEO');
     assert.ok(!indexHtml.includes('Opening the studio'), 'Home static fallback must provide semantic content instead of stub text');
     assert.ok(faqHtml.includes('"@type":"FAQPage"'), 'FAQ static HTML must embed FAQPage schema');
+    const cardPage = path.join(rootDir, 'dist', 'card', 'tokyo-matcha-studio', 'index.html');
+    assert.ok(fs.existsSync(cardPage), 'Every card must build its own /card/<id> page');
   }
+
+  const homeView = fs.readFileSync(path.join(SRC_DIR, 'views', 'HomeView.tsx'), 'utf8');
+  assert.ok(homeView.includes('href={`/card/${card.id}`}'), 'Home cards must link directly to dedicated /card/<id> pages');
+  assert.ok(!homeView.includes('previewDialogRef'), 'Home cards must navigate to own pages instead of popup modal');
+
+  const mobileNav = fs.readFileSync(path.join(SRC_DIR, 'components', 'MobileBottomNav.tsx'), 'utf8');
+  assert.ok(!mobileNav.includes('preventDefault'), 'MobileBottomNav links must perform full browser loads for AdSense');
 });

@@ -382,11 +382,6 @@
     border-radius: var(--app-radius-control);
   }
 
-  /* Ensure closed <details> popovers occupy zero phantom layout space or hit targets */
-  details:not([open]) > :not(summary) {
-    display: none;
-  }
-
   p, .body-regular {
     font-weight: 500;
     line-height: 1.6;
@@ -418,6 +413,11 @@
     font-variant-numeric: tabular-nums;
     font-weight: 600;
   }
+}
+
+/* Keep outside @layer base so utility classes like .flex inside closed <details> never override display: none */
+details:not([open]) > :not(summary) {
+  display: none !important;
 }
 
 /* Square Duotone Icon System */
@@ -726,13 +726,14 @@ html.light .studio-input:focus {
 .studio-pill {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
+  padding: 0.5rem 0.9375rem;
   border-radius: 0.75rem;
   font-size: 0.75rem;
   font-weight: 600;
   font-family: var(--font-subheading);
-  transition: all 140ms ease;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 140ms ease, border-color 140ms ease, color 140ms ease;
   white-space: nowrap;
   cursor: pointer;
   border: 1px solid var(--app-border-subtle);
@@ -742,6 +743,10 @@ html.light .studio-input:focus {
 .studio-pill:hover {
   color: var(--app-text-primary);
   border-color: var(--app-border-strong);
+  transform: translateY(-1px);
+}
+.studio-pill:active {
+  transform: scale(0.97);
 }
 .studio-pill.active {
   background-color: var(--app-accent);
@@ -1341,7 +1346,55 @@ html.light .studio-input:focus {
 }
 
 .animate-card-entrance {
-  animation: card-fade-in-up 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: card-fade-in-up 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--stagger-i, 0) * 32ms);
+}
+
+@keyframes hero-card-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6px; }
+}
+
+@keyframes hero-card-bob-reverse {
+  0%, 100% { translate: 0 -4px; }
+  50% { translate: 0 4px; }
+}
+
+@keyframes cta-sheen-glide {
+  0% { transform: translateX(-140%) skewX(-18deg); }
+  45%, 100% { transform: translateX(240%) skewX(-18deg); }
+}
+
+.animate-hero-bob {
+  animation: hero-card-bob 5.8s ease-in-out infinite;
+}
+
+.animate-hero-bob-reverse {
+  animation: hero-card-bob-reverse 6.4s ease-in-out infinite;
+}
+
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.btn-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: translateX(-140%) skewX(-18deg);
+  animation: cta-sheen-glide 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+.card-artwork-zoom img,
+.card-artwork-zoom svg {
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.group:hover .card-artwork-zoom img,
+.group:hover .card-artwork-zoom svg {
+  transform: scale(1.025);
 }
 
 /* Tactile micro-interactions for buttons and interactive cards */
@@ -1353,11 +1406,11 @@ html.light .studio-input:focus {
 }
 
 .card-editorial-hover {
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease, border-color 260ms ease;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms ease, border-color 280ms ease;
 }
 .card-editorial-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.18);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px -10px rgba(0, 0, 0, 0.24);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1373,10 +1426,18 @@ html.light .studio-input:focus {
   .animate-companion-breathe,
   .animate-shimmer-sweep,
   .animate-card-entrance,
+  .animate-hero-bob,
+  .animate-hero-bob-reverse,
+  .btn-sheen::after,
+  .card-artwork-zoom img,
+  .card-artwork-zoom svg,
   .interactive-tactile:active,
   .card-editorial-hover:hover,
+  .studio-pill:hover,
+  .studio-pill:active,
   .holographic-foil {
     animation: none !important;
     transform: none !important;
+    translate: none !important;
   }
 }

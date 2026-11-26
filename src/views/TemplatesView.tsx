@@ -28,24 +28,28 @@ interface TemplatesViewProps {
 }
 
 const CATEGORY_TABS = [
-  { id: 'all', label: 'All designs' },
-  { id: 'poster', label: 'Posters' },
-  { id: 'id-card', label: 'ID & passes' },
-  { id: 'pastel', label: 'Cute & Pastel' },
-  { id: 'vintage', label: 'Vintage & Retro' },
-  { id: 'fan', label: 'Fan & Character' },
-  { id: 'minimal', label: 'Minimal' },
-  { id: 'school', label: 'School & Academy' },
-  { id: 'quote', label: 'Editorial Quotes' },
+  { id: 'all', label: 'All designs', href: '/templates' },
+  { id: 'poster', label: 'Posters', href: '/templates?cat=poster' },
+  { id: 'id-card', label: 'ID & passes', href: '/templates/aesthetic-id-cards' },
+  { id: 'pastel', label: 'Cute & Pastel', href: '/templates?cat=pastel' },
+  { id: 'vintage', label: 'Vintage & Retro', href: '/templates/scrapbook-cards' },
+  { id: 'fan', label: 'Fan & Character', href: '/templates/social-text-cards' },
+  { id: 'minimal', label: 'Minimal', href: '/templates/minimal-cards' },
+  { id: 'school', label: 'Study Notes', href: '/templates/study-note-cards' },
+  { id: 'quote', label: 'Quote Cards', href: '/templates/quote-cards' },
 ];
 
 export const TemplatesView: React.FC<TemplatesViewProps> = ({
   theme = 'dark',
-  onOpenEditorWithTemplate,
 }) => {
   const isLight = theme === 'light';
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeCategory] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).get('cat') || 'all';
+    }
+    return 'all';
+  });
   const [selectedForCompare, setSelectedForCompare] = useState<CardTemplate[]>([]);
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
   const [ambientEnabled, setAmbientEnabledState] = useState<boolean>(() => getAmbientState().enabled);
@@ -180,22 +184,22 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           <span className="active">Templates</span>
         </nav>
 
-        <header className="grid gap-6 border-b border-[var(--app-border-subtle)] pb-8 lg:grid-cols-[1fr_auto] lg:items-end">
-          <div className="max-w-3xl">
-            <span className="editorial-kicker mb-3 block">Templates / {PRESET_TEMPLATES.length} starting points</span>
-            <h1 className="font-heading text-5xl leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
+        <header className="grid gap-5 border-b border-[var(--app-border-subtle)] pb-6 lg:grid-cols-[1fr_auto] lg:items-end animate-card-entrance">
+          <div className="max-w-2xl">
+            <span className="editorial-kicker mb-2 block">{PRESET_TEMPLATES.length} Free Templates</span>
+            <h1 className="font-heading text-4xl leading-[0.94] tracking-tight sm:text-6xl">
               Make it your own.
             </h1>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--app-text-secondary)] sm:text-base">
-              Posters, passes, and small printed things. Pick a layout; change every layer.
+            <p className="mt-3 text-sm text-[var(--app-text-secondary)]">
+              Pick a layout and customize every layer free.
             </p>
           </div>
           <a
             href="/canvas?blank=true"
-            className="studio-btn-primary min-h-11 w-fit px-5"
+            className="studio-btn-primary btn-sheen interactive-tactile min-h-11 w-fit px-5"
           >
             <FilePlus className="w-4 h-4" />
-            <span>Start with a blank canvas</span>
+            <span>Blank canvas</span>
           </a>
         </header>
 
@@ -246,7 +250,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           </div>
 
           {/* Primary Category Filter Tabs */}
-          <div role="group" aria-label="Filter templates by category" className="flex flex-wrap items-center gap-2 pb-1">
+          <nav aria-label="Filter templates by category" className="flex flex-wrap items-center gap-2 pb-1">
             {CATEGORY_TABS.map((tab) => {
               const count =
                 tab.id === 'all'
@@ -256,11 +260,10 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                   : PRESET_TEMPLATES.filter((t) => t.category === tab.id).length;
 
               return (
-                <button
+                <a
                   key={tab.id}
-                  type="button"
-                  aria-pressed={activeCategory === tab.id}
-                  onClick={() => setActiveCategory(tab.id)}
+                  href={tab.href}
+                  aria-current={activeCategory === tab.id ? 'page' : undefined}
                   className={`studio-pill ${activeCategory === tab.id ? 'active' : ''}`}
                 >
                   <span>{tab.label}</span>
@@ -273,85 +276,82 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                   >
                     {count}
                   </span>
-                </button>
+                </a>
               );
             })}
-          </div>
+          </nav>
         </div>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
         {/* TEMPLATES GRID                                                      */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         {filteredTemplates.length === 0 ? (
-          <div className="studio-panel flex flex-col items-center gap-3 p-12 text-center">
+          <div className="studio-panel flex flex-col items-center gap-3 p-10 text-center">
             <FileQuestion className="w-10 h-10 text-[var(--app-text-muted)]" />
             <h3 className="font-heading text-2xl text-[var(--app-text-primary)]">
-              No templates match "{searchQuery}"
+              No matches for "{searchQuery}"
             </h3>
-            <p className="text-xs text-[var(--app-text-secondary)] max-w-sm">
-              Try searching for "ID", "Vintage", "Pastel", "Minimal", or reset the category filter.
-            </p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setActiveCategory('all');
-              }}
+            <a
+              href="/templates"
               className="studio-btn-primary mt-2"
             >
-              Show All {PRESET_TEMPLATES.length} Styles
-            </button>
+              Show All {PRESET_TEMPLATES.length}
+            </a>
           </div>
         ) : (
           <div className="columns-1 md:columns-2 xl:columns-3 gap-5 [column-fill:_balance]">
-            {filteredTemplates.map((template) => {
+            {filteredTemplates.map((template, idx) => {
               const isSelected = selectedForCompare.some((t) => t.id === template.id);
 
               return (
                 <article
                   key={template.id}
                   data-template-id={template.id}
-                  className="break-inside-avoid mb-5 template-ambient-card group flex flex-col overflow-hidden rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-all card-editorial-hover animate-card-entrance"
+                  style={{ '--stagger-i': idx % 10 } as React.CSSProperties}
+                  className="break-inside-avoid mb-5 template-ambient-card group flex flex-col overflow-hidden rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-all card-editorial-hover animate-card-entrance"
                 >
                   {/* Real Card Visual Artwork Preview (Safely container-padded to prevent right edge clipping) */}
-                  <div className="p-3 pb-0">
-                    <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="w-full overflow-hidden rounded-sm border border-[var(--app-border-subtle)]">
-                      <UnifiedCardThumbnail
-                        template={template}
-                        isLight={isLight}
-                        className="h-full w-full"
-                      />
-                    </LazyTemplateCard>
-                  </div>
+                  <a href={`/card/${template.id}`} aria-label={`View ${template.title}`} className="block">
+                    <div className="p-3 pb-0">
+                      <LazyTemplateCard aspectRatio={getTemplateAspectRatio(template)} className="w-full overflow-hidden rounded-sm border border-[var(--app-border-subtle)] card-artwork-zoom">
+                        <UnifiedCardThumbnail
+                          template={template}
+                          isLight={isLight}
+                          className="h-full w-full"
+                        />
+                      </LazyTemplateCard>
+                    </div>
+                  </a>
 
                   {/* Card Footer Bar with actions */}
                   <div className="flex flex-col gap-3 border-t border-[var(--app-border-subtle)] p-4 mt-3">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <h3 className="truncate text-base font-semibold text-[var(--app-text-primary)]">
+                      <a href={`/card/${template.id}`} className="min-w-0">
+                        <h3 className="truncate text-base font-semibold text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors">
                           {template.title}
                         </h3>
                         <span className="mt-1 block text-[10px] uppercase tracking-[0.08em] text-[var(--app-text-muted)] font-subheading">
                           {template.categoryLabel}
                         </span>
-                      </div>
+                      </a>
                       <button
                         onClick={() => toggleCompareTemplate(template)}
                         type="button"
                         aria-pressed={isSelected}
-                        className={`shrink-0 rounded-xl border px-3 py-2 text-[10px] font-semibold transition-colors ${
+                        className={`min-h-[38px] shrink-0 rounded-xl border px-3 py-1.5 text-[10px] font-semibold transition-colors interactive-tactile cursor-pointer ${
                           isSelected
                             ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] border-[var(--app-accent)]'
                             : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
                         }`}
                       >
-                        {isSelected ? 'Remove Compare' : '+ Compare'}
+                        {isSelected ? 'Compared' : '+ Compare'}
                       </button>
                     </div>
 
                     <div className={`grid ${template.canvasDoc ? 'grid-cols-1' : 'grid-cols-2'} gap-2 pt-1`}>
                       <a
                         href={`/canvas?template=${template.id}`}
-                        className="studio-btn-primary min-h-10 !py-2 !text-xs !rounded-xl"
+                        className="studio-btn-primary min-h-[44px] !py-2 !text-xs !rounded-xl interactive-tactile"
                         title="Open in Freeform Canvas Studio"
                       >
                         <Layers className="w-3.5 h-3.5" />
@@ -360,16 +360,10 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
 
                       {!template.canvasDoc && <a
                         href={`/create?template=${template.id}`}
-                        onClick={(e) => {
-                          if (onOpenEditorWithTemplate) {
-                            e.preventDefault();
-                            onOpenEditorWithTemplate(template);
-                          }
-                        }}
-                        className="studio-btn-secondary min-h-10 !py-2 !text-xs !rounded-xl"
+                        className="studio-btn-secondary min-h-[44px] !py-2 !text-xs !rounded-xl interactive-tactile"
                         title="Open in classic text typesetting editor"
                       >
-                        <span>Quick text card</span>
+                        <span>Quick card</span>
                         <ArrowRight className="w-3 h-3" />
                       </a>}
                     </div>
@@ -398,13 +392,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
         onClose={() => setComparisonModalOpen(false)}
         templates={selectedForCompare}
         onOpenTemplate={(tmpl) => {
-          if (onOpenEditorWithTemplate) {
-            onOpenEditorWithTemplate(tmpl);
-          } else {
-            window.location.href = tmpl.canvasDoc?.objects.length
-              ? `/canvas?template=${tmpl.id}`
-              : `/create?template=${tmpl.id}`;
-          }
+          window.location.href = `/card/${encodeURIComponent(tmpl.id)}`;
         }}
         theme={theme}
       />

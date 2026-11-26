@@ -14,6 +14,7 @@ import { CategoryView } from './views/CategoryView';
 import { GuideIndexView } from './views/GuideIndexView';
 import { GuideDetailView } from './views/GuideDetailView';
 import { BlogIndexView, BlogDetailView } from './views/BlogView';
+import { CardDetailView } from './views/CardDetailView';
 import {
   AboutView,
   ContactView,
@@ -337,6 +338,16 @@ export const App: React.FC = () => {
       return <NotFoundView theme={theme} onNavigate={navigate} />;
     }
 
+    // 8b. Dedicated Individual Card Detail Pages (/card/:slug)
+    if (path.startsWith('/card/')) {
+      const slug = path.replace('/card/', '');
+      const matchedCard = PRESET_TEMPLATES.find((t) => t.id === slug);
+      if (matchedCard) {
+        return <CardDetailView template={matchedCard} theme={theme} />;
+      }
+      return <NotFoundView theme={theme} onNavigate={navigate} />;
+    }
+
     // 9. Trust & Information Pages
     if (path === '/about') {
       return <AboutView theme={theme} onNavigate={navigate} />;
@@ -460,12 +471,10 @@ export const App: React.FC = () => {
                     Matching Art Directions
                   </span>
                   {matchingTemplatesInCommand.map((tmpl) => (
-                    <button
+                    <a
                       key={tmpl.id}
-                      onClick={() => {
-                        handleOpenEditorWithTemplate(tmpl);
-                        setShortcutsOpen(false);
-                      }}
+                      href={`/card/${tmpl.id}`}
+                      onClick={() => setShortcutsOpen(false)}
                       className="w-full p-2 rounded-lg text-left flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)]"
                     >
                       <div className="flex items-center gap-2">
@@ -478,8 +487,8 @@ export const App: React.FC = () => {
                         </span>
                         <span className="text-[10px] text-[var(--app-text-muted)]">({tmpl.categoryLabel})</span>
                       </div>
-                      <span className="text-[10px] text-[var(--app-accent)] font-semibold">Open Style →</span>
-                    </button>
+                      <span className="text-[10px] text-[var(--app-accent)] font-semibold">Open Page →</span>
+                    </a>
                   ))}
                 </div>
               )}
@@ -488,11 +497,9 @@ export const App: React.FC = () => {
                 Quick Studio Navigation
               </span>
 
-              <button
-                onClick={() => {
-                  navigate('/create');
-                  setShortcutsOpen(false);
-                }}
+              <a
+                href="/create"
+                onClick={() => setShortcutsOpen(false)}
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
@@ -502,13 +509,11 @@ export const App: React.FC = () => {
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /create
                 </span>
-              </button>
+              </a>
 
-              <button
-                onClick={() => {
-                  navigate('/canvas');
-                  setShortcutsOpen(false);
-                }}
+              <a
+                href="/canvas"
+                onClick={() => setShortcutsOpen(false)}
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
@@ -518,13 +523,11 @@ export const App: React.FC = () => {
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /canvas
                 </span>
-              </button>
+              </a>
 
-              <button
-                onClick={() => {
-                  navigate('/premium');
-                  setShortcutsOpen(false);
-                }}
+              <a
+                href="/premium"
+                onClick={() => setShortcutsOpen(false)}
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
@@ -534,13 +537,11 @@ export const App: React.FC = () => {
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /premium
                 </span>
-              </button>
+              </a>
 
-              <button
-                onClick={() => {
-                  navigate('/bingo');
-                  setShortcutsOpen(false);
-                }}
+              <a
+                href="/bingo"
+                onClick={() => setShortcutsOpen(false)}
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
@@ -550,13 +551,11 @@ export const App: React.FC = () => {
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /bingo
                 </span>
-              </button>
+              </a>
 
-              <button
-                onClick={() => {
-                  navigate('/templates');
-                  setShortcutsOpen(false);
-                }}
+              <a
+                href="/templates"
+                onClick={() => setShortcutsOpen(false)}
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
@@ -566,13 +565,11 @@ export const App: React.FC = () => {
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /templates
                 </span>
-              </button>
+              </a>
 
-              <button
-                onClick={() => {
-                  navigate('/guides');
-                  setShortcutsOpen(false);
-                }}
+              <a
+                href="/guides"
+                onClick={() => setShortcutsOpen(false)}
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
@@ -582,13 +579,11 @@ export const App: React.FC = () => {
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /guides
                 </span>
-              </button>
+              </a>
 
-              <button
-                onClick={() => {
-                  navigate('/blog');
-                  setShortcutsOpen(false);
-                }}
+              <a
+                href="/blog"
+                onClick={() => setShortcutsOpen(false)}
                 className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
               >
                 <div className="flex items-center gap-2.5">
@@ -598,7 +593,7 @@ export const App: React.FC = () => {
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /blog
                 </span>
-              </button>
+              </a>
 
               <button
                 onClick={() => {

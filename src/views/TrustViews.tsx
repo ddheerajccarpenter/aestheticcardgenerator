@@ -282,21 +282,22 @@ export const FaqView: React.FC<TrustViewBaseProps> = () => {
           </p>
         </header>
 
-        <div className="flex flex-col gap-4">
+        <section aria-label="FAQ list" className="flex flex-col gap-4">
+          <h2 className="sr-only">Questions and Answers</h2>
           {faqItems.map((item, idx) => (
-            <div
+            <article
               key={idx}
               className="studio-panel p-5 flex flex-col gap-2"
             >
-              <h2 className="text-sm font-bold font-heading text-[var(--app-text-primary)]">
+              <h3 className="text-sm sm:text-base font-bold leading-snug text-[var(--app-text-primary)]">
                 {item.q}
-              </h2>
-              <p className="text-xs leading-relaxed text-[var(--app-text-secondary)]">
+              </h3>
+              <p className="text-xs sm:text-sm leading-relaxed text-[var(--app-text-secondary)]">
                 {item.a}
               </p>
-            </div>
+            </article>
           ))}
-        </div>
+        </section>
 
         <AdSlot slotId="faq-bottom-slot" />
       </div>
