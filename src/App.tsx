@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { HomeView } from './views/HomeView';
 import { CreatorView } from './views/CreatorView';
 import { CanvasEditorView } from './views/CanvasEditorView';
+import { BingoView } from './views/BingoView';
 import { TemplatesView } from './views/TemplatesView';
 import { CategoryView } from './views/CategoryView';
 import { GuideIndexView } from './views/GuideIndexView';
@@ -38,6 +39,7 @@ import {
   Newspaper,
   Sun,
   Moon,
+  Grid3X3,
 } from 'lucide-react';
 import { restoreSavedCustomFonts } from './services/customFontManager';
 import { AmbientAtmosphereLayer } from './components/AmbientAtmosphereLayer';
@@ -237,6 +239,11 @@ export const App: React.FC = () => {
           onToggleTheme={toggleTheme}
         />
       );
+    }
+
+    // 2c. Bingo Card Generator
+    if (path === '/bingo') {
+      return <BingoView theme={theme} />;
     }
 
     // 3. Template Library Hub
@@ -497,6 +504,22 @@ export const App: React.FC = () => {
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /canvas
+                </span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate('/bingo');
+                  setShortcutsOpen(false);
+                }}
+                className="w-full p-2.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer hover:bg-[var(--app-surface-secondary)] text-[var(--app-text)]"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Grid3X3 className="w-4 h-4 text-[var(--app-accent)]" />
+                  <span className="font-medium">Open Bingo Card Generator</span>
+                </div>
+                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                  /bingo
                 </span>
               </button>
 

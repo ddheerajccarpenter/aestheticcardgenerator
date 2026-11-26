@@ -148,6 +148,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
             <a href="/templates" className="btn-editorial-ghost min-h-11 px-5">
               Browse templates
             </a>
+            <a href="/bingo" className="btn-editorial-ghost min-h-11 px-5">
+              Bingo cards
+            </a>
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[var(--app-border-subtle)] pt-4 text-[10px] uppercase tracking-[0.1em] text-[var(--app-text-muted)]">
             <span>{PRESET_TEMPLATES.length} editable designs</span>

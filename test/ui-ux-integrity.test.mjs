@@ -12,6 +12,7 @@ const criticalRoutes = [
   'index.html',
   'create/index.html',
   'canvas/index.html',
+  'bingo/index.html',
   'templates/index.html',
   'guides/index.html',
   'blog/index.html',
@@ -48,7 +49,7 @@ const sitemapPath = path.join(distDir, 'sitemap.xml');
 assert.ok(fs.existsSync(sitemapPath), 'Sitemap.xml must exist in dist');
 const sitemapContent = fs.readFileSync(sitemapPath, 'utf8');
 const locCount = (sitemapContent.match(/<loc>/g) || []).length;
-assert.strictEqual(locCount, 36, `Sitemap must contain 36 indexed routes (found ${locCount})`);
+assert.strictEqual(locCount, 37, `Sitemap must contain 37 indexed routes (found ${locCount})`);
 console.log(`✓ Sitemap contains all ${locCount} published pages.`);
 
 // 3. Check CSS Design Tokens & Media Queries in built assets
