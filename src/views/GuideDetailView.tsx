@@ -180,7 +180,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
                       — {t.author}
                     </cite>
                     <a
-                      href={`/create?template=${t.id}`}
+                      href={t.canvasDoc?.objects.length ? `/canvas?template=${t.id}` : `/create?template=${t.id}`}
                       className="px-2.5 py-1 rounded bg-black/10 hover:bg-black/20 text-[10px] font-semibold cursor-pointer transition-colors"
                     >
                       Open in Studio →

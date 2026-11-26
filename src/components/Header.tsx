@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   const toolClass = 'inline-flex h-10 w-10 items-center justify-center rounded-xl text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]';
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)]/85 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)]/95">
       <div className="mx-auto flex h-14 max-w-[1540px] items-center justify-between gap-2 px-3 text-[var(--app-text-primary)] sm:px-6">
         <a href="/" aria-label="ACG home" className="flex min-w-0 items-center gap-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--app-accent)] text-[var(--app-accent)]" aria-hidden="true">

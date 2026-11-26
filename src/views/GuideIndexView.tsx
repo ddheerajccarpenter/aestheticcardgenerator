@@ -133,7 +133,7 @@ const BOOK_SPREADS: BookSpread[] = [
         bg: '#e0e722',
         ink: '#111417',
       },
-      actionUrl: '/canvas?template=pass-creative-studio',
+      actionUrl: '/canvas?template=studio-visitor',
       actionLabel: 'Build 90s Press Pass in Studio →',
     },
   },

@@ -16,7 +16,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: '5 min read',
     publishedDate: 'October 14, 2026',
     author: 'Aesthetic Card Studio Team',
-    featuredTemplateId: 'pass-creative-studio',
+    featuredTemplateId: 'studio-visitor',
     sections: [
       {
         heading: '1. Establish the Lanyard Proportion & Slotted Punch Hole',
@@ -26,7 +26,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Header clearance: Keep at least 60px of breathing room at the top for the lanyard sleeve clip.',
           'Color palette: High-voltage acidic yellow (#e0e722) on obsidian ink (#111417) gives an unmistakable backstage vibe.',
         ],
-        templateId: 'pass-creative-studio',
+        templateId: 'studio-visitor',
         actionPrompt: 'Load 90s Press Lanyard Preset in Canvas Studio →',
       },
       {
@@ -36,13 +36,13 @@ export const BLOG_POSTS: BlogPost[] = [
           title: 'Photo Treatment Rule',
           text: 'Select your photo layer on /canvas and apply the "1-Bit Atkinson Dither" or "High-Contrast Photocopy" filter in the Right Inspector for immediate tactile texture.',
         },
-        templateId: 'id-aesthetic-pretty',
+        templateId: 'identity-2026',
         actionPrompt: 'Open Dithered Photo ID Style in Studio →',
       },
       {
         heading: '3. Serial Numbers & Code-128 Barcodes',
         body: 'Nothing sells an ID card faster than tabular monospaced metadata. Use JetBrains Mono or Space Mono for authorization tiers (e.g. "TIER 01 • ALL ACCESS") and bind a dynamic Code-128 barcode strip at the card bottom.',
-        templateId: 'pass-tyler-travel',
+        templateId: 'travel-license-pass',
         actionPrompt: 'Load Barcode Travel Pass in Studio →',
       },
     ],
@@ -88,8 +88,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: '3. Tactile Highlighter Accents (==highlight==)',
         body: 'Direct quotes often contain a single phrase that carries the weight of the whole excerpt. Wrap that key fragment in ==double equal signs== inside the Words tab to render a soft, semi-transparent tactile highlighter swatch.',
-        templateId: 'didion-notebook',
-        actionPrompt: 'Test Tactile Highlighter on Joan Didion Preset →',
+        templateId: 'cambridge-notes',
+        actionPrompt: 'Test Tactile Highlighter on Notebook Quote Preset →',
       },
     ],
   },
@@ -133,7 +133,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: '4. Soft Celadon and Mindful Reflection',
         body: 'Derived from ancient pottery glazes, Celadon Mist (#e2ecf9 / #a8d8c4) combines soft pale blue with hints of herbal green. It activates calming responses, making it the ideal palette for morning journals, meditation mantras, and personal wellness notes.',
-        templateId: 'marcus-aurelius-stoic',
+        templateId: 'rubin-morning',
         actionPrompt: 'Load Soft Celadon in Studio →',
       },
     ],
@@ -172,7 +172,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         heading: '3. When to Choose 1:1 Classic Square (1080×1080 / 2160×2160)',
         body: '1:1 remains the gold standard for album cover aesthetics, Twitter/X image previews, carousel cover slides, and print postcards. Its symmetrical geometry creates balanced equilibrium that works exceptionally well for short aphorisms under 25 words.',
-        templateId: 'dieter-rams-less',
+        templateId: 'studio-form-study',
         actionPrompt: 'Open 1:1 Square Studio Template →',
       },
       {

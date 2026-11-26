@@ -25,7 +25,11 @@ import {
 import { ASSET_AVATARS } from '../data/canvasAssets';
 import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
 import { ThreeDPreviewControls } from '../components/ThreeDPreviewControls';
-import { getBrandedExportFilename, triggerBrandedBlobDownload } from '../engines/brandedExportAndThreePng';
+import {
+  buildSafeFontEmbedCSS,
+  getBrandedExportFilename,
+  triggerBrandedBlobDownload,
+} from '../engines/brandedExportAndThreePng';
 import {
   loadAllFontsFromIndexedDB,
   registerAndSaveCustomFont,
@@ -167,6 +171,16 @@ const getTemplateRatio = (template?: CardTemplate): AspectRatioOption => {
   return '9:16';
 };
 
+const getContrastInkForBg = (bg?: string): string => {
+  const hex = bg?.match(/^#([\da-f]{3}|[\da-f]{6})$/i)?.[1];
+  if (!hex) return '#1c1b18';
+  const full = hex.length === 3 ? hex.split('').map((c) => `${c}${c}`).join('') : hex;
+  const channels = [0, 2, 4].map((offset) => parseInt(full.slice(offset, offset + 2), 16) / 255);
+  const [r, g, b] = channels.map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.45 ? '#1c1b18' : '#f4ede4';
+};
+
 const getTemplateTextField = (template: CardTemplate | undefined, fields: string[]) => {
   const textObjects = template?.canvasDoc?.objects.filter((object) => object.type === 'text') || [];
   const field = textObjects.find((object) => {
@@ -269,7 +283,24 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
   // ID mode content
   const templateQuoteLines = initialTemplate?.quote.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) || [];
-  const [idName, setIdName] = useState(() => getTemplateTextField(initialTemplate, ['value name', 'field name', 'name']) || initialTemplate?.title || 'Dan Valentini');
+  const [idName, setIdName] = useState(
+    () =>
+      getTemplateTextField(initialTemplate, [
+        'value name',
+        'field name',
+        'visitor name',
+        'artist name',
+        'speaker name',
+        'streamer name',
+        'bias name',
+        'handle val',
+        'v1',
+        'field 1',
+        'name',
+      ]) ||
+      initialTemplate?.title ||
+      'Dan Valentini'
+  );
   const [idRole, setIdRole] = useState(() => getTemplateTextField(initialTemplate, ['role', 'position', 'focus area']) || templateQuoteLines[1] || (initialTemplate ? '' : 'Vision Architect'));
   const [idClearance, setIdClearance] = useState(() => getTemplateTextField(initialTemplate, ['clearance', 'access level', 'status']) || initialTemplate?.tag || templateQuoteLines[0] || (initialTemplate ? '' : 'ALL-ACCESS • TIER 01'));
   const [avatar, setAvatar] = useState<string>(() => getTemplateAvatar(initialTemplate));
@@ -307,9 +338,10 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
     }
 
     let isMounted = true;
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       if (!cardRef.current) return;
-      toPng(cardRef.current, { pixelRatio: 1.5, skipFonts: true }).then((dataUrl) => {
+      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts);
+      toPng(cardRef.current, { pixelRatio: 1.5, fontEmbedCSS }).then((dataUrl) => {
         if (!isMounted) return;
         const img = new Image();
         img.onload = () => {
@@ -394,10 +426,11 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
       if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
+      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts);
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 2,
         cacheBust: true,
-        skipFonts: true,
+        fontEmbedCSS,
       });
       const blob = dataUrlToBlob(dataUrl);
       triggerBrandedBlobDownload(blob, getBrandedExportFilename('png'));
@@ -743,22 +776,22 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                         <img
                           src={avatar}
                           alt="ID Portrait"
-                          className="w-full h-full object-cover grayscale contrast-125"
+                          className="w-full h-full object-cover"
                         />
                       </div>
 
                       <div className="flex-1 flex flex-col gap-1 sm:gap-1.5 font-mono text-xs overflow-hidden">
                         <div>
                           <span className="text-[8px] uppercase tracking-wider opacity-60 block">NAME</span>
-                          <span className="font-bold text-xs sm:text-sm block leading-tight truncate">{idName}</span>
+                          <span className="font-bold text-xs sm:text-sm block leading-tight break-words">{idName}</span>
                         </div>
                         <div>
                           <span className="text-[8px] uppercase tracking-wider opacity-60 block">ROLE</span>
-                          <span className="text-[11px] sm:text-xs opacity-90 block truncate">{idRole}</span>
+                          <span className="text-[11px] sm:text-xs opacity-90 block break-words">{idRole}</span>
                         </div>
                         <div>
                           <span className="text-[8px] uppercase tracking-wider opacity-60 block">STATUS</span>
-                          <span className="text-[9px] sm:text-[10px] font-semibold opacity-80 block tracking-wide truncate">
+                          <span className="text-[9px] sm:text-[10px] font-semibold opacity-80 block tracking-wide break-words">
                             {idClearance}
                           </span>
                         </div>
@@ -888,7 +921,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                             id: 'eyedropper-bg',
                             name: 'Eyedropper Tone',
                             bg: picked,
-                            ink: isLight ? '#1c1b18' : '#ffffff',
+                            ink: getContrastInkForBg(picked),
                             badge: 'PICKED',
                             surface: 'warm-nano-texture-matte',
                           });
@@ -914,7 +947,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                             id: `extracted-${idx}`,
                             name: `Photo Tone ${idx + 1}`,
                             bg: color,
-                            ink: isLight ? '#1c1b18' : '#ffffff',
+                            ink: getContrastInkForBg(color),
                             badge: 'PHOTO',
                             surface: 'warm-nano-texture-matte',
                           });

@@ -236,6 +236,9 @@ export interface ImageCanvasObject extends BaseCanvasObject {
   filteredSrc?: string; // cached processed canvas dataUrl
   naturalWidth?: number;
   naturalHeight?: number;
+  zoomScale?: number;
+  panX?: number;
+  panY?: number;
 }
 
 export interface ShapeCanvasObject extends BaseCanvasObject {

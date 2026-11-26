@@ -321,7 +321,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
                 </button>
               ) : (
                 <a
-                  href={`/create?template=${featuredTemplate.id}`}
+                  href={featuredTemplate.canvasDoc?.objects.length ? `/canvas?template=${featuredTemplate.id}` : `/create?template=${featuredTemplate.id}`}
                   className="studio-btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs cursor-pointer"
                 >
                   <PenTool className="w-3.5 h-3.5" />
@@ -364,7 +364,11 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
               {section.templateId && (
                 <div className="pt-2">
                   <a
-                    href={`/create?template=${section.templateId}`}
+                    href={
+                      PRESET_TEMPLATES.some((t) => t.id === section.templateId && t.canvasDoc?.objects.length)
+                        ? `/canvas?template=${section.templateId}`
+                        : `/create?template=${section.templateId}`
+                    }
                     className="studio-btn-primary inline-flex items-center gap-2 px-4 py-2.5 text-xs cursor-pointer"
                   >
                     <PenTool className="w-3.5 h-3.5" />

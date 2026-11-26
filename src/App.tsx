@@ -52,8 +52,8 @@ export const App: React.FC = () => {
   const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/+$/, '') || '/';
   const isEditor = normalizedPath.startsWith('/create') || normalizedPath.startsWith('/canvas');
 
-  // Active template state with URL param / session restoration
-  const activeTemplate: CardTemplate | undefined = (() => {
+  // Active template state with URL param / session restoration (captured once so re-renders never drop it)
+  const [activeTemplate] = useState<CardTemplate | undefined>(() => {
     const params = new URLSearchParams(window.location.search);
     const tmplId = params.get('template') || sessionStorage.getItem('aesthetic_card_studio_selected_template');
     if (tmplId) {
@@ -61,7 +61,7 @@ export const App: React.FC = () => {
       return PRESET_TEMPLATES.find((t) => t.id === tmplId);
     }
     return undefined;
-  })();
+  });
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [guideModalOpen, setGuideModalOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');

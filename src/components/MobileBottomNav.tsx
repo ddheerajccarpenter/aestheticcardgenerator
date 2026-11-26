@@ -32,7 +32,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="global-mobile-bottom-nav fixed bottom-0 inset-x-0 z-40 border-t border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)] md:hidden text-[var(--app-text-primary)]"
+      className="global-mobile-bottom-nav fixed bottom-0 inset-x-0 z-40 border-t border-[var(--app-border-subtle)] bg-[var(--app-surface)] pb-[env(safe-area-inset-bottom,0px)] md:hidden text-[var(--app-text-primary)]"
     >
       <div className="grid h-14 grid-cols-4 items-center px-1">
         {navItems.map((item) => {

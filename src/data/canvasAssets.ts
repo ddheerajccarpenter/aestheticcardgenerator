@@ -573,9 +573,6 @@ export const ASSET_POSTER_ART = {
     <rect x="260" y="456" width="80" height="8" fill="%23f4ede2" />
     <rect x="268" y="464" width="10" height="56" fill="%23f4ede2" />
     <rect x="322" y="464" width="10" height="56" fill="%23f4ede2" />
-    <!-- Japanese Kanji Typography -->
-    <text x="300" y="580" font-family="'Murecho', sans-serif" font-size="34" font-weight="900" fill="%232b2622" text-anchor="middle" letter-spacing="14">京都 • 1984</text>
-    <text x="300" y="612" font-family="'Funnel Sans', sans-serif" font-size="12" font-weight="600" fill="%237a6f66" text-anchor="middle" letter-spacing="4">KYOTO NATIONAL MUSEUM OF MODERN ART</text>
   </svg>`,
 
   bauhaus1923: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
@@ -593,8 +590,6 @@ export const ASSET_POSTER_ART = {
     <circle cx="460" cy="200" r="14" fill="%231a1a1a" />
     <!-- Structural grid lines -->
     <line x1="80" y1="520" x2="520" y2="520" stroke="%231a1a1a" stroke-width="4" />
-    <text x="80" y="580" font-family="'Funnel Sans', sans-serif" font-size="44" font-weight="900" fill="%231a1a1a" letter-spacing="2">BAUHAUS</text>
-    <text x="80" y="620" font-family="'Funnel Sans', sans-serif" font-size="18" font-weight="700" fill="%23c92a2a" letter-spacing="6">DESSAU • WEIMAR 1923</text>
   </svg>`,
 
   frenchCinema: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
@@ -624,10 +619,6 @@ export const ASSET_POSTER_ART = {
     <ellipse cx="300" cy="210" rx="48" ry="56" fill="%230b0c0e" />
     <!-- Parisian beret silhouette -->
     <ellipse cx="300" cy="180" rx="64" ry="22" fill="%230b0c0e" transform="rotate(-8 300 180)" />
-    <!-- Iconic Typography -->
-    <text x="300" y="550" font-family="'Murecho', sans-serif" font-size="40" font-weight="900" fill="%23f5eedc" text-anchor="middle" letter-spacing="3">NOUVELLE VAGUE</text>
-    <text x="300" y="588" font-family="'Funnel Sans', sans-serif" font-size="15" font-weight="700" fill="%23e63946" text-anchor="middle" letter-spacing="8">CINÉMATHÈQUE FRANÇAISE • 1965</text>
-    <text x="300" y="626" font-family="'Newsreader', Georgia, serif" font-style="italic" font-size="14" fill="%239e9aa8" text-anchor="middle">“Le cinéma, c'est vingt-quatre fois la vérité par seconde.”</text>
   </svg>`,
 
   nordicBotanical: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
@@ -645,10 +636,8 @@ export const ASSET_POSTER_ART = {
     <ellipse cx="250" cy="370" rx="44" ry="30" fill="%23606c38" opacity="0.85" transform="rotate(-20 250 370)" />
     <ellipse cx="355" cy="360" rx="42" ry="28" fill="%23738043" opacity="0.85" transform="rotate(35 355 360)" />
     <ellipse cx="305" cy="140" rx="28" ry="20" fill="%2385944d" opacity="0.9" transform="rotate(5 305 140)" />
-    <!-- Scientific specimen plate label -->
+    <!-- Scientific specimen plate backing -->
     <rect x="180" y="515" width="240" height="60" fill="%23ebe5d8" stroke="%233a4036" stroke-width="1" rx="2" />
-    <text x="300" y="538" font-family="'Newsreader', Georgia, serif" font-style="italic" font-size="16" font-weight="bold" fill="%23283618" text-anchor="middle">Ginkgo Biloba L.</text>
-    <text x="300" y="558" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700" fill="%23606c38" text-anchor="middle" letter-spacing="2">HERBARIUM NORDICUM • NO. 1892</text>
   </svg>`,
 
   polaroidSummerPhoto: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
@@ -693,11 +682,6 @@ export const ASSET_POSTER_ART = {
     <circle cx="250" cy="250" r="80" fill="none" stroke="%23c49a45" stroke-width="1" stroke-dasharray="3 3" />
     <!-- Center Spindle Hole -->
     <circle cx="250" cy="250" r="18" fill="%230e1013" stroke="%23444b58" stroke-width="2" />
-    <!-- Vinyl Label Typography -->
-    <text x="250" y="205" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold" fill="%236e4b1f" text-anchor="middle" letter-spacing="3">SIDE A • 33 RPM</text>
-    <text x="250" y="226" font-family="'Newsreader', Georgia, serif" font-size="16" font-weight="bold" font-style="italic" fill="%232b1a09" text-anchor="middle">Aesthetic Card Studio</text>
-    <text x="250" y="295" font-family="'Funnel Sans', sans-serif" font-size="10" font-weight="600" fill="%236e4b1f" text-anchor="middle" letter-spacing="1">STEREO HIGH FIDELITY</text>
-    <text x="250" y="312" font-family="'JetBrains Mono', monospace" font-size="8" fill="%239c7a45" text-anchor="middle">RECORD NO. 2026-PINTEREST</text>
   </svg>`,
 
   matchaCupArt: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
@@ -740,9 +724,6 @@ export const ASSET_POSTER_ART = {
     <ellipse cx="270" cy="90" rx="20" ry="12" fill="%233a5a40" transform="rotate(-15 270 90)" />
     <ellipse cx="310" cy="115" rx="18" ry="11" fill="%23588157" transform="rotate(25 310 115)" />
     <ellipse cx="240" cy="110" rx="16" ry="20" fill="%23ffdd00" stroke="%23e0a900" stroke-width="1.5" transform="rotate(10 240 110)" />
-    <!-- Typography -->
-    <text x="250" y="470" font-family="'Newsreader', Georgia, serif" font-size="28" font-style="italic" font-weight="bold" fill="%23ffffff" text-anchor="middle">Saint-Tropez</text>
-    <text x="250" y="500" font-family="'Funnel Sans', sans-serif" font-size="10" font-weight="700" fill="%23f4ede4" text-anchor="middle" letter-spacing="4">CÔTE D'AZUR // ÉTÉ 1976</text>
   </svg>`,
 
   y2kAuraGlow: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
@@ -779,9 +760,7 @@ export const ASSET_POSTER_ART = {
     <ellipse cx="150" cy="115" rx="120" ry="45" fill="none" stroke="%23003049" stroke-width="2.5" stroke-dasharray="6 4" transform="rotate(-15 150 115)" />
     <!-- Airport Code Badges -->
     <rect x="25" y="145" width="60" height="26" rx="4" fill="%23003049" />
-    <text x="55" y="162" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="900" fill="%23ffffff" text-anchor="middle">HND</text>
     <rect x="215" y="145" width="60" height="26" rx="4" fill="%23c1121f" />
-    <text x="245" y="162" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="900" fill="%23ffffff" text-anchor="middle">CDG</text>
   </svg>`,
 };
 

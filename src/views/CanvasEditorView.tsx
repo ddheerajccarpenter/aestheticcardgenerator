@@ -40,7 +40,7 @@ import {
   safeLocalStorageGet,
   safeLocalStorageSet,
 } from '../services/storageManager';
-import { toPng, toJpeg, toBlob } from 'html-to-image';
+import { toPng, toJpeg, toCanvas } from 'html-to-image';
 import {
   Type,
   Image as ImageIcon,
@@ -109,10 +109,17 @@ import {
 import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
 import { ThreeDPreviewControls } from '../components/ThreeDPreviewControls';
 import {
+  buildSafeFontEmbedCSS,
   getBrandedExportFilename,
   exportThreeDimensionalCardPNG,
   triggerBrandedBlobDownload,
 } from '../engines/brandedExportAndThreePng';
+import {
+  saveProjectLocally,
+  loadAllProjectsLocally,
+  deleteProjectLocally,
+  type SavedProject,
+} from '../services/localProjectStore';
 import type { ImageFilterPreset, ImageClipMask } from '../types/card';
 
 interface CanvasEditorViewProps {
@@ -144,27 +151,28 @@ const getCanvasDefaultTextColor = (background?: string, muted = false): string =
   return muted ? '#bcb5aa' : '#f4ede4';
 };
 
+const CANVAS_FONT_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: DEFAULT_CANVAS_FONT_FAMILY, label: 'System Sans (Local)' },
+  { value: "'Plus Jakarta Sans', sans-serif", label: 'Plus Jakarta Sans (Geometric)' },
+  { value: "'Funnel Sans', sans-serif", label: 'Funnel Sans (Display Sans)' },
+  { value: "'Space Grotesk', sans-serif", label: 'Space Grotesk (Modernist)' },
+  { value: "'Syne', sans-serif", label: 'Syne (Avant-Garde)' },
+  { value: "'Unbounded', sans-serif", label: 'Unbounded (Wide Display)' },
+  { value: "'Murecho', sans-serif", label: 'Murecho (Japanese + Latin)' },
+  { value: "'Newsreader', Georgia, serif", label: 'Newsreader (Editorial Serif)' },
+  { value: "'Playfair Display', Georgia, serif", label: 'Playfair Display (Display Serif)' },
+  { value: "'Instrument Serif', Georgia, serif", label: 'Instrument Serif (Condensed)' },
+  { value: "'Cormorant Garamond', Georgia, serif", label: 'Cormorant Garamond (Classic Serif)' },
+  { value: "'JetBrains Mono', monospace", label: 'JetBrains Mono (Technical)' },
+  { value: "'Space Mono', monospace", label: 'Space Mono (Archival Mono)' },
+  { value: "'VT323', monospace", label: 'VT323 (Pixel Terminal)' },
+  { value: "'Caveat', cursive", label: 'Caveat (Handwritten)' },
+  { value: "'Reenie Beanie', cursive", label: 'Reenie Beanie (Sketch)' },
+];
+
 const isDocumentCollapsed = (d: CanvasDocument): boolean => {
   if (!d || !d.objects || d.objects.length === 0) return false;
-  const nonBg = d.objects.filter(
-    (o) =>
-      !(o.width >= d.canvasWidth * 0.85 && o.height >= d.canvasHeight * 0.85) &&
-      !/paper|card base|card outline|parchment|background frame/i.test(o.name)
-  );
-  if (nonBg.length === 0) return false;
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const o of nonBg) {
-    minX = Math.min(minX, o.x);
-    minY = Math.min(minY, o.y);
-    maxX = Math.max(maxX, o.x + o.width);
-    maxY = Math.max(maxY, o.y + o.height);
-  }
-  const spanW = maxX - minX;
-  const spanH = maxY - minY;
-  return spanW < d.canvasWidth * 0.35 || spanH < d.canvasHeight * 0.35;
+  return d.objects.every((o) => o.width < 12 && o.height < 12);
 };
 
 export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
@@ -239,9 +247,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // Selection
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Undo / Redo history
+  // Undo / Redo history (ref-mirrored so rapid sequential commits stay atomic)
   const [history, setHistory] = useState<CanvasDocument[]>([doc]);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
+  const historyRef = useRef<CanvasDocument[]>([doc]);
+  const historyIndexRef = useRef<number>(0);
+  const [savedProjects, setSavedProjects] = useState<SavedProject[]>([]);
 
   // Viewport / Zoom & Stage Toggles
   const [zoom, setZoom] = useState<number>(1);
@@ -513,7 +524,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     const timer = setTimeout(async () => {
       try {
         if (!canvasElementRef.current) return;
-        const rawDataUrl = await toPng(canvasElementRef.current, { pixelRatio: 1.5, skipFonts: true });
+        const usedFamilies = doc.objects
+          .filter((o): o is TextCanvasObject => o.type === 'text')
+          .map((o) => resolveCanvasFontFamily(o.fontFamily));
+        const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts, usedFamilies);
+        const rawDataUrl = await toPng(canvasElementRef.current, { pixelRatio: 1.5, fontEmbedCSS });
         if (!isMounted) return;
         const img = new Image();
         img.onload = () => {
@@ -590,6 +605,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     isDragging: boolean;
     isResizing: boolean;
     isRotating: boolean;
+    targetId: string | null;
     handle: string | null;
     startX: number;
     startY: number;
@@ -604,6 +620,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     isDragging: false,
     isResizing: false,
     isRotating: false,
+    targetId: null,
     handle: null,
     startX: 0,
     startY: 0,
@@ -658,33 +675,76 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   const commitDocumentChange = useCallback((newDoc: CanvasDocument) => {
     setDoc(newDoc);
     docRef.current = newDoc;
-    setHistory((prev) => {
-      const nextHistory = prev.slice(0, historyIndex + 1);
-      if (nextHistory.length >= MAX_HISTORY) {
-        nextHistory.shift();
-      }
-      return [...nextHistory, newDoc];
-    });
-    setHistoryIndex((prev) => Math.min(prev + 1, MAX_HISTORY - 1));
-  }, [historyIndex]);
+    const truncated = historyRef.current.slice(0, historyIndexRef.current + 1);
+    const nextHistory = [...truncated, newDoc];
+    if (nextHistory.length > MAX_HISTORY) {
+      nextHistory.shift();
+    }
+    const nextIndex = nextHistory.length - 1;
+    historyRef.current = nextHistory;
+    historyIndexRef.current = nextIndex;
+    setHistory(nextHistory);
+    setHistoryIndex(nextIndex);
+  }, []);
 
   const handleUndo = useCallback(() => {
-    if (historyIndex > 0) {
-      const nextIndex = historyIndex - 1;
+    if (historyIndexRef.current > 0) {
+      const nextIndex = historyIndexRef.current - 1;
+      const targetDoc = historyRef.current[nextIndex];
+      if (!targetDoc) return;
+      historyIndexRef.current = nextIndex;
       setHistoryIndex(nextIndex);
-      setDoc(history[nextIndex]);
-      docRef.current = history[nextIndex];
+      setDoc(targetDoc);
+      docRef.current = targetDoc;
     }
-  }, [history, historyIndex]);
+  }, []);
 
   const handleRedo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      const nextIndex = historyIndex + 1;
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      const nextIndex = historyIndexRef.current + 1;
+      const targetDoc = historyRef.current[nextIndex];
+      if (!targetDoc) return;
+      historyIndexRef.current = nextIndex;
       setHistoryIndex(nextIndex);
-      setDoc(history[nextIndex]);
-      docRef.current = history[nextIndex];
+      setDoc(targetDoc);
+      docRef.current = targetDoc;
     }
-  }, [history, historyIndex]);
+  }, []);
+
+  // Load saved projects + support ?project=<id> reopening
+  useEffect(() => {
+    loadAllProjectsLocally().then((projects) => {
+      setSavedProjects(projects);
+      const params = new URLSearchParams(window.location.search);
+      const projId = params.get('project');
+      if (projId) {
+        const match = projects.find((p) => p.id === projId && p.type === 'canvas');
+        const restored = match ? sanitizeAndValidateCanvasDocument(match.data) : null;
+        if (restored) {
+          commitDocumentChange(restored);
+        }
+      }
+    });
+  }, [commitDocumentChange]);
+
+  const handleSaveCurrentProject = useCallback(async () => {
+    const current = docRef.current;
+    try {
+      await saveProjectLocally({
+        id: current.id,
+        title: current.title || 'Untitled Card',
+        type: 'canvas',
+        aspectRatio: `${current.canvasWidth}:${current.canvasHeight}`,
+        updatedAt: Date.now(),
+        data: current,
+      });
+      const updated = await loadAllProjectsLocally();
+      setSavedProjects(updated);
+      showToast(`Saved "${current.title || 'Untitled Card'}" to Saved Edits`);
+    } catch (err: any) {
+      showToast(err?.message || 'Could not save card locally');
+    }
+  }, []);
 
   // ───────────────────────────────────────────────────────────────────────────
   // OBJECT ACTIONS
@@ -774,34 +834,30 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     [commitDocumentChange]
   );
 
-  // Layer ordering
+  // Layer ordering (clones objects so history snapshots stay immutable and normalizes zIndex)
   const reorderObject = useCallback(
     (id: string, direction: 'front' | 'back' | 'up' | 'down') => {
       const currentDoc = docRef.current;
-      const sorted = [...currentDoc.objects].sort((a, b) => a.zIndex - b.zIndex);
+      const sorted = currentDoc.objects
+        .map((o) => ({ ...o }))
+        .sort((a, b) => a.zIndex - b.zIndex);
       const index = sorted.findIndex((o) => o.id === id);
       if (index === -1) return;
 
-      if (direction === 'up' && index < sorted.length - 1) {
-        const temp = sorted[index].zIndex;
-        sorted[index].zIndex = sorted[index + 1].zIndex;
-        sorted[index + 1].zIndex = temp;
-      } else if (direction === 'down' && index > 0) {
-        const temp = sorted[index].zIndex;
-        sorted[index].zIndex = sorted[index - 1].zIndex;
-        sorted[index - 1].zIndex = temp;
-      } else if (direction === 'front') {
-        const maxZ = sorted.reduce((max, o) => Math.max(max, o.zIndex), 0);
-        sorted[index].zIndex = maxZ + 1;
-      } else if (direction === 'back') {
-        const minZ = sorted.reduce((min, o) => Math.min(min, o.zIndex), 0);
-        sorted[index].zIndex = Math.max(0, minZ - 1);
-      }
+      const [moved] = sorted.splice(index, 1);
+      let targetIndex = index;
+      if (direction === 'up') targetIndex = Math.min(sorted.length, index + 1);
+      else if (direction === 'down') targetIndex = Math.max(0, index - 1);
+      else if (direction === 'front') targetIndex = sorted.length;
+      else if (direction === 'back') targetIndex = 0;
+
+      sorted.splice(targetIndex, 0, moved);
+      const normalized = sorted.map((obj, idx) => ({ ...obj, zIndex: idx + 1 }));
 
       const nextDoc: CanvasDocument = {
         ...currentDoc,
         updatedAt: new Date().toISOString(),
-        objects: sorted,
+        objects: normalized,
       };
       commitDocumentChange(nextDoc);
     },
@@ -826,9 +882,16 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const handleObjectPointerDown = (e: React.PointerEvent, obj: CanvasObject) => {
     e.stopPropagation();
+    if (e.isPrimary === false) return;
     if (obj.locked) {
       setSelectedId(obj.id);
       return;
+    }
+
+    try {
+      (e.currentTarget as HTMLElement)?.setPointerCapture?.(e.pointerId);
+    } catch {
+      // Ignore synthetic events without active pointerId
     }
 
     setSelectedId(obj.id);
@@ -838,6 +901,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       isDragging: true,
       isResizing: false,
       isRotating: false,
+      targetId: obj.id,
       handle: null,
       startX: coords.x,
       startY: coords.y,
@@ -857,13 +921,20 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     obj: CanvasObject
   ) => {
     e.stopPropagation();
-    if (obj.locked) return;
+    if (e.isPrimary === false || obj.locked) return;
+
+    try {
+      (e.currentTarget as HTMLElement)?.setPointerCapture?.(e.pointerId);
+    } catch {
+      // Ignore synthetic events without active pointerId
+    }
 
     const coords = getCanvasCoords(e);
     dragRef.current = {
       isDragging: false,
       isResizing: true,
       isRotating: false,
+      targetId: obj.id,
       handle,
       startX: coords.x,
       startY: coords.y,
@@ -879,7 +950,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const handleRotateHandlePointerDown = (e: React.PointerEvent, obj: CanvasObject) => {
     e.stopPropagation();
-    if (obj.locked) return;
+    if (e.isPrimary === false || obj.locked) return;
+
+    try {
+      (e.currentTarget as HTMLElement)?.setPointerCapture?.(e.pointerId);
+    } catch {
+      // Ignore synthetic events without active pointerId
+    }
 
     const coords = getCanvasCoords(e);
     const centerX = obj.x + obj.width / 2;
@@ -889,6 +966,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       isDragging: false,
       isResizing: false,
       isRotating: true,
+      targetId: obj.id,
       handle: 'rotate',
       startX: coords.x,
       startY: coords.y,
@@ -1083,7 +1161,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     const handlePointerMove = (e: PointerEvent) => {
       const drag = dragRef.current;
       if (!drag.isDragging && !drag.isResizing && !drag.isRotating) return;
-      if (!selectedId) return;
+      const activeId = drag.targetId || selectedId;
+      if (!activeId) return;
 
       const coords = getCanvasCoords(e);
       const deltaX = coords.x - drag.startX;
@@ -1126,7 +1205,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
           // Proximity to other visible layers
           for (const other of docRef.current.objects) {
-            if (other.id === selectedId || !other.visible) continue;
+            if (other.id === activeId || !other.visible) continue;
 
             if (Math.abs(newX - other.x) <= SNAP_PROXIMITY) {
               newX = other.x;
@@ -1147,11 +1226,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           }
 
           setSnapGuides(guides);
-          updateObject(selectedId, { x: Math.round(newX), y: Math.round(newY) }, false);
+          updateObject(activeId, { x: Math.round(newX), y: Math.round(newY) }, false);
         } else if (drag.isResizing && drag.handle) {
           const h = drag.handle;
           const isCorner = h.length === 2;
-          const currentObj = docRef.current.objects.find((o) => o.id === selectedId);
+          const currentObj = docRef.current.objects.find((o) => o.id === activeId);
           const isImage = currentObj?.type === 'image';
           const isShift = e.shiftKey;
 
@@ -1196,7 +1275,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           const newY = newCenterY - newHeight / 2;
 
           updateObject(
-            selectedId,
+            activeId,
             {
               x: Math.round(newX),
               y: Math.round(newY),
@@ -1213,7 +1292,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           if (e.shiftKey) {
             deg = Math.round(deg / 15) * 15;
           }
-          updateObject(selectedId, { rotation: deg }, false);
+          updateObject(activeId, { rotation: deg }, false);
         }
       });
     };
@@ -1221,13 +1300,26 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     const finishPointerDrag = () => {
       const drag = dragRef.current;
       if (drag.isDragging || drag.isResizing || drag.isRotating) {
+        const targetObj = drag.targetId
+          ? docRef.current.objects.find((o) => o.id === drag.targetId)
+          : undefined;
+        const didChange =
+          !targetObj ||
+          targetObj.x !== drag.startObjX ||
+          targetObj.y !== drag.startObjY ||
+          targetObj.width !== drag.startWidth ||
+          targetObj.height !== drag.startHeight ||
+          (targetObj.rotation || 0) !== drag.startRotation;
+
         drag.isDragging = false;
         drag.isResizing = false;
         drag.isRotating = false;
+        drag.targetId = null;
         drag.handle = null;
         setSnapGuides([]);
-        // Commit change to history stack with the latest synchronized docRef
-        commitDocumentChange(docRef.current);
+        if (didChange) {
+          commitDocumentChange(docRef.current);
+        }
       }
     };
 
@@ -1244,11 +1336,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     window.addEventListener('pointercancel', handlePointerUp);
     return () => {
       if (animFrameId !== null) cancelAnimationFrame(animFrameId);
+      finishPointerDrag();
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('pointercancel', handlePointerUp);
     };
-  }, [selectedId, showGrid, getCanvasCoords, updateObject, commitDocumentChange]);
+  }, [showGrid, getCanvasCoords, updateObject, commitDocumentChange]);
 
   // Global Keyboard shortcuts
   useEffect(() => {
@@ -1398,18 +1491,26 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const handleExport = async (format: 'png' | 'jpeg' | 'webp' | '4k' | '8k' | '16k' | '3d-4k' | '3d-8k') => {
     if (!canvasElementRef.current) return;
+    if (editingTextId) {
+      setEditingTextId(null);
+      commitDocumentChange(docRef.current);
+    }
     setExporting(true);
     setExportDropdownOpen(false);
 
-    // Wait for selection controls to hide before capturing the artwork.
+    // Wait for selection controls and inline editor chrome to hide before capturing.
     await new Promise((resolve) => setTimeout(resolve, 80));
 
     try {
       const node = canvasElementRef.current;
+      const usedFamilies = doc.objects
+        .filter((o): o is TextCanvasObject => o.type === 'text')
+        .map((o) => resolveCanvasFontFamily(o.fontFamily));
+      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts, usedFamilies);
 
       // Handle 3D Transparent PNG Export (Part V.2 & Part IX.1)
       if (format === '3d-4k' || format === '3d-8k') {
-        const rawUrl = await toPng(node, { pixelRatio: 2, cacheBust: true, skipFonts: true });
+        const rawUrl = await toPng(node, { pixelRatio: 2, cacheBust: true, fontEmbedCSS });
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.src = rawUrl;
@@ -1451,8 +1552,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         pixelRatio: scale,
         canvasWidth: doc.canvasWidth,
         canvasHeight: doc.canvasHeight,
-        // Avoid external font stylesheet reads that can stall canvas downloads.
-        skipFonts: true,
+        fontEmbedCSS,
       };
 
       if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
@@ -1467,11 +1567,19 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         const dataUrl = await toPng(node, options);
         exportBlob = dataUrlToBlob(dataUrl);
       } else if (actualFormat === 'jpeg') {
-        const dataUrl = await toJpeg(node, { ...options, backgroundColor: doc.background || '#ffffff' });
+        const jpegBg = doc.background && doc.background !== 'transparent' ? doc.background : '#ffffff';
+        const dataUrl = await toJpeg(node, { ...options, backgroundColor: jpegBg });
         exportBlob = dataUrlToBlob(dataUrl);
       } else if (actualFormat === 'webp') {
-        const blob = await toBlob(node, { ...options, type: 'image/webp' });
-        if (!blob) throw new Error('WebP blob creation failed');
+        // html-to-image toBlob ignores type options and always emits PNG; render to canvas and encode WebP directly
+        const webpCanvas = await toCanvas(node, options);
+        const blob = await new Promise<Blob>((resolve, reject) => {
+          webpCanvas.toBlob(
+            (b) => (b ? resolve(b) : reject(new Error('WebP blob creation failed'))),
+            'image/webp', // type: 'image/webp'
+            0.98
+          );
+        });
         exportBlob = blob;
       } else {
         const dataUrl = await toPng(node, options);
@@ -1860,6 +1968,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               >
                 <span className="flex items-center gap-2"><Sun className="w-3.5 h-3.5" /> Stage tone</span>
                 <span className="text-[var(--app-text-muted)]">{ambientModeEnabled ? 'Soft' : 'Plain'}</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  handleSaveCurrentProject();
+                  e.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full px-2 py-2 text-left text-xs flex items-center gap-2 cursor-pointer transition-colors ${
+                  isLight ? 'hover:bg-[#f0ede7]' : 'hover:bg-[#29251f]'
+                }`}
+                title="Save editable copy to Saved Edits"
+              >
+                <BookOpen className="w-3.5 h-3.5" /> Save edit locally
               </button>
               <button
                 onClick={(e) => {
@@ -2890,7 +3010,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                     >
                       {/* 1. TEXT OBJECT */}
                       {obj.type === 'text' && (
-                        editingTextId === obj.id ? (
+                        editingTextId === obj.id && !exporting ? (
                           <textarea
                             autoFocus
                             value={obj.text}
@@ -2901,9 +3021,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             }}
                             onKeyDown={(e) => {
                               e.stopPropagation();
-                              if (e.key === 'Escape') {
-                                setEditingTextId(null);
-                              } else if (e.key === 'Enter' && !e.shiftKey) {
+                              if (e.key === 'Escape' || (e.key === 'Enter' && (e.metaKey || e.ctrlKey))) {
                                 e.preventDefault();
                                 setEditingTextId(null);
                                 commitDocumentChange(docRef.current);
@@ -2920,12 +3038,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               textAlign: obj.align,
                               lineHeight: obj.lineHeight,
                               letterSpacing: `${obj.letterSpacing}px`,
-                              background: 'color-mix(in srgb, var(--app-accent) 8%, transparent)',
-                              border: `2px dashed ${isLight ? '#24211b' : '#E2D9C8'}`,
+                              background: 'transparent',
+                              border: 'none',
+                              outline: `2px dashed ${isLight ? '#24211b' : '#E2D9C8'}`,
                               borderRadius: '4px',
-                              outline: 'none',
                               resize: 'none',
-                              padding: '2px 4px',
+                              padding: 0,
                               margin: 0,
                               boxSizing: 'border-box',
                             }}
@@ -2947,64 +3065,70 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               textAlign: obj.align,
                               lineHeight: obj.lineHeight,
                               letterSpacing: `${obj.letterSpacing}px`,
-                              whiteSpace: 'pre-wrap',
-                              wordBreak: 'break-word',
                               userSelect: 'none',
                             }}
                             className="flex items-center"
                             title="Double-click to edit text"
                           >
-                            {obj.text}
+                            <span className="w-full whitespace-pre-wrap break-words">{obj.text}</span>
                           </div>
                         )
                       )}
 
                       {/* 2. IMAGE OBJECT WITH PHOTO TREATMENT & CLIPPING MASKS */}
-                      {obj.type === 'image' && (
-                        <div
-                          onDoubleClick={(e) => {
-                            e.stopPropagation();
-                            if (!obj.locked) {
-                              pendingReplaceLayerIdRef.current = obj.id;
-                              replaceFileInputRef.current?.click();
-                            }
-                          }}
-                          title="Double-click to replace photo in-place"
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            opacity: obj.opacity,
-                            borderRadius: obj.clipMask === 'circle' ? '50%' : `${obj.borderRadius}px`,
-                            overflow: 'hidden',
-                            ...(obj.clipMask === 'circle'
-                              ? { clipPath: 'circle(50% at 50% 50%)' }
-                              : obj.clipMask === 'oval'
-                              ? { clipPath: 'ellipse(50% 50% at 50% 50%)' }
-                              : obj.clipMask === 'star'
-                              ? { clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }
-                              : obj.clipMask === 'heart'
-                              ? { clipPath: 'polygon(50% 15%, 65% 0%, 85% 0%, 100% 15%, 100% 35%, 50% 85%, 0% 35%, 0% 15%, 15% 0%, 35% 0%)' }
-                              : obj.clipMask === 'id-frame'
-                              ? {
-                                  border: '1px solid rgba(0,0,0,0.3)',
-                                  borderRadius: '6px',
-                                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.25), 0 2px 5px rgba(0,0,0,0.15)',
-                                }
-                              : {}),
-                          }}
-                        >
-                          <img
-                            src={obj.filteredSrc || obj.src}
-                            alt={obj.name}
+                      {obj.type === 'image' && (() => {
+                        const imgZoom = obj.zoomScale && obj.zoomScale > 1 ? obj.zoomScale : 1;
+                        const posX = 50 + (obj.panX || 0);
+                        const posY = 50 + (obj.panY || 0);
+                        return (
+                          <div
+                            onDoubleClick={(e) => {
+                              e.stopPropagation();
+                              if (!obj.locked) {
+                                pendingReplaceLayerIdRef.current = obj.id;
+                                replaceFileInputRef.current?.click();
+                              }
+                            }}
+                            title="Double-click to replace photo in-place"
                             style={{
                               width: '100%',
                               height: '100%',
-                              objectFit: obj.objectFit,
-                              pointerEvents: 'none',
+                              opacity: obj.opacity,
+                              borderRadius: obj.clipMask === 'circle' ? '50%' : `${obj.borderRadius}px`,
+                              overflow: 'hidden',
+                              ...(obj.clipMask === 'circle'
+                                ? { clipPath: 'circle(50% at 50% 50%)' }
+                                : obj.clipMask === 'oval'
+                                ? { clipPath: 'ellipse(50% 50% at 50% 50%)' }
+                                : obj.clipMask === 'star'
+                                ? { clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }
+                                : obj.clipMask === 'heart'
+                                ? { clipPath: 'polygon(50% 15%, 65% 0%, 85% 0%, 100% 15%, 100% 35%, 50% 85%, 0% 35%, 0% 15%, 15% 0%, 35% 0%)' }
+                                : obj.clipMask === 'id-frame'
+                                ? {
+                                    border: '1px solid rgba(0,0,0,0.3)',
+                                    borderRadius: '6px',
+                                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.25), 0 2px 5px rgba(0,0,0,0.15)',
+                                  }
+                                : {}),
                             }}
-                          />
-                        </div>
-                      )}
+                          >
+                            <img
+                              src={obj.filteredSrc || obj.src}
+                              alt={obj.name}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: obj.objectFit,
+                                objectPosition: `${posX}% ${posY}%`,
+                                transform: imgZoom !== 1 ? `scale(${imgZoom})` : undefined,
+                                transformOrigin: `${posX}% ${posY}%`,
+                                pointerEvents: 'none',
+                              }}
+                            />
+                          </div>
+                        );
+                      })()}
 
                       {/* 3. SHAPE & ACCENT STAMP OBJECTS */}
                       {obj.type === 'shape' && (
@@ -3033,8 +3157,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             />
                           )}
 
-                          {/* Circle */}
-                          {obj.shape === 'circle' && (
+                          {/* Circle / Ellipse */}
+                          {(obj.shape === 'circle' || obj.shape === 'ellipse') && (
                             <div
                               style={{
                                 width: '100%',
@@ -3046,6 +3170,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                 borderRadius: '50%',
                               }}
                             />
+                          )}
+
+                          {/* Diamond SVG */}
+                          {obj.shape === 'diamond' && (
+                            <svg viewBox="0 0 100 100" className="w-full h-full">
+                              <polygon
+                                points="50,3 97,50 50,97 3,50"
+                                fill={obj.fill}
+                                stroke={obj.strokeWidth ? obj.stroke : 'none'}
+                                strokeWidth={obj.strokeWidth}
+                              />
+                            </svg>
                           )}
 
                           {/* Line / Divider */}
@@ -3103,7 +3239,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                           {/* Holographic Security Seal */}
                           {obj.shape === 'security-seal' && (
-                            <div className="w-full h-full relative flex items-center justify-center select-none holographic-foil rounded-full shadow-lg p-2">
+                            <div
+                              className="w-full h-full relative flex items-center justify-center select-none holographic-foil rounded-full shadow-lg p-2"
+                              style={{ color: obj.fill && obj.fill !== '#312c27' ? obj.fill : '#1a1a1a' }}
+                            >
                               <svg viewBox="0 0 100 100" className="w-full h-full">
                                 <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3 2" />
                                 <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" strokeWidth="1" />
@@ -3139,7 +3278,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                 <svg
                                   key={star}
                                   viewBox="0 0 24 24"
-                                  className="w-5 h-5"
+                                  className="h-full flex-1 max-h-full"
                                   fill={(obj.starRating ?? 5) >= star ? (obj.fill || '#fcd535') : 'none'}
                                   stroke={obj.fill || '#fcd535'}
                                   strokeWidth="2"
@@ -3654,11 +3793,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             isLight ? 'bg-[#f8f5ef] border-[#d4cdbf]' : 'bg-[#211e19] border-[#39342d]'
                           }`}
                         >
-                          <option value={DEFAULT_CANVAS_FONT_FAMILY}>System Sans (Local)</option>
-                          <option value="'Newsreader', Georgia, serif">Newsreader (Editorial Serif)</option>
-                          <option value="'Playfair Display', Georgia, serif">Playfair Display (Display Serif)</option>
-                          <option value="'JetBrains Mono', monospace">JetBrains Mono (Technical)</option>
-                          <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Geometric)</option>
+                          {CANVAS_FONT_OPTIONS.map((font) => (
+                            <option key={font.value} value={font.value}>
+                              {font.label}
+                            </option>
+                          ))}
                           {customFonts.length > 0 && (
                             <optgroup label="Uploaded Custom Fonts">
                               {customFonts.map((f) => (
@@ -3834,7 +3973,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             <span>{isRemovingBg ? `${bgProgress}%` : 'Remove BG'}</span>
                           </button>
                           <button
-                            onClick={() => replaceFileInputRef.current?.click()}
+                            onClick={() => {
+                              pendingReplaceLayerIdRef.current = selectedObject.id;
+                              replaceFileInputRef.current?.click();
+                            }}
                             className="text-[11px] font-semibold text-[var(--app-text-secondary)] hover:underline cursor-pointer flex items-center gap-1"
                             title="Replace image in-place keeping layout and crop"
                           >
@@ -4375,7 +4517,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                       '#e4ff37',
                       '#efe5cb',
                       '#f2f8f4',
-                      'var(--app-accent-hover)',
+                      '#2563eb',
                       '#0a0a0a',
                     ].map((c) => (
                       <button
@@ -4472,6 +4614,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setSelectedId(obj.id);
+                                          pendingReplaceLayerIdRef.current = obj.id;
                                           replaceFileInputRef.current?.click();
                                         }}
                                         className="text-[10px] font-bold text-[var(--app-text-secondary)] hover:underline cursor-pointer"
@@ -4530,11 +4673,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                   <span className="font-semibold opacity-75">{obj.name}</span>
                                   <span className="text-[9px] font-mono opacity-50">{obj.fontSize}px</span>
                                 </div>
-                                <input
-                                  type="text"
+                                <textarea
+                                  rows={obj.text.includes('\n') ? 2 : 1}
                                   value={obj.text}
                                   onChange={(e) => updateObject(obj.id, { text: e.target.value })}
-                                  className={`w-full px-2 py-1 rounded text-xs border outline-none font-medium ${
+                                  className={`w-full px-2 py-1 rounded text-xs border outline-none font-medium resize-y ${
                                     isLight
                                       ? 'bg-white border-slate-300 text-black focus:border-[var(--app-accent)]'
                                       : 'bg-[#211e19] border-[#3b352e] text-white focus:border-[var(--app-accent)]'
@@ -5145,11 +5288,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               isLight ? 'bg-[#f8f5ef] border-[#d4cdbf]' : 'bg-[#211e19] border-[#39342d]'
                             }`}
                           >
-                            <option value={DEFAULT_CANVAS_FONT_FAMILY}>System Sans (Local)</option>
-                            <option value="'Newsreader', Georgia, serif">Newsreader (Editorial Serif)</option>
-                            <option value="'Playfair Display', Georgia, serif">Playfair Display (Display Serif)</option>
-                            <option value="'JetBrains Mono', monospace">JetBrains Mono (Technical)</option>
-                            <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Geometric)</option>
+                            {CANVAS_FONT_OPTIONS.map((font) => (
+                              <option key={font.value} value={font.value}>
+                                {font.label}
+                              </option>
+                            ))}
                             {customFonts.length > 0 && (
                               <optgroup label="Uploaded Custom Fonts">
                                 {customFonts.map((f) => (
@@ -5518,6 +5661,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
               <div className="flex items-center gap-2 self-end sm:self-auto">
                 <button
+                  onClick={handleSaveCurrentProject}
+                  className={`px-3 py-2 rounded-xl border flex items-center gap-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+                    isLight
+                      ? 'bg-[#24211b] text-white border-[#24211b] hover:opacity-90'
+                      : 'bg-[#E2D9C8] text-[#24211b] border-[#E2D9C8] hover:opacity-90'
+                  }`}
+                  title="Save current card so you can reopen it anytime"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Save Current Edit</span>
+                </button>
+                <button
                   onClick={() => setTemplateDrawerOpen(false)}
                   className={`p-2 rounded-xl border flex items-center gap-1.5 text-xs font-semibold cursor-pointer transition-colors ${
                     isLight
@@ -5631,8 +5786,57 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               </div>
             </div>
 
-            {/* Grid of Templates */}
+            {/* Grid of Templates & Saved Edits */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {savedProjects.filter((p) => p.type === 'canvas').length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-[#81786d] font-bold">
+                      Saved Edits ({savedProjects.filter((p) => p.type === 'canvas').length})
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {savedProjects
+                      .filter((p) => p.type === 'canvas')
+                      .map((proj) => (
+                        <div
+                          key={proj.id}
+                          className={`rounded-xl p-3 border flex items-center justify-between gap-2 ${
+                            isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#211e19] border-[#39342d]'
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const restored = sanitizeAndValidateCanvasDocument(proj.data);
+                              if (restored) {
+                                commitDocumentChange(restored);
+                                setSelectedId(null);
+                                setTemplateDrawerOpen(false);
+                                showToast(`Reopened "${proj.title}"`);
+                              }
+                            }}
+                            className="flex-1 text-left cursor-pointer min-w-0"
+                          >
+                            <div className="text-xs font-bold truncate">{proj.title}</div>
+                            <div className="text-[10px] font-mono text-[#81786d]">{proj.aspectRatio}</div>
+                          </button>
+                          <button
+                            type="button"
+                            aria-label={`Delete saved ${proj.title}`}
+                            onClick={async () => {
+                              await deleteProjectLocally(proj.id);
+                              setSavedProjects(await loadAllProjectsLocally());
+                            }}
+                            className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
               {filteredTemplates.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredTemplates.map((tmpl) => {

@@ -185,7 +185,7 @@ export function sanitizeAndValidateCanvasDocument(input: unknown): CanvasDocumen
           : 1.2;
       const letterSpacing =
         typeof o.letterSpacing === 'number' && Number.isFinite(o.letterSpacing)
-          ? Math.max(-5, Math.min(20, o.letterSpacing))
+          ? Math.max(-6, Math.min(30, o.letterSpacing))
           : 0;
 
       const textObj: TextCanvasObject = {
@@ -221,6 +221,23 @@ export function sanitizeAndValidateCanvasDocument(input: unknown): CanvasDocumen
           ? Math.max(0, Math.min(1000, o.borderRadius))
           : 0;
 
+      const filteredSrc =
+        typeof o.filteredSrc === 'string' && o.filteredSrc.startsWith('data:image/')
+          ? o.filteredSrc
+          : undefined;
+      const zoomScale =
+        typeof o.zoomScale === 'number' && Number.isFinite(o.zoomScale)
+          ? Math.max(1, Math.min(3, o.zoomScale))
+          : undefined;
+      const panX =
+        typeof o.panX === 'number' && Number.isFinite(o.panX)
+          ? Math.max(-50, Math.min(50, o.panX))
+          : undefined;
+      const panY =
+        typeof o.panY === 'number' && Number.isFinite(o.panY)
+          ? Math.max(-50, Math.min(50, o.panY))
+          : undefined;
+
       const imgObj: ImageCanvasObject = {
         id: objId,
         type: 'image',
@@ -240,8 +257,12 @@ export function sanitizeAndValidateCanvasDocument(input: unknown): CanvasDocumen
         borderRadius,
         filterPreset: typeof o.filterPreset === 'string' ? o.filterPreset : undefined,
         clipMask: typeof o.clipMask === 'string' ? o.clipMask : undefined,
+        filteredSrc,
         naturalWidth: typeof o.naturalWidth === 'number' && Number.isFinite(o.naturalWidth) ? o.naturalWidth : undefined,
         naturalHeight: typeof o.naturalHeight === 'number' && Number.isFinite(o.naturalHeight) ? o.naturalHeight : undefined,
+        zoomScale,
+        panX,
+        panY,
       };
       validObjects.push(imgObj);
     } else if (o.type === 'shape') {

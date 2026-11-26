@@ -1,8 +1,146 @@
 // src/engines/brandedExportAndThreePng.ts
 import * as THREE from 'three';
+import type { StoredCustomFont } from '../services/customFontManager';
 
 export type ExportFormat = 'png' | 'webp' | 'svg' | '3d-png';
 export type ExportTier = '4K' | '8K' | '12K' | '16K';
+
+const fontDataUrlCache = new Map<string, string>();
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+async function fetchFontAsDataUri(url: string): Promise<string | null> {
+  if (url.startsWith('data:')) return url;
+  const cached = fontDataUrlCache.get(url);
+  if (cached) return cached;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 1800);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const buffer = await res.arrayBuffer();
+    const contentType = res.headers.get('content-type')?.split(';')[0]?.trim();
+    const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
+    const mime =
+      contentType ||
+      (ext === 'woff2' ? 'font/woff2' : ext === 'woff' ? 'font/woff' : ext === 'otf' ? 'font/otf' : 'font/ttf');
+    const dataUri = `data:${mime};base64,${arrayBufferToBase64(buffer)}`;
+    fontDataUrlCache.set(url, dataUri);
+    return dataUri;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeFontFamilyName(raw: string): string {
+  return raw.replace(/['"]/g, '').trim().toLowerCase();
+}
+
+function extractCssFamilyName(cssText: string): string {
+  const m = cssText.match(/font-family:\s*([^;]+)/i);
+  return m ? normalizeFontFamilyName(m[1]) : '';
+}
+
+async function inlineCssFontUrls(cssText: string, baseHref?: string): Promise<string> {
+  const matches = Array.from(cssText.matchAll(/url\((['"]?)([^)'"]+)\1\)/g));
+  let output = cssText;
+  for (const match of matches) {
+    const rawUrl = match[2];
+    if (!rawUrl || rawUrl.startsWith('data:')) continue;
+    let resolvedUrl = rawUrl;
+    try {
+      resolvedUrl = new URL(rawUrl, baseHref || window.location.href).href;
+    } catch {
+      continue;
+    }
+    const dataUri = await fetchFontAsDataUri(resolvedUrl);
+    if (dataUri) {
+      output = output.replace(match[0], `url("${dataUri}")`);
+    }
+  }
+  return output;
+}
+
+/**
+ * Safely collects @font-face CSS from accessible stylesheets + IndexedDB custom fonts
+ * without failing when third-party CDN stylesheets restrict CSSOM access or offline mode blocks fetches.
+ */
+export async function buildSafeFontEmbedCSS(
+  customFonts: StoredCustomFont[] = [],
+  preferredFamilies?: Iterable<string>
+): Promise<string> {
+  if (typeof document === 'undefined') return '';
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
+  const familyFilter = preferredFamilies
+    ? new Set(
+        Array.from(preferredFamilies)
+          .flatMap((entry) => entry.split(','))
+          .map(normalizeFontFamilyName)
+          .filter(Boolean)
+      )
+    : null;
+
+  const fontFaceBlocks: string[] = [];
+
+  for (const sheet of Array.from(document.styleSheets)) {
+    const baseHref = sheet.href || undefined;
+    try {
+      const rules = Array.from(sheet.cssRules || []);
+      for (const rule of rules) {
+        if (rule.type !== CSSRule.FONT_FACE_RULE) continue;
+        const family = extractCssFamilyName(rule.cssText);
+        if (familyFilter && family && !familyFilter.has(family) && family !== 'starborn') continue;
+        fontFaceBlocks.push(await inlineCssFontUrls(rule.cssText, baseHref));
+      }
+    } catch {
+      if (baseHref && baseHref.startsWith('https://fonts.googleapis.com')) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 1800);
+          const resp = await fetch(baseHref, { signal: controller.signal });
+          clearTimeout(timer);
+          if (resp.ok) {
+            const css = await resp.text();
+            const blocks = css.match(/@font-face\s*\{[^}]+\}/g) || [];
+            for (const block of blocks) {
+              const family = extractCssFamilyName(block);
+              if (familyFilter && family && !familyFilter.has(family)) continue;
+              fontFaceBlocks.push(await inlineCssFontUrls(block, baseHref));
+            }
+          }
+        } catch {
+          // Skip external stylesheet if offline or blocked
+        }
+      }
+    }
+  }
+
+  for (const font of customFonts) {
+    const family = normalizeFontFamilyName(font.familyName);
+    if (familyFilter && !familyFilter.has(family)) continue;
+    const ext = font.fileName.split('.').pop()?.toLowerCase();
+    const mime =
+      ext === 'woff2' ? 'font/woff2' : ext === 'woff' ? 'font/woff' : ext === 'otf' ? 'font/otf' : 'font/ttf';
+    const dataUri = `data:${mime};base64,${arrayBufferToBase64(font.buffer)}`;
+    fontFaceBlocks.push(
+      `@font-face { font-family: '${font.familyName}'; src: url("${dataUri}"); font-weight: 100 900; font-style: normal; }`
+    );
+  }
+
+  return fontFaceBlocks.join('\n');
+}
 
 /**
  * MANDATORY FILENAME RULE (Part VI & Part IX.1):

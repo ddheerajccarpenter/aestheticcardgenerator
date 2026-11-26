@@ -400,7 +400,9 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           if (onOpenEditorWithTemplate) {
             onOpenEditorWithTemplate(tmpl);
           } else {
-            window.location.href = `/create?template=${tmpl.id}`;
+            window.location.href = tmpl.canvasDoc?.objects.length
+              ? `/canvas?template=${tmpl.id}`
+              : `/create?template=${tmpl.id}`;
           }
         }}
         theme={theme}

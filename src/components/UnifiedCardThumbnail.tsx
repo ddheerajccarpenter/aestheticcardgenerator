@@ -52,7 +52,14 @@ const renderShape = (object: ShapeCanvasObject, canvasWidth: number): React.Reac
     case 'rubber-stamp':
       return <div className="flex h-full w-full items-center justify-center text-center font-mono font-bold uppercase tracking-[0.15em]" style={{ color: object.fill, border: `${scaled(3)} dashed currentColor`, padding: scaled(6), borderRadius: scaled(object.borderRadius || 8), fontSize: scaled(12) }}><span className="border border-current" style={{ padding: `${scaled(2)} ${scaled(10)}` }}>{object.stampText || 'APPROVED'}</span></div>;
     case 'security-seal':
-      return <svg viewBox="0 0 100 100" className="h-full w-full" style={{ color: object.fill }}><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3 2" /><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" /><text x="50" y="44" textAnchor="middle" fontSize="8" fontWeight="bold" fill="currentColor">OFFICIAL</text><text x="50" y="56" textAnchor="middle" fontSize="6" fontWeight="600" fill="currentColor" letterSpacing="1">SECURE PASS</text><circle cx="50" cy="50" r="49" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg>;
+      return (
+        <div
+          className="holographic-foil flex h-full w-full items-center justify-center rounded-full"
+          style={{ padding: scaled(8), color: object.fill && object.fill !== '#312c27' ? object.fill : '#1a1a1a' }}
+        >
+          <svg viewBox="0 0 100 100" className="h-full w-full"><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3 2" /><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" /><text x="50" y="44" textAnchor="middle" fontSize="8" fontWeight="bold" fill="currentColor">OFFICIAL</text><text x="50" y="56" textAnchor="middle" fontSize="6" fontWeight="600" fill="currentColor" letterSpacing="1">SECURE PASS</text><circle cx="50" cy="50" r="49" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg>
+        </div>
+      );
     case 'washi-tape':
       return <div className="h-full w-full" style={{ backgroundColor: object.fill, clipPath: 'polygon(0% 12%, 3% 0%, 6% 14%, 9% 0%, 91% 0%, 94% 12%, 97% 0%, 100% 12%, 100% 88%, 97% 100%, 94% 86%, 91% 100%, 9% 100%, 6% 86%, 3% 100%, 0% 88%)' }} />;
     case 'rating-stars':
@@ -83,11 +90,50 @@ const renderObject = (object: CanvasObject, doc: CanvasDocument) => {
   };
 
   if (object.type === 'text') {
-    return <div key={object.id} style={{ ...frame, fontFamily: resolveCanvasFontFamily(object.fontFamily), fontSize: `${(object.fontSize / doc.canvasWidth) * 100}cqw`, fontWeight: object.fontWeight, fontStyle: object.fontStyle, color: object.color, textAlign: object.align, lineHeight: object.lineHeight, letterSpacing: `${(object.letterSpacing / doc.canvasWidth) * 100}cqw`, whiteSpace: 'pre-wrap', wordBreak: 'break-word', display: 'flex', alignItems: 'center' }}>{object.text}</div>;
+    return (
+      <div
+        key={object.id}
+        style={{
+          ...frame,
+          fontFamily: resolveCanvasFontFamily(object.fontFamily),
+          fontSize: `${(object.fontSize / doc.canvasWidth) * 100}cqw`,
+          fontWeight: object.fontWeight,
+          fontStyle: object.fontStyle,
+          color: object.color,
+          textAlign: object.align,
+          lineHeight: object.lineHeight,
+          letterSpacing: `${(object.letterSpacing / doc.canvasWidth) * 100}cqw`,
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <span className="w-full whitespace-pre-wrap break-words">{object.text}</span>
+      </div>
+    );
   }
 
   if (object.type === 'image') {
-    return <div key={object.id} style={{ ...frame, borderRadius: `${(object.borderRadius / doc.canvasWidth) * 100}cqw`, overflow: 'hidden', ...imageClip(object) }}><img src={object.filteredSrc || object.src} alt="" loading="lazy" draggable={false} style={{ width: '100%', height: '100%', objectFit: object.objectFit }} /></div>;
+    const imgZoom = object.zoomScale && object.zoomScale > 1 ? object.zoomScale : 1;
+    const posX = 50 + (object.panX || 0);
+    const posY = 50 + (object.panY || 0);
+    return (
+      <div key={object.id} style={{ ...frame, borderRadius: `${(object.borderRadius / doc.canvasWidth) * 100}cqw`, overflow: 'hidden', ...imageClip(object) }}>
+        <img
+          src={object.filteredSrc || object.src}
+          alt=""
+          loading="lazy"
+          draggable={false}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: object.objectFit,
+            objectPosition: `${posX}% ${posY}%`,
+            transform: imgZoom !== 1 ? `scale(${imgZoom})` : undefined,
+            transformOrigin: `${posX}% ${posY}%`,
+          }}
+        />
+      </div>
+    );
   }
 
   return <div key={object.id} style={{ ...frame, color: object.fill }}>{renderShape(object, doc.canvasWidth)}</div>;

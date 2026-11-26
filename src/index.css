@@ -565,8 +565,8 @@ html:not(.light) .border-\[\#1f242c\],
   background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #a1c4fd 50%, #c2e9fb 75%, #fdcbf1 100%);
   background-size: 200% 200%;
   animation: holoSheen 6s ease infinite;
-  color: #1a1a1a !important;
-  border-color: rgba(255,255,255,0.7) !important;
+  color: #1a1a1a;
+  border-color: rgba(255,255,255,0.7);
   box-shadow: 0 0 10px rgba(255, 182, 193, 0.5);
 }
 
@@ -1369,7 +1369,8 @@ html.light .studio-input:focus {
   .animate-shimmer-sweep,
   .animate-card-entrance,
   .interactive-tactile:active,
-  .card-editorial-hover:hover {
+  .card-editorial-hover:hover,
+  .holographic-foil {
     animation: none !important;
     transform: none !important;
   }

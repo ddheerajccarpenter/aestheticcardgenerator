@@ -61,8 +61,8 @@ export const STUDIO_TEMPLATES: CardTemplate[] = [
   template('studio-visitor', 'Studio Visitor', 'id-card', paper, ink, 960, 600, [
     shape('rect', { name: 'Pass stripe', x: 0, y: 0, width: 22, height: 600, fill: rust }),
     text({ name: 'Studio name', text: 'COMMON\nGROUND', fontFamily: sans, fontSize: 38, fontWeight: '700', lineHeight: 1, color: ink, x: 62, y: 42, width: 400, height: 90 }),
-    text({ name: 'Pass number', text: 'VISITOR / 0084', fontFamily: mono, fontSize: 17, color: ink, x: 650, y: 48, width: 248, height: 32 }),
-    text({ name: 'Access code', text: '01', fontFamily: sans, fontSize: 68, fontWeight: '700', color: rust, x: 804, y: 78, width: 94, height: 80 }),
+    text({ name: 'Pass number', text: 'VISITOR / 0084', fontFamily: mono, fontSize: 17, color: ink, x: 650, y: 42, width: 248, height: 28 }),
+    text({ name: 'Access code', text: '01', fontFamily: sans, fontSize: 68, fontWeight: '700', color: rust, x: 804, y: 74, width: 94, height: 80 }),
     shape('line', { x: 62, y: 165, width: 836, height: 2, fill: ink }),
     text({ name: 'Name label', text: 'HELLO, MY NAME IS', fontFamily: mono, fontSize: 16, color: rust, x: 62, y: 202, width: 700, height: 30 }),
     text({ name: 'Visitor name', text: 'Alex Morgan', fontFamily: serif, fontSize: 92, fontWeight: '400', color: ink, x: 56, y: 248, width: 842, height: 115 }),

@@ -62,6 +62,28 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
   const [feedback, setFeedback] = useState('');
   const previewDialogRef = useRef<HTMLDialogElement | null>(null);
   const previewTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const heroStageRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let rafId: number | null = null;
+    const update = () => {
+      rafId = null;
+      const el = heroStageRef.current;
+      if (!el) return;
+      const progress = Math.min(1, Math.max(0, window.scrollY / Math.max(360, window.innerHeight * 0.75)));
+      el.style.setProperty('--scroll-p', progress.toFixed(4));
+    };
+    const onScroll = () => {
+      if (rafId === null) rafId = window.requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    update();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   useEffect(() => {
     updatePageSEO({
@@ -159,24 +181,42 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
           </div>
         </div>
 
-        <div aria-label="Featured card designs" className="relative mx-auto min-h-[300px] w-full max-w-[760px] sm:min-h-[430px] lg:min-h-[560px]">
+        <div ref={heroStageRef} aria-label="Featured card designs" className="relative mx-auto min-h-[300px] w-full max-w-[760px] sm:min-h-[430px] lg:min-h-[560px]">
           <div className="absolute inset-x-[4%] sm:inset-x-[8%] bottom-[7%] top-[7%] rounded-[2rem] border border-[var(--app-border-subtle)] bg-[var(--app-bg)]" aria-hidden="true" />
           {heroTemplates[1] && (
-            <button type="button" aria-label={`Preview ${heroTemplates[1].title}`} onClick={(event) => openPreview(heroTemplates[1], event)} className="hidden sm:block absolute left-[3%] top-[24%] z-10 w-[40%] -rotate-[8deg] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+            <button
+              type="button"
+              aria-label={`Preview ${heroTemplates[1].title}`}
+              onClick={(event) => openPreview(heroTemplates[1], event)}
+              style={{ transform: 'translate3d(calc(var(--scroll-p, 0) * -28px), calc(var(--scroll-p, 0) * -22px), 0) rotate(calc(-8deg - var(--scroll-p, 0) * 4deg))' }}
+              className="hidden sm:block absolute left-[3%] top-[24%] z-10 w-[40%] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-shadow duration-300 hover:shadow-[0_24px_60px_rgba(0,0,0,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+            >
               <LazyTemplateCard aspectRatio={getTemplateAspectRatio(heroTemplates[1])}>
                 <UnifiedCardThumbnail template={heroTemplates[1]} className="h-full w-full" />
               </LazyTemplateCard>
             </button>
           )}
           {heroTemplates[3] && (
-            <button type="button" aria-label={`Preview ${heroTemplates[3].title}`} onClick={(event) => openPreview(heroTemplates[3], event)} className="hidden sm:block absolute bottom-[8%] right-[2%] z-20 w-[35%] rotate-[6deg] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+            <button
+              type="button"
+              aria-label={`Preview ${heroTemplates[3].title}`}
+              onClick={(event) => openPreview(heroTemplates[3], event)}
+              style={{ transform: 'translate3d(calc(var(--scroll-p, 0) * 28px), calc(var(--scroll-p, 0) * 18px), 0) rotate(calc(6deg + var(--scroll-p, 0) * 4deg))' }}
+              className="hidden sm:block absolute bottom-[8%] right-[2%] z-20 w-[35%] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-shadow duration-300 hover:shadow-[0_24px_60px_rgba(0,0,0,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+            >
               <LazyTemplateCard aspectRatio={getTemplateAspectRatio(heroTemplates[3])}>
                 <UnifiedCardThumbnail template={heroTemplates[3]} className="h-full w-full" />
               </LazyTemplateCard>
             </button>
           )}
           {heroTemplates[0] && (
-            <button type="button" aria-label={`Preview ${heroTemplates[0].title}`} onClick={(event) => openPreview(heroTemplates[0], event)} className="relative sm:absolute mx-auto sm:left-[20%] sm:top-[12%] z-10 w-[88%] sm:w-[70%] sm:-rotate-[1.5deg] overflow-hidden rounded-2xl border border-[var(--app-border-strong)] shadow-[0_32px_80px_rgba(0,0,0,0.38)] transition-transform duration-300 hover:-translate-y-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]">
+            <button
+              type="button"
+              aria-label={`Preview ${heroTemplates[0].title}`}
+              onClick={(event) => openPreview(heroTemplates[0], event)}
+              style={{ transform: 'translate3d(0, calc(var(--scroll-p, 0) * -14px), 0) scale(calc(1 + var(--scroll-p, 0) * 0.03)) rotate(calc(-1.5deg + var(--scroll-p, 0) * 1.5deg))' }}
+              className="relative sm:absolute mx-auto sm:left-[20%] sm:top-[12%] z-10 w-[88%] sm:w-[70%] overflow-hidden rounded-2xl border border-[var(--app-border-strong)] shadow-[0_32px_80px_rgba(0,0,0,0.38)] transition-shadow duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+            >
               <LazyTemplateCard aspectRatio={getTemplateAspectRatio(heroTemplates[0])}>
                 <UnifiedCardThumbnail template={heroTemplates[0]} className="h-full w-full" />
               </LazyTemplateCard>
