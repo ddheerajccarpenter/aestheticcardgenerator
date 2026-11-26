@@ -239,3 +239,22 @@ test('canvas text spans inherit layer fontFamily without global Comfortaa span o
   const thumb = fs.readFileSync(path.join(SRC_DIR, 'components', 'UnifiedCardThumbnail.tsx'), 'utf8');
   assert.ok(thumb.includes("fontFamily: 'inherit'"));
 });
+
+test('responsive sitewide UI prevents tablet/mobile header overflow and closes hidden details popovers', () => {
+  const header = fs.readFileSync(path.join(SRC_DIR, 'components', 'Header.tsx'), 'utf8');
+  assert.ok(header.includes('overflow-x-clip'));
+  assert.ok(header.includes('hidden h-4 w-4 lg:block'));
+
+  const editor = fs.readFileSync(path.join(SRC_DIR, 'views', 'CanvasEditorView.tsx'), 'utf8');
+  assert.ok(editor.includes('hidden lg:flex items-center gap-1'));
+  assert.ok(editor.includes('absolute right-0 top-full mt-2 w-52 max-w-[calc(100vw-16px)]'));
+
+  const indexCss = fs.readFileSync(path.join(SRC_DIR, 'index.css'), 'utf8');
+  assert.ok(indexCss.includes('details:not([open]) > :not(summary)'));
+
+  const templatesView = fs.readFileSync(path.join(SRC_DIR, 'views', 'TemplatesView.tsx'), 'utf8');
+  assert.ok(templatesView.includes('flex-wrap items-center gap-2'));
+
+  const blogView = fs.readFileSync(path.join(SRC_DIR, 'views', 'BlogView.tsx'), 'utf8');
+  assert.ok(blogView.includes('flex-wrap items-center gap-2'));
+});

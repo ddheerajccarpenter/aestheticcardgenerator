@@ -154,16 +154,16 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
 
   return (
     <div className="mx-auto w-full max-w-[1580px] px-3 pb-24 pt-4 sm:px-6 sm:pt-8 md:px-8 md:pb-16 text-[var(--app-text-primary)]">
-      <section aria-labelledby="home-title" className="home-hero grid min-h-[min(76vh,760px)] items-center gap-6 overflow-hidden rounded-2xl sm:rounded-[2rem] border border-[var(--app-border-subtle)] bg-[var(--app-surface)] px-5 py-8 sm:px-8 md:px-12 lg:grid-cols-[0.88fr_1.12fr] lg:px-14 lg:py-12">
-        <div className="relative z-10 max-w-2xl py-2 lg:py-8">
+      <section aria-labelledby="home-title" className="home-hero grid min-h-[min(76vh,760px)] items-center gap-4 sm:gap-6 overflow-hidden rounded-2xl sm:rounded-[2rem] border border-[var(--app-border-subtle)] bg-[var(--app-surface)] px-4 py-5 sm:px-8 sm:py-8 md:px-12 lg:grid-cols-[0.88fr_1.12fr] lg:px-14 lg:py-12">
+        <div className="relative z-10 max-w-2xl py-1 sm:py-2 lg:py-8">
           <p className="editorial-kicker">A small studio for card design</p>
-          <h1 id="home-title" className="mt-5 max-w-[14ch] text-[clamp(2.5rem,6vw,5.5rem)] font-heading leading-[0.95] tracking-tight">
+          <h1 id="home-title" className="mt-3 sm:mt-5 max-w-[14ch] text-[clamp(2.25rem,6vw,5.5rem)] font-heading leading-[0.95] tracking-tight">
             Make something <span className="font-editorial font-normal italic text-[var(--app-accent)]">worth keeping.</span>
           </h1>
-          <p className="mt-6 max-w-lg text-sm leading-7 text-[var(--app-text-secondary)] sm:text-base">
+          <p className="mt-3 sm:mt-6 max-w-lg text-sm leading-6 sm:leading-7 text-[var(--app-text-secondary)] sm:text-base">
             Start with a card style or an empty canvas. Shape the type, images, and details, then export directly from your browser.
           </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
+          <div className="mt-4 sm:mt-7 flex flex-wrap items-center gap-2.5 sm:gap-3">
             <a href="/canvas?blank=true" className="btn-editorial-primary min-h-11 px-5">
               Open the canvas <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
@@ -177,14 +177,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
               Bingo cards
             </a>
           </div>
-          <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[var(--app-border-subtle)] pt-4 text-[10px] uppercase tracking-[0.1em] text-[var(--app-text-muted)]">
+          <div className="mt-5 sm:mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[var(--app-border-subtle)] pt-3 sm:pt-4 text-[10px] uppercase tracking-[0.1em] text-[var(--app-text-muted)]">
             <span>{PRESET_TEMPLATES.length} editable designs</span>
             <span aria-hidden="true" className="h-1 w-1 rounded-full bg-[var(--app-accent)]" />
             <span>Work stays in this browser</span>
           </div>
         </div>
 
-        <div ref={heroStageRef} aria-label="Featured card designs" className="relative mx-auto min-h-[300px] w-full max-w-[760px] sm:min-h-[430px] lg:min-h-[560px]">
+        <div ref={heroStageRef} aria-label="Featured card designs" className="relative mx-auto min-h-[250px] w-full max-w-[760px] sm:min-h-[430px] lg:min-h-[560px]">
           <div className="absolute inset-x-[4%] sm:inset-x-[8%] bottom-[7%] top-[7%] rounded-[2rem] border border-[var(--app-border-subtle)] bg-[var(--app-bg)]" aria-hidden="true" />
           {heroTemplates[1] && (
             <button
@@ -192,7 +192,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
               aria-label={`Preview ${heroTemplates[1].title}`}
               onClick={(event) => openPreview(heroTemplates[1], event)}
               style={{ transform: 'translate3d(calc(var(--scroll-p, 0) * -28px), calc(var(--scroll-p, 0) * -22px), 0) rotate(calc(-8deg - var(--scroll-p, 0) * 4deg))' }}
-              className="hidden sm:block absolute left-[3%] top-[24%] z-10 w-[40%] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-shadow duration-300 hover:shadow-[0_24px_60px_rgba(0,0,0,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+              className="hidden sm:block absolute left-[1%] top-[18%] z-10 w-[39%] overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] shadow-2xl transition-shadow duration-300 hover:shadow-[0_24px_60px_rgba(0,0,0,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
             >
               <LazyTemplateCard aspectRatio={getTemplateAspectRatio(heroTemplates[1])}>
                 <UnifiedCardThumbnail template={heroTemplates[1]} className="h-full w-full" />
@@ -218,7 +218,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
               aria-label={`Preview ${heroTemplates[0].title}`}
               onClick={(event) => openPreview(heroTemplates[0], event)}
               style={{ transform: 'translate3d(0, calc(var(--scroll-p, 0) * -14px), 0) scale(calc(1 + var(--scroll-p, 0) * 0.03)) rotate(calc(-1.5deg + var(--scroll-p, 0) * 1.5deg))' }}
-              className="relative sm:absolute mx-auto sm:left-[20%] sm:top-[12%] z-10 w-[88%] sm:w-[70%] overflow-hidden rounded-2xl border border-[var(--app-border-strong)] shadow-[0_32px_80px_rgba(0,0,0,0.38)] transition-shadow duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+              className="relative sm:absolute mx-auto sm:left-[23%] sm:top-[10%] z-10 w-[86%] sm:w-[66%] overflow-hidden rounded-2xl border border-[var(--app-border-strong)] shadow-[0_32px_80px_rgba(0,0,0,0.38)] transition-shadow duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
             >
               <LazyTemplateCard aspectRatio={getTemplateAspectRatio(heroTemplates[0])}>
                 <UnifiedCardThumbnail template={heroTemplates[0]} className="h-full w-full" />
@@ -262,7 +262,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
 
         <section aria-label="Design gallery controls" className="mb-6 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-3 sm:p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div role="group" aria-label="Filter designs by category" className="flex min-w-0 items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+            <div role="group" aria-label="Filter designs by category" className="flex min-w-0 flex-wrap items-center gap-1.5">
               {FILTERS.map((filter) => (
                 <button
                   key={filter.id}

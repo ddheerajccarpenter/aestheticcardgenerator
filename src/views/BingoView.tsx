@@ -92,7 +92,7 @@ export const BingoView: React.FC<BingoViewProps> = () => {
   const stampedCount = marked.filter(Boolean).length;
 
   return (
-    <div className="mx-auto w-full max-w-[1380px] px-3 pb-24 pt-6 sm:px-6 md:px-8 md:pb-16 text-[var(--app-text-primary)]">
+    <div className="mx-auto w-full max-w-[1380px] px-3 pb-32 pt-6 sm:px-6 md:px-8 md:pb-16 text-[var(--app-text-primary)]">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="editorial-kicker">4 Card Editions · Local Export</p>
@@ -109,13 +109,13 @@ export const BingoView: React.FC<BingoViewProps> = () => {
         {/* Controls Panel */}
         <section
           aria-label="Bingo card controls"
-          className="rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-4 sm:p-5 flex flex-col gap-5"
+          className="rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-4 sm:p-5 flex flex-col gap-4 sm:gap-5"
         >
           <div>
-            <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--app-text-muted)] mb-2.5">
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--app-text-muted)] mb-2">
               1. Bingo Kind
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
               {BINGO_KINDS.map((kind) => {
                 const selected = kind.id === kindId;
                 return (
@@ -124,7 +124,7 @@ export const BingoView: React.FC<BingoViewProps> = () => {
                     type="button"
                     aria-pressed={selected}
                     onClick={() => handleSelectKind(kind.id)}
-                    className={`min-h-[44px] w-full rounded-xl border px-3.5 py-2.5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
+                    className={`min-h-[44px] w-full rounded-xl border px-2.5 py-2 sm:px-3.5 sm:py-2.5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
                       selected
                         ? 'border-[var(--app-accent)] bg-[var(--app-accent)] text-[var(--app-accent-ink)]'
                         : 'border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'

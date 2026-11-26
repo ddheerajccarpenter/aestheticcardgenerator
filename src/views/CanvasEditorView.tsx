@@ -1778,7 +1778,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     <div className="canvas-editor w-full h-dvh min-h-0 overflow-hidden flex flex-col pt-0 transition-colors duration-200 bg-[var(--app-bg)] text-[var(--app-text)]">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl studio-panel shadow-2xl flex items-center gap-2 text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 text-[var(--app-text)]">
+        <div className="fixed bottom-20 lg:bottom-6 right-4 lg:right-6 z-50 px-4 py-2.5 rounded-xl studio-panel shadow-2xl flex items-center gap-2 text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 text-[var(--app-text)]">
           <Check className="w-4 h-4 text-[var(--app-text-secondary)]" />
           <span>{toastMessage}</span>
         </div>
@@ -1805,9 +1805,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* ───────────────────────────────────────────────────────────────────── */}
       {/* TOP STUDIO TOOLBAR                                                    */}
       {/* ───────────────────────────────────────────────────────────────────── */}
-      <header className="editor-top-toolbar h-13 sm:h-14 border-b border-[var(--app-border-subtle)] px-2 sm:px-4 flex items-center justify-between shrink-0 transition-colors z-30 pt-[env(safe-area-inset-top,0px)] bg-[var(--app-surface)] text-[var(--app-text)]">
+      <header className="editor-top-toolbar h-13 sm:h-14 border-b border-[var(--app-border-subtle)] px-2 sm:px-4 flex items-center justify-between gap-1.5 sm:gap-2 shrink-0 transition-colors z-30 pt-[env(safe-area-inset-top,0px)] bg-[var(--app-surface)] text-[var(--app-text)]">
         {/* Left: Back & Title */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 min-w-0">
+        <div className="flex items-center gap-1 sm:gap-2.5 flex-1 min-w-0">
           <button
             onClick={() => {
               if (onNavigateHome) onNavigateHome();
@@ -1819,13 +1819,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <ArrowLeft className="w-4 h-4" />
           </button>
 
-          <div className="flex items-center gap-1.5 min-w-0">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
             <input
               type="text"
               value={doc.title}
               onChange={(e) => setDoc((prev) => ({ ...prev, title: e.target.value }))}
               onBlur={(e) => commitDocumentChange({ ...doc, title: e.target.value })}
-              className={`doc-title-input text-xs sm:text-sm font-semibold tracking-tight bg-transparent border-b border-transparent hover:border-[#81786d] focus:border-[#24211b] dark:focus:border-[#E2D9C8] focus:outline-none px-1 py-0.5 rounded transition-all max-w-[75px] sm:max-w-[160px] md:max-w-xs truncate ${
+              className={`doc-title-input w-full min-w-0 text-xs sm:text-sm font-semibold tracking-tight bg-transparent border-b border-transparent hover:border-[#81786d] focus:border-[#24211b] dark:focus:border-[#E2D9C8] focus:outline-none px-1 py-0.5 rounded transition-all max-w-[74px] sm:max-w-[140px] lg:max-w-[190px] xl:max-w-xs truncate ${
                 isLight ? 'text-[var(--app-accent)]' : 'text-white'
               }`}
               title="Click to rename document"
@@ -1859,10 +1859,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <Redo2 className="w-4 h-4" />
           </button>
 
-          <div className="h-4 w-px bg-[#39342d]/40 mx-1 hidden sm:block" />
+          <div className="h-4 w-px bg-[#39342d]/40 mx-1 hidden lg:block" />
 
-          {/* Zoom Controls */}
-          <div className="hidden sm:flex items-center gap-1">
+          {/* Zoom Controls (Desktop >=lg; mobile & tablet use Fit on bottom bar and View menu) */}
+          <div className="hidden lg:flex items-center gap-1">
             <button
               onClick={() => setZoom((z) => Math.max(0.2, Number((z - 0.1).toFixed(2))))}
               className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
@@ -1895,17 +1895,17 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             </button>
           </div>
 
-          <div className="h-4 w-px bg-[#39342d]/40 mx-1 hidden sm:block" />
+          <div className="h-4 w-px bg-[#39342d]/40 mx-0.5 hidden sm:block" />
 
           <details className="relative">
-            <summary className={`list-none p-2 rounded-lg flex items-center gap-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+            <summary className={`list-none p-1.5 sm:p-2 rounded-lg flex items-center gap-1 text-xs font-semibold cursor-pointer transition-colors ${
               isLight ? 'hover:bg-[#f0ede7] text-[#81786d]' : 'hover:bg-[#211e19] text-[#a0a5ad]'
             }`}>
               <Eye className="w-4 h-4" />
               <span className="hidden md:inline">View</span>
               <ChevronDown className="w-3 h-3" />
             </summary>
-            <div className={`absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-52 rounded-xl border p-2 shadow-2xl z-50 flex flex-col gap-1 canvas-utility-popover ${
+            <div className={`absolute right-0 top-full mt-2 w-52 max-w-[calc(100vw-16px)] rounded-xl border p-2 shadow-2xl z-50 flex flex-col gap-1 canvas-utility-popover ${
               isLight ? 'bg-white border-[#e3ddd3]' : 'bg-[#211e19] border-[#39342d]'
             }`}>
               <button
@@ -2017,7 +2017,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           </button>
 
           <details ref={moreMenuRef} className="relative">
-            <summary className={`list-none inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
+            <summary className={`list-none inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer ${
               isLight
                 ? 'bg-white border-[#e3ddd3] text-[var(--app-accent)] hover:bg-[#f8f5ef]'
                 : 'bg-[#211e19] border-[#39342d] text-white hover:bg-[#29251f]'
@@ -2099,7 +2099,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <button
               onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
               disabled={exporting}
-              className={`inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer ${
+              className={`inline-flex items-center gap-1 px-2 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer shrink-0 ${
                 isLight
                   ? 'bg-[#24211b] text-white hover:bg-[#2a2620]'
                   : 'bg-[#E2D9C8] text-[#24211b] hover:bg-[#d3cabc]'
@@ -5015,21 +5015,21 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               <h3 className="text-xs font-bold uppercase tracking-wider">Add Elements to Canvas</h3>
               <button
                 onClick={() => setMobileAddSheetOpen(false)}
-                className="p-1 rounded-lg hover:bg-white/10"
+                className="px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]"
               >
                 Done
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-4 overflow-y-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-4 min-h-0 flex-1 overflow-y-auto">
               <button
                 onClick={() => {
                   setTemplateDrawerOpen(true);
                   setMobileAddSheetOpen(false);
                 }}
-                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#E2D9C8]"
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[var(--app-accent)]"
               >
-                <LayoutTemplate className="w-5 h-5 text-[#E2D9C8]" />
+                <LayoutTemplate className="w-5 h-5 text-[var(--app-accent)]" />
                 <span className="text-xs font-medium">Templates</span>
               </button>
 
@@ -5038,9 +5038,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   setMediaModalOpen(true);
                   setMobileAddSheetOpen(false);
                 }}
-                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#E2D9C8]"
+                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[var(--app-accent)]"
               >
-                <BookOpen className="w-5 h-5 text-[#E2D9C8]" />
+                <BookOpen className="w-5 h-5 text-[var(--app-accent)]" />
                 <span className="text-xs font-medium">Book / Song</span>
               </button>
 
@@ -5179,7 +5179,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           />
           <div
             className={`lg:hidden fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t shadow-2xl flex flex-col max-h-[75vh] animate-slide-up transition-colors ${
-              isLight ? 'bg-white border-[#e3ddd3] text-[var(--app-accent)]' : 'bg-[#24211b] border-[#39342d] text-[#e1e2e7]'
+              isLight ? 'bg-white border-[#e3ddd3] text-[#24211b]' : 'bg-[#24211b] border-[#39342d] text-[#e1e2e7]'
             }`}
           >
             {/* Sheet Tabs Header */}
@@ -5208,7 +5208,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               </div>
               <button
                 onClick={() => setMobileInspectorOpen(false)}
-                className="px-2.5 py-1 text-xs font-semibold text-[#81786d] hover:text-white"
+                className="px-2.5 py-1 text-xs font-semibold text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]"
               >
                 Done
               </button>

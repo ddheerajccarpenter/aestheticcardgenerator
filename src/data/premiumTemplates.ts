@@ -139,9 +139,9 @@ export const PREMIUM_ART_ASSETS = {
       <path d="M342 422 C370 300 455 245 452 0 L562 0 C535 200 415 285 352 422 Z" fill="#ff9900" />
       <path d="M356 426 C445 315 530 220 640 80 L640 235 C525 320 435 370 362 430 Z" fill="#ff9900" />
       <path d="M366 436 C485 375 565 440 640 345 L640 465 C555 510 455 465 362 442 Z" fill="#ff9900" />
-      <path d="M292 528 C215 620 115 630 0 685 L0 805 C120 710 220 645 296 534 Z" fill="#ff9900" />
-      <path d="M294 538 C215 695 140 770 0 885 L0 960 L125 960 C215 800 250 695 300 544 Z" fill="#ff9900" />
-      <path d="M302 544 C280 715 245 835 198 960 L308 960 C318 820 315 695 306 546 Z" fill="#ff9900" />
+      <path d="M292 528 C215 620 115 630 0 685 L0 805 C120 710 212 645 286 534 Z" fill="#ff9900" />
+      <path d="M294 538 C210 695 140 770 0 885 L0 960 L118 960 C205 800 238 695 288 544 Z" fill="#ff9900" />
+      <path d="M298 544 C268 715 232 835 186 960 L290 960 C298 820 296 695 294 546 Z" fill="#ff9900" />
     </svg>
   `),
 
@@ -517,7 +517,7 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     canvasDoc: buildDoc('easier_than_think', 'Easier Than You Think', 640, 960, '#faeed6', [
       createImageObject(PREMIUM_ART_ASSETS.retroSunburstBackdrop, { name: 'Optical Sunburst Backdrop', x: 0, y: 0, width: 640, height: 960, borderRadius: 0, zIndex: 1, locked: true }),
       createTextObject({ name: 'Upper Stack', text: 'MAYBE\nIT IS\nEASIER\nTHAN', fontFamily: "'Fredoka', sans-serif", fontSize: 66, fontWeight: '700', lineHeight: 1.0, letterSpacing: -1, color: '#ff9900', align: 'left', x: 36, y: 44, width: 345, height: 390, zIndex: 10 }),
-      createTextObject({ name: 'Lower Punchline', text: 'You\nthink', fontFamily: "'Fredoka', sans-serif", fontSize: 92, fontWeight: '700', lineHeight: 0.96, letterSpacing: -2, color: '#ff9900', align: 'left', x: 280, y: 472, width: 336, height: 360, zIndex: 10 }),
+      createTextObject({ name: 'Lower Punchline', text: 'You\nthink', fontFamily: "'Fredoka', sans-serif", fontSize: 90, fontWeight: '700', lineHeight: 0.96, letterSpacing: -2, color: '#ff9900', align: 'left', x: 314, y: 472, width: 302, height: 360, zIndex: 10 }),
     ]),
   },
   {

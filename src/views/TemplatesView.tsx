@@ -245,7 +245,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           </div>
 
           {/* Primary Category Filter Tabs */}
-          <div role="group" aria-label="Filter templates by category" className="flex items-center gap-2 overflow-x-auto pb-1 pr-4 scrollbar-none">
+          <div role="group" aria-label="Filter templates by category" className="flex flex-wrap items-center gap-2 pb-1">
             {CATEGORY_TABS.map((tab) => {
               const count =
                 tab.id === 'all'

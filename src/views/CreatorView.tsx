@@ -852,7 +852,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           </div>
 
           {/* Controls Body: Scrollable area */}
-          <div className="flex-1 p-4 sm:p-5 flex flex-col gap-5 overflow-y-auto">
+          <div className="flex-1 p-4 sm:p-5 pb-20 md:pb-6 flex flex-col gap-5 overflow-y-auto">
             {/* Palette Preset Group */}
             <div className={mobileTab === 'palette' ? 'block' : 'hidden md:block'}>
               <div className="flex items-center justify-between mb-2">

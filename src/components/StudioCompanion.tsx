@@ -6,7 +6,6 @@ import {
   Shuffle,
   Smile,
   Minimize2,
-  Maximize2,
   RotateCcw,
   Check,
   Stamp,
@@ -104,9 +103,11 @@ export const StudioCompanion: React.FC = () => {
   const [stampedCanvas, setStampedCanvas] = useState(false);
   const [isMinimized, setIsMinimized] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('acg_companion_minimized') === 'true';
+      const saved = localStorage.getItem('acg_companion_minimized');
+      // Default to compact corner pill so interactive cards, inputs, and inspectors remain unobstructed
+      return saved !== 'false';
     }
-    return false;
+    return true;
   });
 
   const currentMeta = COMPANION_ROSTER.find((c) => c.id === character) || COMPANION_ROSTER[0];
@@ -134,11 +135,12 @@ export const StudioCompanion: React.FC = () => {
   const [wiggleAnim, setWiggleAnim] = useState(false);
   const [emote, setEmote] = useState<string | null>(null);
 
-  // Measure companion size based on screen
+  // Measure companion size based on screen & minimized state
   const getCompanionSize = useCallback(() => {
     if (typeof window === 'undefined') return 64;
+    if (isMinimized) return 44;
     return window.innerWidth >= 768 ? 96 : 64;
-  }, []);
+  }, [isMinimized]);
 
   // Strict boundary limit: cannot be dragged over top navbar or behind bottom nav
   const clampCoordinates = useCallback((x: number, y: number): Position => {
@@ -160,7 +162,7 @@ export const StudioCompanion: React.FC = () => {
     };
   }, [getCompanionSize]);
 
-  // Load saved position on mount, or initialize default bottom-right
+  // Load saved position on mount, or initialize non-occluding default corner
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const size = getCompanionSize();
@@ -175,9 +177,12 @@ export const StudioCompanion: React.FC = () => {
       } catch {}
     }
 
-    // Default position: bottom-right
-    const defaultX = window.innerWidth - size - (window.innerWidth >= 768 ? 24 : 16);
-    const defaultY = window.innerHeight - size - (window.innerWidth >= 768 ? 24 : 96);
+    // In desktop Canvas Studio, default to bottom-left rail under +Add so right Inspector stays clear
+    const isDesktopCanvas = window.location.pathname.startsWith('/canvas') && window.innerWidth >= 1024;
+    const defaultX = isDesktopCanvas
+      ? 10
+      : window.innerWidth - size - (window.innerWidth >= 768 ? 20 : 12);
+    const defaultY = window.innerHeight - size - (window.innerWidth >= 768 ? 16 : 84);
     setPosition(clampCoordinates(defaultX, defaultY));
   }, [clampCoordinates, getCompanionSize]);
 
@@ -662,12 +667,12 @@ export const StudioCompanion: React.FC = () => {
           <button
             type="button"
             onClick={() => toggleMinimize(false)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-lg hover:border-[var(--app-accent)]/50 text-xs text-[var(--app-text)] transition-transform hover:scale-105 cursor-pointer"
-            title="Expand Studio Companion"
+            className="flex h-10 items-center gap-1.5 px-2.5 rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 shadow-lg hover:border-[var(--app-accent)]/50 text-xs text-[var(--app-text)] transition-transform hover:scale-105 cursor-pointer"
+            title={`Expand ${currentMeta.name} companion`}
+            aria-label={`Open ${currentMeta.name} companion`}
           >
-            <span className="text-xs">{currentMeta.badge}</span>
-            <span className="font-medium text-[11px]">{currentMeta.name}</span>
-            <Maximize2 className="w-3 h-3 text-[var(--app-text-muted)]" />
+            <span className="text-sm leading-none">{currentMeta.badge}</span>
+            <span className="hidden sm:inline font-medium text-[11px]">{currentMeta.name}</span>
           </button>
         ) : (
           <div className="relative">
