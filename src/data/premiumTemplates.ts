@@ -104,7 +104,15 @@ export const PREMIUM_ART_ASSETS = {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 960" width="640" height="960">
       <defs>
         <filter id="waveBlur" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="44" />
+          <feGaussianBlur stdDeviation="42" />
+        </filter>
+        <filter id="waveGrain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.78" numOctaves="3" seed="7" result="noise" />
+          <feColorMatrix type="saturate" values="0" in="noise" result="gray" />
+          <feComponentTransfer in="gray" result="alphaNoise">
+            <feFuncA type="linear" slope="0.18" />
+          </feComponentTransfer>
+          <feBlend mode="overlay" in="SourceGraphic" in2="alphaNoise" />
         </filter>
         <linearGradient id="copperSweep" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stop-color="#615d52" />
@@ -115,12 +123,12 @@ export const PREMIUM_ART_ASSETS = {
       </defs>
       <rect width="640" height="960" fill="url(#copperSweep)" />
       <g filter="url(#waveBlur)">
-        <ellipse cx="220" cy="190" rx="280" ry="260" fill="#6b675b" opacity="0.88" />
+        <ellipse cx="220" cy="190" rx="280" ry="260" fill="#716d5f" opacity="0.9" />
         <path d="M-40 580 Q150 690 290 830 Q430 960 680 710 L680 990 L-40 990 Z" fill="#0d0402" />
-        <path d="M-40 560 Q140 675 280 820 Q425 945 680 680" fill="none" stroke="#ff9447" stroke-width="58" opacity="0.92" />
-        <path d="M-40 640 Q180 790 380 885 Q520 945 680 740" fill="none" stroke="#f03c0a" stroke-width="34" opacity="0.85" />
+        <path d="M-40 560 Q140 675 280 820 Q425 945 680 680" fill="none" stroke="#ff9d52" stroke-width="60" opacity="0.94" />
+        <path d="M-40 640 Q180 790 380 885 Q520 945 680 740" fill="none" stroke="#f03c0a" stroke-width="34" opacity="0.86" />
       </g>
-      <rect width="640" height="960" fill="#000000" opacity="0.06" />
+      <rect width="640" height="960" fill="transparent" filter="url(#waveGrain)" />
     </svg>
   `),
 
@@ -203,29 +211,42 @@ export const PREMIUM_ART_ASSETS = {
   impressionistMeadowArt: svgUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 960" width="640" height="960">
       <defs>
-        <filter id="motionBlur" x="-30%" y="-30%" width="160%" height="160%">
+        <filter id="skyGlowBlur" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="24" />
+        </filter>
+        <filter id="meadowBrushBlur" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="6.5" />
         </filter>
         <linearGradient id="skyHaze" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stop-color="#2c3323" />
-          <stop offset="50%" stop-color="#b9ab90" />
-          <stop offset="100%" stop-color="#4e4057" />
+          <stop offset="48%" stop-color="#c9ba9b" />
+          <stop offset="100%" stop-color="#5a456b" />
         </linearGradient>
       </defs>
       <rect width="640" height="960" fill="url(#skyHaze)" />
-      <g filter="url(#motionBlur)">
-        <circle cx="490" cy="180" r="190" fill="#e8dfc4" opacity="0.88" />
-        <ellipse cx="140" cy="160" rx="220" ry="180" fill="#232c1f" opacity="0.92" />
-        <ellipse cx="320" cy="540" rx="340" ry="160" fill="#d9cca8" opacity="0.72" />
-        <ellipse cx="210" cy="780" rx="240" ry="220" fill="#7c639c" opacity="0.85" />
-        <ellipse cx="470" cy="810" rx="220" ry="220" fill="#5e4b75" opacity="0.82" />
-        <ellipse cx="320" cy="680" rx="280" ry="90" fill="#9a7eb8" opacity="0.65" />
-        <!-- Soft impressionist figures standing in golden haze -->
-        <ellipse cx="226" cy="435" rx="24" ry="26" fill="#2b211c" opacity="0.92" />
-        <path d="M185 605 C190 480 205 455 228 455 C252 455 268 485 275 615 Z" fill="#c7bba4" opacity="0.86" />
-        <ellipse cx="390" cy="378" rx="22" ry="26" fill="#3b261d" opacity="0.9" />
-        <rect x="358" y="405" width="66" height="145" rx="28" fill="#e5decb" opacity="0.88" />
-        <rect x="372" y="535" width="44" height="110" rx="16" fill="#2e2d2b" opacity="0.82" />
+      <g filter="url(#skyGlowBlur)">
+        <circle cx="485" cy="175" r="195" fill="#f2ead2" opacity="0.9" />
+        <ellipse cx="140" cy="160" rx="220" ry="180" fill="#232c1f" opacity="0.88" />
+        <ellipse cx="320" cy="545" rx="340" ry="155" fill="#e5d7b3" opacity="0.78" />
+        <ellipse cx="210" cy="785" rx="250" ry="220" fill="#8b6fb0" opacity="0.86" />
+        <ellipse cx="470" cy="810" rx="220" ry="220" fill="#634d7d" opacity="0.82" />
+      </g>
+      <g filter="url(#meadowBrushBlur)">
+        <!-- Distant woodland treeline -->
+        <path d="M0 360 Q95 270 190 350 Q285 280 390 345 Q510 265 640 340 L640 430 L0 430 Z" fill="#4f5638" opacity="0.48" />
+        <!-- Painterly strolling figures in golden mist -->
+        <ellipse cx="226" cy="435" rx="22" ry="25" fill="#2b211c" opacity="0.88" />
+        <path d="M188 605 C193 485 206 458 228 458 C250 458 264 488 270 612 Z" fill="#efe6cf" opacity="0.88" />
+        <ellipse cx="390" cy="380" rx="20" ry="24" fill="#3b261d" opacity="0.88" />
+        <rect x="358" y="408" width="64" height="140" rx="26" fill="#f3ebd6" opacity="0.9" />
+        <rect x="372" y="534" width="42" height="106" rx="14" fill="#2e2b27" opacity="0.8" />
+        <!-- Foreground Impressionist wildflower tufts -->
+        <ellipse cx="120" cy="740" rx="68" ry="26" fill="#bfa3df" opacity="0.72" />
+        <ellipse cx="315" cy="710" rx="90" ry="28" fill="#d9c69e" opacity="0.65" />
+        <ellipse cx="515" cy="760" rx="75" ry="30" fill="#a887cc" opacity="0.72" />
+        <circle cx="170" cy="690" r="14" fill="#f5e6ba" opacity="0.78" />
+        <circle cx="445" cy="680" r="16" fill="#e9d2a1" opacity="0.78" />
+        <circle cx="290" cy="825" r="18" fill="#c7aee8" opacity="0.68" />
       </g>
     </svg>
   `),
@@ -290,10 +311,10 @@ export const PREMIUM_ART_ASSETS = {
       <rect x="28" y="28" width="584" height="904" fill="none" stroke="url(#goldLeafGrad)" stroke-width="4" opacity="0.82" />
       <rect x="42" y="42" width="556" height="876" fill="none" stroke="#8a6e2f" stroke-width="1.5" stroke-dasharray="6 4" />
       <!-- Treasury rosettes -->
-      <circle cx="320" cy="145" r="78" fill="none" stroke="url(#goldLeafGrad)" stroke-width="5" stroke-dasharray="4 3" opacity="0.88" />
-      <circle cx="320" cy="145" r="56" fill="#232018" stroke="#d4af37" stroke-width="1.5" />
-      <circle cx="320" cy="815" r="78" fill="none" stroke="url(#goldLeafGrad)" stroke-width="5" stroke-dasharray="4 3" opacity="0.88" />
-      <circle cx="320" cy="815" r="56" fill="#232018" stroke="#d4af37" stroke-width="1.5" />
+      <circle cx="320" cy="145" r="82" fill="none" stroke="url(#goldLeafGrad)" stroke-width="5" stroke-dasharray="4 3" opacity="0.88" />
+      <circle cx="320" cy="145" r="65" fill="#232018" stroke="#d4af37" stroke-width="1.5" />
+      <circle cx="320" cy="815" r="82" fill="none" stroke="url(#goldLeafGrad)" stroke-width="5" stroke-dasharray="4 3" opacity="0.88" />
+      <circle cx="320" cy="815" r="65" fill="#232018" stroke="#d4af37" stroke-width="1.5" />
       <!-- Central dark oval currency portrait engraving -->
       <ellipse cx="320" cy="480" rx="220" ry="270" fill="#111111" stroke="#444038" stroke-width="4" />
       <ellipse cx="320" cy="480" rx="205" ry="255" fill="#21201d" />
@@ -407,7 +428,7 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     iconName: 'sparkles',
     canvasDoc: buildDoc('actually_aura', 'Actually, I Can', 640, 960, '#2b2623', [
       createImageObject(PREMIUM_ART_ASSETS.auraSparkleBackdrop, { name: 'Aura Sparkle Backdrop', x: 0, y: 0, width: 640, height: 960, borderRadius: 0, zIndex: 1, locked: true }),
-      createTextObject({ name: 'Aura Statement', text: 'actually,\nI can.', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 60, fontWeight: '700', lineHeight: 0.94, letterSpacing: -2, color: '#f2c4ec', align: 'center', x: 60, y: 395, width: 520, height: 150, zIndex: 10 }),
+      createTextObject({ name: 'Aura Statement', text: 'actually,\nI can.', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 62, fontWeight: '800', lineHeight: 0.94, letterSpacing: -2.5, color: '#f2c4ec', align: 'center', x: 60, y: 395, width: 520, height: 150, zIndex: 10 }),
     ]),
   },
   {
@@ -466,7 +487,7 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     iconName: 'sparkles',
     canvasDoc: buildDoc('do_it_yourself', 'Do It For Yourself', 640, 960, '#6b675b', [
       createImageObject(PREMIUM_ART_ASSETS.amberWaveNoirBackdrop, { name: 'Copper Light-Leak Grain', x: 0, y: 0, width: 640, height: 960, borderRadius: 0, zIndex: 1, locked: true }),
-      createTextObject({ name: 'Serif Mantra', text: 'do it for yourself.', fontFamily: "'Playfair Display', Georgia, serif", fontSize: 34, fontWeight: '500', letterSpacing: -0.5, color: '#110a07', align: 'center', x: 60, y: 446, width: 520, height: 64, zIndex: 10 }),
+      createTextObject({ name: 'Serif Mantra', text: 'do it for yourself.', fontFamily: "'Playfair Display', Georgia, serif", fontSize: 38, fontWeight: '600', letterSpacing: -0.8, color: '#110a07', align: 'center', x: 60, y: 444, width: 520, height: 68, zIndex: 10 }),
     ]),
   },
   {
@@ -495,8 +516,8 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     iconName: 'sparkles',
     canvasDoc: buildDoc('easier_than_think', 'Easier Than You Think', 640, 960, '#faeed6', [
       createImageObject(PREMIUM_ART_ASSETS.retroSunburstBackdrop, { name: 'Optical Sunburst Backdrop', x: 0, y: 0, width: 640, height: 960, borderRadius: 0, zIndex: 1, locked: true }),
-      createTextObject({ name: 'Upper Stack', text: 'MAYBE\nIT IS\nEASIER\nTHAN', fontFamily: "'Fredoka', sans-serif", fontSize: 68, fontWeight: '700', lineHeight: 1.0, letterSpacing: -1, color: '#ff9900', align: 'left', x: 38, y: 44, width: 320, height: 390, zIndex: 10 }),
-      createTextObject({ name: 'Lower Punchline', text: 'You\nthink', fontFamily: "'Fredoka', sans-serif", fontSize: 102, fontWeight: '700', lineHeight: 0.96, letterSpacing: -2, color: '#ff9900', align: 'left', x: 300, y: 468, width: 310, height: 360, zIndex: 10 }),
+      createTextObject({ name: 'Upper Stack', text: 'MAYBE\nIT IS\nEASIER\nTHAN', fontFamily: "'Fredoka', sans-serif", fontSize: 66, fontWeight: '700', lineHeight: 1.0, letterSpacing: -1, color: '#ff9900', align: 'left', x: 36, y: 44, width: 345, height: 390, zIndex: 10 }),
+      createTextObject({ name: 'Lower Punchline', text: 'You\nthink', fontFamily: "'Fredoka', sans-serif", fontSize: 92, fontWeight: '700', lineHeight: 0.96, letterSpacing: -2, color: '#ff9900', align: 'left', x: 280, y: 472, width: 336, height: 360, zIndex: 10 }),
     ]),
   },
   {
@@ -525,7 +546,7 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     iconName: 'sparkles',
     canvasDoc: buildDoc('something_beautiful', 'Something Beautiful', 640, 960, '#cfd09f', [
       createImageObject(PREMIUM_ART_ASSETS.oliveGouachePaper, { name: 'Gouache Sage Paper', x: 0, y: 0, width: 640, height: 960, borderRadius: 0, zIndex: 1, locked: true }),
-      createTextObject({ name: 'Bubble Manifesto', text: 'MAKE\nTODAY\nSOME-\nTHING\nBEAUTI-\nFUL.', fontFamily: "'Fredoka', sans-serif", fontSize: 102, fontWeight: '700', lineHeight: 0.88, letterSpacing: -3, color: '#52601e', align: 'left', x: 38, y: 46, width: 564, height: 870, zIndex: 10 }),
+      createTextObject({ name: 'Bubble Manifesto', text: 'MAKE\nTODAY\nSOME-\nTHING\nBEAUTI-\nFUL.', fontFamily: "'Fredoka', sans-serif", fontSize: 96, fontWeight: '700', lineHeight: 0.9, letterSpacing: -2, color: '#52601e', align: 'left', x: 42, y: 52, width: 556, height: 856, zIndex: 10 }),
     ]),
   },
   {
@@ -554,8 +575,8 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     iconName: 'sparkles',
     canvasDoc: buildDoc('chill_wave', 'CHILL Condensed Pillar', 800, 1000, '#ede4d0', [
       createImageObject(PREMIUM_ART_ASSETS.chillBoneWaveBackdrop, { name: 'Archival Bone Sheet', x: 0, y: 0, width: 800, height: 1000, borderRadius: 0, zIndex: 1, locked: true }),
-      createTextObject({ name: 'Towering Title', text: 'CHILL', fontFamily: "'Anton', sans-serif", fontSize: 310, fontWeight: '400', lineHeight: 0.88, letterSpacing: 6, color: '#992020', align: 'center', x: 40, y: 120, width: 720, height: 740, zIndex: 10 }),
-      createTextObject({ name: 'Margin Stamp', text: 'SPECIMEN 06 // OXBLOOD ARCHIVE', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: '700', letterSpacing: 3, color: '#992020', align: 'center', x: 180, y: 928, width: 440, height: 24, zIndex: 10 }),
+      createTextObject({ name: 'Towering Title', text: 'CHILL', fontFamily: "'Anton', sans-serif", fontSize: 270, fontWeight: '400', lineHeight: 0.88, letterSpacing: 4, color: '#992020', align: 'center', x: 30, y: 120, width: 740, height: 740, zIndex: 10 }),
+      createTextObject({ name: 'Margin Stamp', text: 'SPECIMEN 06 // OXBLOOD ARCHIVE', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: '700', letterSpacing: 3, color: '#992020', align: 'center', x: 140, y: 928, width: 520, height: 24, zIndex: 10 }),
     ]),
   },
   {
@@ -747,8 +768,8 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     iconName: 'sparkles',
     canvasDoc: buildDoc('gold_foil_plate', 'Gold Foil Currency Plate', 640, 960, '#171717', [
       createImageObject(PREMIUM_ART_ASSETS.goldFoilEngravingPlate, { name: 'Engraved Gold Leaf Plate', x: 0, y: 0, width: 640, height: 960, borderRadius: 0, zIndex: 1, locked: true }),
-      createTextObject({ name: 'Top Serial', text: 'KB 51467758', fontFamily: "'JetBrains Mono', monospace", fontSize: 18, fontWeight: '800', letterSpacing: 4, color: '#d4af37', align: 'center', x: 160, y: 132, width: 320, height: 28, zIndex: 10 }),
-      createTextObject({ name: 'Bottom Serial', text: 'KB 51467758 // ARCHIVE', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '800', letterSpacing: 3, color: '#d4af37', align: 'center', x: 150, y: 800, width: 340, height: 28, zIndex: 10 }),
+      createTextObject({ name: 'Top Serial', text: 'KB 51467758', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: '800', letterSpacing: 1.5, color: '#d4af37', align: 'center', x: 245, y: 135, width: 150, height: 22, zIndex: 10 }),
+      createTextObject({ name: 'Bottom Serial', text: 'KB 51467758\nARCHIVE', fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, fontWeight: '800', letterSpacing: 1.5, lineHeight: 1.25, color: '#d4af37', align: 'center', x: 245, y: 800, width: 150, height: 32, zIndex: 10 }),
     ]),
   },
   {
@@ -807,9 +828,9 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     iconName: 'sparkles',
     canvasDoc: buildDoc('sky_collage', 'All Things Possible', 640, 960, '#2b65b0', [
       createImageObject(PREMIUM_ART_ASSETS.skyCumulusBackdrop, { name: 'Cerulean Cloud Sky', x: 0, y: 0, width: 640, height: 960, borderRadius: 0, zIndex: 1, locked: true }),
-      createTextObject({ name: 'Cutout Sky Headline', text: 'WITH\nGOD\nALL\nTHINGS\nARE\nPOSSIBLE', fontFamily: "'Fredoka', sans-serif", fontSize: 94, fontWeight: '700', lineHeight: 0.9, letterSpacing: -2, color: '#ffffff', align: 'center', x: 50, y: 120, width: 540, height: 670, zIndex: 6 }),
+      createTextObject({ name: 'Cutout Sky Headline', text: 'WITH\nGOD\nALL\nTHINGS\nARE\nPOSSIBLE', fontFamily: "'Fredoka', sans-serif", fontSize: 94, fontWeight: '700', lineHeight: 0.9, letterSpacing: -2, color: '#ffffff', align: 'center', x: 50, y: 112, width: 540, height: 670, zIndex: 6 }),
       createImageObject(PREMIUM_ART_ASSETS.skyStreetlampOverlay, { name: 'Streetlamp Collage Poles', x: 100, y: 460, width: 500, height: 500, objectFit: 'contain', borderRadius: 0, zIndex: 8 }),
-      createTextObject({ name: 'Marker Accent Top', text: '° o °', fontFamily: "'Fredoka', sans-serif", fontSize: 28, fontWeight: '700', color: '#f97316', align: 'center', x: 250, y: 68, width: 140, height: 42, zIndex: 10 }),
+      createTextObject({ name: 'Marker Accent Top', text: '° o °', fontFamily: "'Fredoka', sans-serif", fontSize: 28, fontWeight: '700', color: '#f97316', align: 'center', x: 170, y: 66, width: 300, height: 42, zIndex: 10 }),
     ]),
   },
 ];

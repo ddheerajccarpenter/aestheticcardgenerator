@@ -3073,7 +3073,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             className="flex items-center"
                             title="Double-click to edit text"
                           >
-                            <span className="w-full whitespace-pre-wrap break-words">{obj.text}</span>
+                            <span
+                              className="w-full whitespace-pre-wrap break-words"
+                              style={{ fontFamily: 'inherit', fontWeight: 'inherit', fontStyle: 'inherit', letterSpacing: 'inherit', lineHeight: 'inherit' }}
+                            >
+                              {obj.text}
+                            </span>
                           </div>
                         )
                       )}

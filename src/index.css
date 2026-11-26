@@ -370,8 +370,8 @@
     color: var(--color-ink);
   }
 
-  /* Base Body Rule: Elegant Comfortaa medium rounded typography */
-  body, p, span, li, input, textarea, select, button, label {
+  /* Base Body Rule: Elegant Comfortaa medium rounded typography (keep span inheriting parent card/canvas fontFamily) */
+  body, p, li, input, textarea, select, button, label {
     font-family: var(--font-body);
     font-weight: 500;
     -webkit-font-smoothing: antialiased;

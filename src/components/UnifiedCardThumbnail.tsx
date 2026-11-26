@@ -107,7 +107,12 @@ const renderObject = (object: CanvasObject, doc: CanvasDocument) => {
           alignItems: 'center',
         }}
       >
-        <span className="w-full whitespace-pre-wrap break-words">{object.text}</span>
+        <span
+          className="w-full whitespace-pre-wrap break-words"
+          style={{ fontFamily: 'inherit', fontWeight: 'inherit', fontStyle: 'inherit', letterSpacing: 'inherit', lineHeight: 'inherit' }}
+        >
+          {object.text}
+        </span>
       </div>
     );
   }

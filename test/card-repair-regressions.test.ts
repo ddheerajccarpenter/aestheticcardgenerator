@@ -228,3 +228,14 @@ test('/premium signature editions (14 cards) are 100% free, editable, and free o
   const premiumView = fs.readFileSync(path.join(SRC_DIR, 'views', 'PremiumView.tsx'), 'utf8');
   assert.ok(!/\$\d+/.test(premiumView) && !premiumView.includes('Subscribe') && !premiumView.includes('Paywall') && !premiumView.includes('Upgrade to Pro'));
 });
+
+test('canvas text spans inherit layer fontFamily without global Comfortaa span override', () => {
+  const indexCss = fs.readFileSync(path.join(SRC_DIR, 'index.css'), 'utf8');
+  assert.ok(!/body,\s*p,\s*span\b/.test(indexCss), 'index.css must not target bare span with var(--font-body)');
+
+  const editor = fs.readFileSync(path.join(SRC_DIR, 'views', 'CanvasEditorView.tsx'), 'utf8');
+  assert.ok(editor.includes("fontFamily: 'inherit'"));
+
+  const thumb = fs.readFileSync(path.join(SRC_DIR, 'components', 'UnifiedCardThumbnail.tsx'), 'utf8');
+  assert.ok(thumb.includes("fontFamily: 'inherit'"));
+});
