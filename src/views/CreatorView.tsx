@@ -681,7 +681,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Center Canvas Stage (Visual preview first on mobile!) */}
         <main
-          className="order-1 md:order-2 h-[42vh] sm:h-[48vh] md:h-auto md:flex-1 p-3 sm:p-6 md:p-10 flex flex-col items-center justify-center overflow-auto relative bg-[var(--app-surface-secondary)] border-b md:border-b-0"
+          className="order-1 md:order-2 h-[36vh] min-h-[210px] max-h-[320px] sm:h-[44vh] sm:max-h-[420px] md:h-auto md:max-h-none md:min-h-0 md:flex-1 p-3 sm:p-6 md:p-10 flex flex-col items-center justify-center overflow-auto relative bg-[var(--app-surface-secondary)] border-b md:border-b-0"
         >
           {/* Subtle feedback toast */}
           {feedbackMessage && (
@@ -692,8 +692,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           )}
 
           {is3DMode ? (
-            <div className="w-full h-full min-h-[260px] flex flex-col items-center justify-center">
-              <div className="relative w-full max-w-md h-[300px] sm:h-[380px]">
+            <div className="w-full h-full min-h-[190px] sm:min-h-[260px] flex flex-col items-center justify-center">
+              <div className="relative w-full max-w-md h-[210px] sm:h-[340px]">
                 <div ref={threeMountRef} className="h-full w-full cursor-grab active:cursor-grabbing" />
                 <ThreeDPreviewControls controllerRef={threeStageRef} />
               </div>
@@ -818,7 +818,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           <div className="md:hidden flex items-center border-b border-[var(--app-border-subtle)] bg-[var(--app-surface)] shrink-0 px-2 py-1.5 gap-1">
             <button
               onClick={() => setMobileTab('content')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`flex-1 min-h-[44px] py-2 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
                 mobileTab === 'content'
                   ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] shadow-xs'
                   : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)]'
@@ -829,7 +829,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
             </button>
             <button
               onClick={() => setMobileTab('palette')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`flex-1 min-h-[44px] py-2 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
                 mobileTab === 'palette'
                   ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] shadow-xs'
                   : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)]'
@@ -840,7 +840,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
             </button>
             <button
               onClick={() => setMobileTab('type')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`flex-1 min-h-[44px] py-2 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
                 mobileTab === 'type'
                   ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] shadow-xs'
                   : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)]'
@@ -852,7 +852,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           </div>
 
           {/* Controls Body: Scrollable area */}
-          <div className="flex-1 p-4 sm:p-5 pb-20 md:pb-6 flex flex-col gap-5 overflow-y-auto">
+          <div className="flex-1 p-4 sm:p-5 pb-24 md:pb-6 flex flex-col gap-5 overflow-y-auto">
             {/* Palette Preset Group */}
             <div className={mobileTab === 'palette' ? 'block' : 'hidden md:block'}>
               <div className="flex items-center justify-between mb-2">

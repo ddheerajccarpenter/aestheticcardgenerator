@@ -21,13 +21,18 @@ export const Footer: React.FC<FooterProps> = ({ theme = 'dark' }) => {
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6 text-xs font-semibold text-[var(--app-text)]">
-            <a href="/about" className="hover:text-[var(--app-accent)] transition-colors">About</a>
-            <a href="/guides" className="hover:text-[var(--app-accent)] transition-colors">How to Use</a>
-            <a href="/faq" className="hover:text-[var(--app-accent)] transition-colors">FAQ</a>
-            <a href="/contact" className="hover:text-[var(--app-accent)] transition-colors">Contact</a>
-            <a href="/privacy" className="hover:text-[var(--app-accent)] transition-colors text-[11px] font-normal text-[var(--app-text-muted)]">Privacy</a>
-            <a href="/terms" className="hover:text-[var(--app-accent)] transition-colors text-[11px] font-normal text-[var(--app-text-muted)]">Terms</a>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs font-semibold text-[var(--app-text)]">
+            <a href="/premium" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors">Signature</a>
+            <a href="/bingo" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors">Bingo</a>
+            <a href="/about" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors">About</a>
+            <a href="/guides" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors">Guides</a>
+            <a href="/blog" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors">Blog</a>
+            <a href="/faq" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors">FAQ</a>
+            <a href="/contact" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors">Contact</a>
+            <a href="/privacy" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors text-[11px] font-normal text-[var(--app-text-muted)]">Privacy</a>
+            <a href="/cookies" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors text-[11px] font-normal text-[var(--app-text-muted)]">Cookies</a>
+            <a href="/terms" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors text-[11px] font-normal text-[var(--app-text-muted)]">Terms</a>
+            <a href="/disclaimer" className="min-h-[36px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors text-[11px] font-normal text-[var(--app-text-muted)]">Disclaimer</a>
           </div>
         </div>
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
-import { updatePageSEO } from '../utils/seo';
+import { HOME_AEO_FAQ, PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
 import { ArrowRight, Check, Copy, Search, X } from 'lucide-react';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 import { LazyTemplateCard } from '../components/LazyTemplateCard';
 import { getTemplateAspectRatio } from '../utils/templateAspectRatio';
+import { AdSlot } from '../components/AdSlot';
 
 export interface HomeViewProps {
   onOpenEditorWithTemplate?: (template: CardTemplate) => void;
@@ -87,10 +88,27 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
 
   useEffect(() => {
     updatePageSEO({
-      title: 'ACG — Aesthetic Card Generator | Design Gallery',
-      description: 'Browse quote cards, editorial designs, and ID passes. Customize and export designs in your browser.',
+      title: 'Aesthetic Card Generator - Free Quote Cards, ID Passes & Posters',
+      description: 'Browse quote cards, editorial designs, and ID passes. Customize and export watermark-free designs locally in your browser.',
       canonicalPath: '/',
       ogType: 'website',
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Aesthetic Card Generator',
+          url: PRODUCTION_DOMAIN,
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: HOME_AEO_FAQ.map((item) => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: { '@type': 'Answer', text: item.a },
+          })),
+        },
+      ],
     });
   }, []);
 
@@ -374,6 +392,34 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
             ))}
           </div>
         )}
+      </section>
+
+      <section aria-labelledby="home-faq-heading" className="mt-12 border-t border-[var(--app-border-subtle)] pt-10">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--app-text-muted)]">
+              Quick Answers
+            </p>
+            <h2 id="home-faq-heading" className="mt-1 text-xl sm:text-2xl font-heading tracking-tight">
+              Free Editing &amp; Export Guide
+            </h2>
+          </div>
+          <a href="/faq" className="text-xs font-semibold text-[var(--app-accent)] hover:underline">
+            Read all FAQs
+          </a>
+        </div>
+        <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+          {HOME_AEO_FAQ.map((item) => (
+            <article
+              key={item.q}
+              className="rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-4 sm:p-5"
+            >
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--app-text-primary)]">{item.q}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-[var(--app-text-secondary)]">{item.a}</p>
+            </article>
+          ))}
+        </div>
+        <AdSlot slotId="home-bottom-slot" format="horizontal" />
       </section>
 
       <p role="status" aria-live="polite" className="sr-only">{feedback}</p>

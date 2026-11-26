@@ -236,48 +236,30 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
 // --------------------------------------------------------------------------
 // 3. FAQ PAGE (/faq)
 // --------------------------------------------------------------------------
+import { SITE_FAQ_ITEMS } from '../utils/seo';
+
 export const FaqView: React.FC<TrustViewBaseProps> = () => {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Frequently Asked Questions — Aesthetic Card Studio',
+      title: 'Frequently Asked Questions - Aesthetic Card Generator',
       description:
-        'Answers to common questions about card creation, export resolutions, local privacy, supported fonts, and browser compatibility.',
+        'Answers to common questions about card creation, free downloads, export resolutions, local privacy, supported fonts, and browser compatibility.',
       canonicalPath: '/faq',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: SITE_FAQ_ITEMS.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: item.a },
+        })),
+      },
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const faqItems = [
-    {
-      q: 'Does this app send my text or photos to any server?',
-      a: 'Never. The generator runs 100% on client-side browser technology. Your words, custom fonts, and exported cards never touch a database or external API.',
-    },
-    {
-      q: 'Can I customize the typography, margins, and paper textures?',
-      a: 'Yes. The Studio Editor provides full granular control over font families (Newsreader, Playfair, Inter, JetBrains Mono), optical font sizes, alignment, padding, border radius, and analog film-grain layers.',
-    },
-    {
-      q: 'What resolution are the downloaded cards?',
-      a: 'Cards are exported at crisp 2x Retina resolution (up to 2160x2160 or 2160x2700 pixels depending on aspect ratio), perfectly formatted for Instagram posts, Stories, Twitter, and print.',
-    },
-    {
-      q: 'Can I export in different aspect ratios?',
-      a: 'Yes, you can toggle between 1:1 Square, 4:5 Social Portrait, 9:16 Story/Reel, and 16:9 Landscape with a single click, and all typography reflows proportionally.',
-    },
-    {
-      q: 'How does draft saving work if there is no database?',
-      a: 'Your card state is stored locally in your browser storage (localStorage). When you reload the page, your in-progress card is restored automatically without transmitting your words anywhere.',
-    },
-    {
-      q: 'Can I use these cards for commercial projects and book covers?',
-      a: 'Yes. The cards you generate with your own text are your intellectual property. All built-in fonts are open-source and licensed under SIL Open Font License.',
-    },
-    {
-      q: 'Why does the exported image look sharper than my screen preview?',
-      a: 'During export, the rendering engine rasterizes your card at double pixel density (pixelRatio: 2) to match high-DPI smartphone displays, ensuring hairline borders and serifs never pixelate.',
-    },
-  ];
+  const faqItems = SITE_FAQ_ITEMS;
 
   return (
     <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
@@ -400,10 +382,10 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
 
           <section className="flex flex-col gap-2">
             <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
-              5. Analytics and Advertising
+              5. Analytics &amp; Google AdSense Readiness
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              This application build does not load an analytics service or active advertising integration. Advertising placeholders are disabled in the current source configuration. If that changes, this policy must be updated to describe the services and choices provided.
+              This build keeps Google AdSense slots disabled until a verified Publisher ID (`ca-pub-...`) is activated. When enabled in the future, Google AdSense and authorized advertising partners may use cookies or local signals to deliver relevant or non-personalized ads alongside gallery and editorial pages. Your card text, uploaded images, and custom fonts always remain local in your browser. Visitors may manage personalized ad preferences at any time via Google Ad Settings or youradchoices.com.
             </p>
           </section>
 
@@ -539,10 +521,10 @@ export const CookieView: React.FC<TrustViewBaseProps> = () => {
 
           <section className="flex flex-col gap-2">
             <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
-              2. External Resources
+              2. External Resources &amp; Future Advertising Cookies
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              Google Fonts, CDNFONTS, and unpkg may serve fonts or icon files used by the interface. Loading those files sends a request to the respective host and shares standard network metadata. This build does not load analytics or advertising scripts.
+              Google Fonts, CDNFONTS, and unpkg may serve fonts or icon files used by the interface, which shares standard network request headers with those hosts. In the current disabled-ad configuration, no Google AdSense scripts or ad cookies are loaded. When Google AdSense is enabled later with a verified publisher account, Google may place standard advertising and measurement cookies subject to your browser controls and Google ad personalization settings.
             </p>
           </section>
         </div>

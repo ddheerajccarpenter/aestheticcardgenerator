@@ -4,7 +4,8 @@ import { PREMIUM_SIGNATURE_TEMPLATES } from '../data/premiumTemplates';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 import { LazyTemplateCard } from '../components/LazyTemplateCard';
 import { getTemplateAspectRatio } from '../utils/templateAspectRatio';
-import { updatePageSEO } from '../utils/seo';
+import { PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
+import { AdSlot } from '../components/AdSlot';
 import type { CardTemplate } from '../types/card';
 
 export interface PremiumViewProps {
@@ -46,11 +47,34 @@ export const PremiumView: React.FC<PremiumViewProps> = ({
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Signature Studio Collection (100% Free) — Aesthetic Card Generator',
+      title: 'Signature Studio Collection (100% Free) - Aesthetic Card Generator',
       description:
         'Explore our 14 flagship layered card designs: chromatic light-leaks, Swiss refraction posters, gold-foil engravings, and tactile lettering. Free to customize and export.',
       canonicalPath: '/premium',
       ogType: 'website',
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: 'Signature Free Editions',
+          url: `${PRODUCTION_DOMAIN}/premium`,
+          isAccessibleForFree: true,
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'Are Signature Edition cards really free to download?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Yes. Every card in the Signature collection is 100% free to open in Canvas Studio, edit across every layer, and download without watermarks.',
+              },
+            },
+          ],
+        },
+      ],
     });
   }, []);
 
@@ -196,6 +220,8 @@ export const PremiumView: React.FC<PremiumViewProps> = ({
           );
         })}
       </div>
+
+      <AdSlot slotId="premium-bottom-slot" format="horizontal" className="mt-10" />
     </div>
   );
 };

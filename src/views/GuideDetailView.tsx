@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import type { GuideArticle, CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
 import { GUIDE_ARTICLES } from '../data/guides';
-import { updatePageSEO } from '../utils/seo';
+import { PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
 import { AdSlot } from '../components/AdSlot';
 import {
   ChevronRight,
@@ -45,9 +45,9 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
           '@context': 'https://schema.org',
           '@type': 'BreadcrumbList',
           itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://aestheticcardstudio.com/' },
-            { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://aestheticcardstudio.com/guides' },
-            { '@type': 'ListItem', position: 3, name: guide.title, item: `https://aestheticcardstudio.com${guide.path}` },
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${PRODUCTION_DOMAIN}/` },
+            { '@type': 'ListItem', position: 2, name: 'Guides', item: `${PRODUCTION_DOMAIN}/guides` },
+            { '@type': 'ListItem', position: 3, name: guide.title, item: `${PRODUCTION_DOMAIN}${guide.path}` },
           ],
         },
         {
@@ -55,12 +55,12 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
           '@type': 'Article',
           headline: guide.title,
           description: guide.description,
-          mainEntityOfPage: `https://aestheticcardstudio.com${guide.path}`,
+          mainEntityOfPage: `${PRODUCTION_DOMAIN}${guide.path}`,
           datePublished: '2026-10-01',
           publisher: {
             '@type': 'Organization',
-            name: 'Aesthetic Card Studio',
-            url: 'https://aestheticcardstudio.com/',
+            name: 'Aesthetic Card Generator',
+            url: `${PRODUCTION_DOMAIN}/`,
           },
         },
       ],

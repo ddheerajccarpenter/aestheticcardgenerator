@@ -4,6 +4,7 @@ import { BLOG_POSTS } from '../data/blog';
 import { TEMPLATE_CATEGORIES } from '../data/categories';
 import { GUIDE_ARTICLES } from '../data/guides';
 import SiteLayout from '../layouts/SiteLayout.astro';
+import { resolveRouteSeo } from '../utils/ssrSeo';
 
 export function getStaticPaths() {
   const staticRoutes = [
@@ -21,39 +22,43 @@ export function getStaticPaths() {
 }
 
 const routePath = `/${Astro.params.path ?? ''}`;
-const category = TEMPLATE_CATEGORIES.find(({ path }) => path === routePath);
-const guide = GUIDE_ARTICLES.find(({ path }) => path === routePath);
-const post = BLOG_POSTS.find(({ path }) => path === routePath);
-const staticMeta: Record<string, [string, string]> = {
-  '/create': ['Card Creator — ACG', 'Compose a quote card or identity pass in your browser.'],
-  '/canvas': ['Canvas Editor — ACG', 'Build and edit layered card designs in the local-first canvas studio.'],
-  '/bingo': ['Bingo Card Generator — ACG', 'Generate, customize, stamp, and export 4 different kinds of aesthetic bingo cards.'],
-  '/premium': ['Signature Free Editions — ACG', '14 flagship graphic card styles inspired by chromatic prism prints, Swiss refraction, and tactile foil, 100% free to edit and download.'],
-  '/templates': ['Template Library — ACG', 'Browse editable card styles and choose a starting point for your design.'],
-  '/guides': ['Design Guides — ACG', 'Practical guides to card design, typography, and export sizes.'],
-  '/blog': ['Design Notes — ACG', 'Notes on card design, typography, and the craft behind the studio.'],
-  '/about': ['About ACG', 'An independent, local-first studio for making thoughtful cards.'],
-  '/contact': ['Contact ACG', 'Get in touch with the Aesthetic Card Generator team.'],
-  '/faq': ['Frequently Asked Questions — ACG', 'Answers about templates, editing, exports, and browser storage.'],
-  '/privacy': ['Privacy — ACG', 'How the browser-based card studio handles your work and local files.'],
-  '/terms': ['Terms — ACG', 'Terms for using the Aesthetic Card Generator.'],
-  '/cookies': ['Cookies & Storage — ACG', 'Information about browser storage used by the card studio.'],
-  '/disclaimer': ['Disclaimer — ACG', 'Important information about templates and generated card content.'],
-  '/accessibility': ['Accessibility — ACG', 'Accessibility information and ways to report an issue.'],
-  '/credits': ['Credits — ACG', 'Credits for the tools, fonts, and resources used in the studio.'],
-  '/404': ['Page Not Found — ACG', 'The page could not be found. Return to the ACG gallery to continue.'],
-};
-const [title, description] = category
-  ? [category.metaTitle, category.metaDescription]
-  : guide
-    ? [guide.metaTitle, guide.metaDescription]
-    : post
-      ? [post.metaTitle, post.metaDescription]
-      : staticMeta[routePath] ?? ['Aesthetic Card Generator', 'A local-first studio for making editorial cards and original designs.'];
+const seo = resolveRouteSeo(routePath);
 ---
 
-<SiteLayout title={title} description={description} path={routePath}>
+<SiteLayout
+  title={seo.title}
+  description={seo.description}
+  path={routePath}
+  ogType={seo.ogType}
+  robots={seo.robots}
+  structuredData={seo.structuredData}
+>
   <App client:only="react">
-    <div slot="fallback" class="acg-boot" role="status">Opening the studio…</div>
+    <main slot="fallback" class="mx-auto max-w-4xl px-5 py-12 text-[var(--app-text-primary)]">
+      <p class="text-xs font-mono uppercase tracking-[0.16em] text-[var(--app-accent)]">{seo.fallback.eyebrow}</p>
+      <h1 class="mt-3 text-3xl font-extrabold tracking-tight">{seo.fallback.heading}</h1>
+      <p class="mt-4 text-sm leading-relaxed text-[var(--app-text-secondary)]">{seo.fallback.lead}</p>
+      {seo.fallback.paragraphs.map((p) => (
+        <p class="mt-3 text-sm leading-relaxed text-[var(--app-text-secondary)]">{p}</p>
+      ))}
+      {seo.fallback.qaItems && (
+        <section class="mt-8 space-y-4">
+          <h2 class="text-lg font-bold">Frequently Asked Questions</h2>
+          {seo.fallback.qaItems.map((item) => (
+            <article class="rounded-xl border border-[var(--app-border-subtle)] p-4">
+              <h3 class="text-sm font-semibold">{item.q}</h3>
+              <p class="mt-1 text-xs leading-relaxed text-[var(--app-text-secondary)]">{item.a}</p>
+            </article>
+          ))}
+        </section>
+      )}
+      <nav aria-label="Studio navigation" class="mt-8 flex flex-wrap gap-3 text-xs font-semibold">
+        {seo.fallback.links.map((link) => (
+          <a href={link.href} class="underline decoration-[var(--app-border-strong)] underline-offset-4">
+            {link.label}
+          </a>
+        ))}
+      </nav>
+    </main>
   </App>
 </SiteLayout>

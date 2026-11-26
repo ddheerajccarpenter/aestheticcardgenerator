@@ -9,7 +9,8 @@ import {
 } from '../data/bingoPresets';
 import { getBrandedExportFilename, triggerBrandedBlobDownload } from '../engines/brandedExportAndThreePng';
 import { dataUrlToBlob } from '../services/imageSecurity';
-import { updatePageSEO } from '../utils/seo';
+import { PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
+import { AdSlot } from '../components/AdSlot';
 
 interface BingoViewProps {
   theme?: 'dark' | 'light';
@@ -33,10 +34,18 @@ export const BingoView: React.FC<BingoViewProps> = () => {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Bingo Card Generator — ACG',
+      title: 'Free Aesthetic Bingo Card Generator (5x5 Printable & PNG) - ACG',
       description: 'Generate, customize, stamp, and export 4 different kinds of aesthetic bingo cards in your browser.',
       canonicalPath: '/bingo',
       ogType: 'website',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        name: 'Aesthetic Bingo Card Generator',
+        url: `${PRODUCTION_DOMAIN}/bingo`,
+        applicationCategory: 'DesignApplication',
+        isAccessibleForFree: true,
+      },
     });
   }, []);
 
@@ -357,6 +366,9 @@ export const BingoView: React.FC<BingoViewProps> = () => {
             </div>
           </div>
         </section>
+      </div>
+      <div className="mx-auto max-w-6xl px-3 sm:px-6">
+        <AdSlot slotId="bingo-bottom-slot" format="horizontal" />
       </div>
     </div>
   );

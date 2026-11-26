@@ -1,0 +1,3 @@
+# Google AdSense Authorized Digital Sellers
+# Uncomment and replace ca-pub-0000000000000000 with your real Publisher ID before enabling ads in src/components/AdSlot.tsx
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

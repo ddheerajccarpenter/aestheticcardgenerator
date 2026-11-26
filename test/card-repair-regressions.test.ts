@@ -258,3 +258,44 @@ test('responsive sitewide UI prevents tablet/mobile header overflow and closes h
   const blogView = fs.readFileSync(path.join(SRC_DIR, 'views', 'BlogView.tsx'), 'utf8');
   assert.ok(blogView.includes('flex-wrap items-center gap-2'));
 });
+
+test('phone UX menu drawer, 44px touch targets, and companion minimized pill geometry', () => {
+  const header = fs.readFileSync(path.join(SRC_DIR, 'components', 'Header.tsx'), 'utf8');
+  assert.ok(header.includes('mobile-nav-drawer'), 'Header must provide mobile navigation drawer');
+  assert.ok(header.includes('min-h-[44px]'), 'Mobile nav links must meet 44px touch height');
+
+  const creator = fs.readFileSync(path.join(SRC_DIR, 'views', 'CreatorView.tsx'), 'utf8');
+  assert.ok(creator.includes('min-h-[44px] py-2'), 'CreatorView phone segment tabs must meet 44px touch height');
+
+  const companion = fs.readFileSync(path.join(SRC_DIR, 'components', 'StudioCompanion.tsx'), 'utf8');
+  assert.ok(companion.includes('h-11 w-11 items-center justify-center rounded-full'), 'StudioCompanion minimized button must stay compact 44x44 circle');
+  assert.ok(!companion.includes('>{currentMeta.name}</span>'), 'Minimized toggle must not widen past circle hitbox with text label');
+});
+
+test('SEO, GEO, AEO, and AdSense readiness configuration & built SSR output', () => {
+  const rootDir = process.cwd();
+  const seoSrc = fs.readFileSync(path.join(SRC_DIR, 'utils', 'seo.ts'), 'utf8');
+  assert.ok(seoSrc.includes('https://aestheticcardgenerator.pages.dev'));
+  assert.ok(!seoSrc.includes('aestheticcardstudio.com'));
+
+  const llmsTxt = fs.readFileSync(path.join(rootDir, 'public', 'llms.txt'), 'utf8');
+  assert.ok(llmsTxt.includes('https://aestheticcardgenerator.pages.dev'));
+
+  const adsTxt = fs.readFileSync(path.join(rootDir, 'public', 'ads.txt'), 'utf8');
+  assert.ok(adsTxt.includes('f08c47fec0942fa0'));
+
+  const headers = fs.readFileSync(path.join(rootDir, 'public', '_headers'), 'utf8');
+  assert.ok(headers.includes('pagead2.googlesyndication.com'));
+  assert.ok(headers.includes('/ads.txt'));
+
+  const distIndex = path.join(rootDir, 'dist', 'index.html');
+  const distFaq = path.join(rootDir, 'dist', 'faq', 'index.html');
+  if (fs.existsSync(distIndex) && fs.existsSync(distFaq)) {
+    const indexHtml = fs.readFileSync(distIndex, 'utf8');
+    const faqHtml = fs.readFileSync(distFaq, 'utf8');
+    assert.ok(indexHtml.includes('id="seo-jsonld"'), 'Home static HTML must embed JSON-LD schema');
+    assert.ok(indexHtml.includes('"@type":"FAQPage"'), 'Home static HTML must include FAQPage schema for AEO');
+    assert.ok(!indexHtml.includes('Opening the studio'), 'Home static fallback must provide semantic content instead of stub text');
+    assert.ok(faqHtml.includes('"@type":"FAQPage"'), 'FAQ static HTML must embed FAQPage schema');
+  }
+});

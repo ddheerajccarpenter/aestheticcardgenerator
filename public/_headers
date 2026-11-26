@@ -4,7 +4,7 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data: blob:; img-src 'self' data: blob: https:; connect-src 'self' https://openlibrary.org https://covers.openlibrary.org https://itunes.apple.com https://*.mzstatic.com data: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://fundingchoicesmessages.google.com https://ep2.adtrafficquality.google https://www.googletagservices.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.cdnfonts.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://fonts.cdnfonts.com https://unpkg.com data: blob:; img-src 'self' data: blob: https:; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google https://fundingchoicesmessages.google.com; connect-src 'self' https://openlibrary.org https://covers.openlibrary.org https://itunes.apple.com https://*.mzstatic.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google https://fundingchoicesmessages.google.com data: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
 
 # Cache hashed build assets for 1 year with immutable tag on Cloudflare Edge
 /_astro/*
@@ -27,4 +27,12 @@
 
 /robots.txt
   Content-Type: text/plain
+  Cache-Control: public, max-age=86400, stale-while-revalidate=3600
+
+/ads.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=86400, stale-while-revalidate=3600
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=86400, stale-while-revalidate=3600

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import type { CategoryMeta, CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
-import { updatePageSEO } from '../utils/seo';
+import { PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
 import { AdSlot } from '../components/AdSlot';
 import {
   ArrowRight,
@@ -48,19 +48,19 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
             '@type': 'ListItem',
             position: 1,
             name: 'Home',
-            item: 'https://aestheticcardstudio.com/',
+            item: `${PRODUCTION_DOMAIN}/`,
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: 'Templates',
-            item: 'https://aestheticcardstudio.com/templates',
+            item: `${PRODUCTION_DOMAIN}/templates`,
           },
           {
             '@type': 'ListItem',
             position: 3,
             name: category.title,
-            item: `https://aestheticcardstudio.com${category.path}`,
+            item: `${PRODUCTION_DOMAIN}${category.path}`,
           },
         ],
       },

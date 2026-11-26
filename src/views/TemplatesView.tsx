@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import type { CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
-import { updatePageSEO } from '../utils/seo';
+import { PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
 import {
   Search,
   X,
@@ -15,6 +15,7 @@ import {
 import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
 import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
+import { AdSlot } from '../components/AdSlot';
 import { getTemplateAspectRatio } from '../utils/templateAspectRatio';
 import { LazyTemplateCard } from '../components/LazyTemplateCard';
 import { getTemplateAmbientTones } from '../utils/templateAmbient';
@@ -79,8 +80,8 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://aestheticcardstudio.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Templates', item: 'https://aestheticcardstudio.com/templates' },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${PRODUCTION_DOMAIN}/` },
+          { '@type': 'ListItem', position: 2, name: 'Templates', item: `${PRODUCTION_DOMAIN}/templates` },
         ],
       },
     });
@@ -379,7 +380,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
           </div>
         )}
 
-
+        <AdSlot slotId="templates-bottom-slot" format="horizontal" />
       </div>
 
       {/* Floating Comparison Dock */}

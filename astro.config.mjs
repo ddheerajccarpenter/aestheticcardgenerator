@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://aestheticcardstudio.com',
+  site: 'https://aestheticcardgenerator.pages.dev',
   output: 'static',
   integrations: [react()],
   vite: {

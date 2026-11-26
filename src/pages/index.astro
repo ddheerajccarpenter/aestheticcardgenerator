@@ -1,14 +1,45 @@
 ---
 import App from '../App';
 import SiteLayout from '../layouts/SiteLayout.astro';
+import { resolveRouteSeo } from '../utils/ssrSeo';
+
+const seo = resolveRouteSeo('/');
 ---
 
 <SiteLayout
-  title="ACG — Aesthetic Card Generator"
-  description="A quiet, browser-based studio for making editorial cards, identity passes, and original designs."
+  title={seo.title}
+  description={seo.description}
   path="/"
+  ogType={seo.ogType}
+  robots={seo.robots}
+  structuredData={seo.structuredData}
 >
   <App client:only="react">
-    <div slot="fallback" class="acg-boot" role="status">Opening the studio…</div>
+    <main slot="fallback" class="mx-auto max-w-4xl px-5 py-12 text-[var(--app-text-primary)]">
+      <p class="text-xs font-mono uppercase tracking-[0.16em] text-[var(--app-accent)]">{seo.fallback.eyebrow}</p>
+      <h1 class="mt-3 text-3xl font-extrabold tracking-tight">{seo.fallback.heading}</h1>
+      <p class="mt-4 text-sm leading-relaxed text-[var(--app-text-secondary)]">{seo.fallback.lead}</p>
+      {seo.fallback.paragraphs.map((p) => (
+        <p class="mt-3 text-sm leading-relaxed text-[var(--app-text-secondary)]">{p}</p>
+      ))}
+      {seo.fallback.qaItems && (
+        <section class="mt-8 space-y-4">
+          <h2 class="text-lg font-bold">Quick Answers</h2>
+          {seo.fallback.qaItems.map((item) => (
+            <article class="rounded-xl border border-[var(--app-border-subtle)] p-4">
+              <h3 class="text-sm font-semibold">{item.q}</h3>
+              <p class="mt-1 text-xs leading-relaxed text-[var(--app-text-secondary)]">{item.a}</p>
+            </article>
+          ))}
+        </section>
+      )}
+      <nav aria-label="Studio navigation" class="mt-8 flex flex-wrap gap-3 text-xs font-semibold">
+        {seo.fallback.links.map((link) => (
+          <a href={link.href} class="underline decoration-[var(--app-border-strong)] underline-offset-4">
+            {link.label}
+          </a>
+        ))}
+      </nav>
+    </main>
   </App>
 </SiteLayout>

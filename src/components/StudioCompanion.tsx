@@ -177,11 +177,15 @@ export const StudioCompanion: React.FC = () => {
       } catch {}
     }
 
-    // In desktop Canvas Studio, default to bottom-left rail under +Add so right Inspector stays clear
-    const isDesktopCanvas = window.location.pathname.startsWith('/canvas') && window.innerWidth >= 1024;
+    // Dock bottom-left on Canvas Studio (and mobile Create Studio) so right-side tools/inspectors stay clear
+    const path = window.location.pathname;
+    const isDesktopCanvas = path.startsWith('/canvas') && window.innerWidth >= 1024;
+    const isMobileStudio = (path.startsWith('/canvas') || path.startsWith('/create')) && window.innerWidth < 1024;
     const defaultX = isDesktopCanvas
       ? 10
-      : window.innerWidth - size - (window.innerWidth >= 768 ? 20 : 12);
+      : isMobileStudio
+        ? 12
+        : window.innerWidth - size - (window.innerWidth >= 768 ? 20 : 12);
     const defaultY = window.innerHeight - size - (window.innerWidth >= 768 ? 16 : 84);
     setPosition(clampCoordinates(defaultX, defaultY));
   }, [clampCoordinates, getCompanionSize]);
@@ -667,12 +671,11 @@ export const StudioCompanion: React.FC = () => {
           <button
             type="button"
             onClick={() => toggleMinimize(false)}
-            className="flex h-10 items-center gap-1.5 px-2.5 rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 shadow-lg hover:border-[var(--app-accent)]/50 text-xs text-[var(--app-text)] transition-transform hover:scale-105 cursor-pointer"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 shadow-lg hover:border-[var(--app-accent)]/50 text-base text-[var(--app-text)] transition-transform hover:scale-105 cursor-pointer"
             title={`Expand ${currentMeta.name} companion`}
             aria-label={`Open ${currentMeta.name} companion`}
           >
-            <span className="text-sm leading-none">{currentMeta.badge}</span>
-            <span className="hidden sm:inline font-medium text-[11px]">{currentMeta.name}</span>
+            <span className="leading-none" aria-hidden="true">{currentMeta.badge}</span>
           </button>
         ) : (
           <div className="relative">

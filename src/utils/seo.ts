@@ -3,16 +3,72 @@ export interface SEOProps {
   description: string;
   canonicalPath?: string;
   ogType?: 'website' | 'article';
+  robots?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const PRODUCTION_DOMAIN = 'https://aestheticcardstudio.com';
+export const PRODUCTION_DOMAIN = 'https://aestheticcardgenerator.pages.dev';
+
+export const HOME_AEO_FAQ = [
+  {
+    q: 'Is Aesthetic Card Generator free with no watermarks?',
+    a: 'Yes. Every template in the Gallery, Template Library, Bingo Studio, Quick Creator, Canvas Studio, and Signature Free Editions is 100% free to customize and export without watermarks or login walls.',
+  },
+  {
+    q: 'What export formats and resolutions are supported?',
+    a: 'Canvas Studio exports PNG (1x, 2x Retina, 3x Print), JPEG, and WebP. Quick Card Maker exports 2x high-DPI PNG images sized for 1:1, 4:5, 9:16 Stories, and 16:9 widescreen layouts.',
+  },
+  {
+    q: 'Are my photos and quote drafts uploaded to a server?',
+    a: 'No. Editing and image rasterization run locally inside your browser. Drafts stay in localStorage and IndexedDB on your own device.',
+  },
+  {
+    q: 'Which template should I start with for layered photo IDs or tickets?',
+    a: 'Choose any card under ID Pass, Signature Editions, or Aesthetic ID Cards to replace photos, dates, serial numbers, and typography layer by layer.',
+  },
+];
+
+export const SITE_FAQ_ITEMS = [
+  {
+    q: 'Is Aesthetic Card Generator completely free with no watermarks?',
+    a: 'Yes. All base gallery templates, all 14 Signature Editions, Bingo Studio cards, Quick Creator designs, and Canvas Studio exports download 100% free with zero watermarks or login requirements.',
+  },
+  {
+    q: 'Does this app send my text or photos to any server?',
+    a: 'Never. The generator runs 100% on client-side browser technology. Your words, custom fonts, and exported cards never touch a database or external API.',
+  },
+  {
+    q: 'Can I customize the typography, margins, and paper textures?',
+    a: 'Yes. The Studio Editor provides full granular control over font families (Newsreader, Playfair, Inter, JetBrains Mono), optical font sizes, alignment, padding, border radius, and analog film-grain layers.',
+  },
+  {
+    q: 'What resolution are the downloaded cards?',
+    a: 'Cards are exported at crisp 2x Retina resolution (up to 2160x2160 or 2160x2700 pixels depending on aspect ratio, and up to 3x PNG/JPEG/WebP in Canvas Studio), ready for Instagram posts, Stories, X, and print.',
+  },
+  {
+    q: 'Can I export in different aspect ratios?',
+    a: 'Yes, you can toggle between 1:1 Square, 4:5 Social Portrait, 9:16 Story/Reel, and 16:9 Landscape with a single click, and all typography reflows proportionally.',
+  },
+  {
+    q: 'How does draft saving work if there is no database?',
+    a: 'Your card state is stored locally in your browser storage (localStorage and IndexedDB). When you reload the page, your in-progress card restores locally without sending your work to a server.',
+  },
+  {
+    q: 'Can I use these cards for commercial projects and book covers?',
+    a: 'Yes. The cards you generate with your own text are yours to publish. All built-in Google and bundled typefaces use open licenses (such as SIL Open Font License).',
+  },
+  {
+    q: 'Why does the exported image look sharper than my screen preview?',
+    a: 'During export, the rendering engine rasterizes your card at high pixel density (pixelRatio 2x or 3x) to match high-DPI mobile screens so hairline borders and serifs stay sharp.',
+  },
+];
 
 export function updatePageSEO({
   title,
   description,
   canonicalPath = '',
   ogType = 'website',
+  robots = 'index, follow, max-image-preview:large, max-snippet:-1',
   jsonLd,
 }: SEOProps): void {
   // 1. Update Document Title
@@ -29,13 +85,14 @@ export function updatePageSEO({
     element.setAttribute('content', content);
   };
 
-  // 3. Description
+  // 3. Description & Robots
   setMetaTag('name', 'description', description);
+  setMetaTag('name', 'robots', robots);
 
   // 4. Canonical URL
   const cleanPath = canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`;
   const fullCanonicalUrl = `${PRODUCTION_DOMAIN}${cleanPath === '/' ? '' : cleanPath}`;
-  
+
   let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
   if (!canonicalLink) {
     canonicalLink = document.createElement('link');
@@ -49,7 +106,7 @@ export function updatePageSEO({
   setMetaTag('property', 'og:description', description);
   setMetaTag('property', 'og:url', fullCanonicalUrl);
   setMetaTag('property', 'og:type', ogType);
-  setMetaTag('property', 'og:site_name', 'Aesthetic Text-to-Card Studio');
+  setMetaTag('property', 'og:site_name', 'Aesthetic Card Generator');
 
   // 6. Twitter Cards
   setMetaTag('name', 'twitter:card', 'summary_large_image');
@@ -57,8 +114,8 @@ export function updatePageSEO({
   setMetaTag('name', 'twitter:description', description);
 
   // 7. Structured Data (JSON-LD)
-  let scriptTag = document.getElementById('seo-jsonld') as HTMLScriptElement | null;
   if (jsonLd) {
+    let scriptTag = document.getElementById('seo-jsonld') as HTMLScriptElement | null;
     if (!scriptTag) {
       scriptTag = document.createElement('script');
       scriptTag.id = 'seo-jsonld';
@@ -66,7 +123,5 @@ export function updatePageSEO({
       document.head.appendChild(scriptTag);
     }
     scriptTag.textContent = JSON.stringify(jsonLd);
-  } else if (scriptTag) {
-    scriptTag.remove();
   }
 }

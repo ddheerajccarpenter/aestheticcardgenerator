@@ -1,0 +1,33 @@
+# Aesthetic Card Generator (ACG Studio)
+
+> Free, browser-based studio for designing and exporting aesthetic quote cards, Swiss modernist ID passes, chromatic light-leak posters, ticket stubs, and printable 5x5 bingo cards with zero watermarks or signups.
+
+- Canonical URL: https://aestheticcardgenerator.pages.dev
+- Pricing: 100% Free across all base templates, 14 Signature Editions, Bingo Studio, Quick Creator, and layered Canvas Studio
+- Privacy Architecture: Client-side processing in browser (`localStorage`, `sessionStorage`, `IndexedDB`); user text and uploaded photos are never transmitted to an ACG server
+- Export Formats: PNG (1x, 2x Retina, 3x Print), JPEG, and WebP
+
+## Core Studio Tools
+
+- [Design Gallery](https://aestheticcardgenerator.pages.dev/): Browse 90 editable card templates across editorial quote cards, minimalist posters, and identity passes.
+- [Signature Editions (Free)](https://aestheticcardgenerator.pages.dev/premium): 14 flagship layered templates inspired by chromatic prism prints, Swiss refraction glass, gold-foil engravings, and analog paper notes.
+- [Template Library](https://aestheticcardgenerator.pages.dev/templates): Filter and compare cards across categories (`quote-cards`, `journal-cards`, `minimalist-cards`, `book-quotes`, `vintage-cards`, `social-cards`, `aesthetic-id-cards`, `music-cards`).
+- [Canvas Studio](https://aestheticcardgenerator.pages.dev/canvas): Layer-based vector and photo editor with undo/redo, custom fonts, opacity, blend modes, and multi-format download.
+- [Quick Card Maker](https://aestheticcardgenerator.pages.dev/create): Rapid quote card composer with curated paper palettes, highlights, film grain, and 3D preview.
+- [Bingo Studio](https://aestheticcardgenerator.pages.dev/bingo): Interactive 5x5 bingo card generator in 4 presets with custom stamps and PNG export.
+
+## Editorial Guides & Articles
+
+- [Design Guides](https://aestheticcardgenerator.pages.dev/guides): Aspect ratio specs, typography rules, quote layout workflows, and 2x Retina export checklists.
+- [Studio Blog](https://aestheticcardgenerator.pages.dev/blog): Deep dives into archival paper palettes, serif pairings, Bookstagram cards, and local-first privacy.
+- [FAQ](https://aestheticcardgenerator.pages.dev/faq): Direct answers about free exports, browser storage, font licenses, and aspect ratios.
+
+## Policies & Contact
+
+- [About](https://aestheticcardgenerator.pages.dev/about)
+- [Privacy Policy](https://aestheticcardgenerator.pages.dev/privacy)
+- [Cookies & Storage](https://aestheticcardgenerator.pages.dev/cookies)
+- [Terms of Use](https://aestheticcardgenerator.pages.dev/terms)
+- [Disclaimer](https://aestheticcardgenerator.pages.dev/disclaimer)
+- [Accessibility](https://aestheticcardgenerator.pages.dev/accessibility)
+- [Contact](https://aestheticcardgenerator.pages.dev/contact)
