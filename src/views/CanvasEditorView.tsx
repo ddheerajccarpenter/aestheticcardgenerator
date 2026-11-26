@@ -180,7 +180,6 @@ const isDocumentCollapsed = (d: CanvasDocument): boolean => {
 
 export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   theme = 'dark',
-  onNavigateHome,
   onEditingSheetChange,
   onToggleTheme,
 }) => {

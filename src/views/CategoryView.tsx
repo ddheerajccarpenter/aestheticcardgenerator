@@ -22,8 +22,6 @@ interface CategoryViewProps {
 
 export const CategoryView: React.FC<CategoryViewProps> = ({
   category,
-  onNavigate,
-  onOpenEditorWithTemplate,
 }) => {
 
   // Find matching templates for this category

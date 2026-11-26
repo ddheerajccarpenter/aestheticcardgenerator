@@ -297,7 +297,7 @@ test('SEO, GEO, AEO, and AdSense readiness configuration & built SSR output', ()
     assert.ok(indexHtml.includes('"@type":"FAQPage"'), 'Home static HTML must include FAQPage schema for AEO');
     assert.ok(!indexHtml.includes('Opening the studio'), 'Home static fallback must provide semantic content instead of stub text');
     assert.ok(faqHtml.includes('"@type":"FAQPage"'), 'FAQ static HTML must embed FAQPage schema');
-    const cardPage = path.join(rootDir, 'dist', 'card', 'tokyo-matcha-studio', 'index.html');
+    const cardPage = path.join(rootDir, 'dist', 'card', 'poster-pinterest-matcha', 'index.html');
     assert.ok(fs.existsSync(cardPage), 'Every card must build its own /card/<id> page');
   }
 

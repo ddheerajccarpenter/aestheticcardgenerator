@@ -143,19 +143,15 @@ export const StudioCompanion: React.FC = () => {
   }, [isMinimized]);
 
   // Strict boundary limit: cannot be dragged over top navbar or behind bottom nav / canvas tablet bottom bar
-  const hasBottomToolbar = useCallback(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth < 768 || (window.location.pathname.startsWith('/canvas') && window.innerWidth < 1024);
-  }, []);
-
   const clampCoordinates = useCallback((x: number, y: number): Position => {
     if (typeof window === 'undefined') return { x, y };
     const size = getCompanionSize();
     // Top boundary constraint: never overlap the top header/navbar
     const minY = 72;
     // Bottom boundary constraint: stay above mobile bottom navigation bar and canvas <1024px bottom bar
-    const bottomSafety = hasBottomToolbar() ? 84 : 20;
-    const maxY = Math.max(minY, window.innerHeight - size - bottomSafety);
+    const bottomSafety = window.innerWidth < 768 ? 84 : 20;
+    const effectiveBottomSafety = window.location.pathname.startsWith('/canvas') && window.innerWidth < 1024 ? 84 : bottomSafety;
+    const maxY = Math.max(minY, window.innerHeight - size - effectiveBottomSafety);
 
     // Left and right boundary constraints
     const minX = 12;
@@ -165,7 +161,7 @@ export const StudioCompanion: React.FC = () => {
       x: Math.min(Math.max(minX, x), maxX),
       y: Math.min(Math.max(minY, y), maxY),
     };
-  }, [getCompanionSize, hasBottomToolbar]);
+  }, [getCompanionSize]);
 
   // Load saved position on mount, or initialize non-occluding default corner
   useEffect(() => {
@@ -186,15 +182,15 @@ export const StudioCompanion: React.FC = () => {
     const path = window.location.pathname;
     const isDesktopCanvas = path.startsWith('/canvas') && window.innerWidth >= 1024;
     const isMobileStudio = (path.startsWith('/canvas') || path.startsWith('/create')) && window.innerWidth < 1024;
-    const bottomSafety = hasBottomToolbar() ? 84 : 16;
+    const initBottomSafety = window.innerWidth < 768 || (path.startsWith('/canvas') && window.innerWidth < 1024) ? 84 : 16;
     const defaultX = isDesktopCanvas
       ? 10
       : isMobileStudio
         ? 12
         : window.innerWidth - size - (window.innerWidth >= 768 ? 20 : 12);
-    const defaultY = window.innerHeight - size - bottomSafety;
+    const defaultY = window.innerHeight - size - initBottomSafety;
     setPosition(clampCoordinates(defaultX, defaultY));
-  }, [clampCoordinates, getCompanionSize, hasBottomToolbar]);
+  }, [clampCoordinates, getCompanionSize]);
 
   // Keep within bounds on window resize or orientation change
   useEffect(() => {

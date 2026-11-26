@@ -203,7 +203,6 @@ interface BlogDetailViewProps extends BlogViewBaseProps {
 
 export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
   blog,
-  onOpenEditorWithTemplate,
 }) => {
 
   useEffect(() => {

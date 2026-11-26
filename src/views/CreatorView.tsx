@@ -197,7 +197,6 @@ const getTemplateAvatar = (template?: CardTemplate) =>
 export const CreatorView: React.FC<CreatorViewProps> = ({
   initialTemplate,
   theme = 'dark',
-  onNavigateHome,
   onToggleTheme,
 }) => {
   const isLight = theme === 'light';
