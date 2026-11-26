@@ -7,7 +7,7 @@ import SiteLayout from '../layouts/SiteLayout.astro';
 
 export function getStaticPaths() {
   const staticRoutes = [
-    'create', 'canvas', 'bingo', 'templates', 'guides', 'blog', 'about', 'contact', 'faq',
+    'create', 'canvas', 'bingo', 'premium', 'templates', 'guides', 'blog', 'about', 'contact', 'faq',
     'privacy', 'terms', 'cookies', 'disclaimer', 'accessibility', 'credits',
   ];
   const routes = [
@@ -28,6 +28,7 @@ const staticMeta: Record<string, [string, string]> = {
   '/create': ['Card Creator — ACG', 'Compose a quote card or identity pass in your browser.'],
   '/canvas': ['Canvas Editor — ACG', 'Build and edit layered card designs in the local-first canvas studio.'],
   '/bingo': ['Bingo Card Generator — ACG', 'Generate, customize, stamp, and export 4 different kinds of aesthetic bingo cards.'],
+  '/premium': ['Signature Free Editions — ACG', '14 flagship graphic card styles inspired by chromatic prism prints, Swiss refraction, and tactile foil, 100% free to edit and download.'],
   '/templates': ['Template Library — ACG', 'Browse editable card styles and choose a starting point for your design.'],
   '/guides': ['Design Guides — ACG', 'Practical guides to card design, typography, and export sizes.'],
   '/blog': ['Design Notes — ACG', 'Notes on card design, typography, and the craft behind the studio.'],

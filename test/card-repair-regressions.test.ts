@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { PRESET_TEMPLATES } from '../src/data/templates';
+import { PREMIUM_ART_ASSETS, PREMIUM_SIGNATURE_TEMPLATES } from '../src/data/premiumTemplates';
 import { ASSET_POSTER_ART } from '../src/data/canvasAssets';
 import { BLOG_POSTS } from '../src/data/blog';
 import {
@@ -15,11 +16,11 @@ import { sanitizeAndValidateCanvasDocument } from '../src/services/schemaValidat
 
 const SRC_DIR = path.resolve(process.cwd(), 'src');
 
-test('Catalogue IDs are unique (76 templates) and guide/blog references resolve', () => {
+test('Catalogue IDs are unique (90 templates) and guide/blog references resolve', () => {
   const ids = PRESET_TEMPLATES.map((t) => t.id);
   const uniqueIds = new Set(ids);
   assert.equal(uniqueIds.size, PRESET_TEMPLATES.length);
-  assert.equal(PRESET_TEMPLATES.length, 76);
+  assert.equal(PRESET_TEMPLATES.length, 90);
 
   // Duplicate display name check preserves distinct IDs/categories
   const licensePair = PRESET_TEMPLATES.filter((t) => t.title === 'Permanent License of Travel');
@@ -206,4 +207,24 @@ test('Editor & export code isolate UI theme colors and embed web fonts safely', 
   assert.ok(creatorCode.includes('getContrastInkForBg'));
   assert.ok(creatorCode.includes('buildSafeFontEmbedCSS'));
   assert.ok(!creatorCode.includes('skipFonts: true'));
+});
+
+test('/premium signature editions (14 cards) are 100% free, editable, and free of baked SVG text', () => {
+  assert.equal(PREMIUM_SIGNATURE_TEMPLATES.length, 14);
+
+  for (const [key, svg] of Object.entries(PREMIUM_ART_ASSETS)) {
+    assert.ok(!svg.includes('%3Ctext'), `PREMIUM_ART_ASSETS.${key} must not contain baked <text> elements`);
+  }
+
+  for (const tmpl of PREMIUM_SIGNATURE_TEMPLATES) {
+    assert.equal(tmpl.isSignature, true);
+    assert.equal(tmpl.badge, 'FREE');
+    assert.ok(PRESET_TEMPLATES.some((t) => t.id === tmpl.id), `${tmpl.id} must be in PRESET_TEMPLATES`);
+    const doc = templateToCanvasDoc(tmpl);
+    const editableTexts = doc.objects.filter((o) => o.type === 'text');
+    assert.ok(editableTexts.length >= 1, `${tmpl.id} must provide editable text layers`);
+  }
+
+  const premiumView = fs.readFileSync(path.join(SRC_DIR, 'views', 'PremiumView.tsx'), 'utf8');
+  assert.ok(!/\$\d+/.test(premiumView) && !premiumView.includes('Subscribe') && !premiumView.includes('Paywall') && !premiumView.includes('Upgrade to Pro'));
 });

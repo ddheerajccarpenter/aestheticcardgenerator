@@ -4,7 +4,7 @@ import { PRESET_TEMPLATES } from '../src/data/templates';
 import { getTemplateAmbientTones } from '../src/utils/templateAmbient';
 import { validateFontFile } from '../src/services/customFontManager';
 
-console.log('--- Running Ambient Atmosphere, Font Engine & 76 Templates Audit ---');
+console.log('--- Running Ambient Atmosphere, Font Engine & 90 Templates Audit ---');
 
 // 1. Ambient Color Normalization
 const testColors = ['#ff0000', '#00ff00', '#0000ff', '#18191c', '#f1ebdd', '#c69d78'];
@@ -23,8 +23,8 @@ assert.strictEqual(DEFAULT_DARK_AMBIENT.primary, '#c69d78');
 assert.strictEqual(DEFAULT_LIGHT_AMBIENT.primary, '#6f4637');
 console.log('✓ Default dark and light ambient palettes verified.');
 
-// 3. 76 Templates Full Audit
-assert.strictEqual(PRESET_TEMPLATES.length, 76, `Expected 76 templates, found ${PRESET_TEMPLATES.length}`);
+// 3. 90 Templates Full Audit
+assert.strictEqual(PRESET_TEMPLATES.length, 90, `Expected 90 templates, found ${PRESET_TEMPLATES.length}`);
 
 const seenIds = new Set<string>();
 for (const tmpl of PRESET_TEMPLATES) {

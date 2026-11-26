@@ -1,6 +1,7 @@
 import type { AspectRatioPreset, CardTheme, CardTemplate } from '../types/card';
 import { STUDIO_TEMPLATES } from './studioTemplates';
 import { EXTENDED_AESTHETIC_TEMPLATES } from './extendedTemplates';
+import { PREMIUM_SIGNATURE_TEMPLATES } from './premiumTemplates';
 
 export const ASPECT_RATIOS: AspectRatioPreset[] = [
   { id: '1:1', label: 'Square (1:1)', ratio: '1:1', width: 1080, height: 1080, icon: 'crop_square' },
@@ -536,6 +537,7 @@ export const REFERENCE_SHOWCASE_CARDS: CardTemplate[] = [
 export const PRESET_TEMPLATES: CardTemplate[] = [
   ...STUDIO_TEMPLATES,
   ...REFERENCE_SHOWCASE_CARDS,
+  ...PREMIUM_SIGNATURE_TEMPLATES,
   ...EXTENDED_AESTHETIC_TEMPLATES,
   ...ORIGINAL_TEMPLATES,
 ];

@@ -340,7 +340,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
     let isMounted = true;
     const timer = setTimeout(async () => {
       if (!cardRef.current) return;
-      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts);
+      const docText = `${quote}${author}${tag}${idName}${idRole}${idClearance}`;
+      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts, undefined, docText);
       toPng(cardRef.current, { pixelRatio: 1.5, fontEmbedCSS }).then((dataUrl) => {
         if (!isMounted) return;
         const img = new Image();
@@ -426,7 +427,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
       if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
-      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts);
+      const docText = `${quote}${author}${tag}${idName}${idRole}${idClearance}`;
+      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts, undefined, docText);
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 2,
         cacheBust: true,

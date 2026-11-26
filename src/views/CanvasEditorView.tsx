@@ -168,6 +168,9 @@ const CANVAS_FONT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "'VT323', monospace", label: 'VT323 (Pixel Terminal)' },
   { value: "'Caveat', cursive", label: 'Caveat (Handwritten)' },
   { value: "'Reenie Beanie', cursive", label: 'Reenie Beanie (Sketch)' },
+  { value: "'Fredoka', sans-serif", label: 'Fredoka (Groovy Bubble)' },
+  { value: "'Anton', sans-serif", label: 'Anton (Tall Condensed)' },
+  { value: "'Noto Sans Devanagari', sans-serif", label: 'Devanagari Display' },
 ];
 
 const isDocumentCollapsed = (d: CanvasDocument): boolean => {
@@ -524,10 +527,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     const timer = setTimeout(async () => {
       try {
         if (!canvasElementRef.current) return;
-        const usedFamilies = doc.objects
-          .filter((o): o is TextCanvasObject => o.type === 'text')
-          .map((o) => resolveCanvasFontFamily(o.fontFamily));
-        const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts, usedFamilies);
+        const textObjs = doc.objects.filter((o): o is TextCanvasObject => o.type === 'text');
+        const usedFamilies = textObjs.map((o) => resolveCanvasFontFamily(o.fontFamily));
+        const docText = textObjs.map((o) => o.text).join('');
+        const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts, usedFamilies, docText);
         const rawDataUrl = await toPng(canvasElementRef.current, { pixelRatio: 1.5, fontEmbedCSS });
         if (!isMounted) return;
         const img = new Image();
@@ -1503,10 +1506,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
     try {
       const node = canvasElementRef.current;
-      const usedFamilies = doc.objects
-        .filter((o): o is TextCanvasObject => o.type === 'text')
-        .map((o) => resolveCanvasFontFamily(o.fontFamily));
-      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts, usedFamilies);
+      const textObjs = doc.objects.filter((o): o is TextCanvasObject => o.type === 'text');
+      const usedFamilies = textObjs.map((o) => resolveCanvasFontFamily(o.fontFamily));
+      const docText = textObjs.map((o) => o.text).join('');
+      const fontEmbedCSS = await buildSafeFontEmbedCSS(customFonts, usedFamilies, docText);
 
       // Handle 3D Transparent PNG Export (Part V.2 & Part IX.1)
       if (format === '3d-4k' || format === '3d-8k') {
@@ -5892,7 +5895,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           <div className="flex items-center justify-between gap-2">
                             <h5 className="text-xs sm:text-sm font-bold truncate">{tmpl.title}</h5>
                             <span className="text-[10px] font-mono text-[#81786d] shrink-0">
-                              {tmpl.layoutHint === 'square'
+                              {tmpl.canvasDoc
+                                ? `${tmpl.canvasDoc.canvasWidth}×${tmpl.canvasDoc.canvasHeight}`
+                                : tmpl.layoutHint === 'square'
                                 ? '1080×1080'
                                 : tmpl.layoutHint === 'vertical'
                                 ? '640×960'

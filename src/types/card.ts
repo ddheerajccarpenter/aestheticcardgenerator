@@ -57,6 +57,7 @@ export interface CardTemplate {
   iconName: string;
   // Extended fields for richer ID-card layouts
   tags?: string[];
+  isSignature?: boolean;
   hasPhotoArea?: boolean;
   layoutHint?: 'horizontal' | 'vertical' | 'square';
   accentColor?: string;

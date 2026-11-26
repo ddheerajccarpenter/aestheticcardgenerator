@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, LayoutTemplate, Layers, Search, BookOpen, Plus, Moon, Sun, Grid3X3 } from 'lucide-react';
+import { Compass, LayoutTemplate, Layers, Search, BookOpen, Plus, Moon, Sun, Grid3X3, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   currentPath?: string;
@@ -17,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const links = [
     { label: 'Gallery', path: '/', icon: Compass, active: currentPath === '/' },
+    { label: 'Premium', path: '/premium', icon: Sparkles, active: currentPath.startsWith('/premium') },
     { label: 'Templates', path: '/templates', icon: LayoutTemplate, active: currentPath.startsWith('/templates') },
     { label: 'Canvas', path: '/canvas', icon: Layers, active: currentPath.startsWith('/canvas') },
     { label: 'Bingo', path: '/bingo', icon: Grid3X3, active: currentPath.startsWith('/bingo') },

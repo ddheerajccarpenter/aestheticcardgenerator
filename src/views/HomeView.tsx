@@ -170,6 +170,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenEditorWithTemplate }) 
             <a href="/templates" className="btn-editorial-ghost min-h-11 px-5">
               Browse templates
             </a>
+            <a href="/premium" className="btn-editorial-ghost min-h-11 px-5">
+              Signature Free
+            </a>
             <a href="/bingo" className="btn-editorial-ghost min-h-11 px-5">
               Bingo cards
             </a>

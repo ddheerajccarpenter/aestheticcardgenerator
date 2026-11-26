@@ -50,21 +50,54 @@ function extractCssFamilyName(cssText: string): string {
   return m ? normalizeFontFamilyName(m[1]) : '';
 }
 
+function unicodeRangeNeeded(cssText: string, docCodePoints: number[]): boolean {
+  const match = cssText.match(/unicode-range:\s*([^;]+)/i);
+  if (!match || docCodePoints.length === 0) return true;
+  const tokens = match[1].split(',').map((t) => t.trim().toUpperCase());
+  for (const token of tokens) {
+    if (!token.startsWith('U+')) continue;
+    const raw = token.slice(2);
+    let start = 0;
+    let end = 0;
+    if (raw.includes('?')) {
+      start = parseInt(raw.replace(/\?/g, '0'), 16);
+      end = parseInt(raw.replace(/\?/g, 'F'), 16);
+    } else if (raw.includes('-')) {
+      const [a, b] = raw.split('-');
+      start = parseInt(a, 16);
+      end = parseInt(b, 16);
+    } else {
+      start = parseInt(raw, 16);
+      end = start;
+    }
+    if (start <= 0x7f && end >= 0x20) return true;
+    for (const cp of docCodePoints) {
+      if (cp >= start && cp <= end) return true;
+    }
+  }
+  return false;
+}
+
 async function inlineCssFontUrls(cssText: string, baseHref?: string): Promise<string> {
   const matches = Array.from(cssText.matchAll(/url\((['"]?)([^)'"]+)\1\)/g));
   let output = cssText;
-  for (const match of matches) {
-    const rawUrl = match[2];
-    if (!rawUrl || rawUrl.startsWith('data:')) continue;
-    let resolvedUrl = rawUrl;
-    try {
-      resolvedUrl = new URL(rawUrl, baseHref || window.location.href).href;
-    } catch {
-      continue;
-    }
-    const dataUri = await fetchFontAsDataUri(resolvedUrl);
-    if (dataUri) {
-      output = output.replace(match[0], `url("${dataUri}")`);
+  const replacements = await Promise.all(
+    matches.map(async (match) => {
+      const rawUrl = match[2];
+      if (!rawUrl || rawUrl.startsWith('data:')) return null;
+      let resolvedUrl = rawUrl;
+      try {
+        resolvedUrl = new URL(rawUrl, baseHref || window.location.href).href;
+      } catch {
+        return null;
+      }
+      const dataUri = await fetchFontAsDataUri(resolvedUrl);
+      return dataUri ? { raw: match[0], dataUri } : null;
+    })
+  );
+  for (const item of replacements) {
+    if (item) {
+      output = output.replace(item.raw, `url("${item.dataUri}")`);
     }
   }
   return output;
@@ -76,7 +109,8 @@ async function inlineCssFontUrls(cssText: string, baseHref?: string): Promise<st
  */
 export async function buildSafeFontEmbedCSS(
   customFonts: StoredCustomFont[] = [],
-  preferredFamilies?: Iterable<string>
+  preferredFamilies?: Iterable<string>,
+  docText?: string
 ): Promise<string> {
   if (typeof document === 'undefined') return '';
   if (document.fonts?.ready) {
@@ -92,7 +126,11 @@ export async function buildSafeFontEmbedCSS(
       )
     : null;
 
-  const fontFaceBlocks: string[] = [];
+  const docCodePoints = docText
+    ? Array.from(new Set(Array.from(docText).map((ch) => ch.codePointAt(0) || 0)))
+    : [];
+
+  const matchedBlocks: Array<{ css: string; baseHref?: string }> = [];
 
   for (const sheet of Array.from(document.styleSheets)) {
     const baseHref = sheet.href || undefined;
@@ -102,7 +140,8 @@ export async function buildSafeFontEmbedCSS(
         if (rule.type !== CSSRule.FONT_FACE_RULE) continue;
         const family = extractCssFamilyName(rule.cssText);
         if (familyFilter && family && !familyFilter.has(family) && family !== 'starborn') continue;
-        fontFaceBlocks.push(await inlineCssFontUrls(rule.cssText, baseHref));
+        if (!unicodeRangeNeeded(rule.cssText, docCodePoints)) continue;
+        matchedBlocks.push({ css: rule.cssText, baseHref });
       }
     } catch {
       if (baseHref && baseHref.startsWith('https://fonts.googleapis.com')) {
@@ -117,7 +156,8 @@ export async function buildSafeFontEmbedCSS(
             for (const block of blocks) {
               const family = extractCssFamilyName(block);
               if (familyFilter && family && !familyFilter.has(family)) continue;
-              fontFaceBlocks.push(await inlineCssFontUrls(block, baseHref));
+              if (!unicodeRangeNeeded(block, docCodePoints)) continue;
+              matchedBlocks.push({ css: block, baseHref });
             }
           }
         } catch {
@@ -126,6 +166,10 @@ export async function buildSafeFontEmbedCSS(
       }
     }
   }
+
+  const fontFaceBlocks = await Promise.all(
+    matchedBlocks.map((item) => inlineCssFontUrls(item.css, item.baseHref))
+  );
 
   for (const font of customFonts) {
     const family = normalizeFontFamilyName(font.familyName);
