@@ -62,14 +62,7 @@ export const StudioCompanion: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [copiedPalette, setCopiedPalette] = useState(false);
   const [stampedCanvas, setStampedCanvas] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('acg_companion_minimized');
-      // Default to compact corner pill so interactive cards, inputs, and inspectors remain unobstructed
-      return saved !== 'false';
-    }
-    return true;
-  });
+  const [isMinimized, setIsMinimized] = useState(true);
 
   const currentMeta = COMPANION_ROSTER[0];
   const [speechText, setSpeechText] = useState(currentMeta.greeting);
@@ -125,9 +118,14 @@ export const StudioCompanion: React.FC = () => {
     };
   }, [getCompanionSize]);
 
-  // Load saved position on mount, or initialize non-occluding default corner
+  // Load saved minimization state and position on mount (SSR-safe hydration match)
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    try {
+      if (localStorage.getItem('acg_companion_minimized') === 'false') {
+        setIsMinimized(false);
+      }
+    } catch {}
     const size = getCompanionSize();
     const saved = localStorage.getItem('acg_companion_pos');
     if (saved) {

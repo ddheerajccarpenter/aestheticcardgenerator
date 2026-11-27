@@ -105,8 +105,8 @@ export function onStageReady(
 }
 
 /**
- * Editorial press word-mask reveal: words rise cleanly out of their line clip
- * so headline hierarchy reads like freshly inked type.
+ * Editorial press word settle: subtle downward ink settle while keeping SSR text
+ * immediately legible at opacity 1 (never blinks/hides visible headings on hydration).
  */
 export function revealPressWords(container: HTMLElement | null, delayOffset = 0): void {
   if (!container) return;
@@ -122,10 +122,9 @@ export function revealPressWords(container: HTMLElement | null, delayOffset = 0)
   }
 
   animate(words, {
-    y: ['108%', '0%'],
-    opacity: [0, 1],
-    duration: 560,
-    delay: stagger(55, { start: delayOffset }),
+    y: ['14%', '0%'],
+    duration: 420,
+    delay: stagger(40, { start: delayOffset }),
     ease: EDITORIAL_EASE,
   });
 }

@@ -182,16 +182,18 @@ test('Studio Companion: Click debouncing, expressions cycle, squash animation, f
   assert.ok(cssSrc.includes('@keyframes card-fade-in-up'), 'index.css must define @keyframes card-fade-in-up');
 });
 
-test('Skeleton Screen & Telegram Theme Switch View Transition', () => {
+test('Instant SSR Hydration & Telegram Theme Switch View Transition (No Startup Pop)', () => {
   const skeletonSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/components/SkeletonLoader.tsx'), 'utf8');
   const appSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/App.tsx'), 'utf8');
+  const indexAstro = fs.readFileSync(path.resolve(process.cwd(), 'src/pages/index.astro'), 'utf8');
   const cssSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/index.css'), 'utf8');
 
-  // SkeletonLoader component
-  assert.ok(skeletonSrc.includes('durationMs = 1600'), 'SkeletonLoader must default to ~1.6s duration');
-  assert.ok(skeletonSrc.includes('animate-pulse'), 'SkeletonLoader must render subtle pulsing placeholders');
-  assert.ok(skeletonSrc.includes('animate-shimmer-sweep'), 'SkeletonLoader must render diagonal shimmer sweep');
-  assert.ok(appSrc.includes('<SkeletonLoader durationMs={1600} />'), 'App must render SkeletonLoader on initial mount');
+  // SkeletonLoader helper stays intact while App renders SSR directly without fullscreen splash pop
+  assert.ok(skeletonSrc.includes('durationMs = 1600'), 'SkeletonLoader helper defines 1.6s default duration');
+  assert.ok(skeletonSrc.includes('animate-pulse'), 'SkeletonLoader renders pulsing placeholders');
+  assert.ok(skeletonSrc.includes('animate-shimmer-sweep'), 'SkeletonLoader renders diagonal shimmer sweep');
+  assert.ok(!appSrc.includes('<SkeletonLoader durationMs={1600} />'), 'App must not flash fullscreen SkeletonLoader overlay on initial load');
+  assert.ok(indexAstro.includes('client:load') && !indexAstro.includes('client:only="react"'), 'Home page must SSR and hydrate in-place without unstyled fallback wall pop');
 
   // Telegram-style view transition
   assert.ok(appSrc.includes('startViewTransition'), 'App must use document.startViewTransition');

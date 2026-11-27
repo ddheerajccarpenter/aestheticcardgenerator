@@ -20,21 +20,5 @@ const seo = resolveRouteSeo(routePath);
   robots={seo.robots}
   structuredData={seo.structuredData}
 >
-  <App client:only="react">
-    <main slot="fallback" class="mx-auto max-w-4xl px-5 py-12 text-[var(--app-text-primary)]">
-      <p class="text-[13px] font-mono font-medium text-[var(--app-accent)]">{seo.fallback.eyebrow}</p>
-      <h1 class="mt-3 text-3xl font-semibold tracking-tight">{seo.fallback.heading}</h1>
-      <p class="mt-4 text-sm leading-relaxed text-[var(--app-text-secondary)]">{seo.fallback.lead}</p>
-      {seo.fallback.paragraphs.map((p) => (
-        <p class="mt-3 text-sm leading-relaxed text-[var(--app-text-secondary)]">{p}</p>
-      ))}
-      <nav aria-label="Card actions" class="mt-8 flex flex-wrap gap-3 text-[13px] font-medium">
-        {seo.fallback.links.map((link) => (
-          <a href={link.href} class="underline decoration-[var(--app-border-strong)] underline-offset-4">
-            {link.label}
-          </a>
-        ))}
-      </nav>
-    </main>
-  </App>
+  <App initialPath={routePath} client:load />
 </SiteLayout>

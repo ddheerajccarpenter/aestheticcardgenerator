@@ -196,9 +196,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   // Initialize document from URL param (?template= or ?blank=true) or localStorage draft
   const [doc, setDoc] = useState<CanvasDocument>(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tmplId = params.get('template');
-    const isBlank = params.get('blank') === 'true';
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const tmplId = params?.get('template') ?? null;
+    const isBlank = params?.get('blank') === 'true';
 
     if (tmplId) {
       const found = PRESET_TEMPLATES.find((t) => t.id === tmplId);

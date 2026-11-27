@@ -52,12 +52,15 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
 }) => {
   const isLight = theme === 'light';
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return new URLSearchParams(window.location.search).get('cat') || 'all';
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  useEffect(() => {
+    try {
+      const cat = new URLSearchParams(window.location.search).get('cat');
+      if (cat) setActiveCategory(cat);
+    } catch {
+      // URL query optional
     }
-    return 'all';
-  });
+  }, []);
   const [selectedForCompare, setSelectedForCompare] = useState<CardTemplate[]>([]);
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
   const [ambientEnabled, setAmbientEnabledState] = useState<boolean>(() => getAmbientState().enabled);

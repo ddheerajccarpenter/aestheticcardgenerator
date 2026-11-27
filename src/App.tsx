@@ -47,37 +47,59 @@ import {
 import { restoreSavedCustomFonts } from './services/customFontManager';
 import { AmbientAtmosphereLayer } from './components/AmbientAtmosphereLayer';
 import { StudioCompanion } from './components/StudioCompanion';
-import { SkeletonLoader } from './components/SkeletonLoader';
 import { installContentProtection } from './utils/contentProtection';
 
-export const App: React.FC = () => {
-  // Current route path normalized without trailing slashes
-  const currentPath = window.location.pathname || '/';
+export interface AppProps {
+  initialPath?: string;
+}
+
+export const App: React.FC<AppProps> = ({ initialPath = '/' }) => {
+  // Current route path normalized without trailing slashes (SSR-safe)
+  const currentPath =
+    typeof window !== 'undefined'
+      ? window.location.pathname || initialPath || '/'
+      : initialPath || '/';
   const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/+$/, '') || '/';
   const isEditor = normalizedPath.startsWith('/create') || normalizedPath.startsWith('/canvas');
 
-  // Active template state with URL param / session restoration (captured once so re-renders never drop it)
-  const [activeTemplate] = useState<CardTemplate | undefined>(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tmplId = params.get('template') || sessionStorage.getItem('aesthetic_card_studio_selected_template');
-    if (tmplId) {
-      sessionStorage.removeItem('aesthetic_card_studio_selected_template');
-      return PRESET_TEMPLATES.find((t) => t.id === tmplId);
-    }
-    return undefined;
-  });
+  // Active template state restored on client mount so SSR and frame-0 hydration always match
+  const [activeTemplate, setActiveTemplate] = useState<CardTemplate | undefined>(undefined);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');
   const [isEditorSheetOpen, setIsEditorSheetOpen] = useState(false);
 
-  // Workspace theme state (persisted locally)
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    const saved = localStorage.getItem('aesthetic_card_studio_theme');
-    return saved === 'light' ? 'light' : 'dark';
-  });
-
-  // Apply theme class and data-theme to <html> and <body>
+  // Sync URL/session template after mount
   useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tmplId = params.get('template') || sessionStorage.getItem('aesthetic_card_studio_selected_template');
+      if (tmplId) {
+        sessionStorage.removeItem('aesthetic_card_studio_selected_template');
+        const matched = PRESET_TEMPLATES.find((t) => t.id === tmplId);
+        if (matched) setActiveTemplate(matched);
+      }
+    } catch {
+      // Storage optional
+    }
+  }, []);
+
+  // Workspace theme state (persisted locally; starts 'dark' to match SSR, syncs saved preference immediately on mount)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [themeHydrated, setThemeHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('aesthetic_card_studio_theme');
+      if (saved === 'light') setTheme('light');
+    } catch {
+      // Storage optional
+    }
+    setThemeHydrated(true);
+  }, []);
+
+  // Apply theme class and data-theme to <html> and <body> once hydrated
+  useEffect(() => {
+    if (!themeHydrated) return;
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f1ebdd' : '#191715');
@@ -92,8 +114,12 @@ export const App: React.FC = () => {
       document.body.classList.remove('light');
       document.body.classList.add('dark');
     }
-    localStorage.setItem('aesthetic_card_studio_theme', theme);
-  }, [theme]);
+    try {
+      localStorage.setItem('aesthetic_card_studio_theme', theme);
+    } catch {
+      // Storage optional
+    }
+  }, [theme, themeHydrated]);
 
   // Apply route-editor class to body for mobile layout fixes (Screenshot 1 & 2)
   useEffect(() => {
@@ -228,6 +254,7 @@ export const App: React.FC = () => {
     if (path === '/create') {
       return (
         <CreatorView
+          key={activeTemplate?.id || 'default'}
           theme={theme}
           onToggleTheme={toggleTheme}
           initialTemplate={activeTemplate}
@@ -390,12 +417,8 @@ export const App: React.FC = () => {
 
   return (
     <div
-      data-theme={theme}
-      className="app-shell min-h-screen flex flex-col font-sans transition-colors duration-200 relative text-[var(--app-text-primary)]"
+      className="app-shell min-h-screen flex flex-col font-sans relative text-[var(--app-text-primary)]"
     >
-      {/* 1.5 - 2.0s Skeleton Screen on Initial Webpage Load */}
-      <SkeletonLoader durationMs={1600} />
-
       {/* Background Ambient Atmosphere (Scroll-Reactive) */}
       {!isEditor && <AmbientAtmosphereLayer theme={theme} />}
       {/* Global Header (shown across public marketing pages, hidden on standalone fullscreen studio) */}
@@ -628,16 +651,10 @@ export const App: React.FC = () => {
 };
 
 // Wrap with Error Boundary so crashes render the 500 page
-const AppWithBoundary: React.FC = () => {
-  const [theme] = useState<'dark' | 'light'>(() => {
-    const saved = localStorage.getItem('aesthetic_card_studio_theme');
-    return saved === 'light' ? 'light' : 'dark';
-  });
-  return (
-    <ErrorBoundary theme={theme}>
-      <App />
-    </ErrorBoundary>
-  );
-};
+const AppWithBoundary: React.FC<AppProps> = ({ initialPath = '/' }) => (
+  <ErrorBoundary>
+    <App initialPath={initialPath} />
+  </ErrorBoundary>
+);
 
 export default AppWithBoundary;

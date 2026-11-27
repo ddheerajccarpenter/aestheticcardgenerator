@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { animate, stagger } from 'animejs';
 import type { CardTemplate } from '../types/card';
 import { PALETTE_PRESETS, PRESET_TEMPLATES } from '../data/templates';
 import { HOME_AEO_FAQ, PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
@@ -11,7 +10,6 @@ import { AdSlot } from '../components/AdSlot';
 import { getTemplateAmbientTones } from '../utils/templateAmbient';
 import { setAmbientTones } from '../engines/ambientAtmosphere';
 import {
-  EDITORIAL_EASE,
   animateDeckAdvance,
   animateSpringPop,
   drawSvgPaths,
@@ -51,13 +49,7 @@ const getEditorHref = (template: CardTemplate) => {
 };
 
 export const HomeView: React.FC<HomeViewProps> = ({ theme = 'dark' }) => {
-  const [galleryLayout, setGalleryLayout] = useState<'roomy' | 'compact'>(() => {
-    try {
-      return window.localStorage.getItem('acg-gallery-layout') === 'compact' ? 'compact' : 'roomy';
-    } catch {
-      return 'roomy';
-    }
-  });
+  const [galleryLayout, setGalleryLayout] = useState<'roomy' | 'compact'>('roomy');
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [quickTopic, setQuickTopic] = useState<(typeof QUICK_SEARCH_TOPICS)[number]>('all');
@@ -78,52 +70,25 @@ export const HomeView: React.FC<HomeViewProps> = ({ theme = 'dark' }) => {
 
   const heroTemplates = useMemo(() => PRESET_TEMPLATES.slice(0, 4), []);
 
-  // Initial editorial press entrance choreography synced to SkeletonLoader lift
+  // Restore saved gallery density preference on mount (SSR-safe hydration without layout flash)
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem('acg-gallery-layout') === 'compact') {
+        setGalleryLayout('compact');
+      }
+    } catch {
+      // Storage optional
+    }
+  }, []);
+
+  // Keep hero immediately visible on SSR hydration while drawing registration crop marks smoothly
   useEffect(() => {
     const runEntrance = () => {
-      revealPressWords(heroSectionRef.current, 20);
-      drawSvgPaths(heroCropRef.current, '[data-draw-path]', 680, 65);
-
-      if (!isReducedMotion()) {
-        const ctas = heroSectionRef.current?.querySelectorAll<HTMLElement>('[data-hero-cta]');
-        if (ctas?.length) {
-          animate(ctas, {
-            opacity: [0, 1],
-            y: [14, 0],
-            duration: 460,
-            delay: stagger(50, { start: 140 }),
-            ease: EDITORIAL_EASE,
-          });
-        }
-
-        const deckCards = heroStageRef.current?.querySelectorAll<HTMLElement>('[data-deck-card]');
-        if (deckCards?.length) {
-          animate(deckCards, {
-            opacity: [0, 1],
-            scale: [0.92, 1],
-            duration: 580,
-            delay: stagger(75, { start: 90 }),
-            ease: EDITORIAL_EASE,
-          });
-        }
-
-        const swatches = swatchStripRef.current?.querySelectorAll<HTMLElement>('[data-swatch]');
-        if (swatches?.length) {
-          animate(swatches, {
-            opacity: [0, 1],
-            y: [12, 0],
-            duration: 420,
-            delay: stagger(32, { start: 180 }),
-            ease: EDITORIAL_EASE,
-          });
-        }
-      }
+      revealPressWords(heroSectionRef.current, 10);
+      drawSvgPaths(heroCropRef.current, '[data-draw-path]', 620, 55);
     };
 
-    return onStageReady(
-      runEntrance,
-      () => heroSectionRef.current?.querySelectorAll<HTMLElement>('[data-press-word], [data-hero-cta], [data-deck-card]')
-    );
+    return onStageReady(runEntrance);
   }, []);
 
   // SEO + JSON-LD (kept intact for crawlers & AEO)
