@@ -32,7 +32,7 @@ const renderShape = (object: ShapeCanvasObject, canvasWidth: number): React.Reac
     backgroundColor: object.fill,
     border: outline,
     boxSizing: 'border-box',
-    borderRadius: object.shape === 'rounded-rect' ? scaled(object.borderRadius || 16) : undefined,
+    borderRadius: object.shape === 'rounded-rect' ? scaled(object.borderRadius ?? 16) : undefined,
   };
 
   switch (object.shape) {
@@ -50,7 +50,7 @@ const renderShape = (object: ShapeCanvasObject, canvasWidth: number): React.Reac
     case 'diamond':
       return <svg viewBox="0 0 100 100" className="h-full w-full"><polygon points="50,3 97,50 50,97 3,50" fill={object.fill} stroke={object.strokeWidth ? object.stroke : 'none'} strokeWidth={object.strokeWidth} /></svg>;
     case 'rubber-stamp':
-      return <div className="flex h-full w-full items-center justify-center text-center font-mono font-bold uppercase tracking-[0.15em]" style={{ color: object.fill, border: `${scaled(3)} dashed currentColor`, padding: scaled(6), borderRadius: scaled(object.borderRadius || 8), fontSize: scaled(12) }}><span className="border border-current" style={{ padding: `${scaled(2)} ${scaled(10)}` }}>{object.stampText || 'APPROVED'}</span></div>;
+      return <div className="flex h-full w-full items-center justify-center text-center font-mono font-bold uppercase tracking-[0.15em]" style={{ color: object.fill, border: `${scaled(3)} dashed currentColor`, padding: scaled(6), borderRadius: scaled(object.borderRadius ?? 8), fontSize: scaled(12) }}><span className="border border-current" style={{ padding: `${scaled(2)} ${scaled(10)}` }}>{object.stampText || 'APPROVED'}</span></div>;
     case 'security-seal':
       return (
         <div

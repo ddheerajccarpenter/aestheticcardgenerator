@@ -3,6 +3,9 @@ import type { CategoryMeta, CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
 import { PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
 import { AdSlot } from '../components/AdSlot';
+import { LazyTemplateCard } from '../components/LazyTemplateCard';
+import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
+import { getTemplateAspectRatio } from '../utils/templateAspectRatio';
 import {
   ArrowRight,
   Sparkles,
@@ -22,6 +25,7 @@ interface CategoryViewProps {
 
 export const CategoryView: React.FC<CategoryViewProps> = ({
   category,
+  theme = 'dark',
 }) => {
 
   // Find matching templates for this category
@@ -171,26 +175,26 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
                 style={{ '--stagger-i': idx % 9 } as React.CSSProperties}
                 className="studio-panel group flex flex-col overflow-hidden card-editorial-hover animate-card-entrance shadow-md"
               >
-                <a
-                  href={`/card/${template.id}`}
-                  style={{ backgroundColor: template.theme.bg, color: template.theme.ink }}
-                  className="relative p-6 min-h-[200px] flex flex-col justify-between border-b border-black/10"
-                >
-                  <div className="flex items-center justify-between text-[10px] font-mono opacity-70">
-                    <span>{template.tag}</span>
-                    <span className="border border-current/30 px-1 rounded">{template.badge}</span>
-                  </div>
+                <div className="p-3 pb-0">
+                  <a
+                    href={`/card/${template.id}`}
+                    aria-label={`View ${template.title}`}
+                    className="block"
+                  >
+                    <LazyTemplateCard
+                      aspectRatio={getTemplateAspectRatio(template)}
+                      className="rounded-lg border border-black/15"
+                    >
+                      <UnifiedCardThumbnail
+                        template={template}
+                        isLight={theme === 'light'}
+                        className="h-full w-full"
+                      />
+                    </LazyTemplateCard>
+                  </a>
+                </div>
 
-                  <blockquote className="my-3 text-base leading-snug line-clamp-3 font-editorial">
-                    “{template.quote}”
-                  </blockquote>
-
-                  <cite className="not-italic text-[11px] font-medium opacity-80 truncate">
-                    — {template.author}
-                  </cite>
-                </a>
-
-                <div className="p-4 flex flex-col gap-3 bg-[var(--app-surface-secondary)] border-t border-[var(--app-border-subtle)] mt-auto">
+                <div className="p-4 flex flex-col gap-3 bg-[var(--app-surface-secondary)] border-t border-[var(--app-border-subtle)] mt-3">
                   <a href={`/card/${template.id}`} className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-bold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors truncate">
                       {template.title}
@@ -198,23 +202,25 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
                     <span className="text-[10px] text-[var(--app-text-muted)] font-subheading uppercase shrink-0">{template.categoryLabel}</span>
                   </a>
 
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className={`grid gap-2 pt-1 ${template.canvasDoc ? 'grid-cols-1' : 'grid-cols-2'}`}>
                     <a
                       href={`/canvas?template=${template.id}`}
                       className="studio-btn-primary interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
                       title="Open in Canvas Studio"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>Canvas</span>
+                      <span>{template.canvasDoc ? 'Customize in Canvas' : 'Canvas'}</span>
                     </a>
-                    <a
-                      href={`/create?template=${template.id}`}
-                      className="studio-btn-secondary interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
-                      title="Open in Card Creator"
-                    >
-                      <span>Creator</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </a>
+                    {!template.canvasDoc && (
+                      <a
+                        href={`/create?template=${template.id}`}
+                        className="studio-btn-secondary interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
+                        title="Open in Card Creator"
+                      >
+                        <span>Creator</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </a>
+                    )}
                   </div>
                 </div>
               </article>

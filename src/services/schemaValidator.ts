@@ -278,7 +278,7 @@ export function sanitizeAndValidateCanvasDocument(input: unknown): CanvasDocumen
           ? Math.max(0, Math.min(1000, o.borderRadius))
           : 0;
       const payload = typeof o.payload === 'string' ? o.payload.slice(0, 1000) : undefined;
-      const showTextLabel = Boolean(o.showTextLabel);
+      const showTextLabel = typeof o.showTextLabel === 'boolean' ? o.showTextLabel : undefined;
       const stampText = typeof o.stampText === 'string' ? o.stampText.slice(0, 50) : undefined;
       const starRating =
         typeof o.starRating === 'number' && Number.isFinite(o.starRating)

@@ -697,8 +697,8 @@ export const PREMIUM_SIGNATURE_TEMPLATES: CardTemplate[] = [
     canvasDoc: buildDoc('make_art_cobalt', 'Goal: Make Art', 800, 1000, '#1e17d8', [
       createShapeObject('rect', { name: 'Klein Blue Field', x: 0, y: 0, width: 800, height: 1000, fill: '#1e17d8', zIndex: 1, locked: true }),
       createTextObject({ name: 'Stagger Line 1', text: 'goal:', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 94, fontWeight: '500', lineHeight: 1.0, letterSpacing: -3, color: '#f5f5f7', x: 88, y: 240, width: 320, height: 115, zIndex: 10 }),
-      createTextObject({ name: 'Stagger Line 2', text: 'make   art,', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 94, fontWeight: '500', lineHeight: 1.0, letterSpacing: -3, color: '#f5f5f7', x: 185, y: 455, width: 570, height: 115, zIndex: 10 }),
-      createTextObject({ name: 'Stagger Line 3', text: 'be     hot.', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 94, fontWeight: '500', lineHeight: 1.0, letterSpacing: -3, color: '#f5f5f7', x: 68, y: 558, width: 540, height: 115, zIndex: 10 }),
+      createTextObject({ name: 'Stagger Line 2', text: 'make   art,', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 94, fontWeight: '500', lineHeight: 1.0, letterSpacing: -3, color: '#f5f5f7', x: 160, y: 440, width: 600, height: 112, zIndex: 10 }),
+      createTextObject({ name: 'Stagger Line 3', text: 'be     hot.', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 94, fontWeight: '500', lineHeight: 1.0, letterSpacing: -3, color: '#f5f5f7', x: 68, y: 564, width: 560, height: 112, zIndex: 10 }),
     ]),
   },
   {

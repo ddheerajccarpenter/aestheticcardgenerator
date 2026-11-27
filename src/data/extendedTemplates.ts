@@ -117,8 +117,8 @@ const docSoulmatePass: CanvasDocument = buildDoc('soulmate_pass', 'Soulmate Roma
   createTextObject({ name: 'Col2 Valid Val', text: 'ETERNITY ♡', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 16, fontWeight: '700', color: '#a4133c', x: 650, y: 365, width: 250, height: 25, zIndex: 10 }),
 
   // Heart note bottom
-  createShapeObject('rounded-rect', { name: 'Notice Box', x: 360, y: 430, width: 530, height: 75, fill: '#ffccd5', borderRadius: 12, zIndex: 4 }),
-  createTextObject({ name: 'Notice Text', text: 'Registered to one heart only. This card is non-transferable and guarantees infinite hugs, late night conversations, and unconditional care.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', color: '#590d22', x: 380, y: 442, width: 490, height: 50, zIndex: 10 }),
+  createShapeObject('rounded-rect', { name: 'Notice Box', x: 360, y: 422, width: 530, height: 84, fill: '#ffccd5', borderRadius: 12, zIndex: 4 }),
+  createTextObject({ name: 'Notice Text', text: 'Registered to one heart only. This card is non-transferable and guarantees infinite hugs, late night conversations, and unconditional care.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', lineHeight: 1.35, color: '#590d22', x: 380, y: 431, width: 490, height: 66, zIndex: 10 }),
   createShapeObject('heart', { name: 'Heart Stamp', x: 840, y: 120, width: 45, height: 45, fill: '#ff4d6d', zIndex: 10 }),
 ]);
 
@@ -131,8 +131,8 @@ const docPixelStudioPass: CanvasDocument = buildDoc('pixel_studio_pass', 'Cyber 
   createTextObject({ name: 'Pixel Pusher Text', text: '★ PIXEL PUSHER ★', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '800', color: '#ffffff', align: 'center', x: 60, y: 393, width: 240, height: 25, letterSpacing: 2, zIndex: 10 }),
   createShapeObject('barcode', { name: 'Barcode', x: 60, y: 445, width: 240, height: 60, fill: '#111111', payload: 'PIXEL-1111', showTextLabel: true, zIndex: 6 }),
   // Big Header
-  createTextObject({ name: 'Big Title', text: 'CREATIVE', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 50, fontWeight: '900', color: '#111111', x: 330, y: 55, width: 350, height: 54, zIndex: 10 }),
-  createTextObject({ name: 'Big Subtitle', text: 'STUDIO PASS', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 50, fontWeight: '900', color: '#ff007f', x: 330, y: 112, width: 400, height: 54, zIndex: 10 }),
+  createTextObject({ name: 'Big Title', text: 'CREATIVE', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 50, fontWeight: '900', lineHeight: 1.04, color: '#111111', x: 330, y: 55, width: 350, height: 54, zIndex: 10 }),
+  createTextObject({ name: 'Big Subtitle', text: 'STUDIO PASS', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 50, fontWeight: '900', lineHeight: 1.04, color: '#ff007f', x: 330, y: 112, width: 400, height: 54, zIndex: 10 }),
   // QR code
   createImageObject(ASSET_STICKERS.qrCode, { name: 'Neon QR Code', x: 770, y: 65, width: 110, height: 110, borderRadius: 8, zIndex: 6 }),
   // Metadata box
@@ -158,7 +158,7 @@ const docArtistCredential: CanvasDocument = buildDoc('artist_credential', 'Indep
   createTextObject({ name: 'Subhead', text: 'FOLIO SPECIMEN NO. 92 • GUILD OF ILLUSTRATORS', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: '600', color: '#40916c', letterSpacing: 1.5, x: 345, y: 120, width: 550, height: 25, zIndex: 10 }),
   // Fields
   createTextObject({ name: 'Name', text: 'CHARLOTTE A.', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 24, fontWeight: '800', color: '#1b4332', x: 345, y: 170, width: 450, height: 35, zIndex: 10 }),
-  createTextObject({ name: 'Bio', text: 'Status: Freelance concept artist & sketchbook archivist.\nMedium: Digital gouache, risograph, editorial typography.\nAffiliation: Independent Creative Syndicate.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 18, color: '#2d6a4f', lineHeight: 1.5, x: 345, y: 220, width: 530, height: 90, zIndex: 10 }),
+  createTextObject({ name: 'Bio', text: 'Status: Freelance concept artist & sketchbook archivist.\nMedium: Digital gouache, risograph, editorial typography.\nAffiliation: Independent Creative Syndicate.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 17, color: '#2d6a4f', lineHeight: 1.45, x: 345, y: 220, width: 380, height: 155, zIndex: 10 }),
   // Stamp
   createImageObject(ASSET_STICKERS.stampApproved, { name: 'Guild Seal', x: 740, y: 340, width: 140, height: 140, zIndex: 8 }),
   createShapeObject('barcode', { name: 'Barcode', x: 345, y: 450, width: 280, height: 60, fill: '#1b4332', payload: 'ARTIST-092', showTextLabel: true, zIndex: 7 }),
@@ -196,8 +196,8 @@ const docLuckyGradient: CanvasDocument = buildDoc('lucky_gradient', 'Lucky Ident
   // Fields
   createTextObject({ name: 'Field Name', text: 'NAME: SUHANI', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: '700', color: '#4a2840', x: 140, y: 570, width: 380, height: 30, zIndex: 10 }),
   createTextObject({ name: 'Field DOB', text: 'BIRTHDAY: 27 / 08 / 2010', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: '600', color: '#684551', x: 140, y: 615, width: 380, height: 30, zIndex: 10 }),
-  createTextObject({ name: 'Field Country', text: 'COUNTRY: INDIA', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: '600', color: '#684551', x: 140, y: 655, width: 380, height: 30, zIndex: 10 }),
-  createTextObject({ name: 'Field Special', text: 'POWER: INFUSE JOY & ART', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '700', color: '#be185d', x: 140, y: 695, width: 380, height: 30, zIndex: 10 }),
+  createTextObject({ name: 'Field Country', text: 'COUNTRY: INDIA', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: '600', color: '#684551', x: 140, y: 655, width: 270, height: 30, zIndex: 10 }),
+  createTextObject({ name: 'Field Special', text: 'POWER: INFUSE JOY & ART', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '700', color: '#be185d', x: 140, y: 695, width: 270, height: 30, zIndex: 10 }),
   createImageObject(ASSET_STICKERS.cuteBobaSticker, { name: 'Boba Sticker', x: 420, y: 670, width: 90, height: 110, zIndex: 8 }),
   createShapeObject('barcode', { name: 'Barcode', x: 140, y: 770, width: 260, height: 60, fill: '#4a2840', payload: 'LUCKY-8492', showTextLabel: true, zIndex: 7 }),
   createTextObject({ name: 'Motto', text: 'Registered bearer of sweetness and everyday luck.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', color: '#7a5c68', align: 'center', x: 50, y: 865, width: 540, height: 30, zIndex: 10 }),
@@ -206,7 +206,7 @@ const docLuckyGradient: CanvasDocument = buildDoc('lucky_gradient', 'Lucky Ident
 const docCyberFreya: CanvasDocument = buildDoc('cyber_freya', 'Freya Darkwave ID', 640, 960, '#000000', [
   createShapeObject('rounded-rect', { name: 'Card Dark', x: 20, y: 20, width: 600, height: 920, fill: '#0a0a0a', stroke: '#262626', strokeWidth: 2, borderRadius: 16, zIndex: 1 }),
   // Massive FREYA typography
-  createTextObject({ name: 'Freya Name', text: 'FREYA', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 60, fontWeight: '900', color: '#ffffff', letterSpacing: 6, align: 'center', x: 40, y: 50, width: 560, height: 75, zIndex: 10 }),
+  createTextObject({ name: 'Freya Name', text: 'FREYA', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 60, fontWeight: '900', lineHeight: 1.05, color: '#ffffff', letterSpacing: 6, align: 'center', x: 40, y: 50, width: 560, height: 75, zIndex: 10 }),
   createTextObject({ name: 'Subhead', text: 'MEMBER PASS 2026 • DARKWAVE SOUND SYSTEM', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: '700', color: '#737373', letterSpacing: 3, align: 'center', x: 40, y: 125, width: 560, height: 24, zIndex: 10 }),
   // Photo
   createImageObject(ASSET_AVATARS.grungeDan, { name: 'Persona Photo', x: 100, y: 170, width: 440, height: 480, borderRadius: 8, zIndex: 5 }),
@@ -289,8 +289,8 @@ const docPastelBabyBlueSanrio: CanvasDocument = buildDoc('pastel_babyblue_sanrio
 const docPastelPeachScrapbook: CanvasDocument = buildDoc('pastel_peach_scrapbook', 'Peach Washi Scrapbook', 960, 600, '#fff3eb', [
   createShapeObject('rounded-rect', { name: 'Peach Card', x: 20, y: 20, width: 920, height: 560, fill: '#fff8f2', stroke: '#fbc396', strokeWidth: 2, borderRadius: 18, zIndex: 1 }),
   // Tape corners
-  createShapeObject('rounded-rect', { name: 'Tape Left', x: 40, y: 35, width: 120, height: 30, fill: '#ffdda1', opacity: 0.8, rotation: -3, zIndex: 4 }),
-  createShapeObject('rounded-rect', { name: 'Tape Right', x: 800, y: 35, width: 120, height: 30, fill: '#ffdda1', opacity: 0.8, rotation: 3, zIndex: 4 }),
+  createShapeObject('rounded-rect', { name: 'Tape Left', x: 40, y: 35, width: 120, height: 30, fill: '#ffdda1', opacity: 0.8, borderRadius: 0, rotation: -3, zIndex: 4 }),
+  createShapeObject('rounded-rect', { name: 'Tape Right', x: 800, y: 35, width: 120, height: 30, fill: '#ffdda1', opacity: 0.8, borderRadius: 0, rotation: 3, zIndex: 4 }),
   // Left: Photo
   createImageObject(ASSET_AVATARS.kawaiiBoba, { name: 'Peach Photo', x: 60, y: 90, width: 340, height: 420, borderRadius: 16, zIndex: 5 }),
   // Right: Title & content
@@ -321,11 +321,11 @@ const docPastelDoodleManga: CanvasDocument = buildDoc('pastel_doodle_manga', 'Mo
   createImageObject(ASSET_AVATARS.animeTraveler, { name: 'Manga Portrait', x: 600, y: 60, width: 280, height: 420, borderRadius: 10, zIndex: 5 }),
   createShapeObject('rounded-rect', { name: 'Title Badge', x: 60, y: 60, width: 140, height: 38, fill: '#111111', borderRadius: 6, zIndex: 4 }),
   createTextObject({ name: 'Title Badge Text', text: 'ID-CARD', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '800', color: '#ffffff', align: 'center', x: 60, y: 70, width: 140, height: 25, letterSpacing: 2, zIndex: 10 }),
-  // Manga dotted fields
-  createTextObject({ name: 'Field 1', text: 'name: ....................................... Haru Shindo', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: '#111111', x: 60, y: 135, width: 480, height: 30, zIndex: 10 }),
-  createTextObject({ name: 'Field 2', text: 'date of birth: .............................. 09 / 14 / 2005', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: '#111111', x: 60, y: 195, width: 480, height: 30, zIndex: 10 }),
-  createTextObject({ name: 'Field 3', text: 'skill: ...................................... Inking & Stippling', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: '#111111', x: 60, y: 255, width: 480, height: 30, zIndex: 10 }),
-  createTextObject({ name: 'Field 4', text: 'status: ..................................... Night Owl Manga Artist', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: '#111111', x: 60, y: 315, width: 480, height: 30, zIndex: 10 }),
+  // Manga dotted fields (calibrated <=46 monospace chars to stay single-line inside 480px)
+  createTextObject({ name: 'Field 1', text: 'name: ............................ Haru Shindo', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: '#111111', x: 60, y: 135, width: 480, height: 30, zIndex: 10 }),
+  createTextObject({ name: 'Field 2', text: 'date of birth: ................ 09 / 14 / 2005', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: '#111111', x: 60, y: 195, width: 480, height: 30, zIndex: 10 }),
+  createTextObject({ name: 'Field 3', text: 'skill: .................... Inking & Stippling', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: '#111111', x: 60, y: 255, width: 480, height: 30, zIndex: 10 }),
+  createTextObject({ name: 'Field 4', text: 'status: ............... Night Owl Manga Artist', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: '#111111', x: 60, y: 315, width: 480, height: 30, zIndex: 10 }),
   createShapeObject('barcode', { name: 'Barcode', x: 60, y: 380, width: 280, height: 70, fill: '#111111', payload: 'MANGA-2026', showTextLabel: true, zIndex: 7 }),
   createImageObject(ASSET_STICKERS.starCluster, { name: 'Doodle Stars', x: 380, y: 380, width: 80, height: 80, zIndex: 8 }),
   createTextObject({ name: 'Signature', text: 'Signed: 春 Shindo ~ Tokyo 2026', fontFamily: "'Newsreader', Georgia, serif", fontSize: 20, fontStyle: 'italic', color: '#333333', x: 60, y: 490, width: 450, height: 35, zIndex: 10 }),
@@ -368,12 +368,12 @@ const docFanAnimeTraveler: CanvasDocument = buildDoc('fan_anime_traveler', 'Wand
   createImageObject(ASSET_AVATARS.animeTraveler, { name: 'Traveler Portrait', x: 60, y: 85, width: 280, height: 380, borderRadius: 14, zIndex: 6 }),
   // Dotted lines with fields
   createTextObject({ name: 'Header Title', text: 'PERMANENT LICENSE OF TRAVEL • NO. TTC6253021', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '800', color: '#293241', x: 380, y: 90, width: 500, height: 26, letterSpacing: 1.5, zIndex: 10 }),
-  createTextObject({ name: 'Line 1', text: 'Issued to: ....................................... MEURSAULT', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#3d5a80', x: 380, y: 140, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Line 2', text: 'Date of birth: .................................. 22 / 04 / 1998', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#3d5a80', x: 380, y: 190, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Line 3', text: 'Place of issue: ................................. VALENCIA SKY PORT', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#3d5a80', x: 380, y: 240, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Line 4', text: 'Date of issue: .................................. 06 / 12 / 2026', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#3d5a80', x: 380, y: 290, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Line 1', text: 'Issued to: ............................. MEURSAULT', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#3d5a80', x: 380, y: 140, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Line 2', text: 'Date of birth: .................... 22 / 04 / 1998', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#3d5a80', x: 380, y: 190, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Line 3', text: 'Place of issue: ................ VALENCIA SKY PORT', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#3d5a80', x: 380, y: 240, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Line 4', text: 'Date of issue: .................... 06 / 12 / 2026', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#3d5a80', x: 380, y: 290, width: 500, height: 28, zIndex: 10 }),
   // Stamp
-  createImageObject(ASSET_STICKERS.stampCallMe, { name: 'Call Me Stamp', x: 720, y: 320, width: 160, height: 160, zIndex: 8 }),
+  createImageObject(ASSET_STICKERS.stampCallMe, { name: 'Call Me Stamp', x: 720, y: 332, width: 160, height: 160, zIndex: 8 }),
   createTextObject({ name: 'Legal Fine Print', text: 'This is to certify that the holder described above is permitted to explore freely unless stated otherwise. Keep this pass safely in your field jacket.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', color: '#4f6d7a', x: 380, y: 350, width: 330, height: 80, zIndex: 10 }),
   // Bottom star row
   ...Array.from({ length: 11 }).map((_, i) =>
@@ -441,14 +441,14 @@ const docVintageTravelLicense: CanvasDocument = buildDoc('vintage_travel_license
     createShapeObject('star', { name: `Top Star ${i + 1}`, x: 60 + i * 82, y: 40, width: 22, height: 22, fill: '#4a3b2c', opacity: 0.8, zIndex: 5 })
   ),
   createImageObject(ASSET_AVATARS.animeTraveler, { name: 'Traveler Photo', x: 60, y: 85, width: 280, height: 380, borderRadius: 8, zIndex: 6 }),
-  createTextObject({ name: 'Header Title', text: 'PERMANENT LICENSE OF TRAVEL', fontFamily: "'Newsreader', Georgia, serif", fontSize: 24, fontWeight: '700', color: '#33261a', letterSpacing: 2, x: 380, y: 85, width: 500, height: 35, zIndex: 10 }),
+  createTextObject({ name: 'Header Title', text: 'PERMANENT LICENSE OF TRAVEL', fontFamily: "'Newsreader', Georgia, serif", fontSize: 22, fontWeight: '700', lineHeight: 1.15, color: '#33261a', letterSpacing: 1.5, x: 380, y: 85, width: 500, height: 35, zIndex: 10 }),
   createTextObject({ name: 'Subhead No', text: 'NO. TTC6253021', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '800', color: '#664d36', letterSpacing: 2, x: 380, y: 125, width: 500, height: 25, zIndex: 10 }),
   // Fields
-  createTextObject({ name: 'Field 1', text: 'Issued to: ....................................... G. MEURSAULT', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#33261a', x: 380, y: 170, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Field 2', text: 'Date of birth: .................................. 22 / 04 / 1998', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#33261a', x: 380, y: 215, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Field 3', text: 'Place of issue: ................................. ALGIERS EMBASSY', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#33261a', x: 380, y: 260, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Field 4', text: 'Date of issue: .................................. 06 / 12 / 1954', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#33261a', x: 380, y: 305, width: 500, height: 28, zIndex: 10 }),
-  createImageObject(ASSET_STICKERS.stampCallMe, { name: 'Call Me Stamp', x: 720, y: 320, width: 160, height: 160, zIndex: 8 }),
+  createTextObject({ name: 'Field 1', text: 'Issued to: .......................... G. MEURSAULT', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#33261a', x: 380, y: 170, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Field 2', text: 'Date of birth: .................... 22 / 04 / 1998', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#33261a', x: 380, y: 215, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Field 3', text: 'Place of issue: .................. ALGIERS EMBASSY', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#33261a', x: 380, y: 260, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Field 4', text: 'Date of issue: .................... 06 / 12 / 1954', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#33261a', x: 380, y: 305, width: 500, height: 28, zIndex: 10 }),
+  createImageObject(ASSET_STICKERS.stampCallMe, { name: 'Call Me Stamp', x: 720, y: 342, width: 160, height: 160, zIndex: 8 }),
   createTextObject({ name: 'Clause', text: 'The holder of this license is authorized to wander all lands without hindrance and report all observations to the archive of memory.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', color: '#57412f', x: 380, y: 360, width: 330, height: 75, zIndex: 10 }),
   // Star border bottom
   ...Array.from({ length: 11 }).map((_, i) =>
@@ -463,13 +463,13 @@ const docVintagePinkLicense: CanvasDocument = buildDoc('vintage_pink_license', '
     createShapeObject('star', { name: `Top Star ${i + 1}`, x: 60 + i * 82, y: 40, width: 22, height: 22, fill: '#6e2b40', opacity: 0.8, zIndex: 5 })
   ),
   createImageObject(ASSET_AVATARS.jenniePretty, { name: 'Portrait', x: 60, y: 85, width: 280, height: 380, borderRadius: 8, zIndex: 6 }),
-  createTextObject({ name: 'Header Title', text: 'PERMANENT LICENSE • LOVE DEPT.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 24, fontWeight: '700', color: '#591629', letterSpacing: 2, x: 380, y: 85, width: 500, height: 35, zIndex: 10 }),
+  createTextObject({ name: 'Header Title', text: 'PERMANENT LICENSE • LOVE DEPT.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 21, fontWeight: '700', lineHeight: 1.15, color: '#591629', letterSpacing: 1.5, x: 380, y: 85, width: 500, height: 35, zIndex: 10 }),
   createTextObject({ name: 'Subhead No', text: 'NO. JN817290', fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '800', color: '#8c2443', letterSpacing: 2, x: 380, y: 125, width: 500, height: 25, zIndex: 10 }),
-  createTextObject({ name: 'Field 1', text: 'Name: ........................................... PHOTOGRAPH OF HER', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#591629', x: 380, y: 170, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Field 2', text: 'Date of birth: .................................. 16 / 01 / 1996', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#591629', x: 380, y: 215, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Field 3', text: 'Place of issue: ................................. SEOUL / PARIS', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#591629', x: 380, y: 260, width: 500, height: 28, zIndex: 10 }),
-  createTextObject({ name: 'Field 4', text: 'Status: ......................................... THE ONE AND ONLY MINE', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#591629', x: 380, y: 305, width: 500, height: 28, zIndex: 10 }),
-  createImageObject(ASSET_STICKERS.stampCallMe, { name: 'Stamp', x: 720, y: 320, width: 160, height: 160, zIndex: 8 }),
+  createTextObject({ name: 'Field 1', text: 'Name: ......................... PHOTOGRAPH OF HER', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#591629', x: 380, y: 170, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Field 2', text: 'Date of birth: .................... 16 / 01 / 1996', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#591629', x: 380, y: 215, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Field 3', text: 'Place of issue: .................... SEOUL / PARIS', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#591629', x: 380, y: 260, width: 500, height: 28, zIndex: 10 }),
+  createTextObject({ name: 'Field 4', text: 'Status: .................... THE ONE AND ONLY MINE', fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: '600', color: '#591629', x: 380, y: 305, width: 500, height: 28, zIndex: 10 }),
+  createImageObject(ASSET_STICKERS.stampCallMe, { name: 'Stamp', x: 720, y: 342, width: 160, height: 160, zIndex: 8 }),
   createTextObject({ name: 'Clause', text: 'This is to certify that the holder described above is the true love of my life and holds perpetual residence in my heart.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', color: '#6e2b40', x: 380, y: 360, width: 330, height: 75, zIndex: 10 }),
   // Star border bottom
   ...Array.from({ length: 11 }).map((_, i) =>
@@ -483,7 +483,7 @@ const docVintageHotelKey: CanvasDocument = buildDoc('vintage_hotel_key', 'Grand 
   createTextObject({ name: 'Hotel Tag', text: 'GUEST RESIDENCE KEY CARD • ROOM NO. 402', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '700', color: '#7a5a29', align: 'center', letterSpacing: 2, x: 50, y: 110, width: 860, height: 25, zIndex: 10 }),
   // Large Room Number Badge
   createShapeObject('rounded-rect', { name: 'Room Badge', x: 380, y: 160, width: 200, height: 110, fill: '#dfcdb2', stroke: '#8a6a3b', strokeWidth: 2, borderRadius: 14, zIndex: 4 }),
-  createTextObject({ name: 'Room Text', text: '402', fontFamily: "'Newsreader', Georgia, serif", fontSize: 64, fontWeight: '700', color: '#382813', align: 'center', x: 380, y: 175, width: 200, height: 80, zIndex: 10 }),
+  createTextObject({ name: 'Room Text', text: '402', fontFamily: "'Newsreader', Georgia, serif", fontSize: 64, fontWeight: '700', lineHeight: 1.05, color: '#382813', align: 'center', x: 380, y: 175, width: 200, height: 80, zIndex: 10 }),
   // Guest Details
   createTextObject({ name: 'Guest Name', text: 'GUEST: MONSIEUR G. VON ASCHENBACH', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: '700', color: '#2b1e0d', align: 'center', x: 50, y: 300, width: 860, height: 35, zIndex: 10 }),
   createTextObject({ name: 'Dates', text: 'CHECK-IN: 14 MAY 1934  •  CONCIERGE DESK EXT. 09', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '600', color: '#63471f', align: 'center', x: 50, y: 345, width: 860, height: 25, zIndex: 10 }),
@@ -579,7 +579,7 @@ const docMinimalStudioArchitect: CanvasDocument = buildDoc('minimal_studio_archi
   createShapeObject('rect', { name: 'Card Paper', x: 20, y: 20, width: 920, height: 560, fill: '#f6f2ec', stroke: '#111111', strokeWidth: 3, borderRadius: 0, zIndex: 1 }),
   // Black and red geometric accents (Bauhaus style)
   createShapeObject('rect', { name: 'Red Accent', x: 20, y: 20, width: 30, height: 560, fill: '#d90429', zIndex: 3 }),
-  createTextObject({ name: 'Header', text: 'BAUHAUS DESSAU • ATELIER CARD', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: '900', color: '#111111', letterSpacing: 2, x: 80, y: 60, width: 600, height: 35, zIndex: 10 }),
+  createTextObject({ name: 'Header', text: 'BAUHAUS DESSAU • ATELIER CARD', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: '900', color: '#111111', letterSpacing: 1.5, x: 80, y: 60, width: 500, height: 35, zIndex: 10 }),
   createTextObject({ name: 'Quote', text: 'Form follows function. The designer’s duty is to strip away all superfluous ornaments and reveal the inner truth of construction.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 24, fontStyle: 'italic', color: '#222222', lineHeight: 1.5, x: 80, y: 130, width: 500, height: 160, zIndex: 10 }),
   createTextObject({ name: 'Architect', text: 'MARCEL BREUER — FURNITURE & INTERIORS', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '800', color: '#111111', x: 80, y: 320, width: 500, height: 25, zIndex: 10 }),
   createImageObject(ASSET_AVATARS.grungeDan, { name: 'Architect Photo', x: 620, y: 60, width: 280, height: 360, borderRadius: 0, zIndex: 5 }),
@@ -630,14 +630,14 @@ const docSchoolCampusLanyard: CanvasDocument = buildDoc('school_campus_lanyard',
 
 const docSchoolBookClub: CanvasDocument = buildDoc('school_book_club', 'Literary Society Membership Pass', 960, 600, '#eaf2ec', [
   createShapeObject('rounded-rect', { name: 'Society Pass', x: 20, y: 20, width: 920, height: 560, fill: '#f2f8f4', stroke: '#1b4332', strokeWidth: 3, borderRadius: 16, zIndex: 1 }),
-  createTextObject({ name: 'Society Title', text: 'THE INKLINGS LITERARY SOCIETY', fontFamily: "'Playfair Display', Georgia, serif", fontSize: 32, fontWeight: '700', color: '#1b4332', x: 60, y: 60, width: 800, height: 45, zIndex: 10 }),
-  createTextObject({ name: 'Motto', text: 'FOUNDED FOR THE APPRECIATION OF TACTILE BOOKS & PHILOSOPHY', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: '700', color: '#40916c', letterSpacing: 2, x: 65, y: 110, width: 800, height: 25, zIndex: 10 }),
+  createTextObject({ name: 'Society Title', text: 'THE INKLINGS LITERARY SOCIETY', fontFamily: "'Playfair Display', Georgia, serif", fontSize: 28, fontWeight: '700', color: '#1b4332', x: 60, y: 60, width: 550, height: 45, zIndex: 10 }),
+  createTextObject({ name: 'Motto', text: 'FOUNDED FOR THE APPRECIATION OF TACTILE BOOKS & PHILOSOPHY', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: '700', color: '#40916c', letterSpacing: 1, x: 65, y: 110, width: 550, height: 25, zIndex: 10 }),
   createImageObject(ASSET_AVATARS.studentScholar, { name: 'Member Portrait', x: 640, y: 60, width: 240, height: 320, borderRadius: 12, zIndex: 5 }),
   // Fields
   createTextObject({ name: 'Member Name', text: 'MEMBER: ELEANOR VANE', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: '800', color: '#081c15', x: 65, y: 170, width: 550, height: 35, zIndex: 10 }),
   createTextObject({ name: 'Member No', text: 'MEMBER NO. #0482  •  CHAPTER: OXFORD', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '700', color: '#2d6a4f', x: 65, y: 215, width: 550, height: 25, zIndex: 10 }),
-  createTextObject({ name: 'Favorite', text: 'GENRE FOCUS: 19th Century British Poetry & Continental Philosophy', fontFamily: "'Newsreader', Georgia, serif", fontSize: 18, fontStyle: 'italic', color: '#1b4332', x: 65, y: 260, width: 550, height: 30, zIndex: 10 }),
-  createTextObject({ name: 'Goal', text: 'ANNUAL READING TARGET: 40 WORKS COMPLETE', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '700', color: '#2d6a4f', x: 65, y: 305, width: 550, height: 25, zIndex: 10 }),
+  createTextObject({ name: 'Favorite', text: 'GENRE FOCUS: 19th Century British Poetry & Continental Philosophy', fontFamily: "'Newsreader', Georgia, serif", fontSize: 16, fontStyle: 'italic', lineHeight: 1.35, color: '#1b4332', x: 65, y: 258, width: 550, height: 46, zIndex: 10 }),
+  createTextObject({ name: 'Goal', text: 'ANNUAL READING TARGET: 40 WORKS COMPLETE', fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '700', color: '#2d6a4f', x: 65, y: 315, width: 550, height: 25, zIndex: 10 }),
   createImageObject(ASSET_STICKERS.stampApproved, { name: 'Approved Seal', x: 65, y: 360, width: 130, height: 130, zIndex: 8 }),
   createTextObject({ name: 'Seal Text', text: 'Certified active member with borrowing privileges at all collegiate libraries.', fontFamily: "'Newsreader', Georgia, serif", fontSize: 15, fontStyle: 'italic', color: '#40916c', x: 220, y: 410, width: 400, height: 40, zIndex: 10 }),
   createShapeObject('barcode', { name: 'Barcode', x: 640, y: 410, width: 240, height: 60, fill: '#1b4332', payload: 'INK-0482', showTextLabel: true, zIndex: 7 }),
@@ -680,7 +680,7 @@ const docPinterestKyoto: CanvasDocument = buildDoc('pinterest_kyoto', 'Kyoto 198
   createImageObject(ASSET_POSTER_ART.kyoto1984, { name: 'Kyoto Sun Art', x: 60, y: 80, width: 580, height: 640, borderRadius: 0, zIndex: 5 }),
   createTextObject({ name: 'Kyoto Title', text: '京都 • 1984', fontFamily: "'Murecho', sans-serif", fontSize: 33, fontWeight: '900', color: '#2b2622', letterSpacing: 13, x: 60, y: 588, width: 580, height: 42, align: 'center', zIndex: 10 }),
   createTextObject({ name: 'Museum Subtitle', text: 'KYOTO NATIONAL MUSEUM OF MODERN ART', fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '600', color: '#7a6f66', letterSpacing: 4, x: 60, y: 632, width: 580, height: 22, align: 'center', zIndex: 10 }),
-  createTextObject({ name: 'Exhibition Dates', text: '14 AVRIL — 28 MAI 1984 • GALERIE NATIONALE DE KYOTO', fontFamily: "'Murecho', sans-serif", fontSize: 16, fontWeight: '800', color: '#c83e2b', letterSpacing: 4, x: 40, y: 735, width: 620, height: 30, align: 'center', zIndex: 10 }),
+  createTextObject({ name: 'Exhibition Dates', text: '14 AVRIL — 28 MAI 1984 • GALERIE NATIONALE DE KYOTO', fontFamily: "'Murecho', sans-serif", fontSize: 14, fontWeight: '800', color: '#c83e2b', letterSpacing: 2.5, x: 40, y: 735, width: 620, height: 30, align: 'center', zIndex: 10 }),
   createTextObject({ name: 'Curator Note', text: '“Une méditation visuelle sur les estampes traditionnelles et la sérigraphie géométrique moderne.”', fontFamily: "'Newsreader', Georgia, serif", fontSize: 16, fontStyle: 'italic', color: '#574f48', x: 70, y: 775, width: 560, height: 50, align: 'center', zIndex: 10 }),
   createShapeObject('barcode', { name: 'Archive Barcode', x: 230, y: 835, width: 240, height: 50, fill: '#2b2622', payload: 'KYOTO-1984', showTextLabel: true, zIndex: 7 }),
   createTextObject({ name: 'Footer Colophon', text: 'ARCHIVAL PRINT NO. 482 // AESTHETIC CARD STUDIO COLLECTION', fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: '600', color: '#8c8075', letterSpacing: 2, x: 40, y: 900, width: 620, height: 20, align: 'center', zIndex: 10 }),
@@ -690,11 +690,11 @@ const docPinterestBauhaus: CanvasDocument = buildDoc('pinterest_bauhaus', 'Bauha
   createShapeObject('rect', { name: 'Bauhaus Canvas', x: 20, y: 20, width: 660, height: 940, fill: '#ebe5d8', stroke: '#1a1a1a', strokeWidth: 3, zIndex: 1 }),
   createTextObject({ name: 'Bauhaus Top Bar', text: 'STAATLICHES BAUHAUS WEIMAR // 1919-1923', fontFamily: "'Funnel Sans', sans-serif", fontSize: 15, fontWeight: '900', color: '#1a1a1a', letterSpacing: 4, x: 40, y: 44, width: 620, height: 28, zIndex: 10 }),
   createImageObject(ASSET_POSTER_ART.bauhaus1923, { name: 'Constructivist Art', x: 50, y: 80, width: 600, height: 650, zIndex: 5 }),
-  createTextObject({ name: 'Bauhaus Wordmark', text: 'BAUHAUS', fontFamily: "'Funnel Sans', sans-serif", fontSize: 44, fontWeight: '900', color: '#1a1a1a', letterSpacing: 2, x: 130, y: 598, width: 480, height: 50, zIndex: 10 }),
+  createTextObject({ name: 'Bauhaus Wordmark', text: 'BAUHAUS', fontFamily: "'Funnel Sans', sans-serif", fontSize: 44, fontWeight: '900', lineHeight: 1.05, color: '#1a1a1a', letterSpacing: 2, x: 130, y: 598, width: 480, height: 50, zIndex: 10 }),
   createTextObject({ name: 'Dessau Subhead', text: 'DESSAU • WEIMAR 1923', fontFamily: "'Funnel Sans', sans-serif", fontSize: 18, fontWeight: '700', color: '#c92a2a', letterSpacing: 6, x: 130, y: 648, width: 480, height: 28, zIndex: 10 }),
   createTextObject({ name: 'Manifesto Headline', text: 'KUNST UND TECHNIK — EINE NEUE EINHEIT', fontFamily: "'Funnel Sans', sans-serif", fontSize: 20, fontWeight: '900', color: '#1a1a1a', letterSpacing: 2, x: 50, y: 745, width: 600, height: 35, zIndex: 10 }),
   createTextObject({ name: 'Master Names', text: 'LEITUNG: WALTER GROPIUS • MEISTER: WASSILY KANDINSKY, PAUL KLEE, LÁSZLÓ MOHOLY-NAGY', fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#c92a2a', letterSpacing: 1.5, x: 50, y: 785, width: 600, height: 30, zIndex: 10 }),
-  createTextObject({ name: 'Exhibition Location', text: 'AUSSTELLUNG WEIMAR / DESSAU • KATALOG PREIS 2 GOLDMARK • ARCHIV DER MODERNE', fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: '600', color: '#4a4a4a', letterSpacing: 1.5, x: 50, y: 825, width: 600, height: 25, zIndex: 10 }),
+  createTextObject({ name: 'Exhibition Location', text: 'AUSSTELLUNG WEIMAR / DESSAU • KATALOG PREIS 2 GOLDMARK • ARCHIV DER MODERNE', fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: '600', color: '#4a4a4a', letterSpacing: 1, x: 50, y: 822, width: 455, height: 32, zIndex: 10 }),
   createImageObject(ASSET_STICKERS.stampApproved, { name: 'Bauhaus Seal', x: 520, y: 835, width: 110, height: 110, zIndex: 8 }),
   createShapeObject('barcode', { name: 'Barcode', x: 50, y: 865, width: 220, height: 50, fill: '#1a1a1a', payload: 'BAUHAUS-23', showTextLabel: true, zIndex: 7 }),
 ]);
@@ -720,8 +720,8 @@ const docPinterestBotanical: CanvasDocument = buildDoc('pinterest_botanical', 'N
   createTextObject({ name: 'Specimen Plate Subtitle', text: 'HERBARIUM NORDICUM • NO. 1892', fontFamily: "'JetBrains Mono', monospace", fontSize: 9, fontWeight: '700', color: '#606c38', letterSpacing: 1.5, x: 230, y: 600, width: 240, height: 18, align: 'center', zIndex: 10 }),
   createTextObject({ name: 'Latin Taxonomy', text: 'GINKGO BILOBA L. (GINKGOACEAE)', fontFamily: "'Newsreader', Georgia, serif", fontSize: 26, fontStyle: 'italic', fontWeight: '700', color: '#283618', letterSpacing: 1, x: 40, y: 750, width: 620, height: 35, align: 'center', zIndex: 10 }),
   createTextObject({ name: 'Collection Notes', text: 'SPECIMEN HERBARIUM ARCHIVE NO. 1892 • COLLECTIO NORDICA EX SUECIA', fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#606c38', letterSpacing: 2, x: 40, y: 790, width: 620, height: 25, align: 'center', zIndex: 10 }),
-  createTextObject({ name: 'Curator Inscription', text: '“Arbor antiqua foliis flabelliformibus, per hiemem deciduis. Collectum in horto botanico anno 1892.”', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', color: '#575f4e', x: 60, y: 820, width: 580, height: 40, align: 'center', zIndex: 10 }),
-  createImageObject(ASSET_STICKERS.stampApproved, { name: 'Museum Stamp', x: 500, y: 840, width: 110, height: 110, zIndex: 8 }),
+  createTextObject({ name: 'Curator Inscription', text: '“Arbor antiqua foliis flabelliformibus, per hiemem deciduis. Collectum in horto botanico anno 1892.”', fontFamily: "'Newsreader', Georgia, serif", fontSize: 14, fontStyle: 'italic', color: '#575f4e', x: 60, y: 816, width: 580, height: 32, align: 'center', zIndex: 10 }),
+  createImageObject(ASSET_STICKERS.stampApproved, { name: 'Museum Stamp', x: 505, y: 850, width: 100, height: 100, zIndex: 8 }),
   createShapeObject('barcode', { name: 'Herbarium Barcode', x: 90, y: 865, width: 220, height: 50, fill: '#283618', payload: 'NORDIC-1892', showTextLabel: true, zIndex: 7 }),
 ]);
 
@@ -751,8 +751,8 @@ const docPinterestPolaroid: CanvasDocument = buildDoc('pinterest_polaroid', 'Sum
 const docPinterestVinyl: CanvasDocument = buildDoc('pinterest_vinyl', 'Midnights Vinyl & Spotify Lyric Card', 1080, 1080, '#0a0c10', [
   createShapeObject('rounded-rect', { name: 'Matte Vinyl Sleeve', x: 40, y: 40, width: 1000, height: 1000, fill: '#101318', stroke: '#202632', strokeWidth: 2, borderRadius: 24, zIndex: 1, locked: true }),
   createImageObject(ASSET_POSTER_ART.vinylRecordSleeve, { name: 'Vinyl Disc 33RPM', x: 520, y: 90, width: 480, height: 480, zIndex: 3 }),
-  createTextObject({ name: 'Vinyl Speed', text: 'SIDE A • 33 RPM', fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: '700', color: '#6e4b1f', letterSpacing: 2.5, x: 682, y: 274, width: 156, height: 18, align: 'center', zIndex: 4 }),
-  createTextObject({ name: 'Vinyl Label Title', text: 'Aesthetic Card Studio', fontFamily: "'Newsreader', Georgia, serif", fontSize: 15, fontStyle: 'italic', fontWeight: '700', color: '#2b1a09', x: 682, y: 294, width: 156, height: 24, align: 'center', zIndex: 4 }),
+  createTextObject({ name: 'Vinyl Speed', text: 'SIDE A • 33 RPM', fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: '700', color: '#6e4b1f', letterSpacing: 2.5, x: 672, y: 274, width: 176, height: 18, align: 'center', zIndex: 4 }),
+  createTextObject({ name: 'Vinyl Label Title', text: 'Aesthetic Card Studio', fontFamily: "'Newsreader', Georgia, serif", fontSize: 13, fontStyle: 'italic', fontWeight: '700', color: '#2b1a09', x: 672, y: 294, width: 176, height: 22, align: 'center', zIndex: 4 }),
   createTextObject({ name: 'Vinyl Fidelity', text: 'STEREO HIGH FIDELITY', fontFamily: "'Funnel Sans', sans-serif", fontSize: 9, fontWeight: '700', color: '#6e4b1f', letterSpacing: 1, x: 682, y: 360, width: 156, height: 16, align: 'center', zIndex: 4 }),
   createTextObject({ name: 'Vinyl Catalog No', text: 'RECORD NO. 2026-PINTEREST', fontFamily: "'JetBrains Mono', monospace", fontSize: 8, fontWeight: '600', color: '#9c7a45', x: 682, y: 377, width: 156, height: 15, align: 'center', zIndex: 4 }),
   createShapeObject('rounded-rect', { name: 'Album Cover Frame', x: 80, y: 90, width: 480, height: 480, fill: '#181d26', stroke: '#2e3746', strokeWidth: 1.5, borderRadius: 16, zIndex: 4 }),
@@ -810,9 +810,9 @@ const docPinterestFrenchRiviera: CanvasDocument = buildDoc('pinterest_french_riv
   createTextObject({ name: 'Top Header', text: 'REVUE MÉDITERRANÉENNE // ÉDITION D’ÉTÉ NO. 14', fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#c76a4f', align: 'center', letterSpacing: 4, x: 40, y: 45, width: 620, height: 25, zIndex: 10 }),
   createImageObject(ASSET_POSTER_ART.frenchRivieraVilla, { name: 'Terracotta Villa Art', x: 60, y: 85, width: 580, height: 580, borderRadius: 8, zIndex: 5 }),
   createTextObject({ name: 'Villa Plate Title', text: 'Saint-Tropez', fontFamily: "'Newsreader', Georgia, serif", fontSize: 32, fontStyle: 'italic', fontWeight: '700', color: '#ffffff', x: 160, y: 536, width: 380, height: 42, align: 'center', zIndex: 6 }),
-  createTextObject({ name: 'Villa Plate Caption', text: "CÔTE D'AZUR // ÉTÉ 1976", fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#f4ede4', letterSpacing: 4, x: 160, y: 580, width: 380, height: 22, align: 'center', zIndex: 6 }),
+  createTextObject({ name: 'Villa Plate Caption', text: "CÔTE D'AZUR // ÉTÉ 1976", fontFamily: "'Funnel Sans', sans-serif", fontSize: 12, fontWeight: '700', color: '#f4ede4', letterSpacing: 3, x: 160, y: 580, width: 380, height: 22, align: 'center', zIndex: 6 }),
 
-  createTextObject({ name: 'Main Title', text: 'CÔTE D’AZUR', fontFamily: "'Murecho', sans-serif", fontSize: 44, fontWeight: '900', color: '#2b1e16', align: 'center', letterSpacing: 6, x: 40, y: 690, width: 620, height: 55, zIndex: 10 }),
+  createTextObject({ name: 'Main Title', text: 'CÔTE D’AZUR', fontFamily: "'Murecho', sans-serif", fontSize: 44, fontWeight: '900', lineHeight: 1.05, color: '#2b1e16', align: 'center', letterSpacing: 6, x: 40, y: 690, width: 620, height: 55, zIndex: 10 }),
   createTextObject({ name: 'Subhead', text: 'SAINT-TROPEZ • ANTIBES • VILLEFRANCHE-SUR-MER', fontFamily: "'Funnel Sans', sans-serif", fontSize: 13, fontWeight: '700', color: '#c76a4f', align: 'center', letterSpacing: 3, x: 40, y: 745, width: 620, height: 26, zIndex: 10 }),
   createTextObject({ name: 'Quote', text: '“Sous la lumière dorée du Midi, chaque instant a la couleur du bonheur et le parfum des pins maritimes.”', fontFamily: "'Newsreader', Georgia, serif", fontSize: 16, fontStyle: 'italic', color: '#523d32', align: 'center', lineHeight: 1.45, x: 50, y: 780, width: 600, height: 55, zIndex: 10 }),
 
@@ -845,8 +845,8 @@ const docPinterestTokyoBoarding: CanvasDocument = buildDoc('pinterest_tokyo_boar
   createTextObject({ name: 'Ticket Class', text: 'PREMIÈRE CLASSE // BOARDING PASS', fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: '700', color: '#fcd535', align: 'right', letterSpacing: 2, x: 560, y: 46, width: 350, height: 26, zIndex: 10 }),
 
   createImageObject(ASSET_POSTER_ART.tokyoBoardingPassLogo, { name: 'Jetliner Emblem', x: 50, y: 110, width: 220, height: 140, zIndex: 5 }),
-  createTextObject({ name: 'Origin Airport Code', text: 'HND', fontFamily: "'JetBrains Mono', monospace", fontSize: 9, fontWeight: '900', color: '#ffffff', align: 'center', x: 68, y: 213, width: 44, height: 19, zIndex: 6 }),
-  createTextObject({ name: 'Dest Airport Code', text: 'CDG', fontFamily: "'JetBrains Mono', monospace", fontSize: 9, fontWeight: '900', color: '#ffffff', align: 'center', x: 208, y: 213, width: 44, height: 19, zIndex: 6 }),
+  createTextObject({ name: 'Origin Airport Code', text: 'HND', fontFamily: "'JetBrains Mono', monospace", fontSize: 9, fontWeight: '900', color: '#ffffff', align: 'center', x: 72.5, y: 211.5, width: 42, height: 18.2, zIndex: 6 }),
+  createTextObject({ name: 'Dest Airport Code', text: 'CDG', fontFamily: "'JetBrains Mono', monospace", fontSize: 9, fontWeight: '900', color: '#ffffff', align: 'center', x: 205.5, y: 211.5, width: 42, height: 18.2, zIndex: 6 }),
   createShapeObject('line', { name: 'Perforated Line', x: 660, y: 95, width: 2, height: 485, fill: '#94a3b8', zIndex: 4 }),
 
   createTextObject({ name: 'Label Passenger', text: 'PASSENGER NAME', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: '700', color: '#64748b', letterSpacing: 1.5, x: 300, y: 115, width: 170, height: 20, zIndex: 10 }),

@@ -130,7 +130,7 @@ export const createShapeObject = (
   stroke: overrides?.stroke || 'transparent',
   strokeWidth: overrides?.strokeWidth ?? 0,
   opacity: overrides?.opacity ?? 1,
-  borderRadius: overrides?.borderRadius ?? 0,
+  borderRadius: overrides?.borderRadius ?? (shape === 'rounded-rect' ? 16 : 0),
   payload: overrides?.payload,
   showTextLabel: overrides?.showTextLabel,
   stampText: overrides?.stampText,
@@ -189,26 +189,31 @@ export const templateToCanvasDoc = (template: CardTemplate): CanvasDocument => {
     const image = isLandscape
       ? createImageObject(ASSET_AVATARS.studentScholar, { name: 'Portrait Photo', x: 60, y: 120, width: 220, height: 330, borderRadius: 8, zIndex: 5 })
       : createImageObject(ASSET_AVATARS.studentScholar, { name: 'Portrait Photo', x: (width - width * 0.48) / 2, y: 105, width: width * 0.48, height: height * 0.34, borderRadius: 8, zIndex: 5 });
+    const badgeText = template.badge || '';
+    const badgeWidth = Math.max(128, Math.min(220, Math.round(badgeText.length * 8.5 + 28)));
+    const badgeX = width - 60 - badgeWidth;
     const textX = isLandscape ? 330 : 60;
     const textWidth = isLandscape ? width - 390 : width - 120;
-    const titleY = isLandscape ? 125 : height * 0.49;
-    const quoteY = titleY + 78;
-    const authorY = quoteY + 90;
+    const titleY = isLandscape ? 120 : Math.round(height * 0.48);
+    const quoteY = titleY + 76;
+    const quoteH = isLandscape ? 148 : 136;
+    const dividerY = quoteY + quoteH + 12;
+    const issuerY = dividerY + 14;
     const objects: CanvasObject[] = [
       createShapeObject('rounded-rect', {
         name: 'Card Base', x: 30, y: 30, width: width - 60, height: height - 60,
         fill: template.theme.bg, stroke: template.showBorder ? (template.theme.border || 'rgba(0,0,0,0.15)') : 'transparent',
         strokeWidth: template.showBorder ? 2 : 0, borderRadius: template.borderRadius || 16, zIndex: 1,
       }),
-      createTextObject({ name: 'Header Tag', text: template.tag, fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '600', color: template.theme.ink, x: 60, y: 58, width: width - 265, height: 32, zIndex: 10 }),
-      createShapeObject('rounded-rect', { name: 'Badge Box', x: width - 190, y: 54, width: 120, height: 36, fill: 'transparent', stroke: template.theme.ink, strokeWidth: 1.5, borderRadius: 6, zIndex: 9 }),
-      createTextObject({ name: 'Badge Text', text: template.badge, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: '600', color: template.theme.ink, x: width - 190, y: 61, width: 120, height: 24, align: 'center', zIndex: 10 }),
+      createTextObject({ name: 'Header Tag', text: template.tag, fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: '600', color: template.theme.ink, x: 60, y: 58, width: Math.max(180, badgeX - 76), height: 32, zIndex: 10 }),
+      createShapeObject('rounded-rect', { name: 'Badge Box', x: badgeX, y: 54, width: badgeWidth, height: 36, fill: 'transparent', stroke: template.theme.ink, strokeWidth: 1.5, borderRadius: 6, zIndex: 9 }),
+      createTextObject({ name: 'Badge Text', text: badgeText, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: '600', color: template.theme.ink, x: badgeX, y: 60, width: badgeWidth, height: 24, align: 'center', zIndex: 10 }),
       image,
-      createTextObject({ name: 'Card Title', text: template.title, fontFamily: fontFam, fontSize: 30, fontWeight: '700', color: template.theme.ink, x: textX, y: titleY, width: textWidth, height: 70, zIndex: 15 }),
-      createTextObject({ name: 'Access Details', text: template.quote, fontFamily: "'JetBrains Mono', monospace", fontSize: 17, fontWeight: '600', color: template.theme.ink, x: textX, y: quoteY, width: textWidth, height: 80, lineHeight: 1.35, zIndex: 15 }),
-      createShapeObject('line', { name: 'ID Divider', x: textX, y: authorY - 8, width: textWidth, height: 2, fill: template.theme.ink, opacity: 0.28, zIndex: 4 }),
-      createTextObject({ name: 'Issuer', text: template.author, fontFamily: fontFam, fontSize: 17, fontWeight: '500', color: template.theme.ink, x: textX, y: authorY + 8, width: textWidth, height: 52, zIndex: 15 }),
-      createShapeObject('barcode', { name: 'Access Barcode', x: isLandscape ? 60 : 60, y: isLandscape ? height - 100 : height - 115, width: isLandscape ? 220 : width - 120, height: 48, fill: template.theme.ink, payload: template.id, showTextLabel: false, zIndex: 7 }),
+      createTextObject({ name: 'Card Title', text: template.title, fontFamily: fontFam, fontSize: template.title.length > 26 ? 25 : 30, lineHeight: 1.15, fontWeight: '700', color: template.theme.ink, x: textX, y: titleY, width: textWidth, height: 70, zIndex: 15 }),
+      createTextObject({ name: 'Access Details', text: template.quote, fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: '600', color: template.theme.ink, x: textX, y: quoteY, width: textWidth, height: quoteH, lineHeight: 1.4, zIndex: 15 }),
+      createShapeObject('line', { name: 'ID Divider', x: textX, y: dividerY, width: textWidth, height: 2, fill: template.theme.ink, opacity: 0.28, zIndex: 4 }),
+      createTextObject({ name: 'Issuer', text: template.author, fontFamily: fontFam, fontSize: 16, fontWeight: '500', lineHeight: 1.3, color: template.theme.ink, x: textX, y: issuerY, width: textWidth, height: 60, zIndex: 15 }),
+      createShapeObject('barcode', { name: 'Access Barcode', x: 60, y: isLandscape ? height - 100 : height - 115, width: isLandscape ? 220 : width - 120, height: 48, fill: template.theme.ink, payload: template.id, showTextLabel: false, zIndex: 7 }),
       createTextObject({ name: 'Category Mark', text: template.categoryLabel.toUpperCase(), fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: '600', color: template.theme.ink, align: isLandscape ? 'right' : 'center', x: isLandscape ? textX : 60, y: height - 80, width: isLandscape ? textWidth : width - 120, height: 26, zIndex: 15 }),
     ];
 

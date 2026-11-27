@@ -371,7 +371,7 @@ export const ASSET_STICKERS = {
     </g>
   </svg>`,
 
-  stampApproved: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="140" height="140">
+  stampApproved: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -12 164 164" width="164" height="164">
     <g transform="rotate(8 70 70)">
       <polygon points="70,5 85,15 102,10 112,24 129,27 132,45 145,55 140,73 148,89 137,102 139,120 122,126 116,142 98,140 86,151 70,143 54,151 42,140 24,142 18,126 1,120 3,102 -8,89 0,73 -5,55 8,45 11,27 28,24 38,10 55,15" fill="%23c59b27" opacity="0.15" />
       <circle cx="70" cy="70" r="54" fill="none" stroke="%23b0891d" stroke-width="3" />

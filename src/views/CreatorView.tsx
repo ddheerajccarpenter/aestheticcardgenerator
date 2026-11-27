@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { CardTemplate } from '../types/card';
+import { PALETTE_PRESETS } from '../data/templates';
 import { updatePageSEO } from '../utils/seo';
 import { toPng } from 'html-to-image';
 import {
@@ -194,6 +195,24 @@ const getTemplateAvatar = (template?: CardTemplate) =>
   template?.canvasDoc?.objects.find((object) => object.type === 'image')?.src ||
   (template?.category === 'id-card' || template?.hasPhotoArea ? ASSET_AVATARS.studentScholar : ASSET_AVATARS.grungeDan);
 
+const resolveQueryPalette = (): PaletteOption | null => {
+  if (typeof window === 'undefined') return null;
+  const paletteId = new URLSearchParams(window.location.search).get('palette')?.trim();
+  if (!paletteId) return null;
+  const localMatch = PALETTES.find((p) => p.id === paletteId);
+  if (localMatch) return localMatch;
+  const preset = PALETTE_PRESETS.find((p) => p.id === paletteId);
+  if (!preset) return null;
+  return {
+    id: preset.id,
+    name: preset.name,
+    bg: preset.bg,
+    ink: preset.ink,
+    badge: preset.category.toUpperCase(),
+    surface: preset.category === 'vintage' ? 'cotton-rag-300gsm' : 'warm-nano-texture-matte',
+  };
+};
+
 export const CreatorView: React.FC<CreatorViewProps> = ({
   initialTemplate,
   theme = 'dark',
@@ -220,10 +239,23 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
   const [mobileTab, setMobileTab] = useState<'content' | 'palette' | 'type'>('content');
   const [aspectMenuOpen, setAspectMenuOpen] = useState(false);
 
+  const initialQueryPalette = initialTemplate ? null : resolveQueryPalette();
+
   // Palette selection
-  const [paletteIndex, setPaletteIndex] = useState(() => Math.max(0, findTemplatePalette(initialTemplate)));
-  const [templatePalette, setTemplatePalette] = useState<PaletteOption | null>(() => getTemplatePalette(initialTemplate));
-  const [sourceTemplatePalette] = useState<PaletteOption | null>(() => getTemplatePalette(initialTemplate));
+  const [paletteIndex, setPaletteIndex] = useState(() => {
+    if (initialTemplate) return Math.max(0, findTemplatePalette(initialTemplate));
+    if (initialQueryPalette) {
+      const idx = PALETTES.findIndex((p) => p.bg.toLowerCase() === initialQueryPalette.bg.toLowerCase());
+      return Math.max(0, idx);
+    }
+    return 0;
+  });
+  const [templatePalette, setTemplatePalette] = useState<PaletteOption | null>(
+    () => getTemplatePalette(initialTemplate) || initialQueryPalette
+  );
+  const [sourceTemplatePalette] = useState<PaletteOption | null>(
+    () => getTemplatePalette(initialTemplate) || initialQueryPalette
+  );
 
   // Aspect ratio
   const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>(() => getTemplateRatio(initialTemplate));

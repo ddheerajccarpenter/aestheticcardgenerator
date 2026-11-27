@@ -2151,7 +2151,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   }`}
                 >
                   <span>Ultra-HD 4K</span>
-                  <span className="text-[10px] text-[#E2D9C8] font-mono">3840px</span>
+                  <span className="text-[10px] text-[var(--app-text-secondary)] font-mono">3840px</span>
                 </button>
                 <button
                   onClick={() => handleExport('8k')}
@@ -3156,8 +3156,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                   : 'none',
                                 borderRadius:
                                   obj.shape === 'rounded-rect'
-                                    ? `${obj.borderRadius || 16}px`
-                                    : '0px',
+                                    ? `${obj.borderRadius ?? 16}px`
+                                    : `${obj.borderRadius ?? 0}px`,
                               }}
                             />
                           )}
@@ -3232,7 +3232,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                                 height: '100%',
                                 color: obj.fill || '#dc2626',
                                 border: '3px dashed currentColor',
-                                borderRadius: `${obj.borderRadius || 8}px`,
+                                borderRadius: `${obj.borderRadius ?? 8}px`,
                               }}
                               className="flex items-center justify-center p-1.5 select-none"
                             >
@@ -3303,11 +3303,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               <div className="w-6 h-6 rounded-full bg-current/20 flex items-center justify-center shrink-0">
                                 <div className="w-0 h-0 border-y-4 border-y-transparent border-l-6 border-l-current ml-0.5" />
                               </div>
-                              <div className="flex-1 flex items-center gap-1 h-6">
-                                {[12, 18, 8, 22, 14, 20, 10, 24, 16, 22, 12, 18, 8, 16, 22, 14, 10, 20, 16].map((h, i) => (
+                              <div className="flex-1 flex items-center justify-around h-3/4">
+                                {[28, 44, 20, 54, 34, 48, 24, 60, 38, 54, 28, 44, 20, 38, 54, 34, 24, 48, 38].map((h, i) => (
                                   <div
                                     key={i}
-                                    style={{ height: `${h}px` }}
+                                    style={{ height: `${h}%` }}
                                     className="w-1 bg-current rounded-full"
                                   />
                                 ))}
@@ -4057,7 +4057,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               }}
                               className={`p-2 rounded-xl text-left border text-xs font-semibold cursor-pointer transition-all ${
                                 selectedObject.filterPreset === f.id || (!selectedObject.filterPreset && f.id === 'original')
-                                  ? 'border-[#E2D9C8] bg-[#E2D9C8]/10 text-[#E2D9C8] ring-1 ring-[#E2D9C8]'
+                                  ? isLight
+                                    ? 'border-[#24211b] bg-[#24211b]/5 text-[#24211b] ring-1 ring-[#24211b]'
+                                    : 'border-[#E2D9C8] bg-[#E2D9C8]/10 text-[#E2D9C8] ring-1 ring-[#E2D9C8]'
                                   : isLight ? 'border-slate-200 hover:bg-slate-50' : 'border-[#39342d] hover:bg-[#211e19]'
                               }`}
                             >

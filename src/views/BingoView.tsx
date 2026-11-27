@@ -7,7 +7,11 @@ import {
   generateBingoCells,
   type BingoKindId,
 } from '../data/bingoPresets';
-import { getBrandedExportFilename, triggerBrandedBlobDownload } from '../engines/brandedExportAndThreePng';
+import {
+  buildSafeFontEmbedCSS,
+  getBrandedExportFilename,
+  triggerBrandedBlobDownload,
+} from '../engines/brandedExportAndThreePng';
 import { dataUrlToBlob } from '../services/imageSecurity';
 import { PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
 import { AdSlot } from '../components/AdSlot';
@@ -87,7 +91,11 @@ export const BingoView: React.FC<BingoViewProps> = () => {
     setExporting(true);
     setStatusMsg('Rendering PNG...');
     try {
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, cacheBust: true });
+      if (typeof document !== 'undefined' && document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+      const fontEmbedCSS = await buildSafeFontEmbedCSS([], undefined, `${title}${subtitle}${cells.join('')}`);
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, cacheBust: true, fontEmbedCSS });
       const blob = dataUrlToBlob(dataUrl);
       triggerBrandedBlobDownload(blob, getBrandedExportFilename('png', '2d'));
       setStatusMsg('Bingo card exported as PNG.');

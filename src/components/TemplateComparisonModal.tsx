@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import type { CardTemplate } from '../types/card';
 import { SquareDuotoneIcon } from './SquareDuotoneIcon';
-import { ASSET_AVATARS } from '../data/canvasAssets';
-import { sanitizeQuote } from '../utils/richText';
+import { UnifiedCardThumbnail } from './UnifiedCardThumbnail';
 
 interface TemplateComparisonModalProps {
   isOpen: boolean;
@@ -17,14 +16,12 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
   onClose,
   templates,
   onOpenTemplate,
+  theme = 'dark',
 }) => {
-
-  // Live test input state that injects into all compared templates simultaneously
-  const [testQuote, setTestQuote] = useState(
-    '“We have to be continually jumping off cliffs and developing our wings on the way down.”'
-  );
-  const [testAuthor, setTestAuthor] = useState('Kurt Vonnegut');
-  const [testTag, setTestTag] = useState('STUDIO TEST • NO. 01');
+  // Optional overrides applied to simple text templates while preserving layered canvas art
+  const [testQuote, setTestQuote] = useState('');
+  const [testAuthor, setTestAuthor] = useState('');
+  const [testTag, setTestTag] = useState('');
 
   if (!isOpen || templates.length === 0) return null;
 
@@ -91,59 +88,35 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
         {/* Comparison Grid: Strict 2-Column or 4-Column Layout */}
         <div className={`p-4 sm:p-6 grid gap-4 sm:gap-6 ${isQuad ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2'}`}>
           {templates.map((tmpl) => {
-            const isIdStyle = tmpl.hasPhotoArea || tmpl.category === 'id-card';
+            const previewTemplate: CardTemplate = tmpl.canvasDoc?.objects.length
+              ? tmpl
+              : {
+                  ...tmpl,
+                  quote: testQuote.trim() || tmpl.quote,
+                  author: testAuthor.trim() || tmpl.author,
+                  tag: testTag.trim() || tmpl.tag,
+                };
 
             return (
               <div
                 key={tmpl.id}
                 className="flex flex-col rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-bg)] overflow-hidden shadow-lg"
               >
-                {/* Live Card Render Preview */}
-                <div
-                  style={{ backgroundColor: tmpl.theme.bg, color: tmpl.theme.ink }}
-                  className="p-5 sm:p-6 min-h-[260px] sm:min-h-[280px] flex flex-col justify-between border-b border-black/10 relative overflow-hidden"
-                >
-                  <div className="flex items-center justify-between text-[11px] font-mono opacity-75">
-                    <span>{testTag || tmpl.tag || tmpl.categoryLabel}</span>
-                    <span className="border border-current/30 px-1.5 py-0.5 rounded text-[9px] font-bold">
-                      {tmpl.badge}
-                    </span>
-                  </div>
-
-                  {isIdStyle ? (
-                    <div className="my-4 flex items-center gap-3">
-                      <div className="w-16 h-20 rounded-lg overflow-hidden border border-current/30 shrink-0 bg-black/10">
-                        <img
-                          src={ASSET_AVATARS.grungeDan}
-                          alt="ID Photo"
-                          className="w-full h-full object-cover grayscale contrast-125"
-                        />
-                      </div>
-                      <div className="flex-1 flex flex-col gap-1 text-xs">
-                        <span className="font-bold text-sm tracking-tight">{tmpl.title}</span>
-                        <span className="opacity-80 text-[11px] line-clamp-2">
-                          {sanitizeQuote(testQuote || tmpl.quote)}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="my-6">
-                      <blockquote className="text-xl sm:text-2xl font-editorial leading-snug tracking-tight">
-                        “{sanitizeQuote(testQuote || tmpl.quote)}”
-                      </blockquote>
-                    </div>
-                  )}
-
-                  <div className="pt-3 border-t border-current/15 flex items-center justify-between text-xs">
-                    <span className="font-medium opacity-85">— {testAuthor || tmpl.author}</span>
-                    <span className="text-[10px] font-mono opacity-50 uppercase">{tmpl.badge}</span>
+                {/* Live Unified Card Preview */}
+                <div className="p-3 sm:p-4 bg-[var(--app-surface-secondary)] border-b border-[var(--app-border-subtle)] flex items-center justify-center">
+                  <div className="w-full max-w-[260px] rounded-xl overflow-hidden border border-black/15 shadow-sm">
+                    <UnifiedCardThumbnail
+                      template={previewTemplate}
+                      isLight={theme === 'light'}
+                      className="w-full h-full"
+                    />
                   </div>
                 </div>
 
                 {/* Specs Breakdown Table */}
                 <div className="p-4 flex flex-col gap-2.5 text-xs">
                   <div className="flex items-center justify-between border-b pb-1.5 border-current/10">
-                    <span className="text-[#707a8a]">Style Name:</span>
+                    <span className="text-[var(--app-text-muted)]">Style Name:</span>
                     <strong className="font-bold">{tmpl.title}</strong>
                   </div>
                   <div className="flex items-center justify-between border-b pb-1.5 border-current/10">

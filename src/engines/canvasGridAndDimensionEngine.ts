@@ -71,6 +71,9 @@ export function normalizeTemplateDimensions<T extends {
   width: number;
   height: number;
   fontSize?: number;
+  strokeWidth?: number;
+  borderRadius?: number;
+  letterSpacing?: number;
   isBackground?: boolean;
   name?: string;
 }>(
@@ -82,34 +85,51 @@ export function normalizeTemplateDimensions<T extends {
 ): T[] {
   if (!layers || layers.length === 0) return layers;
 
+  const isFullBleed = (layer: T): boolean =>
+    layer.x <= 2 &&
+    layer.y <= 2 &&
+    layer.width >= fromWidth - 4 &&
+    layer.height >= fromHeight - 4;
+
   const isBgLayer = (layer: T): boolean => {
-    if (layer.isBackground) return true;
-    if (layer.width >= fromWidth - 80 && layer.height >= fromHeight - 80) return true;
-    if (typeof layer.name === 'string') {
-      const lower = layer.name.toLowerCase();
-      if (
-        lower.includes('paper') ||
-        lower.includes('card base') ||
-        lower.includes('card outline') ||
-        lower.includes('parchment') ||
-        lower.includes('background frame')
-      ) {
-        return true;
-      }
+    if (layer.isBackground || isFullBleed(layer)) return true;
+    return layer.width >= fromWidth - 80 && layer.height >= fromHeight - 80;
+  };
+
+  const dimScale = Math.min(toWidth / fromWidth, toHeight / fromHeight);
+  const scaleBgLayer = (layer: T): T => {
+    if (isFullBleed(layer)) {
+      return {
+        ...layer,
+        x: 0,
+        y: 0,
+        width: toWidth,
+        height: toHeight,
+      };
     }
-    return false;
+    const insetX = Math.max(0, Math.round(layer.x * (toWidth / fromWidth)));
+    const insetY = Math.max(0, Math.round(layer.y * (toHeight / fromHeight)));
+    return {
+      ...layer,
+      x: insetX,
+      y: insetY,
+      width: Math.max(20, toWidth - insetX * 2),
+      height: Math.max(20, toHeight - insetY * 2),
+      strokeWidth:
+        typeof layer.strokeWidth === 'number' && layer.strokeWidth > 0
+          ? Math.max(1, Math.round(layer.strokeWidth * dimScale * 10) / 10)
+          : layer.strokeWidth,
+      borderRadius:
+        typeof layer.borderRadius === 'number' && layer.borderRadius > 0
+          ? Math.round(layer.borderRadius * dimScale)
+          : layer.borderRadius,
+    };
   };
 
   const contentLayers = layers.filter((l) => !isBgLayer(l));
 
   if (contentLayers.length === 0) {
-    return layers.map((l) => ({
-      ...l,
-      x: 20,
-      y: 20,
-      width: Math.max(20, toWidth - 40),
-      height: Math.max(20, toHeight - 40),
-    }));
+    return layers.map((l) => scaleBgLayer(l));
   }
 
   let minX = Infinity;
@@ -129,14 +149,25 @@ export function normalizeTemplateDimensions<T extends {
 
   // If content bounding box is invalid, fallback to uniform direct scaling
   if (contentW <= 0 || contentH <= 0) {
-    const fallbackScale = Math.min(toWidth / fromWidth, toHeight / fromHeight);
     return layers.map((l) => ({
       ...l,
-      x: Math.round(l.x * fallbackScale),
-      y: Math.round(l.y * fallbackScale),
-      width: Math.max(4, Math.round(l.width * fallbackScale)),
-      height: Math.max(4, Math.round(l.height * fallbackScale)),
-      fontSize: l.fontSize ? Math.round(l.fontSize * fallbackScale * 10) / 10 : undefined,
+      x: Math.round(l.x * dimScale),
+      y: Math.round(l.y * dimScale),
+      width: Math.max(4, Math.round(l.width * dimScale)),
+      height: Math.max(4, Math.round(l.height * dimScale)),
+      fontSize: l.fontSize ? Math.round(l.fontSize * dimScale * 10) / 10 : undefined,
+      strokeWidth:
+        typeof l.strokeWidth === 'number' && l.strokeWidth > 0
+          ? Math.max(1, Math.round(l.strokeWidth * dimScale * 10) / 10)
+          : l.strokeWidth,
+      borderRadius:
+        typeof l.borderRadius === 'number' && l.borderRadius > 0
+          ? Math.round(l.borderRadius * dimScale)
+          : l.borderRadius,
+      letterSpacing:
+        typeof l.letterSpacing === 'number' && l.letterSpacing !== 0
+          ? Math.round(l.letterSpacing * dimScale * 10) / 10
+          : l.letterSpacing,
     }));
   }
 
@@ -160,13 +191,7 @@ export function normalizeTemplateDimensions<T extends {
 
   return layers.map((layer) => {
     if (isBgLayer(layer)) {
-      return {
-        ...layer,
-        x: 20,
-        y: 20,
-        width: Math.max(20, toWidth - 40),
-        height: Math.max(20, toHeight - 40),
-      };
+      return scaleBgLayer(layer);
     }
 
     const relX = (layer.x - minX) / contentW;
@@ -179,6 +204,18 @@ export function normalizeTemplateDimensions<T extends {
       width: Math.max(4, Math.round(layer.width * scale)),
       height: Math.max(4, Math.round(layer.height * scale)),
       fontSize: layer.fontSize ? Math.round(layer.fontSize * scale * 10) / 10 : undefined,
+      strokeWidth:
+        typeof layer.strokeWidth === 'number' && layer.strokeWidth > 0
+          ? Math.max(1, Math.round(layer.strokeWidth * scale * 10) / 10)
+          : layer.strokeWidth,
+      borderRadius:
+        typeof layer.borderRadius === 'number' && layer.borderRadius > 0
+          ? Math.round(layer.borderRadius * scale)
+          : layer.borderRadius,
+      letterSpacing:
+        typeof layer.letterSpacing === 'number' && layer.letterSpacing !== 0
+          ? Math.round(layer.letterSpacing * scale * 10) / 10
+          : layer.letterSpacing,
     };
   });
 }
