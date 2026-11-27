@@ -150,6 +150,7 @@ test('Studio Companion: Click debouncing, expressions cycle, squash animation, f
   assert.ok(companionSrc.includes('setClickAnim(true)'), 'Click must trigger squash animation');
   assert.ok(companionSrc.includes('EMOTE_LIST'), 'Must pick from playful emote list');
   assert.ok(companionSrc.includes('animate-float-emote'), 'Must render floating emote particle');
+  assert.ok(companionSrc.includes('!isOpen || isNearTop'), 'Must not overlap floating emote over above-avatar open popover');
   assert.ok(companionSrc.includes('animate-companion-breathe'), 'Must feature gentle idle breathing animation');
 
   // Expression cycling

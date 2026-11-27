@@ -331,8 +331,9 @@ export const StudioCompanion: React.FC = () => {
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current) return;
-    const wasMoved = dragRef.current.hasMoved;
+    const drag = dragRef.current;
+    if (!drag) return;
+    const wasMoved = drag.hasMoved;
     dragRef.current = null;
     setIsDragging(false);
 
@@ -340,14 +341,18 @@ export const StudioCompanion: React.FC = () => {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {}
 
-    if (position) {
-      localStorage.setItem('acg_companion_pos', JSON.stringify(position));
+    if (wasMoved) {
+      const finalPos = clampCoordinates(
+        drag.origX + (e.clientX - drag.startX),
+        drag.origY + (e.clientY - drag.startY)
+      );
+      setPosition(finalPos);
+      localStorage.setItem('acg_companion_pos', JSON.stringify(finalPos));
+      return;
     }
 
     // Normal tap toggles options dialog, NEVER triggers cheering
-    if (!wasMoved) {
-      handleCharacterClick();
-    }
+    handleCharacterClick();
   };
 
   const EMOTE_LIST = ['✨', '💖', '🎨', '💡', '🌟', '🎉'];
@@ -384,7 +389,7 @@ export const StudioCompanion: React.FC = () => {
 
   const handleInspireQuote = () => {
     const insp = DESIGN_INSPIRATIONS[Math.floor(Math.random() * DESIGN_INSPIRATIONS.length)];
-    setSpeechText(`${insp.text} — ${insp.tip}`);
+    setSpeechText(`${insp.text} ${insp.tip}`);
     setSpeechAuthor(insp.author);
     setMood('happy');
     setTimeout(() => setMood('idle'), 1500);
@@ -532,7 +537,7 @@ export const StudioCompanion: React.FC = () => {
           <p className="leading-snug mb-2 text-[var(--app-text)] font-normal">{speechText}</p>
           {speechAuthor && (
             <p className="text-[10px] font-mono text-[var(--app-accent)] -mt-1 mb-2">
-              — {speechAuthor}
+              - {speechAuthor}
             </p>
           )}
 
@@ -546,7 +551,7 @@ export const StudioCompanion: React.FC = () => {
                   ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/40'
                   : 'bg-[var(--app-surface-secondary)] text-[var(--app-text)] border-[var(--app-border-subtle)] hover:bg-[var(--app-surface-secondary)]/80'
               }`}
-              title="Add this character as a sticker on your card"
+              title="Add Mochi Cloud as a sticker on your card"
             >
               {stampedCanvas ? <Check className="w-3 h-3 text-emerald-500" /> : <Stamp className="w-3 h-3 text-[var(--app-accent)]" />}
               <span>{stampedCanvas ? 'Added!' : 'Add to Card'}</span>
@@ -609,8 +614,8 @@ export const StudioCompanion: React.FC = () => {
           </button>
         ) : (
           <div className="relative">
-            {/* Floating Emote on Click, Scroll, or Theme Change */}
-            {emote && (
+            {/* Floating Emote on Click, Scroll, or Theme Change (skip above-avatar emote when popover opens above it) */}
+            {emote && (!isOpen || isNearTop) && (
               <div
                 aria-hidden="true"
                 className="absolute -top-7 left-1/2 -translate-x-1/2 text-xl pointer-events-none animate-float-emote z-30"
