@@ -524,9 +524,9 @@ export const StudioCompanion: React.FC = () => {
         >
           {/* Header with Close, Reset, and Minimize */}
           <div className="flex items-center justify-between border-b border-[var(--app-border-subtle)] pb-2 mb-2">
-            <div className="flex items-center gap-1.5 font-semibold text-[11px] uppercase tracking-wider text-[var(--app-text-secondary)]">
-              <Sparkles className="w-3.5 h-3.5 text-[var(--app-accent)]" />
-              <span>Studio Companion</span>
+            <div className="flex items-center gap-1.5 font-medium text-xs text-[var(--app-text-secondary)]">
+              <Sparkles className="w-3.5 h-3.5 text-[var(--app-accent)] stroke-[1.5]" />
+              <span>Studio companion</span>
             </div>
             <div className="flex items-center gap-1">
               <button
@@ -576,8 +576,8 @@ export const StudioCompanion: React.FC = () => {
               }`}
               title="Add Mochi Cloud as a sticker on your card"
             >
-              {stampedCanvas ? <Check className="w-3 h-3 text-emerald-500" /> : <Stamp className="w-3 h-3 text-[var(--app-accent)]" />}
-              <span>{stampedCanvas ? 'Added!' : 'Add to Card'}</span>
+              {stampedCanvas ? <Check className="w-3 h-3 text-emerald-500 stroke-[1.5]" /> : <Stamp className="w-3 h-3 text-[var(--app-accent)] stroke-[1.5]" />}
+              <span>{stampedCanvas ? 'Added' : 'Add to card'}</span>
             </button>
 
             <button
@@ -586,7 +586,7 @@ export const StudioCompanion: React.FC = () => {
               className="py-1 px-1 rounded-lg bg-[var(--app-surface-secondary)] hover:bg-[var(--app-surface-secondary)]/80 text-[var(--app-text)] border border-[var(--app-border-subtle)] flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors"
               title="Get a design quote"
             >
-              <Sparkles className="w-3 h-3 text-[var(--app-accent)]" />
+              <Sparkles className="w-3 h-3 text-[var(--app-accent)] stroke-[1.5]" />
               <span>Inspire</span>
             </button>
 
@@ -598,12 +598,12 @@ export const StudioCompanion: React.FC = () => {
             >
               {copiedPalette ? (
                 <>
-                  <Check className="w-3 h-3 text-emerald-500" />
-                  <span className="text-emerald-500">Copied!</span>
+                  <Check className="w-3 h-3 text-emerald-500 stroke-[1.5]" />
+                  <span className="text-emerald-500">Copied</span>
                 </>
               ) : (
                 <>
-                  <Shuffle className="w-3 h-3 text-[var(--app-accent)]" />
+                  <Shuffle className="w-3 h-3 text-[var(--app-accent)] stroke-[1.5]" />
                   <span>Palette</span>
                 </>
               )}
@@ -615,8 +615,8 @@ export const StudioCompanion: React.FC = () => {
               className="py-1 px-1 rounded-lg bg-[var(--app-accent)]/15 hover:bg-[var(--app-accent)]/25 text-[var(--app-accent)] border border-[var(--app-accent)]/30 flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors font-medium"
               title="Celebrate with confetti"
             >
-              <Smile className="w-3 h-3" />
-              <span>Cheer!</span>
+              <Smile className="w-3 h-3 stroke-[1.5]" />
+              <span>Celebrate</span>
             </button>
           </div>
         </div>
@@ -629,19 +629,19 @@ export const StudioCompanion: React.FC = () => {
           <button
             type="button"
             onClick={() => toggleMinimize(false)}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 shadow-lg hover:border-[var(--app-accent)]/50 text-base text-[var(--app-text)] transition-transform hover:scale-105 cursor-pointer"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-lg hover:border-[var(--app-border-strong)] text-[var(--app-text-secondary)] hover:text-[var(--app-text)] transition-colors cursor-pointer"
             title={`Expand ${currentMeta.name} companion`}
             aria-label={`Open ${currentMeta.name} companion`}
           >
-            <span className="leading-none" aria-hidden="true">{currentMeta.badge}</span>
+            <Cloud className="h-4 w-4 stroke-[1.5]" aria-hidden="true" />
           </button>
         ) : (
           <div className="relative">
-            {/* Floating Emote on Click, Scroll, or Theme Change (skip above-avatar emote when popover opens above it) */}
+            {/* Floating badge on Click, Scroll, or Theme Change */}
             {emote && (!isOpen || isNearTop) && (
               <div
                 aria-hidden="true"
-                className="absolute -top-7 left-1/2 -translate-x-1/2 text-xl pointer-events-none animate-float-emote z-30"
+                className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-md border border-[var(--app-border-subtle)] bg-[var(--app-surface)] px-2 py-0.5 text-[11px] font-mono text-[var(--app-text-primary)] pointer-events-none animate-float-emote z-30 whitespace-nowrap"
               >
                 {emote}
               </div>
@@ -660,7 +660,7 @@ export const StudioCompanion: React.FC = () => {
               tabIndex={0}
               aria-label={`Interactive ${currentMeta.name} companion. Click to open options.`}
               aria-expanded={isOpen}
-              className={`relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl border-2 border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:shadow-2xl hover:border-[var(--app-accent)]/60 overflow-hidden transition-all duration-200 flex items-center justify-center cursor-pointer select-none ${
+              className={`relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-xl hover:border-[var(--app-accent)] overflow-hidden transition-[border-color,transform] duration-200 flex items-center justify-center cursor-pointer select-none ${
                 stampAnim
                   ? 'animate-companion-stamp'
                   : clickAnim
