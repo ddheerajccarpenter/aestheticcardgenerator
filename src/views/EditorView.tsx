@@ -2315,7 +2315,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
       {/* PRIMARY STUDIO TOOLBAR (Compact, Responsive, No Collisions)         */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <div
-        className="w-full border-b border-[var(--app-border-subtle)] px-3 sm:px-6 py-2 flex items-center justify-between gap-2 sticky top-13 sm:top-16 z-40 backdrop-blur-md transition-colors duration-200 bg-[var(--app-bg)]/95 text-[var(--app-text)]"
+        className="w-full border-b border-[var(--app-border-subtle)] px-3 sm:px-6 py-2 flex items-center justify-between gap-2 sticky top-13 sm:top-16 z-40 transition-colors duration-200 bg-[var(--app-bg)] text-[var(--app-text)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left: Back, Studio Switch, Title, Undo / Redo */}
@@ -2780,8 +2780,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
       {/* MOBILE SECONDARY SUB-BAR (Direct Aspect Ratio Chips & Quick Actions) */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <div
-        className={`lg:hidden w-full border-b px-3 py-1.5 flex items-center justify-between gap-1.5 sticky top-[89px] sm:top-[104px] z-30 backdrop-blur-md overflow-x-auto no-scrollbar transition-colors ${
-          isLight ? 'bg-white/90 border-[var(--app-border-subtle)]' : 'bg-[#111417]/90 border-[#262c36]'
+        className={`lg:hidden w-full border-b px-3 py-1.5 flex items-center justify-between gap-1.5 sticky top-[89px] sm:top-[104px] z-30 overflow-x-auto no-scrollbar transition-colors ${
+          isLight ? 'bg-white border-[var(--app-border-subtle)]' : 'bg-[#111417] border-[#262c36]'
         }`}
       >
         {/* Aspect Ratio Chips */}
@@ -3143,8 +3143,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
       {/* MOBILE BOTTOM DOCKED CATEGORY STRIP (Docked cleanly at bottom on mobile) */}
       <div
-        className={`lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t backdrop-blur-xl px-2 py-1.5 pb-[env(safe-area-inset-bottom,4px)] transition-colors shadow-2xl ${
-          isLight ? 'bg-white/98 border-[var(--app-border-subtle)]' : 'bg-[#111417]/98 border-[#262c36]'
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t px-2 py-1.5 pb-[env(safe-area-inset-bottom,4px)] transition-colors shadow-2xl ${
+          isLight ? 'bg-white border-[var(--app-border-subtle)]' : 'bg-[#111417] border-[#262c36]'
         }`}
       >
         <div className="grid grid-cols-4 gap-1 max-w-md mx-auto">
@@ -3218,7 +3218,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
         <>
           {/* Backdrop */}
           <div
-            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            className="lg:hidden fixed inset-0 bg-black/70 z-50 animate-fade-in"
             onClick={() => setMobileSheetOpen(false)}
             aria-hidden="true"
           />
@@ -3271,7 +3271,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
       {mobileOptionsOpen && (
         <>
           <div
-            className="sm:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            className="sm:hidden fixed inset-0 bg-black/70 z-50 animate-fade-in"
             onClick={() => setMobileOptionsOpen(false)}
             aria-hidden="true"
           />
@@ -3392,7 +3392,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
       {/* QUICK STYLE SWITCHER MODAL / DRAWER */}
       {templateDrawerOpen && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4"
           onClick={() => setTemplateDrawerOpen(false)}
         >
           <div

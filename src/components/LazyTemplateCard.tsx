@@ -1,6 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { getStageInnerWidth } from '../utils/templateAspectRatio';
 
+const observerCallbacks = new WeakMap<Element, () => void>();
+let sharedObserver: IntersectionObserver | null = null;
+
+function getSharedObserver(): IntersectionObserver | null {
+  if (typeof IntersectionObserver === 'undefined') return null;
+  if (!sharedObserver) {
+    sharedObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const reveal = observerCallbacks.get(entry.target);
+          sharedObserver?.unobserve(entry.target);
+          observerCallbacks.delete(entry.target);
+          reveal?.();
+        }
+      },
+      { rootMargin: '240px 0px', threshold: 0.05 }
+    );
+  }
+  return sharedObserver;
+}
+
 export const LazyTemplateCard: React.FC<{
   aspectRatioClass?: string;
   aspectRatio?: number;
@@ -13,16 +35,20 @@ export const LazyTemplateCard: React.FC<{
   const [inView, setInView] = useState(() => typeof IntersectionObserver === 'undefined');
 
   useEffect(() => {
+    if (inView) return;
     const node = hostRef.current;
-    if (!node) return;
-    const io = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
+    const io = getSharedObserver();
+    if (!node || !io) {
       setInView(true);
-      io.disconnect();
-    }, { rootMargin: '240px 0px', threshold: 0.05 });
+      return;
+    }
+    observerCallbacks.set(node, () => setInView(true));
     io.observe(node);
-    return () => io.disconnect();
-  }, []);
+    return () => {
+      io.unobserve(node);
+      observerCallbacks.delete(node);
+    };
+  }, [inView]);
 
   const cardFrame = (
     <div

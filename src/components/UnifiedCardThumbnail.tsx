@@ -127,6 +127,7 @@ const renderObject = (object: CanvasObject, doc: CanvasDocument) => {
           src={object.filteredSrc || object.src}
           alt=""
           loading="lazy"
+          decoding="async"
           draggable={false}
           style={{
             width: '100%',
@@ -155,7 +156,7 @@ export const UnifiedCardThumbnail: React.FC<UnifiedCardThumbnailProps> = ({ temp
       onClick={onClick}
       aria-hidden="true"
       className={`relative block w-full overflow-hidden ${className}`}
-      style={{ aspectRatio: `${document.canvasWidth} / ${document.canvasHeight}`, backgroundColor: document.background, containerType: 'inline-size' }}
+      style={{ aspectRatio: `${document.canvasWidth} / ${document.canvasHeight}`, backgroundColor: document.background, containerType: 'inline-size', contain: 'layout style' }}
     >
       {!template.canvasDoc?.objects.length && template.showGrain && (
         <div className="card-noise pointer-events-none absolute inset-0 z-[2]" style={{ opacity: template.textureIntensity ?? 0.12 }} />

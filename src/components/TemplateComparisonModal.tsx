@@ -37,7 +37,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col p-3 sm:p-6 md:p-8 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black/85 flex flex-col p-3 sm:p-6 md:p-8 overflow-y-auto"
       onClick={onClose}
     >
       <div

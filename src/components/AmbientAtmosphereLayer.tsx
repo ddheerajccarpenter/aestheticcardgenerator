@@ -26,12 +26,12 @@ export const AmbientAtmosphereLayer: React.FC<AmbientAtmosphereLayerProps> = ({ 
   const isLight = theme === 'light';
   const c1 = ambientState.tones.primary;
   const c2 = ambientState.tones.secondary;
-  const opacity = isLight ? 0.05 : 0.09;
+  const opacity = isLight ? 0.02 : 0.03;
 
   return (
     <div
       aria-hidden="true"
-      className="acg-ambient-atmosphere pointer-events-none fixed inset-0 z-0 overflow-hidden transition-all duration-500 ease-out"
+      className="acg-ambient-atmosphere pointer-events-none fixed inset-0 z-0 overflow-hidden transition-opacity duration-300 ease-out"
       style={{
         opacity,
         background: `

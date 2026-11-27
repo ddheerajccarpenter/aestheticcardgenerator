@@ -114,32 +114,41 @@ export const Header: React.FC<HeaderProps> = ({
   const toolClass = 'inline-flex h-11 w-11 md:h-10 md:w-10 items-center justify-center rounded-xl text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] cursor-pointer';
 
   return (
-    <header className="sticky top-0 z-50 w-full overflow-x-clip border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full overflow-x-clip border-b border-[var(--app-border-subtle)] bg-[var(--app-bg)]">
       <div className="mx-auto flex h-14 max-w-[1540px] items-center justify-between gap-2 px-3 text-[var(--app-text-primary)] sm:px-5 lg:px-6">
         <a href="/" aria-label="ACG home" className="group flex shrink-0 items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] sm:gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--app-accent)] text-[var(--app-accent)] transition-transform duration-300 group-hover:scale-105" aria-hidden="true">
-            <span className="h-2 w-2 rounded-full bg-current transition-transform duration-300 group-hover:scale-125" />
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[var(--app-border-strong)] text-[var(--app-accent)] transition-colors group-hover:border-[var(--app-accent)]" aria-hidden="true">
+            <span className="h-2 w-2 rounded-xs bg-current" />
           </span>
-          <span className="font-brand text-base leading-none tracking-wide">ACG</span>
+          <span className="font-brand text-base leading-none tracking-normal">ACG</span>
         </a>
 
-        <nav aria-label="Primary" className="hidden min-w-0 items-center gap-0.5 md:flex lg:gap-1">
+        <nav aria-label="Primary" className="hidden min-w-0 items-center gap-1 md:flex">
           {links.map(({ label, path, icon: Icon, active }) => (
             <a
               key={path}
               href={path}
               aria-current={active ? 'page' : undefined}
-              className={`group inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2 text-[11px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] lg:gap-2 lg:px-3 lg:text-xs ${active ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)]'}`}
+              className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] lg:gap-2 lg:px-3 ${active ? 'bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)]' : 'text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)]'}`}
             >
-              <Icon className="hidden h-4 w-4 lg:block transition-transform duration-200 group-hover:-translate-y-0.5" aria-hidden="true" />
+              <Icon className="hidden h-4 w-4 stroke-[1.5] lg:block" aria-hidden="true" />
               <span>{label}</span>
             </a>
           ))}
         </nav>
 
         <div className="flex shrink-0 items-center gap-1">
-          <button type="button" onClick={onOpenShortcuts} title="Quick search (⌘K)" aria-label="Open quick search" className={toolClass}>
-            <Search className="h-4 w-4" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={onOpenShortcuts}
+            title="Quick search"
+            aria-label="Open quick search"
+            className="inline-flex h-11 sm:h-9 w-11 sm:w-auto items-center justify-center gap-1.5 rounded-lg sm:border sm:border-[var(--app-border-subtle)] sm:bg-[var(--app-surface)] sm:px-2.5 text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] cursor-pointer"
+          >
+            <Search className="h-4 w-4 stroke-[1.5]" aria-hidden="true" />
+            <kbd className="hidden lg:inline-block rounded border border-[var(--app-border-subtle)] bg-[var(--app-bg)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--app-text-muted)]">
+              ⌘K
+            </kbd>
           </button>
           <button
             type="button"

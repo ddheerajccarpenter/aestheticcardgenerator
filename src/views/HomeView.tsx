@@ -63,6 +63,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ theme = 'dark' }) => {
   const heroCropRef = useRef<SVGSVGElement | null>(null);
   const swatchStripRef = useRef<HTMLDivElement | null>(null);
   const galleryGridRef = useRef<HTMLDivElement | null>(null);
+  const heroRafRef = useRef<number | null>(null);
 
   const heroTemplates = useMemo(() => PRESET_TEMPLATES.slice(0, 4), []);
 
@@ -196,15 +197,26 @@ export const HomeView: React.FC<HomeViewProps> = ({ theme = 'dark' }) => {
 
   const handleHeroPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType !== 'mouse' || isReducedMotion() || !heroStageRef.current) return;
-    const rect = heroStageRef.current.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    heroStageRef.current.style.setProperty('--hero-px', nx.toFixed(3));
-    heroStageRef.current.style.setProperty('--hero-py', ny.toFixed(3));
+    const { clientX, clientY } = e;
+    if (heroRafRef.current !== null) return;
+    heroRafRef.current = window.requestAnimationFrame(() => {
+      heroRafRef.current = null;
+      const stage = heroStageRef.current;
+      if (!stage) return;
+      const rect = stage.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const nx = ((clientX - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
+      stage.style.setProperty('--hero-px', nx.toFixed(3));
+      stage.style.setProperty('--hero-py', ny.toFixed(3));
+    });
   };
 
   const handleHeroPointerLeave = () => {
+    if (heroRafRef.current !== null) {
+      window.cancelAnimationFrame(heroRafRef.current);
+      heroRafRef.current = null;
+    }
     if (!heroStageRef.current) return;
     heroStageRef.current.style.setProperty('--hero-px', '0');
     heroStageRef.current.style.setProperty('--hero-py', '0');
@@ -340,7 +352,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ theme = 'dark' }) => {
                   aria-label={`View ${frontTemplate.title}`}
                   onPointerMove={handleTiltPointerMove}
                   onPointerLeave={handleTiltPointerLeave}
-                  className="card-tilt-surface block overflow-hidden rounded-2xl border border-[var(--app-border-strong)] shadow-[0_32px_80px_rgba(0,0,0,0.38)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+                  className="card-tilt-surface block overflow-hidden rounded-2xl border border-[var(--app-border-strong)] shadow-[0_18px_40px_rgba(0,0,0,0.3)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
                 >
                   <LazyTemplateCard aspectRatio={getTemplateAspectRatio(frontTemplate)} className="card-tilt-glint">
                     <UnifiedCardThumbnail template={frontTemplate} isLight={theme === 'light'} className="h-full w-full" />
@@ -520,7 +532,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ theme = 'dark' }) => {
               <article
                 key={card.id}
                 data-reveal-card
-                className="group relative flex min-w-0 flex-col"
+                className="gpu-gallery-item group relative flex min-w-0 flex-col"
               >
                 <a
                   href={`/card/${card.id}`}
@@ -533,7 +545,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ theme = 'dark' }) => {
                     aspectRatio={getTemplateAspectRatio(card)}
                     stageRatio={1}
                     stageClassName={`rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] transition-colors group-hover:border-[var(--app-border-strong)] ${galleryLayout === 'compact' ? 'p-2.5 sm:p-3.5' : 'p-3.5 sm:p-5'}`}
-                    className="card-tilt-glint overflow-hidden rounded-xl ring-1 ring-[var(--app-border-subtle)] shadow-[0_12px_28px_rgba(0,0,0,0.22)] card-artwork-zoom"
+                    className="card-tilt-glint overflow-hidden rounded-xl ring-1 ring-[var(--app-border-subtle)] shadow-[0_8px_18px_rgba(0,0,0,0.18)] card-artwork-zoom"
                   >
                     <UnifiedCardThumbnail template={card} isLight={theme === 'light'} className="h-full w-full" />
                   </LazyTemplateCard>

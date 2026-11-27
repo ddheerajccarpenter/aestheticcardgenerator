@@ -54,7 +54,7 @@ export function createThreeCardPreviewScene(
     powerPreference: 'low-power',
     stencil: false,
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(width, height, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -76,7 +76,7 @@ export function createThreeCardPreviewScene(
     cardWidth,
     cardHeight,
     cardDepth,
-    4,
+    2,
     Math.min(cardDepth / 2, Math.min(cardWidth, cardHeight) * 0.024)
   );
   const frontMaterial = new THREE.MeshPhysicalMaterial({
@@ -94,17 +94,15 @@ export function createThreeCardPreviewScene(
   card.rotation.set(-0.14, 0.22, -0.02);
   scene.add(card);
 
-  // 4-Point Studio Lighting (Key, Fill, Rim & Under-glow)
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+  // 3-Point Studio Lighting (Key, Fill & Rim; keeps shader passes lean on mobile GPUs)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.35);
   const keyLight = new THREE.DirectionalLight(0xfff6e9, 2.0);
   keyLight.position.set(2.8, 3.5, 4.2);
-  const fillLight = new THREE.DirectionalLight(0xdcd5c9, 0.8);
+  const fillLight = new THREE.DirectionalLight(0xdcd5c9, 0.9);
   fillLight.position.set(-3.2, -2.0, 2.5);
   const rimLight = new THREE.DirectionalLight(0xffffff, 1.3);
   rimLight.position.set(0, 3.5, -4);
-  const underLight = new THREE.DirectionalLight(0xc69d78, 0.4);
-  underLight.position.set(0, -3.2, 1.5);
-  scene.add(ambientLight, keyLight, fillLight, rimLight, underLight);
+  scene.add(ambientLight, keyLight, fillLight, rimLight);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;

@@ -2758,7 +2758,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         >
           {is3DMode && (
             <div
-              className="relative flex items-center justify-center w-full max-w-xl aspect-[4/3] sm:aspect-square rounded-3xl overflow-hidden border border-[var(--app-border-strong)] bg-gradient-to-b from-black/20 to-black/60 backdrop-blur-xl shadow-2xl p-2 sm:p-4 my-auto"
+              className="relative flex items-center justify-center w-full max-w-xl aspect-[4/3] sm:aspect-square rounded-3xl overflow-hidden border border-[var(--app-border-strong)] bg-gradient-to-b from-black/25 to-black/65 shadow-2xl p-2 sm:p-4 my-auto"
             >
               <div ref={threeMountRef} className="h-full w-full" />
               <ThreeDPreviewControls controllerRef={threeCleanupRef} onExit={() => setIs3DMode(false)} />
@@ -4771,8 +4771,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* MOBILE BOTTOM DOCKED CANVAS ACTION BAR (< lg)                         */}
       {/* ───────────────────────────────────────────────────────────────────── */}
       <div
-        className={`lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t backdrop-blur-lg px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] transition-colors ${
-          isLight ? 'bg-white/95 border-[#e3ddd3]' : 'bg-[#24211b]/95 border-[#39342d]'
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] transition-colors ${
+          isLight ? 'bg-white border-[#e3ddd3]' : 'bg-[#24211b] border-[#39342d]'
         }`}
       >
         <div className="grid grid-cols-4 gap-1 max-w-md mx-auto">
@@ -4840,7 +4840,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {mobileAddSheetOpen && (
         <>
           <div
-            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            className="lg:hidden fixed inset-0 bg-black/70 z-50 animate-fade-in"
             onClick={() => setMobileAddSheetOpen(false)}
             aria-hidden="true"
           />
@@ -5000,7 +5000,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {mobileInspectorOpen && (
         <>
           <div
-            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            className="lg:hidden fixed inset-0 bg-black/70 z-50 animate-fade-in"
             onClick={() => setMobileInspectorOpen(false)}
             aria-hidden="true"
           />
@@ -5467,7 +5467,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       {/* ───────────────────────────────────────────────────────────────────── */}
       {templateDrawerOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in"
+          className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-3 sm:p-6 animate-fade-in"
           onClick={() => setTemplateDrawerOpen(false)}
         >
           <div
@@ -5699,7 +5699,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         <div className="relative h-36 mb-3.5 rounded-xl overflow-hidden border border-black/10 shadow-inner select-none bg-black/10">
                           {/* Pinterest Pick Floating Badge */}
                           {isPinterest && (
-                            <div className="absolute top-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black/70 text-[#E2D9C8] border border-[#E2D9C8]/40 backdrop-blur-xs flex items-center gap-1 shadow-sm">
+                            <div className="absolute top-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black/80 text-[#E2D9C8] border border-[#E2D9C8]/40 flex items-center gap-1 shadow-sm">
                               <Sparkles className="w-2.5 h-2.5 text-[var(--app-accent)]" />
                               <span>Pinterest</span>
                             </div>
@@ -5712,7 +5712,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                           />
 
                           {/* Hover Overlay Button */}
-                          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity flex items-center justify-center z-10">
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity flex items-center justify-center z-10">
                             <span className={`px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-lg flex items-center gap-1.5 transform group-hover:scale-105 transition-transform ${
                               isLight ? 'bg-[#24211b] text-white' : 'bg-[#E2D9C8] text-[#24211b]'
                             }`}>

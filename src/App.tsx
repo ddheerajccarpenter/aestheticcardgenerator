@@ -440,7 +440,7 @@ export const App: React.FC = () => {
       {/* Command Palette (⌘K) Modal */}
       {shortcutsOpen && (
         <div
-          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-start justify-center pt-20 p-4"
+          className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-20 p-4"
           onClick={() => setShortcutsOpen(false)}
         >
           <div

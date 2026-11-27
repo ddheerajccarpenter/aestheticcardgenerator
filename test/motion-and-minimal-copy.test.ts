@@ -170,3 +170,20 @@ test('Uniform card stage framing normalizes mixed aspect ratios across Home, Sig
   const detailSrc = fs.readFileSync(path.join(SRC_DIR, 'views', 'CardDetailView.tsx'), 'utf8');
   assert.ok(detailSrc.includes('stageRatio={1}'), 'CardDetailView related cards grid must use uniform specimen stage');
 });
+
+test('GPU optimization: no heavy SVG blur/turbulence filters, idle infinite background paints, or minimized pointer tracking', () => {
+  const premiumAssets = fs.readFileSync(path.join(SRC_DIR, 'data', 'premiumTemplates.ts'), 'utf8');
+  assert.ok(!premiumAssets.includes('feGaussianBlur'), 'premiumTemplates must not run runtime SVG Gaussian blur passes');
+  assert.ok(!premiumAssets.includes('feTurbulence'), 'premiumTemplates must not run runtime SVG fractal noise shaders');
+
+  const cssSrc = fs.readFileSync(path.join(SRC_DIR, 'index.css'), 'utf8');
+  assert.ok(!cssSrc.includes('animation: holoSheen'), 'holographic-foil must not run idle infinite background-position repaints');
+  assert.ok(cssSrc.includes('.gpu-gallery-item') && cssSrc.includes('content-visibility: auto'), 'index.css must skip offscreen gallery card rasterization');
+  assert.ok(!/\.card-tilt-surface\s*\{[^}]*will-change:\s*transform/.test(cssSrc), 'card-tilt-surface must not pre-allocate GPU layers when idle');
+
+  const companionSrc = fs.readFileSync(path.join(SRC_DIR, 'components', 'StudioCompanion.tsx'), 'utf8');
+  assert.ok(companionSrc.includes('if (isMinimized || motionPaused'), 'StudioCompanion must skip pointer listeners when minimized or paused');
+
+  const threeStage = fs.readFileSync(path.join(SRC_DIR, 'engines', 'threeCardStage.ts'), 'utf8');
+  assert.ok(threeStage.includes('Math.min(window.devicePixelRatio || 1, 1.5)'), 'WebGL 3D stage must cap DPR at 1.5');
+});

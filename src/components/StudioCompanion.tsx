@@ -9,6 +9,7 @@ import {
   RotateCcw,
   Check,
   Stamp,
+  Cloud,
 } from 'lucide-react';
 import { isReducedMotion, useMotionPaused } from '../utils/motion';
 
@@ -27,9 +28,9 @@ export const COMPANION_ROSTER: CompanionMeta[] = [
   {
     id: 'mochi',
     name: 'Mochi',
-    badge: '☁️',
-    role: 'Cozy Cloud',
-    greeting: 'Soft colors make everything feel warmer.',
+    badge: 'Mochi',
+    role: 'Studio guide',
+    greeting: 'Warm tones keep cards readable on paper and dark backgrounds.',
   },
 ];
 
@@ -162,45 +163,62 @@ export const StudioCompanion: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [clampCoordinates]);
 
-  // Pointer tracking with smooth eye interpolation (RAF-throttled to 60/120fps, paused when tab hidden)
+  // Pointer tracking with smooth eye interpolation (skipped while minimized or motion paused to avoid idle mousemove work)
   useEffect(() => {
+    if (isMinimized || motionPaused || mood === 'happy' || mood === 'celebrating') {
+      return;
+    }
+
     let rafId: number | null = null;
+    let cachedCenterX = window.innerWidth - 60;
+    let cachedCenterY = window.innerHeight - 80;
+
+    const refreshBounds = () => {
+      if (!companionRef.current) return;
+      const rect = companionRef.current.getBoundingClientRect();
+      cachedCenterX = rect.left + rect.width / 2;
+      cachedCenterY = rect.top + rect.height / 2;
+    };
+    refreshBounds();
 
     const handlePointerMove = (e: MouseEvent | TouchEvent) => {
       if (document.visibilityState === 'hidden') return;
       if (rafId !== null) return;
 
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const touch = 'touches' in e ? e.touches[0] : null;
+      const clientX = touch ? touch.clientX : (e as MouseEvent).clientX;
+      const clientY = touch ? touch.clientY : (e as MouseEvent).clientY;
 
       rafId = requestAnimationFrame(() => {
         rafId = null;
         if (!companionRef.current) return;
-        const rect = companionRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
 
-        const dx = clientX - centerX;
-        const dy = clientY - centerY;
+        const dx = clientX - cachedCenterX;
+        const dy = clientY - cachedCenterY;
         const dist = Math.hypot(dx, dy) || 1;
         const maxDist = 320;
         const clampDist = Math.min(dist, maxDist) / maxDist;
+        const nextX = (dx / dist) * clampDist;
+        const nextY = (dy / dist) * clampDist;
 
-        setPointer({
-          x: (dx / dist) * clampDist,
-          y: (dy / dist) * clampDist,
-        });
+        setPointer((prev) =>
+          Math.abs(prev.x - nextX) < 0.03 && Math.abs(prev.y - nextY) < 0.03
+            ? prev
+            : { x: nextX, y: nextY }
+        );
       });
     };
 
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
     window.addEventListener('touchmove', handlePointerMove, { passive: true });
+    window.addEventListener('resize', refreshBounds, { passive: true });
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId);
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('resize', refreshBounds);
     };
-  }, []);
+  }, [isMinimized, motionPaused, mood, position]);
 
   // Natural idle blinking loop (paused when tab hidden)
   useEffect(() => {
@@ -241,8 +259,8 @@ export const StudioCompanion: React.FC = () => {
           if (!hasTriggeredEndScroll.current) {
             hasTriggeredEndScroll.current = true;
             setMood('celebrating');
-            setEmote('🎉');
-            setSpeechText('You reached the bottom! Ready to craft your card? ✨');
+            setEmote('Ready');
+            setSpeechText('You reached the bottom! Open Canvas or quick maker to start.');
             setSpeechAuthor('');
             setClickAnim(true);
             setTimeout(() => {
@@ -261,17 +279,17 @@ export const StudioCompanion: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Theme change celebration: react delightfully when lighting changes
+  // Theme change confirmation
   useEffect(() => {
     const handleThemeSwitched = (e: any) => {
       const nextTheme = e?.detail?.theme;
       setMood('surprised');
-      setEmote(nextTheme === 'light' ? '☀️' : '🌙');
+      setEmote(nextTheme === 'light' ? 'Light' : 'Dark');
       setClickAnim(true);
       setSpeechText(
         nextTheme === 'light'
-          ? 'Switched to clean daytime editorial tone! ☀️'
-          : 'Switched to cinematic projection dark mode! 🌙'
+          ? 'Archival light mode active'
+          : 'Projection dark mode active'
       );
       setSpeechAuthor('');
       setTimeout(() => {
@@ -358,7 +376,7 @@ export const StudioCompanion: React.FC = () => {
     handleCharacterClick();
   };
 
-  const EMOTE_LIST = ['✨', '💖', '🎨', '💡', '🌟', '🎉'];
+  const EMOTE_LIST = ['Balanced', 'Crisp', 'Layered', 'Warm', 'Steady'];
 
   // Handle character click / tap: Debounced against double-fire pointerup+click events, cycles expressions, triggers squash-and-stretch
   const handleCharacterClick = () => {
@@ -425,8 +443,8 @@ export const StudioCompanion: React.FC = () => {
     localStorage.setItem('acg_staged_sticker', character);
     setStampedCanvas(true);
     setStampAnim(true);
-    setEmote('🎨');
-    setSpeechText(`Added ${currentMeta.name} to card!`);
+    setEmote('Stamped');
+    setSpeechText(`Added ${currentMeta.name} to card`);
     setMood('happy');
     setTimeout(() => setStampAnim(false), 440);
     setTimeout(() => {
@@ -439,9 +457,9 @@ export const StudioCompanion: React.FC = () => {
   // Explicit Cheer: ONLY triggers when clicking this specific button
   const handleCheer = () => {
     setMood('celebrating');
-    setSpeechText('You’re making something worth keeping!');
+    setSpeechText('Card updated');
     setSpeechAuthor('');
-    setEmote('🎉');
+    setEmote('Done');
     setClickAnim(true);
     setTimeout(() => setClickAnim(false), 400);
     if (!isReducedMotion()) {
@@ -502,7 +520,7 @@ export const StudioCompanion: React.FC = () => {
             isNearTop ? 'top-full mt-2' : 'bottom-full mb-2'
           } ${
             isRightSide ? 'right-0' : 'left-0'
-          } w-72 sm:w-80 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 backdrop-blur-md shadow-2xl p-3 text-xs text-[var(--app-text)] animate-bubble-pop`}
+          } w-72 sm:w-80 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] shadow-2xl p-3 text-xs text-[var(--app-text)] animate-bubble-pop`}
         >
           {/* Header with Close, Reset, and Minimize */}
           <div className="flex items-center justify-between border-b border-[var(--app-border-subtle)] pb-2 mb-2">

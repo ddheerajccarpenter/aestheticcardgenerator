@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { animate, createDrawable, cubicBezier, spring, stagger } from 'animejs';
+import { animate, createDrawable, cubicBezier, stagger } from 'animejs';
 
 export const MOTION_STORAGE_KEY = 'acg_motion_paused';
-export const EDITORIAL_EASE = cubicBezier(0.16, 1, 0.3, 1);
+export const EDITORIAL_EASE = cubicBezier(0.22, 1, 0.36, 1);
 
 /** Checks OS reduced-motion preference or user pause toggle. */
 export function isReducedMotion(): boolean {
@@ -175,7 +175,7 @@ export function observeScrollReveal(
   }
 
   const staggerMs = options?.staggerMs ?? 38;
-  const yOffset = options?.yOffset ?? 18;
+  const yOffset = options?.yOffset ?? 10;
   const pending = new Set<HTMLElement>();
   let rafId: number | null = null;
 
@@ -190,8 +190,7 @@ export function observeScrollReveal(
     animate(batch, {
       opacity: [0, 1],
       y: [yOffset, 0],
-      scale: [0.985, 1],
-      duration: 460,
+      duration: 360,
       delay: stagger(staggerMs),
       ease: EDITORIAL_EASE,
     });
@@ -254,7 +253,7 @@ export function observeScrollReveal(
   };
 }
 
-/** Tactile spring impulse on stamps, buttons, or newly swapped card surfaces. */
+/** Ease-out transition on stamps, toggles, or swapped card surfaces (no overshoot). */
 export function animateSpringPop(
   target: HTMLElement | NodeListOf<HTMLElement> | HTMLElement[] | null,
   variant: 'stamp' | 'swap' | 'settle' = 'stamp'
@@ -262,30 +261,29 @@ export function animateSpringPop(
   if (!target || isReducedMotion()) return;
   if (variant === 'stamp') {
     animate(target, {
-      scale: [0.88, 1.03, 1],
-      duration: 380,
-      ease: spring({ bounce: 0.34, duration: 360 }),
+      scale: [0.95, 1],
+      duration: 200,
+      ease: EDITORIAL_EASE,
     });
     return;
   }
   if (variant === 'swap') {
     animate(target, {
-      opacity: [0.55, 1],
-      y: [8, 0],
-      duration: 320,
+      opacity: [0.65, 1],
+      y: [6, 0],
+      duration: 240,
       ease: EDITORIAL_EASE,
     });
     return;
   }
   animate(target, {
-    scale: [0.96, 1],
-    opacity: [0.7, 1],
-    duration: 340,
+    opacity: [0.75, 1],
+    duration: 220,
     ease: EDITORIAL_EASE,
   });
 }
 
-/** Center-outward 2D grid ripple (ideal for 5x5 Bingo deal & shuffle). */
+/** Center-outward 2D grid stagger reveal for 5x5 Bingo deal & shuffle. */
 export function animateGridWave(
   container: HTMLElement | null,
   selector: string,
@@ -297,20 +295,26 @@ export function animateGridWave(
   if (!cells.length) return;
 
   animate(cells, {
-    scale: [0.84, 1],
-    opacity: [0.35, 1],
-    duration: 400,
-    delay: stagger(20, { grid: [cols, rows], from: 'center' }),
-    ease: spring({ bounce: 0.22, duration: 380 }),
+    scale: [0.94, 1],
+    opacity: [0.4, 1],
+    duration: 280,
+    delay: stagger(18, { grid: [cols, rows], from: 'center' }),
+    ease: EDITORIAL_EASE,
   });
 }
 
-/** Pointer-reactive 3D paper tilt & specular light catch via CSS custom properties (no React re-renders). */
+const tiltLastUpdate = new WeakMap<HTMLElement, number>();
+
+/** Pointer-reactive 3D paper tilt & specular light catch via CSS custom properties (capped ~60Hz, synchronous first hit). */
 export function handleTiltPointerMove(e: React.PointerEvent<HTMLElement>): void {
   if (e.pointerType !== 'mouse' || isReducedMotion()) return;
   const el = e.currentTarget;
+  const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  const prev = tiltLastUpdate.get(el);
+  if (prev !== undefined && now - prev < 16) return;
   const rect = el.getBoundingClientRect();
   if (!rect.width || !rect.height) return;
+  tiltLastUpdate.set(el, now);
   const nx = Math.max(-0.5, Math.min(0.5, (e.clientX - rect.left) / rect.width - 0.5));
   const ny = Math.max(-0.5, Math.min(0.5, (e.clientY - rect.top) / rect.height - 0.5));
   el.style.setProperty('--tilt-x', `${(-ny * 8).toFixed(2)}deg`);
@@ -321,6 +325,7 @@ export function handleTiltPointerMove(e: React.PointerEvent<HTMLElement>): void 
 
 export function handleTiltPointerLeave(e: React.PointerEvent<HTMLElement>): void {
   const el = e.currentTarget;
+  tiltLastUpdate.delete(el);
   el.style.setProperty('--tilt-x', '0deg');
   el.style.setProperty('--tilt-y', '0deg');
   el.style.setProperty('--glint-x', '50%');

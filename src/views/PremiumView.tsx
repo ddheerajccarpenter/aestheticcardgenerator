@@ -166,7 +166,7 @@ export const PremiumView: React.FC<PremiumViewProps> = ({
           <article
             key={tmpl.id}
             data-reveal-card
-            className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-4 transition-colors"
+            className="gpu-gallery-item group flex flex-col justify-between overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-4 transition-colors"
           >
             <div>
               <a

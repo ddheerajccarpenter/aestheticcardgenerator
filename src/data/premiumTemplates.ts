@@ -32,33 +32,49 @@ const signatureTheme = (id: string, name: string, bg: string, ink: string, borde
 });
 
 export const PREMIUM_ART_ASSETS = {
-  // 1. Actually I Can: grainy ember, terracotta, cobalt and lilac sparkle field
+  // 1. Actually I Can: grainy ember, terracotta, cobalt and lilac radial glow field (GPU-lightweight gradients)
   auraSparkleBackdrop: svgUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 960" width="640" height="960">
       <defs>
-        <filter id="blurAura" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="42" />
-        </filter>
-        <filter id="grainNoise">
-          <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="3" seed="11" result="noise" />
-          <feColorMatrix type="saturate" values="0" in="noise" result="gray" />
-          <feComponentTransfer in="gray" result="alphaNoise">
-            <feFuncA type="linear" slope="0.22" />
-          </feComponentTransfer>
-          <feBlend mode="overlay" in="SourceGraphic" in2="alphaNoise" />
-        </filter>
+        <radialGradient id="gEmber" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#a83d20" stop-opacity="0.92" />
+          <stop offset="55%" stop-color="#a83d20" stop-opacity="0.45" />
+          <stop offset="100%" stop-color="#a83d20" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="gPeach" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#f3c59f" stop-opacity="0.88" />
+          <stop offset="55%" stop-color="#f3c59f" stop-opacity="0.42" />
+          <stop offset="100%" stop-color="#f3c59f" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="gTerra" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#cf6a3c" stop-opacity="0.9" />
+          <stop offset="55%" stop-color="#cf6a3c" stop-opacity="0.42" />
+          <stop offset="100%" stop-color="#cf6a3c" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="gLilac" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#99499c" stop-opacity="0.85" />
+          <stop offset="58%" stop-color="#99499c" stop-opacity="0.35" />
+          <stop offset="100%" stop-color="#99499c" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="gTeal" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#5da9ad" stop-opacity="0.78" />
+          <stop offset="60%" stop-color="#5da9ad" stop-opacity="0.25" />
+          <stop offset="100%" stop-color="#5da9ad" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="gAsh" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#464543" stop-opacity="0.88" />
+          <stop offset="65%" stop-color="#464543" stop-opacity="0.35" />
+          <stop offset="100%" stop-color="#464543" stop-opacity="0" />
+        </radialGradient>
       </defs>
       <rect width="640" height="960" fill="#2b2623" />
-      <g filter="url(#blurAura)">
-        <ellipse cx="470" cy="490" rx="230" ry="370" fill="#a83d20" opacity="0.95" />
-        <ellipse cx="595" cy="360" rx="140" ry="260" fill="#f3c59f" opacity="0.9" />
-        <ellipse cx="90" cy="700" rx="190" ry="310" fill="#cf6a3c" opacity="0.92" />
-        <ellipse cx="35" cy="650" rx="115" ry="215" fill="#f6d8b8" opacity="0.92" />
-        <ellipse cx="185" cy="780" rx="110" ry="200" fill="#99499c" opacity="0.88" />
-        <ellipse cx="165" cy="830" rx="60" ry="120" fill="#5da9ad" opacity="0.82" />
-        <ellipse cx="320" cy="210" rx="210" ry="180" fill="#464543" opacity="0.9" />
-      </g>
-      <rect width="640" height="960" fill="transparent" filter="url(#grainNoise)" />
+      <ellipse cx="470" cy="490" rx="280" ry="440" fill="url(#gEmber)" />
+      <ellipse cx="595" cy="360" rx="185" ry="320" fill="url(#gPeach)" />
+      <ellipse cx="90" cy="700" rx="240" ry="380" fill="url(#gTerra)" />
+      <ellipse cx="35" cy="650" rx="155" ry="270" fill="url(#gPeach)" />
+      <ellipse cx="185" cy="780" rx="150" ry="260" fill="url(#gLilac)" />
+      <ellipse cx="165" cy="830" rx="95" ry="170" fill="url(#gTeal)" />
+      <ellipse cx="320" cy="210" rx="260" ry="230" fill="url(#gAsh)" />
       <rect width="640" height="960" fill="#d86c43" opacity="0.08" />
       <g fill="#ebd1ec" opacity="0.92">
         <path d="M320 42 L324 54 L336 58 L324 62 L320 74 L316 62 L304 58 L316 54 Z" />
@@ -99,21 +115,15 @@ export const PREMIUM_ART_ASSETS = {
     </svg>
   `),
 
-  // 3. Do It For Yourself: smoky olive mist & luminous copper wave grain
+  // 3. Do It For Yourself: smoky olive mist & luminous copper wave (radial/layered glow without SVG blur filter)
   amberWaveNoirBackdrop: svgUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 960" width="640" height="960">
       <defs>
-        <filter id="waveBlur" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="42" />
-        </filter>
-        <filter id="waveGrain">
-          <feTurbulence type="fractalNoise" baseFrequency="0.78" numOctaves="3" seed="7" result="noise" />
-          <feColorMatrix type="saturate" values="0" in="noise" result="gray" />
-          <feComponentTransfer in="gray" result="alphaNoise">
-            <feFuncA type="linear" slope="0.18" />
-          </feComponentTransfer>
-          <feBlend mode="overlay" in="SourceGraphic" in2="alphaNoise" />
-        </filter>
+        <radialGradient id="oliveMist" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#716d5f" stop-opacity="0.88" />
+          <stop offset="60%" stop-color="#716d5f" stop-opacity="0.35" />
+          <stop offset="100%" stop-color="#716d5f" stop-opacity="0" />
+        </radialGradient>
         <linearGradient id="copperSweep" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stop-color="#615d52" />
           <stop offset="45%" stop-color="#8b4227" />
@@ -122,13 +132,13 @@ export const PREMIUM_ART_ASSETS = {
         </linearGradient>
       </defs>
       <rect width="640" height="960" fill="url(#copperSweep)" />
-      <g filter="url(#waveBlur)">
-        <ellipse cx="220" cy="190" rx="280" ry="260" fill="#716d5f" opacity="0.9" />
-        <path d="M-40 580 Q150 690 290 830 Q430 960 680 710 L680 990 L-40 990 Z" fill="#0d0402" />
-        <path d="M-40 560 Q140 675 280 820 Q425 945 680 680" fill="none" stroke="#ff9d52" stroke-width="60" opacity="0.94" />
-        <path d="M-40 640 Q180 790 380 885 Q520 945 680 740" fill="none" stroke="#f03c0a" stroke-width="34" opacity="0.86" />
-      </g>
-      <rect width="640" height="960" fill="transparent" filter="url(#waveGrain)" />
+      <ellipse cx="220" cy="190" rx="340" ry="310" fill="url(#oliveMist)" />
+      <path d="M-40 580 Q150 690 290 830 Q430 960 680 710 L680 990 L-40 990 Z" fill="#0d0402" opacity="0.88" />
+      <path d="M-40 560 Q140 675 280 820 Q425 945 680 680" fill="none" stroke="#ff9d52" stroke-width="110" opacity="0.2" />
+      <path d="M-40 560 Q140 675 280 820 Q425 945 680 680" fill="none" stroke="#ff9d52" stroke-width="58" opacity="0.45" />
+      <path d="M-40 560 Q140 675 280 820 Q425 945 680 680" fill="none" stroke="#ff9d52" stroke-width="24" opacity="0.65" />
+      <path d="M-40 640 Q180 790 380 885 Q520 945 680 740" fill="none" stroke="#f03c0a" stroke-width="56" opacity="0.28" />
+      <path d="M-40 640 Q180 790 380 885 Q520 945 680 740" fill="none" stroke="#f03c0a" stroke-width="22" opacity="0.55" />
     </svg>
   `),
 
@@ -149,15 +159,19 @@ export const PREMIUM_ART_ASSETS = {
   oliveGouachePaper: svgUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 960" width="640" height="960">
       <defs>
-        <filter id="gouacheGrain">
-          <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="4" result="blotch" />
-          <feColorMatrix type="matrix" values="0.2 0 0 0 0.72  0.22 0 0 0 0.74  0.12 0 0 0 0.54  0 0 0 1 0" />
-        </filter>
+        <radialGradient id="oliveSoftA" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#b8ba7e" stop-opacity="0.45" />
+          <stop offset="100%" stop-color="#b8ba7e" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="oliveSoftB" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#dfe0b0" stop-opacity="0.42" />
+          <stop offset="100%" stop-color="#dfe0b0" stop-opacity="0" />
+        </radialGradient>
       </defs>
       <rect width="640" height="960" fill="#cfd09f" />
-      <rect width="640" height="960" filter="url(#gouacheGrain)" opacity="0.35" />
-      <ellipse cx="180" cy="240" rx="220" ry="280" fill="#bec08a" opacity="0.24" />
-      <ellipse cx="480" cy="720" rx="240" ry="260" fill="#d9daa9" opacity="0.22" />
+      <ellipse cx="180" cy="240" rx="280" ry="340" fill="url(#oliveSoftA)" />
+      <ellipse cx="480" cy="720" rx="290" ry="320" fill="url(#oliveSoftB)" />
+      <ellipse cx="360" cy="390" rx="230" ry="260" fill="url(#oliveSoftA)" />
     </svg>
   `),
 
@@ -172,33 +186,32 @@ export const PREMIUM_ART_ASSETS = {
     </svg>
   `),
 
-  // 7. Come Back Prism: dark charcoal film & chromatic light trails
+  // 7. Come Back Prism: dark charcoal film & chromatic light trails (feathered gradients without blur pass)
   chromaticPrismBackdrop: svgUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
       <defs>
-        <filter id="prismBlur" x="-30%" y="-10%" width="160%" height="120%">
-          <feGaussianBlur stdDeviation="20" />
-        </filter>
         <linearGradient id="trailUp" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%" stop-color="#f97316" stop-opacity="0.95" />
-          <stop offset="35%" stop-color="#60a5fa" stop-opacity="0.85" />
-          <stop offset="70%" stop-color="#6d28d9" stop-opacity="0.65" />
+          <stop offset="0%" stop-color="#f97316" stop-opacity="0.72" />
+          <stop offset="35%" stop-color="#60a5fa" stop-opacity="0.58" />
+          <stop offset="72%" stop-color="#6d28d9" stop-opacity="0.35" />
           <stop offset="100%" stop-color="#141416" stop-opacity="0" />
         </linearGradient>
         <linearGradient id="trailDown" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#fb923c" stop-opacity="0.95" />
-          <stop offset="35%" stop-color="#38bdf8" stop-opacity="0.85" />
-          <stop offset="72%" stop-color="#7c3aed" stop-opacity="0.65" />
+          <stop offset="0%" stop-color="#fb923c" stop-opacity="0.72" />
+          <stop offset="35%" stop-color="#38bdf8" stop-opacity="0.58" />
+          <stop offset="72%" stop-color="#7c3aed" stop-opacity="0.35" />
           <stop offset="100%" stop-color="#141416" stop-opacity="0" />
         </linearGradient>
       </defs>
       <rect width="800" height="1000" fill="#151517" />
-      <g filter="url(#prismBlur)">
-        <rect x="275" y="10" width="44" height="430" rx="22" fill="url(#trailUp)" />
-        <rect x="335" y="60" width="46" height="390" rx="23" fill="url(#trailUp)" />
-        <rect x="422" y="450" width="42" height="540" rx="21" fill="url(#trailDown)" />
-        <rect x="482" y="475" width="38" height="515" rx="19" fill="url(#trailDown)" />
-      </g>
+      <rect x="262" y="10" width="70" height="440" rx="35" fill="url(#trailUp)" opacity="0.35" />
+      <rect x="275" y="10" width="44" height="430" rx="22" fill="url(#trailUp)" opacity="0.78" />
+      <rect x="322" y="55" width="72" height="405" rx="36" fill="url(#trailUp)" opacity="0.35" />
+      <rect x="335" y="60" width="46" height="390" rx="23" fill="url(#trailUp)" opacity="0.78" />
+      <rect x="410" y="445" width="66" height="550" rx="33" fill="url(#trailDown)" opacity="0.35" />
+      <rect x="422" y="450" width="42" height="540" rx="21" fill="url(#trailDown)" opacity="0.78" />
+      <rect x="470" y="470" width="62" height="525" rx="31" fill="url(#trailDown)" opacity="0.35" />
+      <rect x="482" y="475" width="38" height="515" rx="19" fill="url(#trailDown)" opacity="0.78" />
       <g fill="#ffffff" opacity="0.22">
         <circle cx="110" cy="180" r="1.2" /><circle cx="670" cy="240" r="1.5" />
         <circle cx="205" cy="720" r="1.1" /><circle cx="715" cy="830" r="1.4" />
@@ -207,16 +220,30 @@ export const PREMIUM_ART_ASSETS = {
     </svg>
   `),
 
-  // 8. Golden Meadow: impressionist lavender & woodland motion study
+  // 8. Golden Meadow: impressionist lavender & woodland motion study (layered gradients without blur filters)
   impressionistMeadowArt: svgUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 960" width="640" height="960">
       <defs>
-        <filter id="skyGlowBlur" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="24" />
-        </filter>
-        <filter id="meadowBrushBlur" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="6.5" />
-        </filter>
+        <radialGradient id="meadowSun" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#f2ead2" stop-opacity="0.88" />
+          <stop offset="55%" stop-color="#f2ead2" stop-opacity="0.38" />
+          <stop offset="100%" stop-color="#f2ead2" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="meadowCanopy" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#232c1f" stop-opacity="0.85" />
+          <stop offset="60%" stop-color="#232c1f" stop-opacity="0.35" />
+          <stop offset="100%" stop-color="#232c1f" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="meadowHaze" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#e5d7b3" stop-opacity="0.76" />
+          <stop offset="60%" stop-color="#e5d7b3" stop-opacity="0.3" />
+          <stop offset="100%" stop-color="#e5d7b3" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="meadowLavender" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#8b6fb0" stop-opacity="0.84" />
+          <stop offset="60%" stop-color="#634d7d" stop-opacity="0.36" />
+          <stop offset="100%" stop-color="#634d7d" stop-opacity="0" />
+        </radialGradient>
         <linearGradient id="skyHaze" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stop-color="#2c3323" />
           <stop offset="48%" stop-color="#c9ba9b" />
@@ -224,30 +251,25 @@ export const PREMIUM_ART_ASSETS = {
         </linearGradient>
       </defs>
       <rect width="640" height="960" fill="url(#skyHaze)" />
-      <g filter="url(#skyGlowBlur)">
-        <circle cx="485" cy="175" r="195" fill="#f2ead2" opacity="0.9" />
-        <ellipse cx="140" cy="160" rx="220" ry="180" fill="#232c1f" opacity="0.88" />
-        <ellipse cx="320" cy="545" rx="340" ry="155" fill="#e5d7b3" opacity="0.78" />
-        <ellipse cx="210" cy="785" rx="250" ry="220" fill="#8b6fb0" opacity="0.86" />
-        <ellipse cx="470" cy="810" rx="220" ry="220" fill="#634d7d" opacity="0.82" />
-      </g>
-      <g filter="url(#meadowBrushBlur)">
-        <!-- Distant woodland treeline -->
-        <path d="M0 360 Q95 270 190 350 Q285 280 390 345 Q510 265 640 340 L640 430 L0 430 Z" fill="#4f5638" opacity="0.48" />
-        <!-- Painterly strolling figures in golden mist -->
-        <ellipse cx="226" cy="435" rx="22" ry="25" fill="#2b211c" opacity="0.88" />
-        <path d="M188 605 C193 485 206 458 228 458 C250 458 264 488 270 612 Z" fill="#efe6cf" opacity="0.88" />
-        <ellipse cx="390" cy="380" rx="20" ry="24" fill="#3b261d" opacity="0.88" />
-        <rect x="358" y="408" width="64" height="140" rx="26" fill="#f3ebd6" opacity="0.9" />
-        <rect x="372" y="534" width="42" height="106" rx="14" fill="#2e2b27" opacity="0.8" />
-        <!-- Foreground Impressionist wildflower tufts -->
-        <ellipse cx="120" cy="740" rx="68" ry="26" fill="#bfa3df" opacity="0.72" />
-        <ellipse cx="315" cy="710" rx="90" ry="28" fill="#d9c69e" opacity="0.65" />
-        <ellipse cx="515" cy="760" rx="75" ry="30" fill="#a887cc" opacity="0.72" />
-        <circle cx="170" cy="690" r="14" fill="#f5e6ba" opacity="0.78" />
-        <circle cx="445" cy="680" r="16" fill="#e9d2a1" opacity="0.78" />
-        <circle cx="290" cy="825" r="18" fill="#c7aee8" opacity="0.68" />
-      </g>
+      <circle cx="485" cy="175" r="240" fill="url(#meadowSun)" />
+      <ellipse cx="140" cy="160" rx="260" ry="220" fill="url(#meadowCanopy)" />
+      <ellipse cx="320" cy="545" rx="380" ry="190" fill="url(#meadowHaze)" />
+      <ellipse cx="210" cy="785" rx="280" ry="250" fill="url(#meadowLavender)" />
+      <ellipse cx="470" cy="810" rx="260" ry="250" fill="url(#meadowLavender)" />
+      <path d="M0 360 Q95 270 190 350 Q285 280 390 345 Q510 265 640 340 L640 430 L0 430 Z" fill="#4f5638" opacity="0.4" />
+      <ellipse cx="226" cy="435" rx="26" ry="29" fill="#2b211c" opacity="0.35" />
+      <ellipse cx="226" cy="435" rx="20" ry="23" fill="#2b211c" opacity="0.78" />
+      <path d="M188 605 C193 485 206 458 228 458 C250 458 264 488 270 612 Z" fill="#efe6cf" opacity="0.78" />
+      <ellipse cx="390" cy="380" rx="24" ry="28" fill="#3b261d" opacity="0.35" />
+      <ellipse cx="390" cy="380" rx="18" ry="22" fill="#3b261d" opacity="0.78" />
+      <rect x="358" y="408" width="64" height="140" rx="28" fill="#f3ebd6" opacity="0.8" />
+      <rect x="372" y="534" width="42" height="106" rx="16" fill="#2e2b27" opacity="0.7" />
+      <ellipse cx="120" cy="740" rx="74" ry="30" fill="#bfa3df" opacity="0.55" />
+      <ellipse cx="315" cy="710" rx="96" ry="32" fill="#d9c69e" opacity="0.5" />
+      <ellipse cx="515" cy="760" rx="80" ry="34" fill="#a887cc" opacity="0.55" />
+      <circle cx="170" cy="690" r="16" fill="#f5e6ba" opacity="0.62" />
+      <circle cx="445" cy="680" r="18" fill="#e9d2a1" opacity="0.62" />
+      <circle cx="290" cy="825" r="20" fill="#c7aee8" opacity="0.55" />
     </svg>
   `),
 
@@ -274,21 +296,26 @@ export const PREMIUM_ART_ASSETS = {
   vitriumPrismGlass: svgUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
       <defs>
-        <filter id="prismSoft" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="16" />
-        </filter>
+        <linearGradient id="lensBlue" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0" />
+          <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.34" />
+          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="lensAmber" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#f97316" stop-opacity="0" />
+          <stop offset="50%" stop-color="#f97316" stop-opacity="0.32" />
+          <stop offset="100%" stop-color="#f97316" stop-opacity="0" />
+        </linearGradient>
       </defs>
       <rect width="800" height="1000" fill="#e5ebdd" />
-      <g filter="url(#prismSoft)" opacity="0.62">
-        <rect x="95" y="290" width="110" height="515" rx="40" fill="#38bdf8" opacity="0.55" />
-        <rect x="135" y="305" width="90" height="480" rx="35" fill="#f59e0b" opacity="0.48" />
-        <rect x="330" y="340" width="145" height="440" rx="40" fill="#38bdf8" opacity="0.5" />
-        <rect x="385" y="355" width="120" height="410" rx="35" fill="#f97316" opacity="0.5" />
-        <rect x="570" y="310" width="120" height="475" rx="40" fill="#60a5fa" opacity="0.52" />
-        <rect x="610" y="325" width="100" height="440" rx="35" fill="#ef4444" opacity="0.4" />
-        <ellipse cx="400" cy="545" rx="360" ry="22" fill="#ffffff" opacity="0.65" />
-        <ellipse cx="400" cy="740" rx="360" ry="18" fill="#ffffff" opacity="0.65" />
-      </g>
+      <rect x="80" y="280" width="140" height="535" rx="60" fill="url(#lensBlue)" />
+      <rect x="125" y="295" width="110" height="500" rx="50" fill="url(#lensAmber)" />
+      <rect x="315" y="330" width="175" height="460" rx="65" fill="url(#lensBlue)" />
+      <rect x="375" y="345" width="140" height="430" rx="55" fill="url(#lensAmber)" />
+      <rect x="555" y="300" width="150" height="495" rx="60" fill="url(#lensBlue)" />
+      <rect x="600" y="315" width="120" height="460" rx="50" fill="url(#lensAmber)" />
+      <ellipse cx="400" cy="545" rx="360" ry="26" fill="#ffffff" opacity="0.38" />
+      <ellipse cx="400" cy="740" rx="360" ry="22" fill="#ffffff" opacity="0.38" />
     </svg>
   `),
 
@@ -334,14 +361,13 @@ export const PREMIUM_ART_ASSETS = {
   cottonBleedPaperBackdrop: svgUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
       <defs>
-        <filter id="paperFiber">
-          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="2" />
-          <feColorMatrix type="saturate" values="0" />
-          <feComponentTransfer><feFuncA type="linear" slope="0.06" /></feComponentTransfer>
-        </filter>
+        <pattern id="cottonSpeck" width="18" height="18" patternUnits="userSpaceOnUse">
+          <circle cx="4" cy="5" r="0.8" fill="#8b877e" opacity="0.06" />
+          <circle cx="13" cy="14" r="0.7" fill="#8b877e" opacity="0.05" />
+        </pattern>
       </defs>
       <rect width="800" height="1000" fill="#f3f2ee" />
-      <rect width="800" height="1000" filter="url(#paperFiber)" />
+      <rect width="800" height="1000" fill="url(#cottonSpeck)" />
       <!-- Subtle horizontal reverse-page ghost ink bars (mimics ink bleed without readable clutter) -->
       <g fill="#5b5952" opacity="0.045">
         <rect x="140" y="95" width="460" height="9" rx="4" />
@@ -366,14 +392,16 @@ export const PREMIUM_ART_ASSETS = {
           <stop offset="55%" stop-color="#3c7ac8" />
           <stop offset="100%" stop-color="#76aee8" />
         </linearGradient>
-        <filter id="cloudSoft"><feGaussianBlur stdDeviation="24" /></filter>
+        <radialGradient id="cloudPuff" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.56" />
+          <stop offset="55%" stop-color="#ffffff" stop-opacity="0.24" />
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+        </radialGradient>
       </defs>
       <rect width="640" height="960" fill="url(#skyBlue)" />
-      <g filter="url(#cloudSoft)" fill="#ffffff" opacity="0.55">
-        <ellipse cx="140" cy="180" rx="180" ry="70" />
-        <ellipse cx="520" cy="480" rx="200" ry="90" />
-        <ellipse cx="220" cy="790" rx="230" ry="85" />
-      </g>
+      <ellipse cx="140" cy="180" rx="220" ry="100" fill="url(#cloudPuff)" />
+      <ellipse cx="520" cy="480" rx="240" ry="120" fill="url(#cloudPuff)" />
+      <ellipse cx="220" cy="790" rx="270" ry="115" fill="url(#cloudPuff)" />
     </svg>
   `),
 

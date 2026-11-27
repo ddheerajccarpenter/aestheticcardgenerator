@@ -14,11 +14,11 @@ export const Footer: React.FC<FooterProps> = ({ theme = 'dark' }) => {
     <footer className="w-full border-t border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text)] transition-colors duration-200 mt-16 pb-28 md:pb-8">
       <div className="studio-container py-7 flex flex-col gap-5">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 pb-5 border-b border-[var(--app-border-subtle)]">
-          <a href="/" className="font-brand text-lg font-extrabold tracking-tight text-[var(--app-text)] hover:text-[var(--app-accent)] transition-colors">
+          <a href="/" className="font-brand text-base font-medium tracking-tight text-[var(--app-text)] hover:text-[var(--app-accent)] transition-colors">
             ACG
           </a>
 
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-[var(--app-text)]">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-[var(--app-text)]">
             <a href="/premium" className={linkClass}>Signature</a>
             <a href="/bingo" className={linkClass}>Bingo</a>
             <a href="/about" className={linkClass}>About</a>

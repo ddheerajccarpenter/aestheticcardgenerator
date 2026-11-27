@@ -13,8 +13,8 @@ export function ThreeDPreviewControls({ controllerRef, onExit }: ThreeDPreviewCo
   return (
     <>
       {/* Top Left: 3D Stage Status Badge */}
-      <div className="absolute left-3 top-3 z-20 flex items-center gap-1.5 rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/90 backdrop-blur-md px-3 py-1 shadow-md text-xs font-semibold text-[var(--app-text-primary)] select-none">
-        <Box className="w-3.5 h-3.5 text-[var(--app-accent)] animate-pulse" />
+      <div className="absolute left-3 top-3 z-20 flex items-center gap-1.5 rounded-full border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/95 px-3 py-1 shadow-md text-xs font-semibold text-[var(--app-text-primary)] select-none">
+        <Box className="w-3.5 h-3.5 text-[var(--app-accent)]" />
         <span>3D Stage</span>
         <span className="text-[10px] text-[var(--app-text-muted)] font-normal hidden sm:inline">• Drag to rotate</span>
       </div>
@@ -22,7 +22,7 @@ export function ThreeDPreviewControls({ controllerRef, onExit }: ThreeDPreviewCo
       {/* Top Right: Zoom & Reset Controls + Exit 3D Button */}
       <div
         aria-label="3D preview controls"
-        className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-xl border border-[var(--app-border-strong)] bg-[var(--app-surface)]/95 backdrop-blur-md p-1 shadow-xl"
+        className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-xl border border-[var(--app-border-strong)] bg-[var(--app-surface)]/95 p-1 shadow-xl"
         role="toolbar"
       >
         <button
