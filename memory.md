@@ -112,3 +112,8 @@
 - Refined Form Study, After Hours, Side A, and Studio Visitor; added Night Shift (editable ticket) and Reading Room (journal cover). Inventory is 76.
 - Reference direction: Poster House, The Swiss Grid (https://swissgrid.posterhouse.org/), and historic Swiss music exhibition posters. Compositions are original native text/shape layers; no reference artwork copied into assets.
 - Verified Firefox gallery at localhost:4321 and opened Night Shift in Canvas (32 layers). Build and template tests pass. All views/components/CSS match their contents at the start of this follow-up. Mobile devices and exported files were not checked.
+
+## 2026-11-27 — 90-Template & Card Pipeline Bug Sweep
+- Audited all 90 cards (6 Studio, 14 Signature, 48 Extended, 22 Showcase/Base) in both AST/geometry checks and headless Chrome DOM rendering.
+- Fixed card layout overlaps, text box wrapping/overflow, dotted license lines, approved stamp `viewBox` clipping, and explicit `0` border-radius preservation across thumbnails and Canvas Studio.
+- Fixed `sanitizeAndValidateCanvasDocument` (`showTextLabel`), `normalizeTemplateDimensions` (full-bleed preservation + stroke/radius/letter-spacing scaling), `templateToCanvasDoc` (ID card vertical stack + dynamic badge widths), `CategoryView` & `TemplateComparisonModal` (`UnifiedCardThumbnail` rendering), `CreatorView` (`?palette=` support), `BingoView` (web font embedding on PNG export), and `CanvasEditorView` light-mode active contrast.

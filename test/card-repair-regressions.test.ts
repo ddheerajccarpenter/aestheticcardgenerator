@@ -4,7 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { PRESET_TEMPLATES } from '../src/data/templates';
 import { PREMIUM_ART_ASSETS, PREMIUM_SIGNATURE_TEMPLATES } from '../src/data/premiumTemplates';
-import { ASSET_POSTER_ART } from '../src/data/canvasAssets';
+import { ASSET_POSTER_ART, ASSET_STICKERS } from '../src/data/canvasAssets';
 import { BLOG_POSTS } from '../src/data/blog';
 import {
   createImageObject,
@@ -12,6 +12,7 @@ import {
   createTextObject,
   templateToCanvasDoc,
 } from '../src/utils/canvasBuilder';
+import { normalizeTemplateDimensions } from '../src/engines/canvasGridAndDimensionEngine';
 import { sanitizeAndValidateCanvasDocument } from '../src/services/schemaValidator';
 
 const SRC_DIR = path.resolve(process.cwd(), 'src');
@@ -307,4 +308,82 @@ test('SEO, GEO, AEO, and AdSense readiness configuration & built SSR output', ()
 
   const mobileNav = fs.readFileSync(path.join(SRC_DIR, 'components', 'MobileBottomNav.tsx'), 'utf8');
   assert.ok(!mobileNav.includes('preventDefault'), 'MobileBottomNav links must perform full browser loads for AdSense');
+});
+
+test('Schema, builder, dimension reflow, card clearances, and thumbnail parity', () => {
+  // 1. schemaValidator preserves undefined / explicit boolean showTextLabel on barcodes
+  const docWithBarcodes = templateToCanvasDoc(PRESET_TEMPLATES.find((t) => t.id === 'poster-pinterest-vinyl')!);
+  docWithBarcodes.objects.push(createShapeObject('barcode', { name: 'Default Label Barcode' }));
+  const restored = sanitizeAndValidateCanvasDocument(docWithBarcodes);
+  assert.ok(restored);
+  const defaultBarcode = restored.objects.find((o) => o.type === 'shape' && o.name === 'Default Label Barcode');
+  assert.ok(defaultBarcode && defaultBarcode.type === 'shape');
+  assert.equal(defaultBarcode.showTextLabel, undefined);
+
+  // 2. Explicit 0 borderRadius on rounded-rect stays 0; omitted rounded-rect defaults to 16
+  assert.equal(createShapeObject('rounded-rect').borderRadius, 16);
+  const scrapbook = PRESET_TEMPLATES.find((t) => t.id === 'pastel-peach-scrapbook');
+  assert.ok(scrapbook?.canvasDoc);
+  const tapeLeft = scrapbook.canvasDoc.objects.find((o) => o.name === 'Tape Left');
+  assert.ok(tapeLeft && tapeLeft.type === 'shape');
+  assert.equal(tapeLeft.borderRadius, 0);
+
+  // 3. Full-bleed layers stay full-bleed across dimension reflows
+  const cobalt = PRESET_TEMPLATES.find((t) => t.id === 'premium-make-art-cobalt')!;
+  const cobaltDoc = templateToCanvasDoc(cobalt);
+  const resizedCobalt = normalizeTemplateDimensions(cobaltDoc.objects, 800, 1000, 1080, 1080);
+  const bgLayer = resizedCobalt.find((o) => o.name === 'Klein Blue Field');
+  assert.deepEqual(bgLayer && { x: bgLayer.x, y: bgLayer.y, w: bgLayer.width, h: bgLayer.height }, {
+    x: 0,
+    y: 0,
+    w: 1080,
+    h: 1080,
+  });
+
+  // 4. Generated ID card templates clear Title -> Access Details -> ID Divider -> Issuer
+  for (const id of ['identity-2026', 'travel-license-pass', 'soulmate-clearance-pass', 'vip-backstage-credentials', 'kawaii-pastel-member-id']) {
+    const tmpl = PRESET_TEMPLATES.find((t) => t.id === id);
+    assert.ok(tmpl);
+    const doc = templateToCanvasDoc(tmpl);
+    const title = doc.objects.find((o) => o.name === 'Card Title');
+    const details = doc.objects.find((o) => o.name === 'Access Details');
+    const divider = doc.objects.find((o) => o.name === 'ID Divider');
+    const issuer = doc.objects.find((o) => o.name === 'Issuer');
+    assert.ok(title && details && divider && issuer);
+    assert.ok(title.y + title.height <= details.y, `${id} Card Title overlaps Access Details`);
+    assert.ok(details.y + details.height <= divider.y, `${id} Access Details overlaps ID Divider`);
+    assert.ok(divider.y + divider.height <= issuer.y, `${id} ID Divider overlaps Issuer`);
+  }
+
+  // 5. Repaired layout overlaps and approved stamp viewBox
+  const architects = templateToCanvasDoc(PRESET_TEMPLATES.find((t) => t.id === 'minimal-studio-architect')!);
+  const archHeader = architects.objects.find((o) => o.name === 'Header')!;
+  const archPhoto = architects.objects.find((o) => o.name === 'Architect Photo')!;
+  assert.ok(archHeader.x + archHeader.width <= archPhoto.x);
+
+  const bookClub = templateToCanvasDoc(PRESET_TEMPLATES.find((t) => t.id === 'school-book-club')!);
+  const clubTitle = bookClub.objects.find((o) => o.name === 'Society Title')!;
+  const clubPortrait = bookClub.objects.find((o) => o.name === 'Member Portrait')!;
+  assert.ok(clubTitle.x + clubTitle.width <= clubPortrait.x);
+
+  assert.ok(ASSET_STICKERS.stampApproved.includes('viewBox="-12 -12 164 164"'));
+
+  // 6. CategoryView, ComparisonModal, BingoView, CreatorView, CanvasEditorView parity checks
+  const catView = fs.readFileSync(path.join(SRC_DIR, 'views', 'CategoryView.tsx'), 'utf8');
+  assert.ok(catView.includes('<UnifiedCardThumbnail') && catView.includes("template.canvasDoc ? 'grid-cols-1' : 'grid-cols-2'"));
+
+  const cmpModal = fs.readFileSync(path.join(SRC_DIR, 'components', 'TemplateComparisonModal.tsx'), 'utf8');
+  assert.ok(cmpModal.includes('<UnifiedCardThumbnail') && !cmpModal.includes('text-[#707a8a]'));
+
+  const bingoView = fs.readFileSync(path.join(SRC_DIR, 'views', 'BingoView.tsx'), 'utf8');
+  assert.ok(bingoView.includes('buildSafeFontEmbedCSS') && bingoView.includes('document.fonts'));
+
+  const creatorView = fs.readFileSync(path.join(SRC_DIR, 'views', 'CreatorView.tsx'), 'utf8');
+  assert.ok(creatorView.includes('resolveQueryPalette'));
+
+  const thumb = fs.readFileSync(path.join(SRC_DIR, 'components', 'UnifiedCardThumbnail.tsx'), 'utf8');
+  assert.ok(thumb.includes('object.borderRadius ?? 16'));
+
+  const editor = fs.readFileSync(path.join(SRC_DIR, 'views', 'CanvasEditorView.tsx'), 'utf8');
+  assert.ok(!editor.includes('text-[#E2D9C8] font-mono">3840px'));
 });
