@@ -15,6 +15,10 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ durationMs = 160
 
     const fadeTimer = setTimeout(() => {
       setFading(true);
+      if (typeof window !== 'undefined') {
+        (window as unknown as { __acgLoaderDone?: boolean }).__acgLoaderDone = true;
+        window.dispatchEvent(new CustomEvent('acg:loader-cleared'));
+      }
     }, activeDuration);
 
     const removeTimer = setTimeout(() => {
@@ -31,9 +35,10 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ durationMs = 160
 
   return (
     <div
+      data-acg-skeleton
       aria-hidden="true"
-      className={`fixed inset-0 z-50 flex flex-col bg-[var(--app-bg,#121110)] text-[var(--app-text,#efe6d8)] transition-opacity duration-300 pointer-events-none select-none ${
-        fading ? 'opacity-0' : 'opacity-100'
+      className={`fixed inset-0 z-50 flex flex-col bg-[var(--app-bg,#121110)] text-[var(--app-text,#efe6d8)] transition-all duration-300 ease-out pointer-events-none select-none ${
+        fading ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
       }`}
     >
       {/* Top Header Skeleton */}

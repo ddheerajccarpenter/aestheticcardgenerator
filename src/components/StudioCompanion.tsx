@@ -10,6 +10,7 @@ import {
   Check,
   Stamp,
 } from 'lucide-react';
+import { isReducedMotion, useMotionPaused } from '../utils/motion';
 
 export type CharacterMood = 'idle' | 'happy' | 'surprised' | 'winking' | 'thinking' | 'celebrating';
 export type CharacterType = 'mochi';
@@ -93,6 +94,7 @@ export const StudioCompanion: React.FC = () => {
   const [stampAnim, setStampAnim] = useState(false);
   const [wiggleAnim, setWiggleAnim] = useState(false);
   const [emote, setEmote] = useState<string | null>(null);
+  const motionPaused = useMotionPaused();
 
   // Measure companion size based on screen & minimized state
   const getCompanionSize = useCallback(() => {
@@ -212,17 +214,18 @@ export const StudioCompanion: React.FC = () => {
     return () => clearInterval(blinkInterval);
   }, [mood]);
 
-  // Idle curiosity wiggle (paused when tab hidden or dragging)
+  // Idle curiosity wiggle (paused when tab hidden, dragging, or motion paused)
   useEffect(() => {
+    if (motionPaused) return;
     const wiggleInterval = setInterval(() => {
-      if (document.visibilityState === 'hidden') return;
+      if (document.visibilityState === 'hidden' || isReducedMotion()) return;
       if (mood === 'idle' && !isDragging) {
         setWiggleAnim(true);
         setTimeout(() => setWiggleAnim(false), 520);
       }
     }, 9000 + Math.random() * 4000);
     return () => clearInterval(wiggleInterval);
-  }, [mood, isDragging]);
+  }, [mood, isDragging, motionPaused]);
 
   // Scroll to bottom reaction: celebrated once per visit to page end
   useEffect(() => {
@@ -441,12 +444,14 @@ export const StudioCompanion: React.FC = () => {
     setEmote('🎉');
     setClickAnim(true);
     setTimeout(() => setClickAnim(false), 400);
-    confetti({
-      particleCount: 45,
-      spread: 60,
-      origin: { y: 0.8, x: 0.85 },
-      colors: ['#c69d78', '#efe6d8', '#6f4637', '#ffffff'],
-    });
+    if (!isReducedMotion()) {
+      confetti({
+        particleCount: 45,
+        spread: 60,
+        origin: { y: 0.8, x: 0.85 },
+        colors: ['#c69d78', '#efe6d8', '#6f4637', '#ffffff'],
+      });
+    }
     setTimeout(() => {
       setMood('idle');
       setEmote(null);
@@ -644,7 +649,7 @@ export const StudioCompanion: React.FC = () => {
                   ? 'animate-companion-squash'
                   : wiggleAnim
                   ? 'animate-companion-wiggle'
-                  : !isDragging
+                  : !isDragging && !motionPaused
                   ? 'animate-companion-breathe'
                   : ''
               }`}

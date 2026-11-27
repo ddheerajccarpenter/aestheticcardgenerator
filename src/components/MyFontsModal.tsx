@@ -271,7 +271,7 @@ export const MyFontsModal: React.FC<MyFontsModalProps> = ({
                   {/* Rendered Live Preview in Custom Font */}
                   <div
                     style={{ fontFamily: font.familyName, fontSize: `${previewSize}px` }}
-                    className="py-2 px-3 rounded-lg bg-current/5 border border-current/10 truncate leading-snug select-all"
+                    className="py-2 px-3 rounded-lg bg-current/5 border border-current/10 truncate leading-snug"
                   >
                     {sampleText || displayName}
                   </div>

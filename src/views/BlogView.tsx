@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import type { BlogPost, CardTemplate } from '../types/card';
 import { BLOG_POSTS } from '../data/blog';
 import { PRESET_TEMPLATES } from '../data/templates';
@@ -12,6 +12,7 @@ import {
   PenTool,
   Sparkles,
 } from 'lucide-react';
+import { observeScrollReveal, onStageReady, revealPressWords } from '../utils/motion';
 
 interface BlogViewBaseProps {
   theme?: 'dark' | 'light';
@@ -23,6 +24,8 @@ interface BlogViewBaseProps {
 // --------------------------------------------------------------------------
 export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     updatePageSEO({
@@ -33,6 +36,7 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
       ogType: 'website',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    return onStageReady(() => revealPressWords(titleRef.current, 20));
   }, []);
 
   const categories = ['all', 'Design Trends', 'Typography Craft', 'Color Theory', 'Social Formats', 'Philosophy & Tech'];
@@ -46,10 +50,13 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
     return BLOG_POSTS.filter((p) => p.category === selectedCategory);
   }, [selectedCategory, featuredPost.slug]);
 
+  useEffect(() => {
+    return observeScrollReveal(gridRef.current, '[data-reveal-card]', { staggerMs: 45, yOffset: 16 });
+  }, [selectedCategory]);
+
   return (
     <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 bg-[var(--app-bg)] text-[var(--app-text)] transition-colors duration-200">
-      <div className="studio-container flex flex-col gap-10">
-        {/* Breadcrumb Navigation */}
+      <div className="studio-container flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="hover:text-[var(--app-text)] transition-colors">
             Home
@@ -60,32 +67,22 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
           </span>
         </nav>
 
-        {/* Hero Section */}
-        <header className="flex flex-col gap-4 border-b pb-8 border-[var(--app-border-subtle)]">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[var(--app-accent)] animate-pulse"></span>
-            <span className="text-xs font-subheading font-bold uppercase tracking-wider text-[var(--app-text-muted)]">
-              Editorial Press &amp; Insights
+        <header className="flex flex-col gap-3 border-b pb-5 border-[var(--app-border-subtle)]">
+          <h1 ref={titleRef} className="font-heading text-3xl md:text-5xl font-extrabold tracking-tight text-[var(--app-text)]">
+            <span className="press-word-clip">
+              <span data-press-word className="press-word">Blog</span>
             </span>
-          </div>
-          <h1 className="font-heading text-3xl md:text-5xl font-extrabold tracking-tight text-[var(--app-text)]">
-            Studio Blog
           </h1>
-          <p className="font-body text-sm md:text-base max-w-xl leading-relaxed text-[var(--app-text-muted)]">
-            Short essays on typography, paper palettes, and client-side design.
-          </p>
         </header>
 
-        {/* Featured Post Spotlight Banner */}
         {featuredPost && (
           <article className="studio-panel p-6 md:p-8 rounded-3xl relative overflow-hidden group">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1 flex flex-col gap-4">
+              <div className="flex-1 flex flex-col gap-3">
                 <div className="flex items-center gap-2.5 text-xs">
                   <span className="px-2.5 py-1 rounded-full font-subheading font-bold uppercase tracking-wider text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-accent)] border border-[var(--app-border-subtle)]">
-                    Featured Article
+                    Featured
                   </span>
-                  <span className="text-[var(--app-text-muted)] opacity-50">•</span>
                   <span className="text-[var(--app-text-muted)] font-medium">{featuredPost.category}</span>
                 </div>
 
@@ -95,16 +92,11 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
                   </h2>
                 </a>
 
-                <p className="font-body text-sm md:text-base leading-relaxed line-clamp-3 text-[var(--app-text-muted)]">
+                <p className="font-body text-sm md:text-base leading-relaxed line-clamp-2 text-[var(--app-text-muted)]">
                   {featuredPost.description}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--app-text-muted)] pt-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-subheading font-bold text-[11px] text-[var(--app-accent)] uppercase tracking-wider">
-                      Studio Design Note
-                    </span>
-                  </div>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--app-text-muted)] pt-1">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{featuredPost.publishedDate}</span>
@@ -119,9 +111,9 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
               <div className="shrink-0 flex items-center">
                 <a
                   href={featuredPost.path}
-                  className="studio-btn-primary inline-flex items-center gap-2 px-6 py-3 cursor-pointer"
+                  className="studio-btn-primary btn-sheen interactive-tactile inline-flex items-center gap-2 px-6 py-3 cursor-pointer"
                 >
-                  <span>Read Article</span>
+                  <span>Read</span>
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
@@ -129,7 +121,6 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
           </article>
         )}
 
-        {/* Category Filter Pills */}
         <div className="flex flex-wrap items-center gap-2 pb-1">
           {categories.map((cat) => (
             <button
@@ -137,18 +128,17 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
               onClick={() => setSelectedCategory(cat)}
               className={`studio-pill ${selectedCategory === cat ? 'active' : ''}`}
             >
-              {cat === 'all' ? 'All Articles' : cat}
+              {cat === 'all' ? 'All' : cat}
             </button>
           ))}
         </div>
 
-        {/* Articles Grid: Strict 2-Column Rule */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          {gridPosts.map((post: BlogPost, idx: number) => (
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          {gridPosts.map((post: BlogPost) => (
             <article
               key={post.slug}
-              style={{ '--stagger-i': idx } as React.CSSProperties}
-              className="studio-panel flex flex-col justify-between p-5 sm:p-6 rounded-2xl group card-editorial-hover animate-card-entrance"
+              data-reveal-card
+              className="studio-panel flex flex-col justify-between p-5 sm:p-6 rounded-2xl group card-editorial-hover"
             >
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between text-xs">
@@ -167,18 +157,18 @@ export const BlogIndexView: React.FC<BlogViewBaseProps> = () => {
                   </h3>
                 </a>
 
-                <p className="font-body text-xs leading-relaxed line-clamp-3 text-[var(--app-text-muted)]">
+                <p className="font-body text-xs leading-relaxed line-clamp-2 text-[var(--app-text-muted)]">
                   {post.description}
                 </p>
               </div>
 
-              <div className="pt-6 border-t mt-6 flex items-center justify-between border-[var(--app-border-subtle)] text-xs">
+              <div className="pt-5 border-t mt-5 flex items-center justify-between border-[var(--app-border-subtle)] text-xs">
                 <span className="text-[11px] text-[var(--app-text-muted)]">{post.publishedDate}</span>
                 <a
                   href={post.path}
-                  className="inline-flex items-center gap-1 font-semibold text-xs text-[var(--app-text)] hover:text-[var(--app-accent)] transition-colors cursor-pointer"
+                  className="editorial-link-underline inline-flex items-center gap-1 font-semibold text-xs text-[var(--app-text)] hover:text-[var(--app-accent)] transition-colors cursor-pointer"
                 >
-                  <span>Read Story</span>
+                  <span>Read</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </a>
               </div>
@@ -272,11 +262,6 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
 
           <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--app-text-muted)] pt-3 border-t border-[var(--app-border-subtle)]">
             <div className="flex items-center gap-1.5">
-              <span className="font-subheading font-bold text-[11px] text-[var(--app-accent)] uppercase tracking-wider">
-                Studio Design Note
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
               <span>{blog.publishedDate}</span>
             </div>
@@ -298,15 +283,9 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
                 <Sparkles style={{ color: featuredTemplate.theme.ink }} className="w-6 h-6" />
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] uppercase font-subheading font-bold tracking-wider text-[var(--app-text-muted)]">
-                  Paired Art Direction
-                </span>
                 <h3 className="font-heading text-base font-bold text-[var(--app-text)]">
                   {featuredTemplate.title}
                 </h3>
-                <p className="font-body text-xs text-[var(--app-text-muted)]">
-                  Test this style directly in the Studio Creator with your own words.
-                </p>
               </div>
             </div>
 
@@ -316,7 +295,7 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
                 className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px] w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs cursor-pointer"
               >
                 <PenTool className="w-3.5 h-3.5" />
-                <span>Open in Studio</span>
+                <span>Open</span>
               </a>
             </div>
           </div>
@@ -379,9 +358,6 @@ export const BlogDetailView: React.FC<BlogDetailViewProps> = ({
             <span className="font-heading text-sm font-bold text-[var(--app-text)]">
               {blog.author}
             </span>
-            <p className="font-body text-xs text-[var(--app-text-muted)]">
-              Contributing curator to Aesthetic Card Studio, researching digital ephemera, typography systems, and book arts.
-            </p>
           </div>
         </section>
 

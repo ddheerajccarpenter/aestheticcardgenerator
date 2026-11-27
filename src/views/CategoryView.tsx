@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { CategoryMeta, CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
 import { PRODUCTION_DOMAIN, updatePageSEO } from '../utils/seo';
@@ -6,15 +6,14 @@ import { AdSlot } from '../components/AdSlot';
 import { LazyTemplateCard } from '../components/LazyTemplateCard';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 import { getTemplateAspectRatio } from '../utils/templateAspectRatio';
+import { ArrowRight, ChevronRight, PenTool, Sparkles } from 'lucide-react';
 import {
-  ArrowRight,
-  Sparkles,
-  ChevronRight,
-  BookOpen,
-  CheckCircle2,
-  PenTool,
-  HelpCircle,
-} from 'lucide-react';
+  handleTiltPointerLeave,
+  handleTiltPointerMove,
+  observeScrollReveal,
+  onStageReady,
+  revealPressWords,
+} from '../utils/motion';
 
 interface CategoryViewProps {
   category: CategoryMeta;
@@ -27,18 +26,17 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
   category,
   theme = 'dark',
 }) => {
+  const headerRef = useRef<HTMLElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
 
-  // Find matching templates for this category
   const matchingTemplates = PRESET_TEMPLATES.filter((t) =>
     category.matchedTemplateIds.includes(t.id)
   );
-  // Fallback to all if category has fewer
   const displayTemplates = matchingTemplates.length > 0 ? matchingTemplates : PRESET_TEMPLATES.slice(0, 3);
 
-  // Dynamic SEO & Structured Data (BreadcrumbList + SoftwareApplication)
   useEffect(() => {
     updatePageSEO({
-      title: `${category.metaTitle} — Aesthetic Card Studio`,
+      title: `${category.metaTitle} - Aesthetic Card Studio`,
       description: category.metaDescription,
       canonicalPath: category.path,
       ogType: 'website',
@@ -46,144 +44,77 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          {
-            '@type': 'ListItem',
-            position: 1,
-            name: 'Home',
-            item: `${PRODUCTION_DOMAIN}/`,
-          },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: 'Templates',
-            item: `${PRODUCTION_DOMAIN}/templates`,
-          },
-          {
-            '@type': 'ListItem',
-            position: 3,
-            name: category.title,
-            item: `${PRODUCTION_DOMAIN}${category.path}`,
-          },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${PRODUCTION_DOMAIN}/` },
+          { '@type': 'ListItem', position: 2, name: 'Templates', item: `${PRODUCTION_DOMAIN}/templates` },
+          { '@type': 'ListItem', position: 3, name: category.title, item: `${PRODUCTION_DOMAIN}${category.path}` },
         ],
       },
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    return onStageReady(() => revealPressWords(headerRef.current, 20));
   }, [category]);
+
+  useEffect(() => {
+    return observeScrollReveal(gridRef.current, '[data-reveal-card]', { staggerMs: 45, yOffset: 18 });
+  }, [category.slug]);
 
   return (
     <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
-      <div className="studio-container flex flex-col gap-12">
-        {/* Semantic Breadcrumbs */}
+      <div className="studio-container flex flex-col gap-8">
         <nav aria-label="Breadcrumb" className="studio-breadcrumb">
-          <a href="/" className="cursor-pointer">
-            Home
-          </a>
+          <a href="/" className="cursor-pointer">Home</a>
           <ChevronRight className="w-3.5 h-3.5" />
-          <a href="/templates" className="cursor-pointer">
-            Templates
-          </a>
+          <a href="/templates" className="cursor-pointer">Templates</a>
           <ChevronRight className="w-3.5 h-3.5" />
           <span className="active">{category.title}</span>
         </nav>
 
-        {/* Hero Section */}
-        <header className="flex flex-col gap-4 text-left border-b pb-8 border-[var(--app-border-subtle)]">
-          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--app-text-muted)] font-subheading">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Curated Style Directory</span>
-          </div>
+        <header ref={headerRef} className="flex flex-col gap-4 border-b pb-6 border-[var(--app-border-subtle)] sm:flex-row sm:items-end sm:justify-between">
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading leading-tight">
-            {category.title}
+            {category.title.split(' ').map((word, idx) => (
+              <span key={idx} className="press-word-clip mr-[0.22em]">
+                <span data-press-word className="press-word">{word}</span>
+              </span>
+            ))}
           </h1>
-          <p className="text-base md:text-lg max-w-3xl leading-relaxed text-[var(--app-text-secondary)]">
-            {category.subtitle}
-          </p>
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             {displayTemplates[0] && (
               <a
                 href={`/canvas?template=${encodeURIComponent(displayTemplates[0].id)}`}
                 className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px]"
               >
                 <PenTool className="w-4 h-4" />
-                <span>Create with Style</span>
+                <span>Create</span>
               </a>
             )}
             <a
               href="/templates"
               className="studio-btn-secondary interactive-tactile min-h-[44px]"
             >
-              <span>All Categories</span>
+              <span>All</span>
             </a>
           </div>
         </header>
 
-        {/* Deep Narrative & Use Case Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 flex flex-col gap-4">
-            <h2 className="text-xl font-bold font-heading">
-              About This Art Direction
-            </h2>
-            <p className="text-sm leading-relaxed text-[var(--app-text-secondary)]">
-              {category.longDescription}
-            </p>
-            <div className="studio-panel p-5 mt-2 bg-[var(--app-surface-secondary)]">
-              <h3 className="text-xs font-bold uppercase tracking-wider mb-1.5 font-subheading text-[var(--app-text-primary)]">
-                Primary Use Case
-              </h3>
-              <p className="text-xs leading-relaxed text-[var(--app-text-secondary)]">
-                {category.useCase}
-              </p>
-            </div>
-          </div>
-
-          {/* Design Tips Card */}
-          <div className="lg:col-span-4 studio-panel p-6 flex flex-col gap-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider font-subheading text-[var(--app-text-primary)]">
-              Typesetting Best Practices
-            </h3>
-            <ul className="flex flex-col gap-2.5 text-xs">
-              {category.designTips.map((tip, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[var(--app-accent)] shrink-0 mt-0.5" />
-                  <span className="text-[var(--app-text-secondary)]">{tip}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="pt-3 border-t border-[var(--app-border-subtle)] text-[11px] text-[var(--app-text-muted)] font-subheading">
-              Recommended Ratios: <strong className="text-[var(--app-text-primary)] font-mono">{category.bestAspectRatios.join(', ')}</strong>
-            </div>
-          </div>
-        </section>
-
-        {/* Real Templates Grid */}
-        <section className="flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold font-heading">
-                Tested Presets in this Style
-              </h2>
-              <p className="text-xs text-[var(--app-text-muted)] mt-0.5">
-                Select any card to open the live editor and customize words, fonts, and paper textures.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {displayTemplates.map((template, idx) => (
+        <section aria-label={category.title}>
+          <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {displayTemplates.map((template) => (
               <article
                 key={template.id}
-                style={{ '--stagger-i': idx % 9 } as React.CSSProperties}
-                className="studio-panel group flex flex-col overflow-hidden card-editorial-hover animate-card-entrance shadow-md"
+                data-reveal-card
+                className="studio-panel group flex flex-col overflow-hidden shadow-md"
               >
                 <div className="p-3 pb-0">
                   <a
                     href={`/card/${template.id}`}
                     aria-label={`View ${template.title}`}
-                    className="block"
+                    onPointerMove={handleTiltPointerMove}
+                    onPointerLeave={handleTiltPointerLeave}
+                    className="card-tilt-surface block"
                   >
                     <LazyTemplateCard
                       aspectRatio={getTemplateAspectRatio(template)}
-                      className="rounded-lg border border-black/15"
+                      className="card-tilt-glint rounded-lg border border-black/15 card-artwork-zoom"
                     >
                       <UnifiedCardThumbnail
                         template={template}
@@ -196,20 +127,19 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
 
                 <div className="p-4 flex flex-col gap-3 bg-[var(--app-surface-secondary)] border-t border-[var(--app-border-subtle)] mt-3">
                   <a href={`/card/${template.id}`} className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-bold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors truncate">
+                    <h2 className="text-sm font-bold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors truncate">
                       {template.title}
-                    </h3>
-                    <span className="text-[10px] text-[var(--app-text-muted)] font-subheading uppercase shrink-0">{template.categoryLabel}</span>
+                    </h2>
                   </a>
 
                   <div className={`grid gap-2 pt-1 ${template.canvasDoc ? 'grid-cols-1' : 'grid-cols-2'}`}>
                     <a
                       href={`/canvas?template=${template.id}`}
-                      className="studio-btn-primary interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
+                      className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
                       title="Open in Canvas Studio"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>{template.canvasDoc ? 'Customize in Canvas' : 'Canvas'}</span>
+                      <span>Canvas</span>
                     </a>
                     {!template.canvasDoc && (
                       <a
@@ -228,54 +158,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
           </div>
         </section>
 
-        {/* Safe Advertising Placement */}
         <AdSlot slotId="category-bottom-slot" />
-
-        {/* Category FAQs */}
-        {category.faq.length > 0 && (
-          <section className="flex flex-col gap-4 border-t pt-8 border-[var(--app-border-subtle)]">
-            <div className="flex items-center gap-2">
-              <HelpCircle className="w-4 h-4 text-[var(--app-text-muted)]" />
-              <h2 className="text-lg font-bold font-heading">
-                Frequently Asked Questions about {category.title}
-              </h2>
-            </div>
-            <div className="flex flex-col gap-3">
-              {category.faq.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="studio-panel p-5"
-                >
-                  <h3 className="text-sm font-bold font-heading mb-1 text-[var(--app-text-primary)]">
-                    {item.q}
-                  </h3>
-                  <p className="text-xs leading-relaxed text-[var(--app-text-secondary)]">
-                    {item.a}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Bottom Navigation Links to Guides */}
-        <footer className="studio-panel p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <span className="text-sm font-bold font-heading block text-[var(--app-text-primary)]">
-              Want deeper typesetting advice?
-            </span>
-            <span className="text-xs text-[var(--app-text-secondary)]">
-              Read our educational articles on typography, letter spacing, and card layout.
-            </span>
-          </div>
-          <a
-            href="/guides"
-            className="studio-btn-primary"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Browse All Guides</span>
-          </a>
-        </footer>
       </div>
     </div>
   );

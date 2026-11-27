@@ -48,6 +48,7 @@ import { restoreSavedCustomFonts } from './services/customFontManager';
 import { AmbientAtmosphereLayer } from './components/AmbientAtmosphereLayer';
 import { StudioCompanion } from './components/StudioCompanion';
 import { SkeletonLoader } from './components/SkeletonLoader';
+import { installContentProtection } from './utils/contentProtection';
 
 export const App: React.FC = () => {
   // Current route path normalized without trailing slashes
@@ -66,7 +67,6 @@ export const App: React.FC = () => {
     return undefined;
   });
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
-  const [guideModalOpen, setGuideModalOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');
   const [isEditorSheetOpen, setIsEditorSheetOpen] = useState(false);
 
@@ -107,6 +107,11 @@ export const App: React.FC = () => {
   // Restore saved fonts for locally stored designs.
   useEffect(() => {
     restoreSavedCustomFonts();
+  }, []);
+
+  // Install capture-phase anti-inspect and anti-copy protections.
+  useEffect(() => {
+    return installContentProtection();
   }, []);
 
   const toggleTheme = (e?: React.MouseEvent | { clientX: number; clientY: number } | any) => {
@@ -178,7 +183,6 @@ export const App: React.FC = () => {
         setShortcutsOpen((prev) => !prev);
       } else if (e.key === 'Escape') {
         setShortcutsOpen(false);
-        setGuideModalOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -440,7 +444,7 @@ export const App: React.FC = () => {
           onClick={() => setShortcutsOpen(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl studio-panel shadow-2xl overflow-hidden animate-scale-in"
+            className="animate-panel-slide w-full max-w-lg rounded-2xl studio-panel shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search Input Bar */}
@@ -451,11 +455,12 @@ export const App: React.FC = () => {
                 autoFocus
                 value={commandQuery}
                 onChange={(e) => setCommandQuery(e.target.value)}
-                placeholder="Type a style, action, or command (e.g. 'St. Germain', 'Quote', 'Editor')..."
+                placeholder="Search..."
                 className="w-full text-sm bg-transparent focus:outline-none text-[var(--app-text)] placeholder-[var(--app-text-muted)] font-body"
               />
               <button
                 onClick={() => setShortcutsOpen(false)}
+                aria-label="Close search"
                 className="text-[var(--app-text-muted)] hover:text-[var(--app-text)] cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
@@ -464,11 +469,10 @@ export const App: React.FC = () => {
 
             {/* Quick Actions List */}
             <div className="p-3 flex flex-col gap-1 max-h-96 overflow-y-auto text-xs">
-              {/* Template search results if searching */}
               {matchingTemplatesInCommand.length > 0 && (
                 <div className="mb-2">
                   <span className="px-2 py-1 text-[10px] font-subheading font-bold text-[var(--app-text-muted)] uppercase block">
-                    Matching Art Directions
+                    Cards
                   </span>
                   {matchingTemplatesInCommand.map((tmpl) => (
                     <a
@@ -485,17 +489,12 @@ export const App: React.FC = () => {
                         <span className="font-heading font-medium text-[var(--app-text)]">
                           {tmpl.title}
                         </span>
-                        <span className="text-[10px] text-[var(--app-text-muted)]">({tmpl.categoryLabel})</span>
                       </div>
-                      <span className="text-[10px] text-[var(--app-accent)] font-semibold">Open Page →</span>
+                      <span className="text-[10px] text-[var(--app-accent)] font-semibold">Open</span>
                     </a>
                   ))}
                 </div>
               )}
-
-              <span className="px-2 py-1 text-[10px] font-subheading font-bold text-[var(--app-text-muted)] uppercase block">
-                Quick Studio Navigation
-              </span>
 
               <a
                 href="/create"
@@ -504,7 +503,7 @@ export const App: React.FC = () => {
               >
                 <div className="flex items-center gap-2.5">
                   <PenTool className="w-4 h-4 text-[var(--app-accent)]" />
-                  <span className="font-medium">Open Card Creator</span>
+                  <span className="font-medium">Creator</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /create
@@ -518,7 +517,7 @@ export const App: React.FC = () => {
               >
                 <div className="flex items-center gap-2.5">
                   <Layers className="w-4 h-4 text-[var(--app-accent)]" />
-                  <span className="font-medium">Launch Freeform Canvas Studio</span>
+                  <span className="font-medium">Canvas</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /canvas
@@ -532,7 +531,7 @@ export const App: React.FC = () => {
               >
                 <div className="flex items-center gap-2.5">
                   <Sparkles className="w-4 h-4 text-[var(--app-accent)]" />
-                  <span className="font-medium">Browse Signature Editions (Free)</span>
+                  <span className="font-medium">Signature</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /premium
@@ -546,7 +545,7 @@ export const App: React.FC = () => {
               >
                 <div className="flex items-center gap-2.5">
                   <Grid3X3 className="w-4 h-4 text-[var(--app-accent)]" />
-                  <span className="font-medium">Open Bingo Card Generator</span>
+                  <span className="font-medium">Bingo</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /bingo
@@ -560,7 +559,7 @@ export const App: React.FC = () => {
               >
                 <div className="flex items-center gap-2.5">
                   <LayoutTemplate className="w-4 h-4 text-[var(--app-accent)]" />
-                  <span className="font-medium">Browse Template Library</span>
+                  <span className="font-medium">Templates</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /templates
@@ -574,7 +573,7 @@ export const App: React.FC = () => {
               >
                 <div className="flex items-center gap-2.5">
                   <BookOpen className="w-4 h-4 text-[var(--app-text-secondary)]" />
-                  <span className="font-medium">Explore Design &amp; Typography Guides</span>
+                  <span className="font-medium">Guides</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /guides
@@ -588,7 +587,7 @@ export const App: React.FC = () => {
               >
                 <div className="flex items-center gap-2.5">
                   <Newspaper className="w-4 h-4 text-[var(--app-text-secondary)]" />
-                  <span className="font-medium">Studio Blog &amp; Design Essays</span>
+                  <span className="font-medium">Blog</span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /blog
@@ -609,7 +608,7 @@ export const App: React.FC = () => {
                     <Sun className="w-4 h-4 text-[var(--app-accent)]" />
                   )}
                   <span className="font-medium">
-                    Switch to {isLight ? 'Dark (Obsidian)' : 'Light (Daylight)'} Mode
+                    {isLight ? 'Dark' : 'Light'} Mode
                   </span>
                 </div>
                 <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
@@ -618,97 +617,8 @@ export const App: React.FC = () => {
               </button>
             </div>
 
-            <div className="p-3 border-t border-[var(--app-border-subtle)] text-[11px] text-[var(--app-text-muted)] text-center font-body">
-              Press <kbd className="px-1.5 py-0.5 rounded border border-[var(--app-border-subtle)] text-current">Esc</kbd> to close
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Typography & Typesetting Guide Modal */}
-      {guideModalOpen && (
-        <div
-          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setGuideModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-2xl max-h-[85vh] rounded-2xl studio-panel shadow-2xl flex flex-col overflow-hidden animate-scale-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-5 border-b border-[var(--app-border-subtle)] flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <BookOpen className="w-5 h-5 text-[var(--app-accent)]" />
-                <h3 className="font-heading text-base font-bold text-[var(--app-text)]">
-                  Typesetting &amp; Design System Guide
-                </h3>
-              </div>
-              <button
-                onClick={() => setGuideModalOpen(false)}
-                className="text-[var(--app-text-muted)] hover:text-[var(--app-text)] cursor-pointer transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-6 overflow-y-auto flex flex-col gap-6 text-xs leading-relaxed font-body">
-              <div className="flex flex-col gap-2">
-                <h4 className="font-heading text-sm font-bold text-[var(--app-text)]">
-                  1. Optical Hierarchy &amp; Line Measure
-                </h4>
-                <p className="text-[var(--app-text-muted)] leading-relaxed">
-                  Editorial cards shine when lines do not stretch past 45–65 characters. When rendering long quotes (over 200 characters), reduce font size to 20–22px to avoid clipping and preserve comfortable negative space around your margins.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <h4 className="font-heading text-sm font-bold text-[var(--app-text)]">
-                  2. Font Pairings
-                </h4>
-                <p className="text-[var(--app-text-muted)] leading-relaxed">
-                  • <strong>Newsreader (Editorial Serif)</strong>: Best for philosophical reflections, literature quotes, and classic essays.<br />
-                  • <strong>Playfair Display</strong>: High-contrast drama, ideal for short 1–2 line poetic fragments.<br />
-                  • <strong>Inter (Humanist Sans)</strong>: Clean, modern readability for software notes, critique, and product design axioms.<br />
-                  • <strong>JetBrains Mono</strong>: Precise tabular monospaced style for technical quotes and code fragments.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <h4 className="font-heading text-sm font-bold text-[var(--app-text)]">
-                  3. Export Resolutions &amp; Social Specs
-                </h4>
-                <p className="text-[var(--app-text-muted)] leading-relaxed">
-                  All PNG and WebP exports are rendered with a 2× device pixel ratio (Retina standard). Square cards export at 2160×2160 pixels, and 4:5 portrait cards export at 2160×2700 pixels, ensuring maximum sharpness on high-DPI smartphone displays.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex items-center justify-between">
-                <div>
-                  <span className="font-heading font-bold block text-[var(--app-text)]">
-                    Ready to craft your card?
-                  </span>
-                  <span className="text-[11px] text-[var(--app-text-muted)]">Jump into the Studio Editor to start typesetting.</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      setGuideModalOpen(false);
-                      navigate('/guides');
-                    }}
-                    className="studio-btn-secondary px-3 py-2 text-xs"
-                  >
-                    View All Guides
-                  </button>
-                  <button
-                    onClick={() => {
-                      setGuideModalOpen(false);
-                      navigate('/create');
-                    }}
-                    className="studio-btn-primary px-4 py-2 text-xs"
-                  >
-                    Open Studio
-                  </button>
-                </div>
-              </div>
+            <div className="p-2.5 border-t border-[var(--app-border-subtle)] text-[11px] text-[var(--app-text-muted)] text-center font-body">
+              <kbd className="px-1.5 py-0.5 rounded border border-[var(--app-border-subtle)] text-current">Esc</kbd>
             </div>
           </div>
         </div>

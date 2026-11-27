@@ -48,15 +48,12 @@ export const AboutView: React.FC<TrustViewBaseProps> = () => {
           {/* Nano-texture grain overlay */}
           <div className="absolute inset-0 card-noise opacity-20 pointer-events-none" />
 
-          <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)] relative z-10">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
-              Studio Colophon &amp; Manifesto
-            </span>
+          <header className="flex flex-col gap-2 border-b pb-5 border-[var(--app-border-subtle)] relative z-10">
             <h1 className="font-brand text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
               Aesthetic Card Studio
             </h1>
-            <p className="text-sm md:text-base leading-relaxed text-[var(--app-text-secondary)] max-w-2xl font-body">
-              An independent, local-first card press created for writers, readers, visual curators, and designers.
+            <p className="text-sm leading-relaxed text-[var(--app-text-secondary)] max-w-xl font-body">
+              Local-first browser card studio.
             </p>
           </header>
 
@@ -150,16 +147,10 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
           <span className="active">Contact</span>
         </nav>
 
-        <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
-          <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
-            Direct Communication
-          </span>
+        <header className="flex flex-col gap-2 border-b pb-5 border-[var(--app-border-subtle)]">
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
-            Contact &amp; Feedback
+            Contact
           </h1>
-          <p className="text-sm md:text-base leading-relaxed text-[var(--app-text-secondary)]">
-            Connect directly with the independent developer behind Aesthetic Card Studio.
-          </p>
         </header>
 
         {/* 2-Column Contact Cards */}
@@ -174,7 +165,7 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
               <p className="text-xs text-[var(--app-text-secondary)] leading-relaxed">
                 Send feedback, template requests, or bugs directly to the project owner:
               </p>
-              <div className="p-3 rounded-xl bg-[var(--app-surface-secondary)] border border-[var(--app-border-subtle)] font-mono text-xs font-bold text-[var(--app-text-primary)] select-all">
+              <div className="p-3 rounded-xl bg-[var(--app-surface-secondary)] border border-[var(--app-border-subtle)] font-mono text-xs font-bold text-[var(--app-text-primary)]">
                 ddheerajcarpenter@gmail.com
               </div>
             </div>
@@ -270,16 +261,10 @@ export const FaqView: React.FC<TrustViewBaseProps> = () => {
           <span className="active">FAQ</span>
         </nav>
 
-        <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
-          <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
-            Knowledge Base
-          </span>
+        <header className="flex flex-col gap-2 border-b pb-5 border-[var(--app-border-subtle)]">
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
-            Frequently Asked Questions
+            FAQ
           </h1>
-          <p className="text-sm md:text-base leading-relaxed text-[var(--app-text-secondary)]">
-            Everything you need to know about typography, export settings, browser storage, and privacy.
-          </p>
         </header>
 
         <section aria-label="FAQ list" className="flex flex-col gap-4">
@@ -836,14 +821,12 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
 
             <div className="flex flex-col items-center gap-3 text-center max-w-md">
               <h1 className="text-2xl md:text-3xl font-extrabold font-heading tracking-tight text-[var(--app-text-primary)]">
-                Page Not Found
+                Not Found
               </h1>
               <p className="text-sm leading-relaxed text-[var(--app-text-secondary)]">
-                The URL{' '}
                 <code className="px-1.5 py-0.5 rounded text-xs font-mono bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] border border-[var(--app-border-subtle)]">
                   {currentPath}
-                </code>{' '}
-                does not exist or has been moved. Use the links below to navigate back to the studio.
+                </code>
               </p>
             </div>
 
@@ -857,7 +840,6 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
                   <span className="text-xs font-bold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors">
                     {s.label}
                   </span>
-                  <span className="text-[10px] text-[var(--app-text-muted)] leading-snug">{s.description}</span>
                 </a>
               ))}
             </div>
@@ -865,23 +847,18 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
               <a
                 href="/"
-                className="studio-btn-primary w-full !py-3 !text-sm text-center"
+                className="studio-btn-primary btn-sheen interactive-tactile w-full !py-3 !text-sm text-center"
               >
-                Back to Homepage
+                Home
               </a>
               <a
                 href="/create"
-                className="studio-btn-secondary w-full !py-3 !text-sm text-center"
+                className="studio-btn-secondary interactive-tactile w-full !py-3 !text-sm text-center"
               >
-                Open Studio
+                Create
               </a>
             </div>
           </div>
-        </div>
-
-        <div className="mt-6 flex items-center gap-2 text-xs text-[var(--app-text-muted)] font-subheading">
-          <span className="w-2 h-2 rounded-full bg-[var(--app-accent)] animate-pulse" />
-          <span>Studio is running normally — this URL simply does not exist</span>
         </div>
       </div>
     </div>

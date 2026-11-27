@@ -39,6 +39,7 @@ import {
 import { MyFontsModal } from '../components/MyFontsModal';
 import { pickColorWithEyedropper, extractPaletteFromImage } from '../utils/colorExtractor';
 import { validateAndSanitizeImageFile, dataUrlToBlob } from '../services/imageSecurity';
+import { animateSpringPop } from '../utils/motion';
 
 export interface CreatorViewProps {
   initialTemplate?: CardTemplate;
@@ -349,7 +350,10 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
   const currentPalette = templatePalette || PALETTES[paletteIndex] || PALETTES[0];
 
-  const handleModeChange = (newMode: 'quote' | 'id') => setMode(newMode);
+  const handleModeChange = (newMode: 'quote' | 'id') => {
+    setMode(newMode);
+    animateSpringPop(cardRef.current, 'swap');
+  };
 
   const showToast = (msg: string) => {
     setFeedbackMessage(msg);
@@ -523,6 +527,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
     setQuote(next.q);
     setAuthor(next.a);
     setTag(next.t);
+    animateSpringPop(cardRef.current, 'swap');
   };
 
   const getAspectDimensions = () => {
@@ -736,7 +741,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                   backgroundColor: currentPalette.bg,
                   color: currentPalette.ink,
                 }}
-                className={`w-full ${getAspectDimensions()} p-5 sm:p-8 rounded-xl shadow-md transition-colors duration-200 flex flex-col justify-between border border-black/15 overflow-hidden relative select-text`}
+                className={`w-full ${getAspectDimensions()} p-5 sm:p-8 rounded-xl shadow-md transition-colors duration-200 flex flex-col justify-between border border-black/15 overflow-hidden relative`}
               >
                 {/* Subtle paper grain texture */}
                 <div className="absolute inset-0 card-noise opacity-25 pointer-events-none" />
@@ -904,7 +909,11 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 {PALETTES.map((p, idx) => (
                   <button
                     key={p.id}
-                    onClick={() => { setPaletteIndex(idx); setTemplatePalette(null); }}
+                    onClick={() => {
+                      setPaletteIndex(idx);
+                      setTemplatePalette(null);
+                      animateSpringPop(cardRef.current, 'settle');
+                    }}
                     className={`h-8 rounded-lg border transition-all cursor-pointer relative flex items-center justify-center ${
                       !templatePalette && paletteIndex === idx
                         ? 'ring-2 ring-[var(--app-accent)] scale-105 border-transparent shadow-xs'

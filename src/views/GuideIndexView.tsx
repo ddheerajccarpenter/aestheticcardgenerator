@@ -1,8 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { updatePageSEO } from '../utils/seo';
 import { SquareDuotoneIcon } from '../components/SquareDuotoneIcon';
 import { GUIDE_ARTICLES } from '../data/guides';
 import { AdSlot } from '../components/AdSlot';
+import {
+  animateSpringPop,
+  handleTiltPointerLeave,
+  handleTiltPointerMove,
+  observeScrollReveal,
+  onStageReady,
+  revealPressWords,
+} from '../utils/motion';
 
 interface GuideIndexViewProps {
   onNavigate?: (path: string) => void;
@@ -147,6 +155,9 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
   const isLight = theme === 'light';
   const [currentSpreadIndex, setCurrentSpreadIndex] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const bookRef = useRef<HTMLDivElement | null>(null);
+  const guidesGridRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     updatePageSEO({
@@ -156,30 +167,37 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
       canonicalPath: '/guides',
       ogType: 'website',
     });
+    return onStageReady(() => revealPressWords(titleRef.current, 20));
+  }, []);
+
+  useEffect(() => {
+    return observeScrollReveal(guidesGridRef.current, '[data-reveal-card]', { staggerMs: 40, yOffset: 16 });
   }, []);
 
   const totalSpreads = BOOK_SPREADS.length;
   const spread = BOOK_SPREADS[currentSpreadIndex];
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentSpreadIndex < totalSpreads - 1 && !isFlipping) {
       setIsFlipping(true);
       setTimeout(() => {
         setCurrentSpreadIndex((prev) => prev + 1);
         setIsFlipping(false);
-      }, 500);
+        animateSpringPop(bookRef.current, 'swap');
+      }, 360);
     }
-  };
+  }, [currentSpreadIndex, totalSpreads, isFlipping]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (currentSpreadIndex > 0 && !isFlipping) {
       setIsFlipping(true);
       setTimeout(() => {
         setCurrentSpreadIndex((prev) => prev - 1);
         setIsFlipping(false);
-      }, 500);
+        animateSpringPop(bookRef.current, 'swap');
+      }, 360);
     }
-  };
+  }, [currentSpreadIndex, isFlipping]);
 
   // Keyboard arrow turning
   useEffect(() => {
@@ -189,7 +207,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSpreadIndex]);
+  }, [handleNext, handlePrev]);
 
   return (
     <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 transition-colors duration-200 text-[var(--app-text-primary)]">
@@ -198,19 +216,19 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
         <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 border-b pb-4 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
             <SquareDuotoneIcon name="book" size="md" />
-            <div>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
-                Editorial Field Guide • Book Edition
+            <h1 ref={titleRef} className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
+              <span className="press-word-clip mr-[0.22em]">
+                <span data-press-word className="press-word">Design</span>
               </span>
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight font-heading">
-                The Anatomy of Aesthetic Cards
-              </h1>
-            </div>
+              <span className="press-word-clip">
+                <span data-press-word className="press-word">Book</span>
+              </span>
+            </h1>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono opacity-70">
-              Spread {currentSpreadIndex + 1} of {totalSpreads}
+              {currentSpreadIndex + 1} / {totalSpreads}
             </span>
             <div className="flex items-center gap-1.5">
               <button
@@ -238,6 +256,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
         {/* ─────────────────────────────────────────────────────────────────── */}
         <div className="guides-book-stage w-full max-w-5xl">
           <div
+            ref={bookRef}
             className={`guides-book-leaf w-full rounded-3xl border shadow-2xl overflow-hidden relative transition-all duration-300 ${
               isFlipping ? 'is-turning-next scale-[0.985] opacity-85' : 'scale-100 opacity-100'
             } ${
@@ -311,8 +330,8 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
               </div>
 
               <div className="pt-6 border-t border-current/10 mt-6 flex items-center justify-between text-[10px] font-mono opacity-60">
-                <span>AESTHETIC CARD STUDIO PRESS</span>
-                <span>OCTOBER 2026 EDITION</span>
+                <span>ACG PRESS</span>
+                <span>2026</span>
               </div>
             </div>
 
@@ -338,11 +357,13 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
 
                 {/* Tactile Mini-Card Specimen */}
                 <div
+                  onPointerMove={handleTiltPointerMove}
+                  onPointerLeave={handleTiltPointerLeave}
                   style={{
                     backgroundColor: spread.rightPage.sampleCard.bg,
                     color: spread.rightPage.sampleCard.ink,
                   }}
-                  className="p-6 rounded-2xl border border-black/15 shadow-xl my-4 relative overflow-hidden flex flex-col justify-between min-h-[220px]"
+                  className="card-tilt-surface card-tilt-glint p-6 rounded-2xl border border-black/15 shadow-xl my-4 relative overflow-hidden flex flex-col justify-between min-h-[220px]"
                 >
                   <div className="absolute inset-0 card-noise opacity-30 pointer-events-none" />
 
@@ -363,14 +384,10 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
               </div>
 
               {/* Direct Studio Launcher Button */}
-              <div className="pt-4 border-t border-current/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <span className="text-[11px] font-mono text-[var(--app-text-muted)]">
-                  Ready to apply to your words?
-                </span>
-
+              <div className="pt-4 border-t border-current/10 flex items-center justify-end gap-3">
                 <a
                   href={spread.rightPage.actionUrl}
-                  className="studio-btn-primary w-full sm:w-auto !py-2.5 !text-xs cursor-pointer"
+                  className="studio-btn-primary btn-sheen interactive-tactile w-full sm:w-auto !py-2.5 !text-xs cursor-pointer"
                 >
                   <span>{spread.rightPage.actionLabel}</span>
                 </a>
@@ -388,7 +405,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
             className="studio-btn-secondary interactive-tactile min-h-[44px] !text-xs !py-2 disabled:opacity-30 cursor-pointer"
           >
             <SquareDuotoneIcon name="arrow-left" size="sm" />
-            <span>Prev Spread</span>
+            <span>Prev</span>
           </button>
 
           <span className="text-xs font-mono font-bold text-[var(--app-text-primary)]">
@@ -400,7 +417,7 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
             disabled={currentSpreadIndex === totalSpreads - 1}
             className="studio-btn-secondary interactive-tactile min-h-[44px] !text-xs !py-2 disabled:opacity-30 cursor-pointer"
           >
-            <span>Next Spread</span>
+            <span>Next</span>
             <SquareDuotoneIcon name="arrow-right" size="sm" />
           </button>
         </div>
@@ -408,19 +425,19 @@ export const GuideIndexView: React.FC<GuideIndexViewProps> = ({
         <section aria-labelledby="direct-guides-heading" className="w-full max-w-5xl border-t border-[var(--app-border-subtle)] pt-8">
           <div className="mb-4 flex items-center justify-between gap-2">
             <h2 id="direct-guides-heading" className="text-xl sm:text-2xl font-heading">
-              Design Guides
+              Guides
             </h2>
             <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--app-text-muted)]">
-              {GUIDE_ARTICLES.length} articles
+              {GUIDE_ARTICLES.length}
             </span>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {GUIDE_ARTICLES.map((article, idx) => (
+          <div ref={guidesGridRef} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {GUIDE_ARTICLES.map((article) => (
               <a
                 key={article.slug}
+                data-reveal-card
                 href={article.path}
-                style={{ '--stagger-i': idx } as React.CSSProperties}
-                className="studio-panel group flex flex-col justify-between gap-2 p-4 card-editorial-hover animate-card-entrance"
+                className="studio-panel group flex flex-col justify-between gap-2 p-4 card-editorial-hover"
               >
                 <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--app-accent)]">
                   {article.category} · {article.readTime}

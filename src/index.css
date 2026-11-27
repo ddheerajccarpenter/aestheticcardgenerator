@@ -356,12 +356,38 @@
     scroll-behavior: smooth;
   }
 
-  /* Body Theme Foundation */
+  /* Body Theme Foundation & Anti-Copy Selection Guard */
+  html, body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
   body {
     background-color: var(--color-canvas);
     color: var(--color-ink);
     min-height: 100vh;
     transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  input:not([readonly]):not([disabled]),
+  textarea:not([readonly]):not([disabled]),
+  select:not([disabled]),
+  [contenteditable="true"],
+  [contenteditable=""] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+
+  img, svg, a {
+    -webkit-user-drag: none;
+  }
+
+  @media print {
+    body {
+      display: none !important;
+    }
   }
 
   html.light body,
@@ -1377,15 +1403,20 @@ html.light .studio-input:focus {
   position: relative;
   overflow: hidden;
 }
+/* Trigger specular sheen on intent (hover/focus) rather than idling continuously */
 .btn-sheen::after {
   content: '';
   position: absolute;
   inset: 0;
-  width: 38%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
-  transform: translateX(-140%) skewX(-18deg);
-  animation: cta-sheen-glide 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  width: 42%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.24), transparent);
+  transform: translateX(-160%) skewX(-18deg);
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
+}
+.btn-sheen:hover::after,
+.btn-sheen:focus-visible::after {
+  transform: translateX(280%) skewX(-18deg);
 }
 
 .card-artwork-zoom img,
@@ -1413,6 +1444,134 @@ html.light .studio-input:focus {
   box-shadow: 0 18px 36px -10px rgba(0, 0, 0, 0.24);
 }
 
+/* Pointer-reactive 3D paper tilt & warm specular glint */
+.card-tilt-surface {
+  transform: perspective(960px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms ease, border-color 280ms ease;
+  will-change: transform;
+}
+.card-tilt-surface:hover {
+  box-shadow: 0 22px 44px -12px rgba(0, 0, 0, 0.34);
+}
+.card-tilt-glint {
+  position: relative;
+}
+.card-tilt-glint::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle 180px at var(--glint-x, 50%) var(--glint-y, 50%), rgba(255, 248, 235, 0.14), transparent 72%);
+  transition: opacity 220ms ease;
+  z-index: 25;
+}
+.card-tilt-surface:hover .card-tilt-glint::after {
+  opacity: 1;
+}
+
+/* Editorial press word-mask clipping */
+.press-word-clip {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+.press-word {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* Sticky header scroll-progress hairline */
+.header-scroll-bar {
+  transform-origin: left center;
+  transform: scaleX(var(--page-scroll, 0));
+  will-change: transform;
+}
+
+/* Editorial animated underline */
+.editorial-link-underline {
+  position: relative;
+}
+.editorial-link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.editorial-link-underline:hover::after,
+.editorial-link-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Mobile drawer curtain unroll */
+@keyframes drawer-unroll {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-drawer-unroll {
+  animation: drawer-unroll 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Search & disclosure slide reveal */
+@keyframes panel-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-panel-slide {
+  animation: panel-slide-down 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* User motion pause toggle & OS reduced-motion support (R-39) */
+html[data-motion-paused="true"] .animate-companion-squash,
+html[data-motion-paused="true"] .animate-companion-wiggle,
+html[data-motion-paused="true"] .animate-companion-stamp,
+html[data-motion-paused="true"] .animate-bubble-pop,
+html[data-motion-paused="true"] .animate-float-emote,
+html[data-motion-paused="true"] .animate-companion-breathe,
+html[data-motion-paused="true"] .animate-shimmer-sweep,
+html[data-motion-paused="true"] .animate-card-entrance,
+html[data-motion-paused="true"] .animate-hero-bob,
+html[data-motion-paused="true"] .animate-hero-bob-reverse,
+html[data-motion-paused="true"] .animate-pulse,
+html[data-motion-paused="true"] .animate-drawer-unroll,
+html[data-motion-paused="true"] .animate-panel-slide,
+html[data-motion-paused="true"] .btn-sheen::after,
+html[data-motion-paused="true"] .card-artwork-zoom img,
+html[data-motion-paused="true"] .card-artwork-zoom svg,
+html[data-motion-paused="true"] .card-tilt-surface,
+html[data-motion-paused="true"] .card-tilt-glint::after,
+html[data-motion-paused="true"] .interactive-tactile:active,
+html[data-motion-paused="true"] .card-editorial-hover:hover,
+html[data-motion-paused="true"] .studio-pill:hover,
+html[data-motion-paused="true"] .studio-pill:active,
+html[data-motion-paused="true"] .holographic-foil {
+  animation: none !important;
+  transform: none !important;
+  translate: none !important;
+  transition-duration: 0.01ms !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root) {
@@ -1428,9 +1587,13 @@ html.light .studio-input:focus {
   .animate-card-entrance,
   .animate-hero-bob,
   .animate-hero-bob-reverse,
+  .animate-drawer-unroll,
+  .animate-panel-slide,
   .btn-sheen::after,
   .card-artwork-zoom img,
   .card-artwork-zoom svg,
+  .card-tilt-surface,
+  .card-tilt-glint::after,
   .interactive-tactile:active,
   .card-editorial-hover:hover,
   .studio-pill:hover,

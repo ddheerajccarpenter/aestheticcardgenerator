@@ -22,13 +22,13 @@ export const TemplateComparisonDock: React.FC<TemplateComparisonDockProps> = ({
   const isLight = theme === 'light';
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-xl animate-bounce-in">
+    <div className="animate-panel-slide fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-xl">
       <div
         className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl border shadow-xl flex items-center justify-between gap-3 sm:gap-4 glass-surface text-[var(--app-text-primary)]"
       >
         <div className="flex items-center gap-2 overflow-x-auto min-w-0">
-          <span className="text-xs font-bold text-[var(--app-accent)] uppercase tracking-wider shrink-0 font-subheading">
-            Compare ({selectedTemplates.length}/4):
+          <span className="text-xs font-bold text-[var(--app-accent)] font-mono shrink-0">
+            {selectedTemplates.length}/4
           </span>
           {selectedTemplates.map((tmpl) => (
             <div

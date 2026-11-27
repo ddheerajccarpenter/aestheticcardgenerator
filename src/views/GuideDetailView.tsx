@@ -36,7 +36,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
   // Dynamic SEO & Article JSON-LD
   useEffect(() => {
     updatePageSEO({
-      title: `${guide.metaTitle} — Aesthetic Card Studio`,
+      title: `${guide.metaTitle} - Aesthetic Card Studio`,
       description: guide.metaDescription,
       canonicalPath: guide.path,
       ogType: 'article',
@@ -150,24 +150,18 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
           ))}
         </div>
 
-        {/* Recommended Presets Box */}
         {recommendedTemplates.length > 0 && (
           <section className="studio-panel p-6 flex flex-col gap-4 bg-[var(--app-surface-secondary)]">
-            <div>
-              <span className="text-[10px] font-bold text-[var(--app-accent)] uppercase tracking-wider block font-subheading">
-                Recommended Art Directions for this Workflow
-              </span>
-              <h3 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
-                Try These Curated Styles
-              </h3>
-            </div>
+            <h3 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
+              Templates
+            </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {recommendedTemplates.map((t) => (
                 <div
                   key={t.id}
                   style={{ backgroundColor: t.theme.bg, color: t.theme.ink }}
-                  className="p-5 rounded-xl border border-black/15 flex flex-col justify-between shadow-sm"
+                  className="card-editorial-hover p-5 rounded-xl border border-black/15 flex flex-col justify-between shadow-sm"
                 >
                   <div>
                     <span className="text-[10px] font-mono opacity-70 block mb-1">{t.tag}</span>
@@ -177,13 +171,13 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
                   </div>
                   <div className="pt-3 border-t border-current/15 mt-3 flex items-center justify-between">
                     <cite className="not-italic text-[10px] font-medium opacity-80 truncate">
-                      — {t.author}
+                      {t.author}
                     </cite>
                     <a
                       href={t.canvasDoc?.objects.length ? `/canvas?template=${t.id}` : `/create?template=${t.id}`}
                       className="px-2.5 py-1 rounded bg-black/10 hover:bg-black/20 text-[10px] font-semibold cursor-pointer transition-colors"
                     >
-                      Open in Studio →
+                      Open
                     </a>
                   </div>
                 </div>
@@ -192,20 +186,13 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
           </section>
         )}
 
-        {/* Clear Next Action CTA Banner */}
-        <section className="studio-panel p-8 text-center flex flex-col items-center gap-4">
-          <PenTool className="w-6 h-6 text-[var(--app-accent)]" />
-          <h2 className="text-xl font-bold font-heading text-[var(--app-text-primary)]">
-            Ready to Create Your Card?
-          </h2>
-          <p className="text-xs max-w-md text-[var(--app-text-secondary)]">
-            {guide.actionPrompt}
-          </p>
+        <section className="studio-panel p-6 text-center flex flex-col items-center gap-3">
+          <PenTool className="w-5 h-5 text-[var(--app-accent)]" />
           <a
             href="/create"
-            className="studio-btn-primary"
+            className="studio-btn-primary btn-sheen interactive-tactile"
           >
-            <span>Launch Studio Creator</span>
+            <span>Open Studio</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </a>
         </section>

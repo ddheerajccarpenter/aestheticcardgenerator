@@ -79,7 +79,11 @@ const adsenseActive = hasConfiguredAdSense();
             root.classList.add('dark');
             root.setAttribute('data-theme', 'dark');
           }
+          if (localStorage.getItem('acg_motion_paused') === 'true') {
+            root.setAttribute('data-motion-paused', 'true');
+          }
         } catch (e) {}
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, true);
       })();
     </script>
     <title>{title}</title>
