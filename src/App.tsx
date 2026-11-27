@@ -42,8 +42,8 @@ import {
   Sun,
   Moon,
   Grid3X3,
-  Sparkles,
-} from 'lucide-react';
+  Award as Sparkles,
+} from './components/icons/faIcons';
 import { restoreSavedCustomFonts } from './services/customFontManager';
 import { AmbientAtmosphereLayer } from './components/AmbientAtmosphereLayer';
 import { StudioCompanion } from './components/StudioCompanion';

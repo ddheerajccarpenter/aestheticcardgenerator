@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowRight, Check, X } from 'lucide-react';
+import { ArrowRight, Check, X } from '../components/icons/faIcons';
 import { updatePageSEO } from '../utils/seo';
 import { SquareDuotoneIcon } from '../components/SquareDuotoneIcon';
 import { GUIDE_ARTICLES } from '../data/guides';

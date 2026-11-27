@@ -246,3 +246,28 @@ test('taste-skill discipline: accessibility landmarks, no blocking CDN fonts, se
   assert.ok(homeSrc.includes("['Card', 'and', 'poster']") && homeSrc.includes('studio'), 'HomeView hero H1 must open with category-first naming');
   assert.ok(homeSrc.includes('Browse templates'), 'HomeView hero must use verb+object Browse templates CTA');
 });
+
+test('Font Awesome Classic Solid animated icons and Uizze interactive home motion helpers', () => {
+  const faIconsSrc = fs.readFileSync(path.join(SRC_DIR, 'components', 'icons', 'faIcons.tsx'), 'utf8');
+  assert.ok(faIconsSrc.includes('@fortawesome/free-solid-svg-icons'), 'faIcons must render bold Font Awesome Classic Solid SVG paths');
+  assert.ok(faIconsSrc.includes('data-fa-motion'), 'faIcons must expose Remocn-style per-icon kinetic tags');
+
+  const headerSrc = fs.readFileSync(path.join(SRC_DIR, 'components', 'Header.tsx'), 'utf8');
+  assert.ok(!headerSrc.includes("'lucide-react'"), 'Header must use Font Awesome Solid icons instead of Lucide');
+  assert.ok(headerSrc.includes('nav-pill-glider'), 'Header desktop nav must render sliding pill glider');
+
+  const homeSrc = fs.readFileSync(path.join(SRC_DIR, 'views', 'HomeView.tsx'), 'utf8');
+  assert.ok(!homeSrc.includes("'lucide-react'"), 'HomeView must use Font Awesome Solid icons instead of Lucide');
+  assert.ok(homeSrc.includes('animateDeckAdvance') && homeSrc.includes('handleMagneticPointerMove'), 'HomeView hero must wire directional deck transitions and magnetic button pull');
+  assert.ok(homeSrc.includes('ArrowLeft') && homeSrc.includes('ArrowRight') && homeSrc.includes('shuffleHeroCard'), 'HomeView hero stage must support keyboard switching and shuffle cycle');
+  assert.ok(homeSrc.includes('segmented-thumb') && homeSrc.includes('search-drawer-grid'), 'HomeView gallery must smoothly animate density thumb and expandable search');
+
+  const cssSrc = fs.readFileSync(path.join(SRC_DIR, 'index.css'), 'utf8');
+  assert.ok(cssSrc.includes('.fa-solid-icon') && cssSrc.includes('fa-remocn-download') && cssSrc.includes('.btn-magnetic'), 'index.css must define Remocn SVG icon keyframes and magnetic button transforms');
+  assert.ok(
+    cssSrc.includes('html[data-motion-paused="true"] .fa-solid-icon') &&
+      cssSrc.includes('.nav-pill-glider') &&
+      cssSrc.includes('.segmented-thumb'),
+    'index.css must halt icon kinematics and sliding UI motion when paused or reduced'
+  );
+});

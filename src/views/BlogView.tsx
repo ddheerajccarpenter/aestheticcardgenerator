@@ -11,7 +11,7 @@ import {
   ArrowRight,
   PenTool,
   Sparkles,
-} from 'lucide-react';
+} from '../components/icons/faIcons';
 import { observeScrollReveal, onStageReady, revealPressWords } from '../utils/motion';
 
 interface BlogViewBaseProps {

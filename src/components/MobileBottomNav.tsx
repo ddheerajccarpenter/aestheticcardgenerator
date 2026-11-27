@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, LayoutTemplate, Plus, Layers, Sparkles } from 'lucide-react';
+import { Compass, LayoutTemplate, Plus, Layers, Award as Sparkles } from './icons/faIcons';
 
 interface MobileBottomNavProps {
   currentPath: string;

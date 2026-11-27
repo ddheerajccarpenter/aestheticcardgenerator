@@ -6,7 +6,7 @@ import { AdSlot } from '../components/AdSlot';
 import { LazyTemplateCard } from '../components/LazyTemplateCard';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 import { getTemplateAspectRatio } from '../utils/templateAspectRatio';
-import { ArrowRight, ChevronRight, PenTool, Sparkles } from 'lucide-react';
+import { ArrowRight, ChevronRight, PenTool, Sparkles } from '../components/icons/faIcons';
 import {
   handleTiltPointerLeave,
   handleTiltPointerMove,

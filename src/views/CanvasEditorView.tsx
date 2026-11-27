@@ -94,7 +94,7 @@ import {
   Maximize2,
   Pipette,
   Smile,
-} from 'lucide-react';
+} from '../components/icons/faIcons';
 import { processImageFilter } from '../utils/imageFilters';
 import { generateQrCodeSvg, generateBarcodeSvg } from '../utils/qrBarcodeGenerator';
 import { MediaImportModal, type MediaResult } from '../components/MediaImportModal';

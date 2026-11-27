@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { animate, stagger } from 'animejs';
-import { ArrowRight, Layers } from 'lucide-react';
+import { ArrowRight, Layers } from '../components/icons/faIcons';
 import { PREMIUM_SIGNATURE_TEMPLATES } from '../data/premiumTemplates';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';
 import { LazyTemplateCard } from '../components/LazyTemplateCard';

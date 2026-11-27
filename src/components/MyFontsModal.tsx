@@ -1,7 +1,7 @@
 // src/components/MyFontsModal.tsx
 // Compact, full-featured My Fonts Manager modal
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Trash2, Search, Check, Type, AlertCircle } from 'lucide-react';
+import { X, Upload, Trash2, Search, Check, Type, AlertCircle } from './icons/faIcons';
 import {
   loadAllFontsFromIndexedDB,
   registerAndSaveCustomFont,

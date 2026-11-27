@@ -22,7 +22,7 @@ import {
   Palette,
   Sparkles,
   Pipette,
-} from 'lucide-react';
+} from '../components/icons/faIcons';
 import { ASSET_AVATARS } from '../data/canvasAssets';
 import { createThreeCardPreviewScene, type ThreeCardPreviewController } from '../engines/threeCardStage';
 import { ThreeDPreviewControls } from '../components/ThreeDPreviewControls';

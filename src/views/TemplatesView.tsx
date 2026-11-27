@@ -11,7 +11,7 @@ import {
   FileQuestion,
   Layers,
   Sparkles,
-} from 'lucide-react';
+} from '../components/icons/faIcons';
 import { TemplateComparisonModal } from '../components/TemplateComparisonModal';
 import { TemplateComparisonDock } from '../components/TemplateComparisonDock';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';

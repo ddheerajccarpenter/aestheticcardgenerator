@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
-import { Check, Download, Edit3, RotateCcw, Shuffle } from 'lucide-react';
+import { Check, Download, Edit3, RotateCcw, Shuffle } from '../components/icons/faIcons';
 import {
   BINGO_KINDS,
   BINGO_PALETTES,

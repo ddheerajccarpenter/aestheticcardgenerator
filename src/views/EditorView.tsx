@@ -62,7 +62,7 @@ import {
   Box,
   Sun,
   Maximize2,
-} from 'lucide-react';
+} from '../components/icons/faIcons';
 import { updateWorkspaceAmbientBackdrop } from '../engines/ambientStageEngine';
 import {
   registerAndSaveCustomFont,

@@ -1567,6 +1567,185 @@ html {
   animation: panel-slide-down 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Remocn-inspired purposeful SVG icon kinematics (hover/focus/active only; zero idle loops) */
+.fa-solid-icon {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fa-remocn-download {
+  0% { transform: translateY(0) scaleY(1); }
+  28% { transform: translateY(-2.5px) scaleY(1); }
+  66% { transform: translateY(2.5px) scaleY(0.92); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+@keyframes fa-remocn-upload {
+  0% { transform: translateY(0) scaleY(1); }
+  40% { transform: translateY(-3px) scaleY(1.06); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+@keyframes fa-remocn-check {
+  0% { transform: scale(1) rotate(0deg); }
+  38% { transform: scale(0.84) rotate(-8deg); }
+  72% { transform: scale(1.16) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes fa-remocn-moon {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-18deg); }
+  65% { transform: rotate(9deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes fa-remocn-compass {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(-16deg) scale(1.06); }
+  72% { transform: rotate(10deg) scale(1.02); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes fa-remocn-search {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  35% { transform: translate(-1.5px, -1px) rotate(-10deg) scale(1.08); }
+  72% { transform: translate(1.5px, 0.5px) rotate(6deg) scale(1.04); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+@keyframes fa-remocn-trash {
+  0% { transform: rotate(0deg) translateY(0); }
+  35% { transform: rotate(-12deg) translateY(-1px); }
+  70% { transform: rotate(7deg) translateY(0); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+@keyframes fa-remocn-gleam {
+  0% { transform: scale(1) rotate(0deg); }
+  45% { transform: scale(1.16) rotate(8deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes fa-remocn-spin-continuous {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fa-solid-icon[data-fa-motion="spin"] {
+  animation: fa-remocn-spin-continuous 0.9s linear infinite;
+}
+
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) > .fa-solid-icon[data-fa-motion="nudge-right"],
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="nudge-right"] {
+  transform: translateX(3px);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="nudge-left"] {
+  transform: translateX(-3px);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="nudge-up"] {
+  transform: translateY(-2.5px);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="nudge-down"] {
+  transform: translateY(2px);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="download"] {
+  animation: fa-remocn-download 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="upload"] {
+  animation: fa-remocn-upload 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="check"] {
+  animation: fa-remocn-check 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="sun"] {
+  transform: rotate(45deg) scale(1.08);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="moon"] {
+  animation: fa-remocn-moon 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="plus"] {
+  transform: rotate(90deg);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="spin-cw"] {
+  transform: rotate(180deg);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="spin-ccw"] {
+  transform: rotate(-180deg);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="layers"] {
+  transform: translateY(-2px) scale(1.06);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="compass"] {
+  animation: fa-remocn-compass 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="search"] {
+  animation: fa-remocn-search 460ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="trash"] {
+  animation: fa-remocn-trash 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="copy"] {
+  transform: translate(1.5px, -1.5px) scale(1.06);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="tilt"] {
+  transform: rotate(-10deg) scale(1.06);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="book"] {
+  transform: scaleX(1.08) scaleY(0.96);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="menu"] {
+  transform: scaleX(1.08);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="gleam"] {
+  animation: fa-remocn-gleam 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(a, button, [role="button"], .interactive-icon-host):is(:hover, :focus-visible) .fa-solid-icon[data-fa-motion="pop"] {
+  transform: scale(1.08);
+}
+:is(a, button, [role="button"], .interactive-icon-host):active .fa-solid-icon {
+  transform: scale(0.9);
+  transition-duration: 70ms;
+}
+
+/* Uizze-inspired homepage & navigation smooth interactive motion primitives */
+.btn-magnetic {
+  transform: translate3d(var(--mag-x, 0px), var(--mag-y, 0px), 0);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 150ms cubic-bezier(0.22, 1, 0.36, 1), border-color 150ms cubic-bezier(0.22, 1, 0.36, 1), color 150ms ease;
+}
+.btn-magnetic:active {
+  transform: translate3d(var(--mag-x, 0px), calc(var(--mag-y, 0px) + 1px), 0) scale(0.985);
+}
+
+.nav-pill-glider {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 0.5rem;
+  background-color: var(--app-surface-secondary);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), width 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 160ms ease;
+  will-change: transform, width;
+}
+
+.segmented-thumb {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.search-drawer-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 240ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease;
+}
+.search-drawer-grid[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.search-drawer-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
 /* User motion pause toggle & OS reduced-motion support (R-39) */
 html[data-motion-paused="true"] .animate-companion-squash,
 html[data-motion-paused="true"] .animate-companion-wiggle,
@@ -1581,6 +1760,11 @@ html[data-motion-paused="true"] .animate-hero-bob-reverse,
 html[data-motion-paused="true"] .animate-pulse,
 html[data-motion-paused="true"] .animate-drawer-unroll,
 html[data-motion-paused="true"] .animate-panel-slide,
+html[data-motion-paused="true"] .fa-solid-icon,
+html[data-motion-paused="true"] .btn-magnetic,
+html[data-motion-paused="true"] .nav-pill-glider,
+html[data-motion-paused="true"] .segmented-thumb,
+html[data-motion-paused="true"] .search-drawer-grid,
 html[data-motion-paused="true"] .btn-sheen::after,
 html[data-motion-paused="true"] .card-artwork-zoom img,
 html[data-motion-paused="true"] .card-artwork-zoom svg,
@@ -1614,6 +1798,11 @@ html[data-motion-paused="true"] .holographic-foil {
   .animate-hero-bob-reverse,
   .animate-drawer-unroll,
   .animate-panel-slide,
+  .fa-solid-icon,
+  .btn-magnetic,
+  .nav-pill-glider,
+  .segmented-thumb,
+  .search-drawer-grid,
   .btn-sheen::after,
   .card-artwork-zoom img,
   .card-artwork-zoom svg,
@@ -1627,5 +1816,6 @@ html[data-motion-paused="true"] .holographic-foil {
     animation: none !important;
     transform: none !important;
     translate: none !important;
+    transition-duration: 0.01ms !important;
   }
 }

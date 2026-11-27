@@ -12,7 +12,7 @@ import {
   ArrowRight,
   BookOpen,
   Info,
-} from 'lucide-react';
+} from '../components/icons/faIcons';
 
 interface GuideDetailViewProps {
   guide: GuideArticle;

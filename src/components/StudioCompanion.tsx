@@ -10,7 +10,7 @@ import {
   Check,
   Stamp,
   Cloud,
-} from 'lucide-react';
+} from './icons/faIcons';
 import { isReducedMotion, useMotionPaused } from '../utils/motion';
 
 export type CharacterMood = 'idle' | 'happy' | 'surprised' | 'winking' | 'thinking' | 'celebrating';

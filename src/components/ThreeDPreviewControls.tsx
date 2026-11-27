@@ -1,4 +1,4 @@
-import { RotateCcw, ZoomIn, ZoomOut, X, Box } from 'lucide-react';
+import { RotateCcw, ZoomIn, ZoomOut, X, Box } from './icons/faIcons';
 import type { ThreeCardPreviewController } from '../engines/threeCardStage';
 
 interface ThreeDPreviewControlsProps {

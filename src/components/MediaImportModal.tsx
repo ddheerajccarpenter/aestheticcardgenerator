@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Search, Book, Music, X, Loader2, ArrowRight } from 'lucide-react';
+import { Search, Book, Music, X, Loader2, ArrowRight } from './icons/faIcons';
 
 export interface BookResult {
   type: 'book';

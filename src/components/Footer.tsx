@@ -1,5 +1,6 @@
 import React from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { ArrowUp, Moon, Sun } from './icons/faIcons';
+import { isReducedMotion } from '../utils/motion';
 
 interface FooterProps {
   onNavigate?: (path: string) => void;
@@ -9,6 +10,10 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ theme = 'dark' }) => {
   const isLight = theme === 'light';
   const linkClass = 'editorial-link-underline min-h-[44px] inline-flex items-center hover:text-[var(--app-accent)] transition-colors';
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: isReducedMotion() ? 'auto' : 'smooth' });
+  };
 
   return (
     <footer className="w-full border-t border-[var(--app-border-subtle)] bg-[var(--app-surface)] text-[var(--app-text)] transition-colors duration-200 mt-16 pb-28 md:pb-8">
@@ -35,9 +40,20 @@ export const Footer: React.FC<FooterProps> = ({ theme = 'dark' }) => {
 
         <div className="flex items-center justify-between gap-3 text-[13px] text-[var(--app-text-muted)]">
           <span>© 2026 ACG</span>
-          <div className="flex items-center gap-1.5">
-            {isLight ? <Sun className="w-3.5 h-3.5 text-[var(--app-accent)]" aria-hidden="true" /> : <Moon className="w-3.5 h-3.5 text-[var(--app-accent)]" aria-hidden="true" />}
-            <span>{isLight ? 'Light' : 'Dark'}</span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={scrollToTop}
+              aria-label="Back to top"
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] px-2.5 py-1 text-xs font-medium text-[var(--app-text-secondary)] transition-colors hover:border-[var(--app-border-strong)] hover:text-[var(--app-text-primary)] cursor-pointer"
+            >
+              <span>Top</span>
+              <ArrowUp className="h-3 w-3" aria-hidden="true" />
+            </button>
+            <div className="flex items-center gap-1.5">
+              {isLight ? <Sun className="w-3.5 h-3.5 text-[var(--app-accent)]" aria-hidden="true" /> : <Moon className="w-3.5 h-3.5 text-[var(--app-accent)]" aria-hidden="true" />}
+              <span>{isLight ? 'Light' : 'Dark'}</span>
+            </div>
           </div>
         </div>
       </div>

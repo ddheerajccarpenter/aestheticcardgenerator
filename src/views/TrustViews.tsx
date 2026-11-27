@@ -13,7 +13,7 @@ import {
   Check,
   Copy,
   ArrowRight,
-} from 'lucide-react';
+} from '../components/icons/faIcons';
 
 interface TrustViewBaseProps {
   onNavigate?: (path: string) => void;

@@ -1,23 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'animejs';
 import {
-  Compass,
-  LayoutTemplate,
-  Layers,
-  Search,
+  Award,
   BookOpen,
-  Plus,
-  Moon,
-  Sun,
+  Compass,
   Grid3X3,
-  Sparkles,
-  Menu,
-  X,
-  Newspaper,
   HelpCircle,
+  Layers,
+  LayoutTemplate,
+  Menu,
+  Moon,
+  Newspaper,
   Pause,
   Play,
-} from 'lucide-react';
+  Plus,
+  Search,
+  Sun,
+  X,
+} from './icons/faIcons';
 import { EDITORIAL_EASE, isReducedMotion, setMotionPaused, useMotionPaused } from '../utils/motion';
 
 interface HeaderProps {
@@ -35,10 +35,18 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenShortcuts,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navGlider, setNavGlider] = useState<{ x: number; w: number; visible: boolean }>({ x: 0, w: 0, visible: false });
   const motionPaused = useMotionPaused();
   const scrollBarRef = useRef<HTMLDivElement | null>(null);
   const drawerRef = useRef<HTMLElement | null>(null);
   const themeIconRef = useRef<HTMLSpanElement | null>(null);
+  const desktopNavRef = useRef<HTMLElement | null>(null);
+
+  const moveNavGlider = (el: HTMLElement | null) => {
+    const nav = desktopNavRef.current;
+    if (!nav || !el) return;
+    setNavGlider({ x: el.offsetLeft, w: el.offsetWidth, visible: true });
+  };
 
   useEffect(() => {
     const bar = scrollBarRef.current;
@@ -100,7 +108,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const links = [
     { label: 'Gallery', path: '/', icon: Compass, active: currentPath === '/' },
-    { label: 'Signature', path: '/premium', icon: Sparkles, active: currentPath.startsWith('/premium') },
+    { label: 'Signature', path: '/premium', icon: Award, active: currentPath.startsWith('/premium') },
     { label: 'Templates', path: '/templates', icon: LayoutTemplate, active: currentPath.startsWith('/templates') },
     { label: 'Canvas', path: '/canvas', icon: Layers, active: currentPath.startsWith('/canvas') },
     { label: 'Bingo', path: '/bingo', icon: Grid3X3, active: currentPath.startsWith('/bingo') },
@@ -120,21 +128,38 @@ export const Header: React.FC<HeaderProps> = ({
       </a>
       <div className="mx-auto flex h-14 max-w-[1540px] items-center justify-between gap-2 px-3 text-[var(--app-text-primary)] sm:px-5 lg:px-6">
         <a href="/" aria-label="ACG home" className="group flex shrink-0 items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] sm:gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[var(--app-border-strong)] text-[var(--app-accent)] transition-colors group-hover:border-[var(--app-accent)]" aria-hidden="true">
-            <span className="h-2 w-2 rounded-xs bg-current" />
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[var(--app-border-strong)] text-[var(--app-accent)] transition-[border-color,transform] duration-200 group-hover:border-[var(--app-accent)] group-hover:rotate-6" aria-hidden="true">
+            <span className="h-2 w-2 rounded-xs bg-current transition-transform duration-200 group-hover:scale-125" />
           </span>
           <span className="font-brand text-base leading-none tracking-normal">ACG</span>
         </a>
 
-        <nav aria-label="Primary" className="hidden min-w-0 items-center gap-1 md:flex">
+        <nav
+          ref={desktopNavRef}
+          aria-label="Primary"
+          onMouseLeave={() => setNavGlider((prev) => ({ ...prev, visible: false }))}
+          className="relative hidden min-w-0 items-center gap-1 md:flex"
+        >
+          <span
+            aria-hidden="true"
+            style={{
+              width: `${navGlider.w}px`,
+              transform: `translate3d(${navGlider.x}px, 0, 0)`,
+              opacity: navGlider.visible ? 1 : 0,
+            }}
+            className="nav-pill-glider top-1 bottom-1 left-0 z-0"
+          />
           {links.map(({ label, path, icon: Icon, active }) => (
             <a
               key={path}
               href={path}
               aria-current={active ? 'page' : undefined}
-              className={`editorial-link-underline inline-flex h-10 shrink-0 items-center gap-1.5 border-b-2 px-2.5 text-[13px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] lg:gap-2 lg:px-3 ${active ? 'border-[var(--app-accent)] text-[var(--app-text-primary)]' : 'border-transparent text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'}`}
+              onMouseEnter={(e) => moveNavGlider(e.currentTarget)}
+              onFocus={(e) => moveNavGlider(e.currentTarget)}
+              onBlur={() => setNavGlider((prev) => ({ ...prev, visible: false }))}
+              className={`editorial-link-underline relative z-10 inline-flex h-10 shrink-0 items-center gap-1.5 border-b-2 px-2.5 text-[13px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] lg:gap-2 lg:px-3 ${active ? 'border-[var(--app-accent)] text-[var(--app-text-primary)]' : 'border-transparent text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'}`}
             >
-              <Icon className="hidden h-4 w-4 lg:block stroke-[1.5]" aria-hidden="true" />
+              <Icon className="hidden h-4 w-4 lg:block" aria-hidden="true" />
               <span>{label}</span>
             </a>
           ))}
@@ -148,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Open quick search"
             className="inline-flex h-11 sm:h-10 w-11 sm:w-auto items-center justify-center gap-1.5 rounded-lg sm:border sm:border-[var(--app-border-subtle)] sm:bg-[var(--app-surface)] sm:px-2.5 text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-surface-secondary)] hover:text-[var(--app-text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] cursor-pointer"
           >
-            <Search className="h-4 w-4 stroke-[1.5]" aria-hidden="true" />
+            <Search className="h-4 w-4" aria-hidden="true" />
             <kbd className="hidden lg:inline-block rounded border border-[var(--app-border-subtle)] bg-[var(--app-bg)] px-1.5 py-0.5 font-mono text-xs text-[var(--app-text-muted)]">
               ⌘K
             </kbd>
@@ -180,7 +205,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <a href="/create" className="btn-sheen interactive-tactile hidden sm:inline-flex min-h-[44px] h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[var(--app-accent)] px-3 text-[13px] font-semibold text-[var(--app-accent-ink)] transition-colors hover:bg-[var(--app-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] sm:ml-1 md:px-3.5">
             <span>Create card</span>
-            <Plus className="h-4 w-4 stroke-[1.5]" aria-hidden="true" />
+            <Plus className="h-4 w-4" aria-hidden="true" />
           </a>
         </div>
       </div>

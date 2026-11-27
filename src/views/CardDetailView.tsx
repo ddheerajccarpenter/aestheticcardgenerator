@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ArrowRight, ChevronRight, Layers } from 'lucide-react';
+import { ArrowRight, ChevronRight, Layers } from '../components/icons/faIcons';
 import type { CardTemplate } from '../types/card';
 import { PRESET_TEMPLATES } from '../data/templates';
 import { UnifiedCardThumbnail } from '../components/UnifiedCardThumbnail';

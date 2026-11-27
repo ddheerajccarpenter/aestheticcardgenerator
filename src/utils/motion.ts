@@ -250,3 +250,56 @@ export function handleTiltPointerLeave(e: React.PointerEvent<HTMLElement>): void
   el.style.setProperty('--glint-x', '50%');
   el.style.setProperty('--glint-y', '50%');
 }
+
+/** Coordinates featured deck swap transitions with directional settle and zero layout shift. */
+export function animateDeckAdvance(
+  container: HTMLElement | null,
+  direction: 1 | -1 = 1
+): void {
+  if (!container || isReducedMotion()) return;
+  const front = container.querySelector<HTMLElement>('[data-deck-front]');
+  const wings = container.querySelectorAll<HTMLElement>('[data-deck-wing]');
+  if (front) {
+    animate(front, {
+      x: [direction * 18, 0],
+      scale: [0.95, 1],
+      opacity: [0.72, 1],
+      duration: 280,
+      ease: EDITORIAL_EASE,
+    });
+  }
+  if (wings.length) {
+    animate(wings, {
+      scale: [0.97, 1],
+      opacity: [0.8, 1],
+      duration: 240,
+      delay: stagger(35),
+      ease: EDITORIAL_EASE,
+    });
+  }
+}
+
+const magneticLastUpdate = new WeakMap<HTMLElement, number>();
+
+/** Clamped cursor-follow pull (max +-3px) on mouse hover for interactive CTAs. */
+export function handleMagneticPointerMove(e: React.PointerEvent<HTMLElement>): void {
+  if (e.pointerType !== 'mouse' || isReducedMotion()) return;
+  const el = e.currentTarget;
+  const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  const prev = magneticLastUpdate.get(el);
+  if (prev !== undefined && now - prev < 16) return;
+  const rect = el.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  magneticLastUpdate.set(el, now);
+  const nx = Math.max(-0.5, Math.min(0.5, (e.clientX - rect.left) / rect.width - 0.5));
+  const ny = Math.max(-0.5, Math.min(0.5, (e.clientY - rect.top) / rect.height - 0.5));
+  el.style.setProperty('--mag-x', `${(nx * 6).toFixed(2)}px`);
+  el.style.setProperty('--mag-y', `${(ny * 4).toFixed(2)}px`);
+}
+
+export function handleMagneticPointerLeave(e: React.PointerEvent<HTMLElement>): void {
+  const el = e.currentTarget;
+  magneticLastUpdate.delete(el);
+  el.style.setProperty('--mag-x', '0px');
+  el.style.setProperty('--mag-y', '0px');
+}
