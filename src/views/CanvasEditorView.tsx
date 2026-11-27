@@ -1090,38 +1090,18 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   // Listen for companion "Add to Card" event from StudioCompanion or staged sticker
   useEffect(() => {
-    const handleAddMascotSticker = (e: Event) => {
-      const customEvent = e as CustomEvent<{ character?: string }>;
-      const charId = customEvent.detail?.character || 'archie';
-      const stickerMap: Record<string, string> = {
-        archie: ASSET_STICKERS.archieMascot,
-        pip: ASSET_STICKERS.pipMascot,
-        emulsion: ASSET_STICKERS.emulsionCat,
-        komorebi: (ASSET_STICKERS as any).komorebiBunny,
-        cosmo: (ASSET_STICKERS as any).cosmoStar,
-        mochi: (ASSET_STICKERS as any).mochiCloud,
-      };
-      const svg = stickerMap[charId] || ASSET_STICKERS.archieMascot;
-      const charNames: Record<string, string> = {
-        archie: 'Archie Bear',
-        pip: 'Pip Pixel',
-        emulsion: 'Emulsion Cat',
-        komorebi: 'Komorebi Bunny',
-        cosmo: 'Cosmo Star',
-        mochi: 'Mochi Cloud',
-      };
-      const stickerName = `${charNames[charId] || 'Mascot'} Sticker`;
+    const handleAddMascotSticker = () => {
       const size = 120;
       addObject(
-        createImageObject(svg, {
-          name: stickerName,
+        createImageObject(ASSET_STICKERS.mochiCloud, {
+          name: 'Mochi Cloud Sticker',
           width: size,
           height: size,
           x: Math.round(doc.canvasWidth / 2 - size / 2),
           y: Math.round(doc.canvasHeight / 2 - size / 2),
         })
       );
-      showToast(`Added ${charNames[charId] || 'Mascot'} to card!`);
+      showToast('Added Mochi Cloud to card!');
     };
 
     window.addEventListener('acg:add-mascot-sticker', handleAddMascotSticker);
@@ -1130,27 +1110,16 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     const staged = localStorage.getItem('acg_staged_sticker');
     if (staged) {
       localStorage.removeItem('acg_staged_sticker');
-      const stickerMap: Record<string, string> = {
-        archie: ASSET_STICKERS.archieMascot,
-        pip: ASSET_STICKERS.pipMascot,
-        emulsion: ASSET_STICKERS.emulsionCat,
-        komorebi: (ASSET_STICKERS as any).komorebiBunny,
-        cosmo: (ASSET_STICKERS as any).cosmoStar,
-        mochi: (ASSET_STICKERS as any).mochiCloud,
-      };
-      const svg = stickerMap[staged];
-      if (svg) {
-        addObject(
-          createImageObject(svg, {
-            name: `${staged.charAt(0).toUpperCase() + staged.slice(1)} Mascot Sticker`,
-            width: 120,
-            height: 120,
-            x: Math.round(doc.canvasWidth / 2 - 60),
-            y: Math.round(doc.canvasHeight / 2 - 60),
-          })
-        );
-        showToast('Pasted companion sticker onto card!');
-      }
+      addObject(
+        createImageObject(ASSET_STICKERS.mochiCloud, {
+          name: 'Mochi Cloud Sticker',
+          width: 120,
+          height: 120,
+          x: Math.round(doc.canvasWidth / 2 - 60),
+          y: Math.round(doc.canvasHeight / 2 - 60),
+        })
+      );
+      showToast('Pasted companion sticker onto card!');
     }
 
     return () => window.removeEventListener('acg:add-mascot-sticker', handleAddMascotSticker);
@@ -2737,137 +2706,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   <button
                     onClick={() => {
                       addObject(
-                        createImageObject(ASSET_STICKERS.archieMascot, {
-                          name: 'Archie Bear Mascot',
-                          width: 100,
-                          height: 100,
-                          x: Math.round(doc.canvasWidth / 2 - 50),
-                          y: Math.round(doc.canvasHeight / 2 - 50),
-                        })
-                      );
-                      setStampsDrawerOpen(false);
-                    }}
-                    aria-label="Add Archie Bear Mascot"
-                    data-close-add-menu
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
-                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Archie Bear Mascot</span>
-                      <span className="text-[10px] text-[#81786d]">Archival Studio Companion</span>
-                    </div>
-                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      addObject(
-                        createImageObject(ASSET_STICKERS.pipMascot, {
-                          name: 'Pip Pixel Mascot',
-                          width: 90,
-                          height: 90,
-                          x: Math.round(doc.canvasWidth / 2 - 45),
-                          y: Math.round(doc.canvasHeight / 2 - 45),
-                        })
-                      );
-                      setStampsDrawerOpen(false);
-                    }}
-                    aria-label="Add Pip Pixel Mascot"
-                    data-close-add-menu
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
-                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Pip Pixel Mascot</span>
-                      <span className="text-[10px] text-[#81786d]">Retro 8-bit studio buddy</span>
-                    </div>
-                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      addObject(
-                        createImageObject(ASSET_STICKERS.emulsionCat, {
-                          name: 'Emulsion Cat',
-                          width: 90,
-                          height: 90,
-                          x: Math.round(doc.canvasWidth / 2 - 45),
-                          y: Math.round(doc.canvasHeight / 2 - 45),
-                        })
-                      );
-                      setStampsDrawerOpen(false);
-                    }}
-                    aria-label="Add Emulsion Cat Mascot"
-                    data-close-add-menu
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
-                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Emulsion Cat</span>
-                      <span className="text-[10px] text-[#81786d]">Feline film studio companion</span>
-                    </div>
-                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      addObject(
-                        createImageObject((ASSET_STICKERS as any).komorebiBunny, {
-                          name: 'Komorebi Bunny',
-                          width: 90,
-                          height: 90,
-                          x: Math.round(doc.canvasWidth / 2 - 45),
-                          y: Math.round(doc.canvasHeight / 2 - 45),
-                        })
-                      );
-                      setStampsDrawerOpen(false);
-                    }}
-                    aria-label="Add Komorebi Bunny Mascot"
-                    data-close-add-menu
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
-                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Komorebi Bunny</span>
-                      <span className="text-[10px] text-[#81786d]">Peaceful forest companion</span>
-                    </div>
-                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      addObject(
-                        createImageObject((ASSET_STICKERS as any).cosmoStar, {
-                          name: 'Cosmo Star',
-                          width: 90,
-                          height: 90,
-                          x: Math.round(doc.canvasWidth / 2 - 45),
-                          y: Math.round(doc.canvasHeight / 2 - 45),
-                        })
-                      );
-                      setStampsDrawerOpen(false);
-                    }}
-                    aria-label="Add Cosmo Star Astronaut"
-                    data-close-add-menu
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between cursor-pointer transition-colors ${
-                      isLight ? 'hover:bg-slate-50 border-slate-200' : 'hover:bg-[#29251f] border-[#39342d]'
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold text-[var(--app-text-primary)]">Cosmo Star</span>
-                      <span className="text-[10px] text-[#81786d]">Cosmic astronaut companion</span>
-                    </div>
-                    <Smile className="w-4 h-4 text-[var(--app-accent)]" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      addObject(
-                        createImageObject((ASSET_STICKERS as any).mochiCloud, {
+                        createImageObject(ASSET_STICKERS.mochiCloud, {
                           name: 'Mochi Cloud',
                           width: 90,
                           height: 90,
@@ -5144,24 +4983,13 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
               <button
                 onClick={() => {
-                  addObject(createImageObject(ASSET_STICKERS.archieMascot, { name: 'Archie Bear Mascot', width: 80, height: 80 }));
+                  addObject(createImageObject(ASSET_STICKERS.mochiCloud, { name: 'Mochi Cloud', width: 80, height: 80 }));
                   setMobileAddSheetOpen(false);
                 }}
                 className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#24211b] dark:hover:border-[#E2D9C8]"
               >
                 <Smile className="w-5 h-5 text-[var(--app-accent)]" />
-                <span className="text-xs font-medium">Archie</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  addObject(createImageObject(ASSET_STICKERS.emulsionCat, { name: 'Emulsion Cat', width: 80, height: 80 }));
-                  setMobileAddSheetOpen(false);
-                }}
-                className="p-3 rounded-xl border flex flex-col items-center gap-1.5 cursor-pointer hover:border-[#24211b] dark:hover:border-[#E2D9C8]"
-              >
-                <Smile className="w-5 h-5 text-[var(--app-accent)]" />
-                <span className="text-xs font-medium">Emulsion</span>
+                <span className="text-xs font-medium">Mochi Cloud</span>
               </button>
             </div>
           </div>

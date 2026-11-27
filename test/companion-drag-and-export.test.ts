@@ -4,21 +4,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { COMPANION_ROSTER } from '../src/components/StudioCompanion';
 
-test('Studio Companion: 6 joyful characters with metadata and persistent position structure', () => {
-  assert.equal(COMPANION_ROSTER.length, 6, 'Should have exactly 6 companions');
-  const expectedCharacters = ['archie', 'pip', 'emulsion', 'komorebi', 'cosmo', 'mochi'];
-  for (const exp of expectedCharacters) {
-    const found = COMPANION_ROSTER.find((c) => c.id === exp);
-    assert.ok(found, `Expected companion ${exp} must be present in COMPANION_ROSTER`);
-    assert.ok(found.name.length > 0, `${exp} must have a name`);
-    assert.ok(found.greeting.length > 0, `${exp} must have a greeting`);
-    assert.ok(found.badge.length > 0, `${exp} must have a badge emoji/icon`);
-  }
+test('Studio Companion: Cloud-only character with metadata and persistent position structure', () => {
+  assert.equal(COMPANION_ROSTER.length, 1, 'Should have only Mochi Cloud companion');
+  const found = COMPANION_ROSTER.find((c) => c.id === 'mochi');
+  assert.ok(found, 'Expected companion mochi must be present in COMPANION_ROSTER');
+  assert.ok(found.name.length > 0, 'mochi must have a name');
+  assert.ok(found.greeting.length > 0, 'mochi must have a greeting');
+  assert.ok(found.badge.length > 0, 'mochi must have a badge icon');
 
   // Inspect StudioCompanion.tsx source for drag events, size responsive classes, and localStorage keys
   const companionSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/components/StudioCompanion.tsx'), 'utf8');
   assert.ok(companionSrc.includes('acg_companion_pos'), 'Must persist position in acg_companion_pos localStorage key');
-  assert.ok(companionSrc.includes('acg_companion_char'), 'Must persist selected character in acg_companion_char localStorage key');
+  assert.ok(!companionSrc.includes('COMPANION_ROSTER.map'), 'Must not render multi-character switcher bar');
   assert.ok(companionSrc.includes('onPointerDown='), 'Must handle pointer down for fluid drag-and-drop');
   assert.ok(companionSrc.includes('onPointerMove='), 'Must handle pointer move for fluid drag-and-drop');
   assert.ok(companionSrc.includes('onPointerUp='), 'Must handle pointer up for fluid drag-and-drop');

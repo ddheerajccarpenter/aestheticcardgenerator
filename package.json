@@ -11,7 +11,6 @@
     "build": "tsc -b && astro build",
     "lint": "oxlint",
     "test": "node test/ui-ux-integrity.test.mjs && npx tsx test/ambient-and-fonts.test.ts && npx tsx test/security-hardening.test.ts && npx tsx test/studio-templates.test.ts && npx tsx test/character-companion.test.ts && npx tsx test/template-ui-audit-fixes.test.ts && npx tsx test/companion-drag-and-export.test.ts && npx tsx test/bingo-generator.test.ts && npx tsx test/card-repair-regressions.test.ts",
-    "rive:verify": "export PATH=\"$HOME/.rive/bin:$PATH\" && rive rive-character --verify",
     "preview": "astro preview",
     "deploy": "npm run pages:deploy",
     "pages:deploy": "npm run build && wrangler pages deploy dist --project-name=aestheticcardgenerator --branch=main",

@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export type CharacterMood = 'idle' | 'happy' | 'surprised' | 'winking' | 'thinking' | 'celebrating';
-export type CharacterType = 'archie' | 'pip' | 'emulsion' | 'komorebi' | 'cosmo' | 'mochi';
+export type CharacterType = 'mochi';
 
 export interface CompanionMeta {
   id: CharacterType;
@@ -23,41 +23,6 @@ export interface CompanionMeta {
 }
 
 export const COMPANION_ROSTER: CompanionMeta[] = [
-  {
-    id: 'archie',
-    name: 'Archie',
-    badge: '🐻',
-    role: 'Archival Bear',
-    greeting: 'Hi! Ready to craft something timeless?',
-  },
-  {
-    id: 'pip',
-    name: 'Pip',
-    badge: '🤖',
-    role: 'Pixel Mascot',
-    greeting: 'Beep boop! Let’s make a clean layout.',
-  },
-  {
-    id: 'emulsion',
-    name: 'Emulsion',
-    badge: '🐱',
-    role: 'Studio Cat',
-    greeting: 'Purr... Let’s frame your words nicely.',
-  },
-  {
-    id: 'komorebi',
-    name: 'Komorebi',
-    badge: '🐰',
-    role: 'Forest Bunny',
-    greeting: 'Take a calm breath — design at your pace.',
-  },
-  {
-    id: 'cosmo',
-    name: 'Cosmo',
-    badge: '🚀',
-    role: 'Star Astronaut',
-    greeting: 'Greetings! Let’s make your card shine.',
-  },
   {
     id: 'mochi',
     name: 'Mochi',
@@ -89,13 +54,7 @@ interface Position {
 }
 
 export const StudioCompanion: React.FC = () => {
-  const [character, setCharacter] = useState<CharacterType>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('acg_companion_char') as CharacterType;
-      if (saved && COMPANION_ROSTER.some((c) => c.id === saved)) return saved;
-    }
-    return 'archie';
-  });
+  const character: CharacterType = 'mochi';
 
   const [mood, setMood] = useState<CharacterMood>('idle');
   const [isOpen, setIsOpen] = useState(false);
@@ -110,7 +69,7 @@ export const StudioCompanion: React.FC = () => {
     return true;
   });
 
-  const currentMeta = COMPANION_ROSTER.find((c) => c.id === character) || COMPANION_ROSTER[0];
+  const currentMeta = COMPANION_ROSTER[0];
   const [speechText, setSpeechText] = useState(currentMeta.greeting);
   const [speechAuthor, setSpeechAuthor] = useState('');
 
@@ -323,17 +282,6 @@ export const StudioCompanion: React.FC = () => {
     window.addEventListener('acg:theme-switched', handleThemeSwitched);
     return () => window.removeEventListener('acg:theme-switched', handleThemeSwitched);
   }, []);
-
-  // Handle character switch
-  const handleSelectCharacter = (newChar: CharacterType) => {
-    setCharacter(newChar);
-    const meta = COMPANION_ROSTER.find((c) => c.id === newChar) || COMPANION_ROSTER[0];
-    setSpeechText(meta.greeting);
-    setSpeechAuthor('');
-    setMood('happy');
-    localStorage.setItem('acg_companion_char', newChar);
-    setTimeout(() => setMood('idle'), 1200);
-  };
 
   // Reset companion to default bottom-right position
   const handleResetPosition = () => {
@@ -580,26 +528,6 @@ export const StudioCompanion: React.FC = () => {
             </div>
           </div>
 
-          {/* Character Switcher Roster (6 Joyful companions) */}
-          <div className="flex items-center justify-between gap-1 mb-2 p-1 rounded-xl bg-[var(--app-surface-secondary)]/50 border border-[var(--app-border-subtle)]">
-            {COMPANION_ROSTER.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleSelectCharacter(item.id)}
-                className={`flex-1 py-1 px-1 rounded-lg text-[10px] font-medium flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
-                  character === item.id
-                    ? 'bg-[var(--app-surface)] text-[var(--app-accent)] shadow-xs border border-[var(--app-accent)]/30 scale-105'
-                    : 'text-[var(--app-text-muted)] hover:text-[var(--app-text)]'
-                }`}
-                title={`${item.name} (${item.role})`}
-              >
-                <span className="text-xs leading-none">{item.badge}</span>
-                <span className="truncate max-w-full text-[9px]">{item.name}</span>
-              </button>
-            ))}
-          </div>
-
           {/* Dialogue Message */}
           <p className="leading-snug mb-2 text-[var(--app-text)] font-normal">{speechText}</p>
           {speechAuthor && (
@@ -719,182 +647,31 @@ export const StudioCompanion: React.FC = () => {
                 transform: `rotate(${headTilt}rad)`,
               }}
             >
-              {character === 'archie' && (
-                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
-                  <rect width="100" height="100" fill="var(--app-surface-secondary, #24211e)" />
-                  <ellipse cx="50" cy="24" rx="30" ry="10" fill="#c69d78" />
-                  <circle cx="50" cy="18" r="4" fill="#efe6d8" />
-                  <polygon points="26,30 36,16 42,32" fill="#c69d78" stroke="#312c27" strokeWidth="1" />
-                  <polygon points="74,30 64,16 58,32" fill="#c69d78" stroke="#312c27" strokeWidth="1" />
-                  <rect x="20" y="28" width="60" height="52" rx="26" fill="#efe6d8" stroke="#312c27" strokeWidth="1.5" />
-                  <ellipse cx="28" cy="56" rx="6" ry="3.5" fill="#c69d78" opacity="0.6" />
-                  <ellipse cx="72" cy="56" rx="6" ry="3.5" fill="#c69d78" opacity="0.6" />
-                  {mood === 'happy' || mood === 'celebrating' ? (
-                    <>
-                      <path d="M 32 50 Q 38 43 44 50" fill="none" stroke="#191715" strokeWidth="2.5" strokeLinecap="round" />
-                      <path d="M 56 50 Q 62 43 68 50" fill="none" stroke="#191715" strokeWidth="2.5" strokeLinecap="round" />
-                    </>
-                  ) : mood === 'winking' ? (
-                    <>
-                      <path d="M 32 50 Q 38 43 44 50" fill="none" stroke="#191715" strokeWidth="2.5" strokeLinecap="round" />
-                      <circle cx={62 + pupilOffsetX} cy={48 + pupilOffsetY} r="6" fill="#191715" />
-                      <circle cx={64 + pupilOffsetX} cy={46 + pupilOffsetY} r="2" fill="#ffffff" />
-                    </>
-                  ) : (
-                    <>
-                      <circle cx="38" cy="48" r="7.5" fill="#ffffff" stroke="#191715" strokeWidth="1" />
-                      <circle cx="62" cy="48" r="7.5" fill="#ffffff" stroke="#191715" strokeWidth="1" />
-                      <circle cx={38 + pupilOffsetX} cy={48 + pupilOffsetY} r="4.5" fill="#191715" />
-                      <circle cx={62 + pupilOffsetX} cy={48 + pupilOffsetY} r="4.5" fill="#191715" />
-                      <circle cx={39 + pupilOffsetX} cy={46 + pupilOffsetY} r="1.5" fill="#ffffff" />
-                      <circle cx={63 + pupilOffsetX} cy={46 + pupilOffsetY} r="1.5" fill="#ffffff" />
-                    </>
-                  )}
-                  <ellipse cx="50" cy="54" rx="3.5" ry="2.5" fill="#6f4637" />
-                  {mood === 'surprised' ? (
-                    <circle cx="50" cy="62" r="3.5" fill="#6f4637" />
-                  ) : (
-                    <path d="M 46 58 Q 50 63 54 58" fill="none" stroke="#6f4637" strokeWidth="1.5" strokeLinecap="round" />
-                  )}
-                  <rect x="44" y="74" width="12" height="10" rx="2" fill="#c69d78" />
-                </svg>
-              )}
-
-              {character === 'pip' && (
-                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
-                  <rect width="100" height="100" fill="var(--app-surface-secondary, #24211e)" />
-                  <line x1="50" y1="20" x2="50" y2="30" stroke="#c69d78" strokeWidth="2.5" />
-                  <circle cx="50" cy="18" r="3.5" fill="#fbbf24" className="animate-pulse" />
-                  <rect x="22" y="30" width="56" height="48" rx="8" fill="#312c27" stroke="#48413a" strokeWidth="2" />
-                  <rect x="28" y="36" width="44" height="28" rx="4" fill="#191715" />
-                  {mood === 'happy' || mood === 'celebrating' ? (
-                    <>
-                      <path d="M 33 50 L 38 44 L 43 50" fill="none" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="square" />
-                      <path d="M 57 50 L 62 44 L 67 50" fill="none" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="square" />
-                    </>
-                  ) : (
-                    <>
-                      <rect x={34 + pupilOffsetX * 0.8} y={44 + pupilOffsetY * 0.8} width="8" height="8" rx="1" fill="#fbbf24" />
-                      <rect x={58 + pupilOffsetX * 0.8} y={44 + pupilOffsetY * 0.8} width="8" height="8" rx="1" fill="#fbbf24" />
-                    </>
-                  )}
-                  <rect x="42" y="70" width="16" height="3" fill="#c69d78" />
-                </svg>
-              )}
-
-              {character === 'emulsion' && (
-                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
-                  <rect width="100" height="100" fill="var(--app-surface-secondary, #24211e)" />
-                  <polygon points="22,40 32,18 48,32" fill="#191715" stroke="#48413a" strokeWidth="1" />
-                  <polygon points="74,38 66,18 52,32" fill="#191715" stroke="#48413a" strokeWidth="1" />
-                  <polygon points="26,36 34,24 44,32" fill="#c69d78" opacity="0.6" />
-                  <polygon points="70,34 64,24 56,32" fill="#c69d78" opacity="0.6" />
-                  <ellipse cx="50" cy="52" rx="34" ry="28" fill="#191715" stroke="#312c27" strokeWidth="1.5" />
-                  {mood === 'happy' || mood === 'celebrating' ? (
-                    <>
-                      <path d="M 32 50 Q 40 44 46 50" fill="none" stroke="#c69d78" strokeWidth="2.5" strokeLinecap="round" />
-                      <path d="M 54 50 Q 60 44 68 50" fill="none" stroke="#c69d78" strokeWidth="2.5" strokeLinecap="round" />
-                    </>
-                  ) : (
-                    <>
-                      <ellipse cx="38" cy="48" rx="7" ry="8" fill="#c69d78" />
-                      <ellipse cx="62" cy="48" rx="7" ry="8" fill="#c69d78" />
-                      <ellipse cx={38 + pupilOffsetX} cy={48 + pupilOffsetY} rx="2.5" ry="6" fill="#191715" />
-                      <ellipse cx={62 + pupilOffsetX} cy={48 + pupilOffsetY} rx="2.5" ry="6" fill="#191715" />
-                    </>
-                  )}
-                  <line x1="18" y1="56" x2="32" y2="58" stroke="#48413a" strokeWidth="1" />
-                  <line x1="18" y1="62" x2="32" y2="61" stroke="#48413a" strokeWidth="1" />
-                  <line x1="82" y1="56" x2="68" y2="58" stroke="#48413a" strokeWidth="1" />
-                  <line x1="82" y1="62" x2="68" y2="61" stroke="#48413a" strokeWidth="1" />
-                  <polygon points="48,58 52,58 50,61" fill="#c69d78" />
-                  <path d="M 46 62 Q 50 65 54 62" fill="none" stroke="#c69d78" strokeWidth="1" />
-                </svg>
-              )}
-
-              {character === 'komorebi' && (
-                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
-                  <rect width="100" height="100" fill="var(--app-surface-secondary, #1e2621)" />
-                  <ellipse cx="36" cy="24" rx="8" ry="18" fill="#e8ede9" stroke="#303d35" strokeWidth="1.5" />
-                  <ellipse cx="64" cy="24" rx="8" ry="18" fill="#e8ede9" stroke="#303d35" strokeWidth="1.5" />
-                  <ellipse cx="36" cy="25" rx="4.5" ry="12" fill="#f4b8b8" opacity="0.6" />
-                  <ellipse cx="64" cy="25" rx="4.5" ry="12" fill="#f4b8b8" opacity="0.6" />
-                  <path d="M 48 30 Q 42 22 47 16 Q 52 22 48 30 Z" fill="#97ab9b" />
-                  <path d="M 50 30 Q 56 20 52 14 Q 48 20 50 30 Z" fill="#84a98c" />
-                  <ellipse cx="50" cy="56" rx="30" ry="24" fill="#e8ede9" stroke="#303d35" strokeWidth="1.5" />
-                  {mood === 'happy' || mood === 'celebrating' ? (
-                    <>
-                      <path d="M 33 54 Q 38 48 43 54" fill="none" stroke="#1a201c" strokeWidth="2.5" strokeLinecap="round" />
-                      <path d="M 57 54 Q 62 48 67 54" fill="none" stroke="#1a201c" strokeWidth="2.5" strokeLinecap="round" />
-                    </>
-                  ) : (
-                    <>
-                      <ellipse cx={38 + pupilOffsetX * 0.6} cy={54 + pupilOffsetY * 0.6} rx="4" ry="5.5" fill="#1a201c" />
-                      <ellipse cx={62 + pupilOffsetX * 0.6} cy={54 + pupilOffsetY * 0.6} rx="4" ry="5.5" fill="#1a201c" />
-                      <circle cx={39.5 + pupilOffsetX * 0.6} cy={52 + pupilOffsetY * 0.6} r="1.5" fill="#ffffff" />
-                      <circle cx={63.5 + pupilOffsetX * 0.6} cy={52 + pupilOffsetY * 0.6} r="1.5" fill="#ffffff" />
-                    </>
-                  )}
-                  <circle cx="31" cy="61" r="5" fill="#f4b8b8" opacity="0.7" />
-                  <circle cx="69" cy="61" r="5" fill="#f4b8b8" opacity="0.7" />
-                  <polygon points="48,59 52,59 50,62" fill="#e07a7a" />
-                  <path d="M 46 64 Q 50 67 54 64" fill="none" stroke="#303d35" strokeWidth="1.4" strokeLinecap="round" />
-                </svg>
-              )}
-
-              {character === 'cosmo' && (
-                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
-                  <rect width="100" height="100" fill="var(--app-surface-secondary, #131722)" />
-                  <line x1="50" y1="12" x2="50" y2="24" stroke="#fbbf24" strokeWidth="2" />
-                  <polygon points="50,6 52,11 57,11 53,14 55,19 50,16 45,19 47,14 43,11 48,11" fill="#fbbf24" />
-                  <rect x="20" y="24" width="60" height="54" rx="20" fill="#242c40" stroke="#3d4b6c" strokeWidth="1.5" />
-                  <rect x="26" y="30" width="48" height="34" rx="14" fill="#1a2030" stroke="#fbbf24" strokeWidth="1.2" />
-                  <path d="M 32 34 Q 50 32 64 38" fill="none" stroke="#ffffff" strokeWidth="1.5" opacity="0.4" strokeLinecap="round" />
-                  {mood === 'happy' || mood === 'celebrating' ? (
-                    <>
-                      <path d="M 35 47 Q 40 41 45 47" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" />
-                      <path d="M 55 47 Q 60 41 65 47" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" />
-                    </>
-                  ) : (
-                    <>
-                      <circle cx={40 + pupilOffsetX * 0.6} cy={46 + pupilOffsetY * 0.6} r="4.5" fill="#60a5fa" />
-                      <circle cx={60 + pupilOffsetX * 0.6} cy={46 + pupilOffsetY * 0.6} r="4.5" fill="#60a5fa" />
-                      <circle cx={41.5 + pupilOffsetX * 0.6} cy={44.5 + pupilOffsetY * 0.6} r="1.5" fill="#ffffff" />
-                      <circle cx={61.5 + pupilOffsetX * 0.6} cy={44.5 + pupilOffsetY * 0.6} r="1.5" fill="#ffffff" />
-                    </>
-                  )}
-                  <path d="M 46 54 Q 50 58 54 54" fill="none" stroke="#fbbf24" strokeWidth="1.6" strokeLinecap="round" />
-                  <circle cx="50" cy="70" r="3" fill="#ef4444" />
-                </svg>
-              )}
-
-              {character === 'mochi' && (
-                <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
-                  <rect width="100" height="100" fill="var(--app-surface-secondary, #241b22)" />
-                  <circle cx="34" cy="54" r="18" fill="#fdfaf6" />
-                  <circle cx="66" cy="54" r="18" fill="#fdfaf6" />
-                  <circle cx="44" cy="40" r="18" fill="#fdfaf6" />
-                  <circle cx="58" cy="40" r="16" fill="#fdfaf6" />
-                  <rect x="34" y="48" width="32" height="24" fill="#fdfaf6" />
-                  {mood === 'happy' || mood === 'celebrating' ? (
-                    <>
-                      <path d="M 35 48 Q 40 42 45 48" fill="none" stroke="#382732" strokeWidth="2.5" strokeLinecap="round" />
-                      <path d="M 55 48 Q 60 42 65 48" fill="none" stroke="#382732" strokeWidth="2.5" strokeLinecap="round" />
-                    </>
-                  ) : (
-                    <>
-                      <circle cx={38 + pupilOffsetX * 0.6} cy={48 + pupilOffsetY * 0.6} r="3.5" fill="#382732" />
-                      <circle cx={62 + pupilOffsetX * 0.6} cy={48 + pupilOffsetY * 0.6} r="3.5" fill="#382732" />
-                      <circle cx={39 + pupilOffsetX * 0.6} cy={47 + pupilOffsetY * 0.6} r="1.2" fill="#ffffff" />
-                      <circle cx={63 + pupilOffsetX * 0.6} cy={47 + pupilOffsetY * 0.6} r="1.2" fill="#ffffff" />
-                    </>
-                  )}
-                  <circle cx="33" cy="57" r="5" fill="#f472b6" opacity="0.6" />
-                  <circle cx="67" cy="57" r="5" fill="#f472b6" opacity="0.6" />
-                  <path d="M 46 57 Q 50 63 54 57" fill="none" stroke="#e11d48" strokeWidth="2" strokeLinecap="round" />
-                  <polygon points="50,22 52,27 57,27 53,30 55,35 50,32 45,35 47,30 43,27 48,27" fill="#fbbf24" />
-                </svg>
-              )}
+              <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
+                <rect width="100" height="100" fill="var(--app-surface-secondary, #241b22)" />
+                <circle cx="34" cy="54" r="18" fill="#fdfaf6" />
+                <circle cx="66" cy="54" r="18" fill="#fdfaf6" />
+                <circle cx="44" cy="40" r="18" fill="#fdfaf6" />
+                <circle cx="58" cy="40" r="16" fill="#fdfaf6" />
+                <rect x="34" y="48" width="32" height="24" fill="#fdfaf6" />
+                {mood === 'happy' || mood === 'celebrating' ? (
+                  <>
+                    <path d="M 35 48 Q 40 42 45 48" fill="none" stroke="#382732" strokeWidth="2.5" strokeLinecap="round" />
+                    <path d="M 55 48 Q 60 42 65 48" fill="none" stroke="#382732" strokeWidth="2.5" strokeLinecap="round" />
+                  </>
+                ) : (
+                  <>
+                    <circle cx={38 + pupilOffsetX * 0.6} cy={48 + pupilOffsetY * 0.6} r="3.5" fill="#382732" />
+                    <circle cx={62 + pupilOffsetX * 0.6} cy={48 + pupilOffsetY * 0.6} r="3.5" fill="#382732" />
+                    <circle cx={39 + pupilOffsetX * 0.6} cy={47 + pupilOffsetY * 0.6} r="1.2" fill="#ffffff" />
+                    <circle cx={63 + pupilOffsetX * 0.6} cy={47 + pupilOffsetY * 0.6} r="1.2" fill="#ffffff" />
+                  </>
+                )}
+                <circle cx="33" cy="57" r="5" fill="#f472b6" opacity="0.6" />
+                <circle cx="67" cy="57" r="5" fill="#f472b6" opacity="0.6" />
+                <path d="M 46 57 Q 50 63 54 57" fill="none" stroke="#e11d48" strokeWidth="2" strokeLinecap="round" />
+                <polygon points="50,22 52,27 57,27 53,30 55,35 50,32 45,35 47,30 43,27 48,27" fill="#fbbf24" />
+              </svg>
             </div>
           </div>
         )}
