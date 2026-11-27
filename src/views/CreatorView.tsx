@@ -223,8 +223,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
   useEffect(() => {
     updatePageSEO({
-      title: 'ACG Studio — Card Creator Workspace',
-      description: 'Clean editorial workspace for designing quote cards and ID passes.',
+      title: 'ACG Studio: Card Creator Workspace',
+      description: 'Editorial workspace for typesetting quote cards and ID passes.',
       canonicalPath: '/create',
       ogType: 'website',
     });
@@ -694,10 +694,10 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="h-8 px-2.5 sm:px-4 rounded-lg bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50 shrink-0"
+            className="min-h-[36px] h-9 px-3 sm:px-4 rounded-lg bg-[var(--app-accent)] text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] text-xs font-semibold flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer disabled:opacity-50 shrink-0"
             title="Download Retina PNG"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 stroke-[1.5]" />
             <span>{isExporting ? 'Exporting...' : 'Export'}</span>
           </button>
         </div>
@@ -1051,15 +1051,15 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
                   {/* Header Tag */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                      Header Tag
+                    <label className="text-xs font-medium text-[var(--app-text-secondary)]">
+                      Header tag
                     </label>
                     <input
                       type="text"
                       value={tag}
                       onChange={(e) => setTag(e.target.value)}
                       className="w-full text-xs px-2.5 py-2 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] focus:outline-none focus:border-[var(--app-accent)] transition-colors"
-                      placeholder="e.g. FIELD NOTES — 001"
+                      placeholder="e.g. FIELD NOTES - 001"
                     />
                   </div>
                 </div>
@@ -1067,8 +1067,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                 <div className="flex flex-col gap-4">
                   {/* ID Name */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                      Full Name
+                    <label className="text-xs font-medium text-[var(--app-text-secondary)]">
+                      Full name
                     </label>
                     <input
                       type="text"
@@ -1081,7 +1081,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
                   {/* ID Role */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                    <label className="text-xs font-medium text-[var(--app-text-secondary)]">
                       Role / Title
                     </label>
                     <input
@@ -1095,7 +1095,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
                   {/* Clearance / Status */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                    <label className="text-xs font-medium text-[var(--app-text-secondary)]">
                       Clearance / Access
                     </label>
                     <input
@@ -1109,13 +1109,13 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
                   {/* Avatar Selection */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
+                    <label className="text-xs font-medium text-[var(--app-text-secondary)]">
                       Portrait / Avatar
                     </label>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setAvatar(ASSET_AVATARS.grungeDan)}
-                        className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-all ${
+                        className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-[border-color,opacity] ${
                           avatar === ASSET_AVATARS.grungeDan
                             ? 'ring-2 ring-[var(--app-accent)] border-transparent'
                             : 'border-[var(--app-border-subtle)] opacity-70 hover:opacity-100'
@@ -1125,7 +1125,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                       </button>
                       <button
                         onClick={() => setAvatar(ASSET_AVATARS.jenniePretty)}
-                        className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-all ${
+                        className={`w-9 h-11 rounded border overflow-hidden cursor-pointer transition-[border-color,opacity] ${
                           avatar === ASSET_AVATARS.jenniePretty
                             ? 'ring-2 ring-[var(--app-accent)] border-transparent'
                             : 'border-[var(--app-border-subtle)] opacity-70 hover:opacity-100'
@@ -1133,7 +1133,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                       >
                         <img src={ASSET_AVATARS.jenniePretty} alt="Jennie" className="w-full h-full object-cover" />
                       </button>
-                      <label className="h-11 px-2.5 rounded border border-dashed border-[var(--app-border-subtle)] hover:border-[var(--app-accent)] bg-[var(--app-bg)] text-[10px] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center justify-center gap-1 cursor-pointer transition-colors">
+                      <label className="h-11 px-2.5 rounded border border-dashed border-[var(--app-border-subtle)] hover:border-[var(--app-accent)] bg-[var(--app-bg)] text-xs text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] flex items-center justify-center gap-1 cursor-pointer transition-colors">
                         <Upload className="w-3 h-3" />
                         <span>Upload</span>
                         <input
@@ -1152,8 +1152,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
             {/* Typography & Alignment Group */}
             <div className={`pt-2 border-t border-[var(--app-border-subtle)] flex flex-col gap-3.5 ${mobileTab === 'type' ? 'block' : 'hidden md:block'}`}>
               <div className="flex items-center justify-between">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)] font-semibold">
-                  Typography &amp; Layout
+                <label className="text-xs font-medium text-[var(--app-text-secondary)]">
+                  Typography &amp; layout
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -1217,8 +1217,8 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
               {/* Custom Uploaded Fonts */}
               {customFonts.length > 0 && (
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--app-text-muted)]">
-                    My Uploaded Fonts ({customFonts.length})
+                  <span className="text-xs font-medium text-[var(--app-text-muted)]">
+                    My uploaded fonts ({customFonts.length})
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {customFonts.map((font) => (
@@ -1243,7 +1243,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
               {/* Text Presets */}
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--app-text-muted)]">
+                <span className="text-xs font-medium text-[var(--app-text-muted)]">
                   Presets
                 </span>
                 <div className="grid grid-cols-4 gap-1">
@@ -1261,7 +1261,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
                         setFontSize(preset.size);
                         setTextAlign(preset.align);
                       }}
-                      className="py-1 text-[10px] font-mono uppercase rounded border border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)] transition-colors cursor-pointer text-center"
+                      className="py-1.5 text-xs font-medium rounded border border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)] transition-colors cursor-pointer text-center"
                     >
                       {preset.label}
                     </button>
@@ -1271,7 +1271,7 @@ export const CreatorView: React.FC<CreatorViewProps> = ({
 
               {mode === 'quote' && (
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="creator-font-size" className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[var(--app-text-secondary)]">
+                  <label htmlFor="creator-font-size" className="flex items-center justify-between text-xs font-medium text-[var(--app-text-secondary)] tabular-nums">
                     <span>Quote size</span><span>{fontSize}px</span>
                   </label>
                   <input id="creator-font-size" type="range" min="14" max="48" step="1" value={fontSize} onChange={(event) => setFontSize(Number(event.target.value))} className="w-full accent-[var(--app-accent)]" />

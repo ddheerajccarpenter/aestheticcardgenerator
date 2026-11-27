@@ -651,9 +651,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
   // SEO
   useEffect(() => {
     updatePageSEO({
-      title: 'Freeform Canvas Studio — Design Aesthetic Cards from Scratch',
+      title: 'Canvas Studio: Multi-Layer Card & ID Pass Editor - ACG',
       description:
-        'Full freeform graphic editor for custom aesthetic ID cards, anime travel licenses, scrapbook journals, and badges. Move, resize, layer, and export with zero accounts.',
+        'Multi-layer canvas editor for custom aesthetic ID cards, travel licenses, scrapbook notes, and badges. Arrange layers and export locally.',
       canonicalPath: '/canvas',
       ogType: 'website',
     });
@@ -1085,7 +1085,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       );
     }
 
-    showToast(`Imported ${item.title} onto canvas!`);
+    showToast(`Imported ${item.title} onto canvas`);
   };
 
   // Listen for companion "Add to Card" event from StudioCompanion or staged sticker
@@ -1101,7 +1101,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           y: Math.round(doc.canvasHeight / 2 - size / 2),
         })
       );
-      showToast('Added Mochi Cloud to card!');
+      showToast('Added Mochi Cloud to card');
     };
 
     window.addEventListener('acg:add-mascot-sticker', handleAddMascotSticker);
@@ -1119,7 +1119,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           y: Math.round(doc.canvasHeight / 2 - 60),
         })
       );
-      showToast('Pasted companion sticker onto card!');
+      showToast('Pasted companion sticker onto card');
     }
 
     return () => window.removeEventListener('acg:add-mascot-sticker', handleAddMascotSticker);
@@ -1397,7 +1397,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       });
 
       addObject(newImgObj);
-      showToast('Photo added to canvas!');
+      showToast('Photo added to canvas.');
     } catch (err: any) {
       showToast(err?.message || 'Could not process image file.');
     }
@@ -1423,7 +1423,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         naturalHeight: sanitized.height,
         name: file.name.replace(/\.[^/.]+$/, '').slice(0, 20) || currentObj.name,
       });
-      showToast('Photo replaced in-place while keeping layout intact!');
+      showToast('Photo replaced while keeping layout intact.');
     } catch (err: any) {
       showToast(err?.message || 'Could not process image file.');
     }
@@ -1446,7 +1446,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
         src: result.updatedSrc,
         filteredSrc: undefined,
       });
-      showToast('Background removed successfully!');
+      showToast('Background removed.');
     } catch (err) {
       console.error('BG removal failed:', err);
       showToast('Failed to remove background.');
@@ -1505,7 +1505,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
           { rotX: -0.14, rotY: 0.24, rotZ: -0.02 },
           resolution
         );
-        showToast(`Exported 3D Card (${resolution}px Transparent PNG)!`);
+        showToast(`Exported 3D card (${resolution}px transparent PNG).`);
         return;
       }
 
@@ -1566,7 +1566,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
       triggerBrandedBlobDownload(exportBlob, filename);
 
-      showToast(`Exported ${doc.title} (${Math.round(doc.canvasWidth * scale)}×${Math.round(doc.canvasHeight * scale)}px pure card isolate)!`);
+      showToast(`Exported ${doc.title} (${Math.round(doc.canvasWidth * scale)}×${Math.round(doc.canvasHeight * scale)}px PNG).`);
     } catch (err: any) {
       console.error('Export failed:', err);
       const msg = err?.message || String(err);
@@ -1599,10 +1599,10 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
   const handleCreateBlank = (presetId?: string) => {
     const preset = CANVAS_DIMENSION_PRESETS.find((p) => p.id === presetId) || CANVAS_DIMENSION_PRESETS[0];
-    const newDoc = createBlankCanvas(preset.width, preset.height, '#ffffff', 'Custom Aesthetic Card');
+    const newDoc = createBlankCanvas(preset.width, preset.height, '#ffffff', 'Custom Card');
     commitDocumentChange(newDoc);
     setSelectedId(null);
-    showToast(`Created new blank canvas (${preset.width}×${preset.height}px)!`);
+    showToast(`Created blank canvas (${preset.width}×${preset.height}px)`);
   };
 
   // Smart "Fit Card Content to Canvas" - scales and reflows elements to fill canvas with clean margins
@@ -1619,7 +1619,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       ...currentDoc,
       objects: expanded as any,
     });
-    showToast('Fitted card elements to canvas!');
+    showToast('Fitted card elements to canvas');
   }, [commitDocumentChange]);
 
   // Quick Command Execution (Leftover Item 5)
@@ -1719,7 +1719,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
     } catch {
       // Storage quota
     }
-    showToast(`Saved "${obj.name}" to Recycle Tray!`);
+    showToast(`Saved "${obj.name}" to Recycle Tray`);
   }, [savedClips]);
 
   const handleInsertRecycledClip = useCallback((clip: CanvasObject) => {
@@ -1735,7 +1735,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
       objects: [...doc.objects, inserted],
     });
     setSelectedId(inserted.id);
-    showToast(`Recycled "${clip.name}" onto active canvas!`);
+    showToast(`Recycled "${clip.name}" onto active canvas`);
   }, [doc, commitDocumentChange]);
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -2486,12 +2486,12 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                 }`}
               >
                 <div className="flex items-center justify-between pb-1.5 border-b border-current/10">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#81786d]">
-                    Stamps & Accents
+                  <span className="text-xs font-semibold text-[#81786d]">
+                    Stamps & accents
                   </span>
                   <button
                     onClick={() => setStampsDrawerOpen(false)}
-                    className="text-[10px] text-[#81786d] hover:text-white"
+                    className="text-xs text-[#81786d] hover:text-white cursor-pointer"
                   >
                     Close
                   </button>
@@ -3452,8 +3452,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   {/* Object Header: Name & Quick Actions */}
                   <div className="sticky top-0 z-10 -mx-4 px-4 py-2 flex items-center justify-between border-b border-[#39342d]/30 bg-[var(--app-surface)]">
                     <div>
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#81786d]">
-                        {selectedObject.type} Layer
+                      <span className="text-xs font-mono text-[#81786d] capitalize">
+                        {selectedObject.type} layer
                       </span>
                       <h4 className="text-sm font-semibold truncate max-w-[170px]">
                         {selectedObject.name}
@@ -3851,8 +3851,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                       {extractedImageColors.length > 0 && (
                         <div className="p-2.5 rounded-xl border border-current/15 bg-current/5 flex flex-col gap-1.5">
-                          <span className="text-[10px] font-mono opacity-70 uppercase tracking-wider">
-                            Extracted Photo Colors (Click to set canvas bg)
+                          <span className="text-xs font-mono opacity-75">
+                            Extracted photo colors
                           </span>
                           <div className="flex items-center gap-1.5">
                             {extractedImageColors.map((col, idx) => (
@@ -4232,9 +4232,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                               canvasHeight: preset.height,
                               objects: resizedLayers as any,
                             });
-                            showToast(`Resized canvas to ${preset.label} (${preset.width}×${preset.height}px) with smart reflow!`);
+                            showToast(`Resized canvas to ${preset.label} (${preset.width}×${preset.height}px).`);
                           }}
-                          className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
+                          className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-colors cursor-pointer ${
                             doc.canvasWidth === preset.width && doc.canvasHeight === preset.height
                               ? isLight
                                 ? 'border-[#24211b] bg-[#24211b]/5 text-[#24211b] font-semibold'
@@ -4434,7 +4434,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         >
                           <div className="flex items-center gap-2">
                             {folderOpen.photo ? <FolderOpen className="w-4 h-4 text-[var(--app-text-secondary)]" /> : <Folder className="w-4 h-4 text-[var(--app-text-secondary)]" />}
-                            <span>📁 1. Profile Photo & Avatar</span>
+                            <span>1. Profile photo &amp; avatar</span>
                           </div>
                           <span className="text-[10px] opacity-60 font-mono">{photos.length}</span>
                         </button>
@@ -4499,7 +4499,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         >
                           <div className="flex items-center gap-2">
                             {folderOpen.text ? <FolderOpen className="w-4 h-4 text-[var(--app-text-secondary)]" /> : <Folder className="w-4 h-4 text-[var(--app-text-secondary)]" />}
-                            <span>📁 2. Editable Text Fields</span>
+                            <span>2. Editable text fields</span>
                           </div>
                           <span className="text-[10px] opacity-60 font-mono">{texts.length}</span>
                         </button>
@@ -4552,7 +4552,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         >
                           <div className="flex items-center gap-2">
                             {folderOpen.accents ? <FolderOpen className="w-4 h-4 text-[#24211b] dark:text-[#E2D9C8]" /> : <Folder className="w-4 h-4 text-[#24211b] dark:text-[#E2D9C8]" />}
-                            <span>📁 3. Stamps, Barcodes & Accents</span>
+                            <span>3. Stamps, barcodes &amp; accents</span>
                           </div>
                           <span className="text-[10px] opacity-60 font-mono">{accents.length}</span>
                         </button>
@@ -4605,7 +4605,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         >
                           <div className="flex items-center gap-2">
                             {folderOpen.frame ? <FolderOpen className="w-4 h-4 text-[var(--app-text-secondary)]" /> : <Folder className="w-4 h-4 text-[var(--app-text-secondary)]" />}
-                            <span>📁 4. Card Frame & Background</span>
+                            <span>4. Card frame &amp; background</span>
                           </div>
                           <span className="text-[10px] opacity-60 font-mono">{frames.length}</span>
                         </button>
@@ -4699,10 +4699,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[var(--app-accent)] uppercase tracking-wider font-mono">
-                    ♻ Recycle Drawer
+                  <span className="inline-flex items-center gap-1.5 font-medium text-[var(--app-accent)] font-mono">
+                    <RefreshCw className="w-3.5 h-3.5 stroke-[1.5]" aria-hidden="true" />
+                    <span>Recycle drawer</span>
                   </span>
-                  <span className="text-[10px] text-[#81786d]">{savedClips.length} Clips</span>
+                  <span className="text-[11px] tabular-nums text-[#81786d]">{savedClips.length} Clips</span>
                 </div>
                 <p className="text-[11px] text-[#81786d] leading-relaxed">
                   Recycle any custom-styled text, cutout photo, or stamp across cards.
@@ -4850,7 +4851,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             }`}
           >
             <div className="flex items-center justify-between pb-3 border-b border-current/10 shrink-0">
-              <h3 className="text-xs font-bold uppercase tracking-wider">Add Elements to Canvas</h3>
+              <h3 className="text-[13px] font-semibold">Add elements</h3>
               <button
                 onClick={() => setMobileAddSheetOpen(false)}
                 className="px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]"
@@ -5482,15 +5483,15 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
             }`}>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg sm:text-xl font-bold tracking-tight">Aesthetic Template Library</h3>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  <h3 className="text-lg sm:text-xl font-semibold tracking-tight">Template Library</h3>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium tabular-nums ${
                     isLight ? 'bg-slate-200 text-[var(--app-accent)]' : 'bg-[#E2D9C8]/10 text-[#E2D9C8] border border-[#E2D9C8]/25'
                   }`}>
                     {filteredTemplates.length} {filteredTemplates.length === 1 ? 'Template' : 'Templates'}
                   </span>
                 </div>
-                <p className="text-xs text-[#81786d] mt-1">
-                  Choose from trending Pinterest moodboards, vinyl records, aesthetic ID passes, receipts & posters.
+                <p className="text-[13px] text-[#81786d] mt-1">
+                  Pick from ID passes, travel tickets, vinyl records, and posters
                 </p>
               </div>
 
@@ -5533,8 +5534,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                   type="text"
                   value={templateSearchQuery}
                   onChange={(e) => setTemplateSearchQuery(e.target.value)}
-                  placeholder="Search templates (e.g. Pinterest, Polaroid, Vinyl, Matcha, Y2K, Boarding Pass, Jennie)..."
-                  className={`w-full pl-10 pr-9 py-2.5 rounded-xl text-xs sm:text-sm border transition-all focus:outline-none ${
+                  placeholder="Search templates"
+                  className={`w-full pl-10 pr-9 py-2.5 rounded-xl text-xs sm:text-sm border transition-colors focus:outline-none ${
                     isLight
                       ? 'bg-[#f0ece4] border-[#d4cdbf] text-[var(--app-accent)] focus:border-[#24211b] focus:bg-white'
                       : 'bg-[#181d26] border-[#39342d] text-white focus:border-[#E2D9C8] focus:bg-[#2a2620]'
@@ -5554,9 +5555,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
                 <button
                   onClick={() => setTemplateCategoryFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors ${
                     templateCategoryFilter === 'all'
-                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b] font-bold shadow-sm'
+                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b]'
                       : isLight ? 'bg-slate-100 text-[#6b6257] hover:bg-slate-200' : 'bg-[#211e19] text-[#a7a197] hover:text-white hover:bg-[#2b2721]'
                   }`}
                 >
@@ -5565,9 +5566,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                 <button
                   onClick={() => setTemplateCategoryFilter('pinterest')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors flex items-center gap-1.5 ${
                     templateCategoryFilter === 'pinterest'
-                      ? isLight ? 'bg-[#24211b] text-white font-bold shadow-sm' : 'bg-[#E2D9C8] text-[#24211b] font-bold shadow-sm'
+                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b]'
                       : isLight ? 'bg-slate-100 text-[#6b6257] hover:bg-slate-200' : 'bg-[#211e19] text-[#a7a197] hover:text-white hover:bg-[#2b2721]'
                   }`}
                 >
@@ -5577,9 +5578,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                 <button
                   onClick={() => setTemplateCategoryFilter('id-card')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors ${
                     templateCategoryFilter === 'id-card'
-                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b] font-bold shadow-sm'
+                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b]'
                       : isLight ? 'bg-slate-100 text-[#6b6257] hover:bg-slate-200' : 'bg-[#211e19] text-[#a7a197] hover:text-white hover:bg-[#2b2721]'
                   }`}
                 >
@@ -5588,9 +5589,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                 <button
                   onClick={() => setTemplateCategoryFilter('poster')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors ${
                     templateCategoryFilter === 'poster'
-                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b] font-bold shadow-sm'
+                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b]'
                       : isLight ? 'bg-slate-100 text-[#6b6257] hover:bg-slate-200' : 'bg-[#211e19] text-[#a7a197] hover:text-white hover:bg-[#2b2721]'
                   }`}
                 >
@@ -5599,9 +5600,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                 <button
                   onClick={() => setTemplateCategoryFilter('vintage')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors ${
                     templateCategoryFilter === 'vintage'
-                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b] font-bold shadow-sm'
+                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b]'
                       : isLight ? 'bg-slate-100 text-[#6b6257] hover:bg-slate-200' : 'bg-[#211e19] text-[#a7a197] hover:text-white hover:bg-[#2b2721]'
                   }`}
                 >
@@ -5610,9 +5611,9 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                 <button
                   onClick={() => setTemplateCategoryFilter('minimal')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors ${
                     templateCategoryFilter === 'minimal'
-                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b] font-bold shadow-sm'
+                      ? isLight ? 'bg-[#24211b] text-white shadow-sm' : 'bg-[#E2D9C8] text-[#24211b]'
                       : isLight ? 'bg-slate-100 text-[#6b6257] hover:bg-slate-200' : 'bg-[#211e19] text-[#a7a197] hover:text-white hover:bg-[#2b2721]'
                   }`}
                 >
@@ -5626,8 +5627,8 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
               {savedProjects.filter((p) => p.type === 'canvas').length > 0 && (
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-[#81786d] font-bold">
-                      Saved Edits ({savedProjects.filter((p) => p.type === 'canvas').length})
+                    <h4 className="text-[13px] font-medium text-[#81786d]">
+                      Saved edits ({savedProjects.filter((p) => p.type === 'canvas').length})
                     </h4>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -5689,7 +5690,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                             handleApplyTemplate(tmpl);
                           }
                         }}
-                        className={`group rounded-2xl p-4 flex flex-col justify-between border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl cursor-pointer relative overflow-hidden focus-visible:ring-2 focus-visible:ring-[var(--app-accent)] focus-visible:outline-none ${
+                        className={`group rounded-2xl p-4 flex flex-col justify-between border transition-[transform,border-color,background-color] duration-200 hover:-translate-y-0.5 cursor-pointer relative overflow-hidden focus-visible:ring-2 focus-visible:ring-[var(--app-accent)] focus-visible:outline-none ${
                           isLight
                             ? 'bg-[#f8f5ef] border-[#e3ddd3] hover:border-[#d4cdbf] hover:bg-white'
                             : 'bg-[#1a1713] border-[#39342d] hover:border-[#4a4339] hover:bg-[#211e19]'
@@ -5699,7 +5700,7 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
                         <div className="relative h-36 mb-3.5 rounded-xl overflow-hidden border border-black/10 shadow-inner select-none bg-black/10">
                           {/* Pinterest Pick Floating Badge */}
                           {isPinterest && (
-                            <div className="absolute top-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black/80 text-[#E2D9C8] border border-[#E2D9C8]/40 flex items-center gap-1 shadow-sm">
+                            <div className="absolute top-2.5 right-2.5 z-20 px-2 py-0.5 rounded-full text-xs font-medium bg-black/80 text-[#E2D9C8] border border-[#E2D9C8]/40 flex items-center gap-1">
                               <Sparkles className="w-2.5 h-2.5 text-[var(--app-accent)]" />
                               <span>Pinterest</span>
                             </div>
@@ -5713,11 +5714,11 @@ export const CanvasEditorView: React.FC<CanvasEditorViewProps> = ({
 
                           {/* Hover Overlay Button */}
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity flex items-center justify-center z-10">
-                            <span className={`px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-lg flex items-center gap-1.5 transform group-hover:scale-105 transition-transform ${
+                            <span className={`px-3.5 py-1.5 rounded-lg font-medium text-xs shadow-lg flex items-center gap-1.5 ${
                               isLight ? 'bg-[#24211b] text-white' : 'bg-[#E2D9C8] text-[#24211b]'
                             }`}>
-                              <Sparkles className="w-3.5 h-3.5" />
-                              <span>Load Template</span>
+                              <Sparkles className="w-3.5 h-3.5 stroke-[1.5]" />
+                              <span>Load template</span>
                             </span>
                           </div>
                         </div>

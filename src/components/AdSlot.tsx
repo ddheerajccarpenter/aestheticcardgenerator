@@ -65,7 +65,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
       aria-label="Advertisement"
       className={`my-6 w-full overflow-hidden rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)]/75 px-3 py-4 text-center sm:px-4 ${minHeightClass} flex flex-col items-center justify-center ${className}`}
     >
-      <span className="mb-2 block text-[10px] font-mono uppercase tracking-wider text-[var(--app-text-muted)]">
+      <span className="mb-2 block text-xs font-mono text-[var(--app-text-muted)]">
         Advertisement
       </span>
       <ins

@@ -89,7 +89,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
         {/* Article Header */}
         <header className="flex flex-col gap-4 border-b pb-8 border-[var(--app-border-subtle)]">
           <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--app-text-muted)] font-subheading">
-            <span className="font-bold uppercase tracking-wider text-[var(--app-accent)]">
+            <span className="font-medium text-[var(--app-accent)]">
               {guide.category}
             </span>
             <span>•</span>
@@ -104,7 +104,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
             </div>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading leading-tight">
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading leading-tight">
             {guide.title}
           </h1>
 
@@ -114,10 +114,10 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
         </header>
 
         {/* Main Guide Content Sections */}
-        <div className="flex flex-col gap-10 leading-relaxed text-sm">
+        <div className="flex flex-col gap-10 leading-relaxed text-sm md:text-base">
           {guide.sections.map((sec, idx) => (
             <section key={idx} className="flex flex-col gap-3.5">
-              <h2 className="text-xl md:text-2xl font-bold font-heading tracking-tight text-[var(--app-text-primary)]">
+              <h2 className="text-xl md:text-2xl font-semibold font-heading tracking-tight text-[var(--app-text-primary)]">
                 {sec.heading}
               </h2>
               <p className="text-[var(--app-text-secondary)]">
@@ -125,7 +125,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
               </p>
 
               {sec.bullets && sec.bullets.length > 0 && (
-                <ul className="flex flex-col gap-2 pl-4 list-disc text-xs md:text-sm text-[var(--app-text-secondary)]">
+                <ul className="flex flex-col gap-2 pl-4 list-disc text-sm text-[var(--app-text-secondary)]">
                   {sec.bullets.map((b, bIdx) => (
                     <li key={bIdx}>
                       {b}
@@ -137,8 +137,8 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
               {sec.callout && (
                 <aside className="my-3 p-4 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex items-start gap-3">
                   <Info className="w-4 h-4 text-[var(--app-accent)] shrink-0 mt-0.5" />
-                  <div className="flex flex-col gap-1 text-xs">
-                    <strong className="font-bold font-heading text-[var(--app-text-primary)]">{sec.callout.title}</strong>
+                  <div className="flex flex-col gap-1 text-[13px]">
+                    <strong className="font-semibold font-heading text-[var(--app-text-primary)]">{sec.callout.title}</strong>
                     <p className="leading-relaxed text-[var(--app-text-secondary)]">{sec.callout.text}</p>
                   </div>
                 </aside>
@@ -152,7 +152,7 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
 
         {recommendedTemplates.length > 0 && (
           <section className="studio-panel p-6 flex flex-col gap-4 bg-[var(--app-surface-secondary)]">
-            <h3 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
+            <h3 className="text-base font-semibold font-heading text-[var(--app-text-primary)]">
               Templates
             </h3>
 
@@ -161,23 +161,23 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
                 <div
                   key={t.id}
                   style={{ backgroundColor: t.theme.bg, color: t.theme.ink }}
-                  className="card-editorial-hover p-5 rounded-xl border border-black/15 flex flex-col justify-between shadow-sm"
+                  className="card-editorial-hover p-5 rounded-xl border border-black/15 flex flex-col justify-between"
                 >
                   <div>
-                    <span className="text-[10px] font-mono opacity-70 block mb-1">{t.tag}</span>
-                    <blockquote className="text-xs font-editorial line-clamp-2">
+                    <span className="text-xs font-mono opacity-70 block mb-1">{t.tag}</span>
+                    <blockquote className="text-sm font-editorial line-clamp-2">
                       “{t.quote}”
                     </blockquote>
                   </div>
-                  <div className="pt-3 border-t border-current/15 mt-3 flex items-center justify-between">
-                    <cite className="not-italic text-[10px] font-medium opacity-80 truncate">
+                  <div className="pt-3 border-t border-current/15 mt-3 flex items-center justify-between gap-2">
+                    <cite className="not-italic text-xs font-medium opacity-80 truncate">
                       {t.author}
                     </cite>
                     <a
                       href={t.canvasDoc?.objects.length ? `/canvas?template=${t.id}` : `/create?template=${t.id}`}
-                      className="px-2.5 py-1 rounded bg-black/10 hover:bg-black/20 text-[10px] font-semibold cursor-pointer transition-colors"
+                      className="inline-flex min-h-[36px] items-center px-3 py-1 rounded bg-black/10 hover:bg-black/20 text-xs font-semibold cursor-pointer transition-colors"
                     >
-                      Open
+                      Open card
                     </a>
                   </div>
                 </div>
@@ -190,19 +190,19 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
           <PenTool className="w-5 h-5 text-[var(--app-accent)]" />
           <a
             href="/create"
-            className="studio-btn-primary btn-sheen interactive-tactile"
+            className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px]"
           >
             <span>Open Studio</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 stroke-[1.5]" aria-hidden="true" />
           </a>
         </section>
 
         {/* Related Guides Links */}
         <footer className="flex flex-col gap-4 border-t pt-8 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-[var(--app-text-muted)]" />
-            <h3 className="text-xs font-bold uppercase tracking-wider font-subheading text-[var(--app-text-primary)]">
-              Related Typography &amp; Design Guides
+            <BookOpen className="w-4 h-4 text-[var(--app-text-muted)] stroke-[1.5]" />
+            <h3 className="text-[13px] font-medium font-subheading text-[var(--app-text-primary)]">
+              Related typography and design guides
             </h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -210,15 +210,15 @@ export const GuideDetailView: React.FC<GuideDetailViewProps> = ({
               <a
                 key={g.slug}
                 href={g.path}
-                className="studio-panel p-4 text-left flex flex-col justify-between hover:border-[var(--app-accent)] transition-colors cursor-pointer"
+                className="studio-panel card-editorial-hover p-4 text-left flex flex-col justify-between hover:border-[var(--app-accent)] transition-colors cursor-pointer"
               >
-                <span className="text-[10px] text-[var(--app-accent)] font-bold uppercase block mb-1 font-subheading">
+                <span className="text-xs text-[var(--app-accent)] font-medium block mb-1 font-subheading">
                   {g.category}
                 </span>
-                <span className="text-xs font-semibold line-clamp-2 text-[var(--app-text-primary)]">
+                <span className="text-[13px] font-semibold line-clamp-2 text-[var(--app-text-primary)]">
                   {g.title}
                 </span>
-                <span className="text-[10px] text-[var(--app-text-muted)] mt-2 block font-subheading">
+                <span className="text-xs text-[var(--app-text-muted)] mt-2 block font-subheading tabular-nums">
                   {g.readTime}
                 </span>
               </a>

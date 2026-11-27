@@ -192,7 +192,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
   return (
     <div className="w-full pt-8 sm:pt-12 pb-28 md:pb-20 text-[var(--app-text-primary)] transition-colors duration-200">
       <div className="studio-container flex flex-col gap-6 sm:gap-8">
-        <nav aria-label="Breadcrumb" className="studio-breadcrumb glass-surface w-fit rounded-full px-3 py-2">
+        <nav aria-label="Breadcrumb" className="studio-breadcrumb">
           <a href="/" className="cursor-pointer">
             Home
           </a>
@@ -211,7 +211,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
             className="studio-btn-primary btn-sheen interactive-tactile min-h-11 w-fit px-5"
           >
             <FilePlus className="w-4 h-4" />
-            <span>Blank</span>
+            <span>New blank card</span>
           </a>
         </header>
 
@@ -225,7 +225,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
+                placeholder="Search"
                 className="studio-input w-full !pl-10 !pr-9"
               />
               {searchQuery && (
@@ -243,7 +243,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
               <button
                 type="button"
                 onClick={toggleAmbient}
-                className={`interactive-tactile inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-medium transition-colors cursor-pointer ${
+                className={`interactive-tactile inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
                   ambientEnabled
                     ? 'border-[var(--app-accent)] bg-[var(--app-accent)]/10 text-[var(--app-accent)] font-semibold'
                     : 'border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] hover:text-[var(--app-text-primary)]'
@@ -251,10 +251,10 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                 title="Toggle scroll-reactive ambient lighting atmosphere"
                 aria-pressed={ambientEnabled}
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-3.5 h-3.5 stroke-[1.5]" />
                 <span>Atmosphere</span>
               </button>
-              <div className="shrink-0 text-xs text-[var(--app-text-secondary)] font-mono" aria-live="polite">
+              <div className="shrink-0 text-xs text-[var(--app-text-secondary)] font-mono tabular-nums" aria-live="polite">
                 {filteredTemplates.length} / {PRESET_TEMPLATES.length}
               </div>
             </div>
@@ -278,10 +278,10 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                 >
                   <span>{tab.label}</span>
                   <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
+                    className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full font-mono ${
                       activeCategory === tab.id
                         ? 'bg-black/15 dark:bg-white/20'
-                        : 'opacity-60'
+                        : 'opacity-70'
                     }`}
                   >
                     {count}
@@ -346,7 +346,7 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                         onClick={(e) => toggleCompareTemplate(template, e.currentTarget)}
                         type="button"
                         aria-pressed={isSelected}
-                        className={`min-h-[38px] shrink-0 rounded-xl border px-3 py-1.5 text-[10px] font-semibold transition-colors interactive-tactile cursor-pointer ${
+                        className={`min-h-[44px] shrink-0 rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors interactive-tactile cursor-pointer ${
                           isSelected
                             ? 'bg-[var(--app-accent)] text-[var(--app-accent-ink)] border-[var(--app-accent)]'
                             : 'border-[var(--app-border-subtle)] text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:border-[var(--app-border-strong)]'
@@ -359,20 +359,20 @@ export const TemplatesView: React.FC<TemplatesViewProps> = ({
                     <div className={`grid ${template.canvasDoc ? 'grid-cols-1' : 'grid-cols-2'} gap-2 pt-1`}>
                       <a
                         href={`/canvas?template=${template.id}`}
-                        className="studio-btn-primary btn-sheen min-h-[44px] !py-2 !text-xs !rounded-xl interactive-tactile"
+                        className="studio-btn-primary btn-sheen min-h-[44px] !py-2 !text-[13px] !rounded-xl interactive-tactile"
                         title="Open in Freeform Canvas Studio"
                       >
                         <Layers className="w-3.5 h-3.5" />
-                        <span>Customize</span>
+                        <span>Edit in Canvas</span>
                       </a>
 
                       {!template.canvasDoc && (
                         <a
                           href={`/create?template=${template.id}`}
-                          className="studio-btn-secondary min-h-[44px] !py-2 !text-xs !rounded-xl interactive-tactile"
+                          className="studio-btn-secondary min-h-[44px] !py-2 !text-[13px] !rounded-xl interactive-tactile"
                           title="Open in quick card maker"
                         >
-                          <span>Quick</span>
+                          <span>Quick maker</span>
                           <ArrowRight className="w-3 h-3" />
                         </a>
                       )}

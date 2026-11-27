@@ -187,3 +187,62 @@ test('GPU optimization: no heavy SVG blur/turbulence filters, idle infinite back
   const threeStage = fs.readFileSync(path.join(SRC_DIR, 'engines', 'threeCardStage.ts'), 'utf8');
   assert.ok(threeStage.includes('Math.min(window.devicePixelRatio || 1, 1.5)'), 'WebGL 3D stage must cap DPR at 1.5');
 });
+
+test('Unslop craft discipline: single ease curve, restrained weights, no emoji UI chrome or hero bloat', () => {
+  const motionSrc = fs.readFileSync(path.join(SRC_DIR, 'utils', 'motion.ts'), 'utf8');
+  assert.ok(motionSrc.includes('cubicBezier(0.22, 1, 0.36, 1)'), 'motion.ts must use unslop ease-out curve');
+  assert.ok(!motionSrc.includes('spring('), 'motion.ts must avoid bouncy overshoot springs');
+
+  const homeSrc = fs.readFileSync(path.join(SRC_DIR, 'views', 'HomeView.tsx'), 'utf8');
+  assert.equal((homeSrc.match(/data-hero-cta\b[^>]*className=/g) || []).length, 2, 'HomeView hero must have only primary and secondary CTA');
+  assert.ok(!homeSrc.includes('--scroll-p') && !homeSrc.includes('--hero-px'), 'HomeView hero must not attach parallax on scroll or pointer');
+  assert.ok(!homeSrc.includes('placeholder="Search..."'), 'HomeView search must use concise "Search" placeholder');
+
+  const companionSrc = fs.readFileSync(path.join(SRC_DIR, 'components', 'StudioCompanion.tsx'), 'utf8');
+  assert.ok(!/[\u{1F300}-\u{1FAFF}]/u.test(companionSrc), 'StudioCompanion must use line icons/text instead of emojis');
+
+  for (const rel of ['HomeView.tsx', 'PremiumView.tsx', 'CategoryView.tsx', 'BlogView.tsx', 'GuideIndexView.tsx', 'GuideDetailView.tsx', 'BingoView.tsx', 'TrustViews.tsx']) {
+    const viewSrc = fs.readFileSync(path.join(SRC_DIR, 'views', rel), 'utf8');
+    assert.ok(!viewSrc.includes('font-extrabold') && !viewSrc.includes('font-black'), `${rel} must avoid weight 800-900 headings`);
+  }
+});
+
+test('taste-skill discipline: accessibility landmarks, no blocking CDN fonts, settled scroll cards, clean copy', () => {
+  const headerSrc = fs.readFileSync(path.join(SRC_DIR, 'components', 'Header.tsx'), 'utf8');
+  assert.ok(headerSrc.includes('href="#main-content"') && headerSrc.includes('className="skip-link"'), 'Header must expose a skip-to-content link');
+
+  const appSrc = fs.readFileSync(path.join(SRC_DIR, 'App.tsx'), 'utf8');
+  assert.ok(appSrc.includes('id="main-content"'), 'App main region must expose #main-content target');
+
+  const layoutSrc = fs.readFileSync(path.join(SRC_DIR, 'layouts', 'SiteLayout.astro'), 'utf8');
+  assert.ok(!layoutSrc.includes('samsungone'), 'SiteLayout must not load unused blocking SamsungOne CSS');
+
+  const motionSrc = fs.readFileSync(path.join(SRC_DIR, 'utils', 'motion.ts'), 'utf8');
+  const scrollRevealSlice = motionSrc.slice(
+    motionSrc.indexOf('export function observeScrollReveal'),
+    motionSrc.indexOf('export function animateSpringPop')
+  );
+  assert.ok(scrollRevealSlice.length > 0 && !scrollRevealSlice.includes("opacity = '0'") && !scrollRevealSlice.includes('IntersectionObserver'), 'observeScrollReveal must keep cards readable without scroll hiding');
+
+  for (const rel of ['index.astro', '[...path].astro', path.join('card', '[slug].astro'), '404.astro']) {
+    const pageSrc = fs.readFileSync(path.join(SRC_DIR, 'pages', rel), 'utf8');
+    assert.ok(!pageSrc.includes('font-extrabold') && !pageSrc.includes('uppercase tracking-'), `${rel} must avoid heavy/tracked fallback eyebrows`);
+  }
+
+  const bannedCopy = /\b(curated|timeless|elevate|leverage|harnessing)\b/i;
+  for (const rel of [
+    path.join('data', 'categories.ts'),
+    path.join('data', 'guides.ts'),
+    path.join('data', 'blog.ts'),
+    path.join('utils', 'ssrSeo.ts'),
+    path.join('views', 'TrustViews.tsx'),
+  ]) {
+    const copySrc = fs.readFileSync(path.join(SRC_DIR, rel), 'utf8');
+    assert.ok(!copySrc.includes('—'), `${rel} must avoid em dashes`);
+    assert.ok(!bannedCopy.test(copySrc), `${rel} must avoid banned AI-slop vocabulary`);
+  }
+
+  const homeSrc = fs.readFileSync(path.join(SRC_DIR, 'views', 'HomeView.tsx'), 'utf8');
+  assert.ok(homeSrc.includes("['Card', 'and', 'poster']") && homeSrc.includes('studio'), 'HomeView hero H1 must open with category-first naming');
+  assert.ok(homeSrc.includes('Browse templates'), 'HomeView hero must use verb+object Browse templates CTA');
+});

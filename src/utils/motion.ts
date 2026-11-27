@@ -154,103 +154,22 @@ export function drawSvgPaths(
 }
 
 /**
- * Batched IntersectionObserver reveal: animates elements in row batches as they
- * enter the viewport instead of firing unseen animations at initial load.
+ * Ensures gallery grid cards stay readable at rest with zero scroll-triggered hiding
+ * or staggered scroll reveals per taste-skill motion rules.
  */
 export function observeScrollReveal(
   container: HTMLElement | null,
   selector = '[data-reveal-card]',
-  options?: { staggerMs?: number; yOffset?: number; rootMargin?: string }
+  _options?: { staggerMs?: number; yOffset?: number; rootMargin?: string }
 ): () => void {
   if (!container || typeof window === 'undefined') return () => {};
   const nodes = Array.from(container.querySelectorAll<HTMLElement>(selector));
-  if (!nodes.length) return () => {};
-
-  if (isReducedMotion() || typeof IntersectionObserver === 'undefined') {
-    nodes.forEach((el) => {
-      el.style.opacity = '1';
-      el.style.transform = 'none';
-    });
-    return () => {};
+  for (const el of nodes) {
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+    el.dataset.revealed = '1';
   }
-
-  const staggerMs = options?.staggerMs ?? 38;
-  const yOffset = options?.yOffset ?? 10;
-  const pending = new Set<HTMLElement>();
-  let rafId: number | null = null;
-
-  const flushBatch = () => {
-    rafId = null;
-    if (!pending.size) return;
-    const batch = Array.from(pending);
-    pending.clear();
-    batch.forEach((el) => {
-      el.dataset.revealed = '1';
-    });
-    animate(batch, {
-      opacity: [0, 1],
-      y: [yOffset, 0],
-      duration: 360,
-      delay: stagger(staggerMs),
-      ease: EDITORIAL_EASE,
-    });
-  };
-
-  // Pre-hide only elements that have not yet revealed so offscreen cards animate on scroll.
-  nodes.forEach((el) => {
-    if (el.dataset.revealed === '1') return;
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight * 0.96) {
-      el.style.opacity = '0';
-      pending.add(el);
-    } else {
-      el.style.opacity = '0';
-    }
-  });
-
-  if (pending.size) {
-    rafId = window.requestAnimationFrame(flushBatch);
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        const target = entry.target as HTMLElement;
-        observer.unobserve(target);
-        if (target.dataset.revealed === '1') continue;
-        pending.add(target);
-      }
-      if (pending.size && rafId === null) {
-        rafId = window.requestAnimationFrame(flushBatch);
-      }
-    },
-    { rootMargin: options?.rootMargin ?? '40px 0px', threshold: 0.04 }
-  );
-
-  nodes.forEach((el) => {
-    if (el.dataset.revealed !== '1' && !pending.has(el)) {
-      observer.observe(el);
-    }
-  });
-
-  const handleMotionToggle = () => {
-    if (isReducedMotion()) {
-      observer.disconnect();
-      nodes.forEach((el) => {
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-        el.dataset.revealed = '1';
-      });
-    }
-  };
-  window.addEventListener('acg:motion-toggled', handleMotionToggle);
-
-  return () => {
-    observer.disconnect();
-    window.removeEventListener('acg:motion-toggled', handleMotionToggle);
-    if (rafId !== null) window.cancelAnimationFrame(rafId);
-  };
+  return () => {};
 }
 
 /** Ease-out transition on stamps, toggles, or swapped card surfaces (no overshoot). */

@@ -1,12 +1,47 @@
 {
   "version": 2,
   "skills": {
+    "add": {
+      "source": "Remocn/remocn",
+      "commit": "63cf48b3adcca25779310166371dfaa75333221c",
+      "sourceType": "github",
+      "skillPath": "plugins/remocn/skills/add/SKILL.md",
+      "computedHash": "bb8e2aeca5eb46550f1398c3b4c2d203e2edf2537c7443928b50da1a9a641970"
+    },
+    "changelog": {
+      "source": "Remocn/remocn",
+      "commit": "63cf48b3adcca25779310166371dfaa75333221c",
+      "sourceType": "github",
+      "skillPath": "plugins/remocn/skills/changelog/SKILL.md",
+      "computedHash": "962f4eb3df7b80f497e981dcfcceeec4a5a5bb819cd7db3423c8c8ed4d46dff8"
+    },
+    "remocn": {
+      "source": "Remocn/remocn",
+      "commit": "63cf48b3adcca25779310166371dfaa75333221c",
+      "sourceType": "github",
+      "skillPath": "plugins/remocn/skills/remocn/SKILL.md",
+      "computedHash": "e40fb0f473eb925219e8109e183264a69ebb94a8e80249fbbeb1404c30e8706c"
+    },
+    "setup": {
+      "source": "Remocn/remocn",
+      "commit": "63cf48b3adcca25779310166371dfaa75333221c",
+      "sourceType": "github",
+      "skillPath": "plugins/remocn/skills/setup/SKILL.md",
+      "computedHash": "a3a77999e950d8ec13cda5e3eccbf6bb57e25c0c8999bc44f5ad29c46febb77f"
+    },
     "setup-matt-pocock-skills": {
       "source": "mattpocock/skills",
       "commit": "6f7f7831a625f040a8e06a0e7954826b87ce775a",
       "sourceType": "github",
       "skillPath": "skills/engineering/setup-matt-pocock-skills/SKILL.md",
       "computedHash": "9659e7025d4cf1c0a0b40ddff32ed4b8debb87a4b20d7a52ff89c506a638df69"
+    },
+    "video": {
+      "source": "Remocn/remocn",
+      "commit": "63cf48b3adcca25779310166371dfaa75333221c",
+      "sourceType": "github",
+      "skillPath": "plugins/remocn/skills/video/SKILL.md",
+      "computedHash": "3c5486021c637c45bc56ba74682d9483f7d05ae17705bd533b5f2e28b025f3f7"
     }
   }
 }

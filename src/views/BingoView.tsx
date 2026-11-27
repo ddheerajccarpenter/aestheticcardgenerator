@@ -160,7 +160,7 @@ export const BingoView: React.FC<BingoViewProps> = () => {
             <div>
               <label
                 htmlFor="bingo-title-input"
-                className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--app-text-muted)] mb-1.5"
+                className="block text-xs font-medium text-[var(--app-text-secondary)] mb-1.5"
               >
                 Title
               </label>
@@ -176,7 +176,7 @@ export const BingoView: React.FC<BingoViewProps> = () => {
             <div>
               <label
                 htmlFor="bingo-subtitle-input"
-                className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--app-text-muted)] mb-1.5"
+                className="block text-xs font-medium text-[var(--app-text-secondary)] mb-1.5"
               >
                 Subtitle
               </label>
@@ -192,7 +192,7 @@ export const BingoView: React.FC<BingoViewProps> = () => {
           </div>
 
           <div>
-            <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--app-text-muted)] mb-2">
+            <span className="block text-xs font-medium text-[var(--app-text-secondary)] mb-2">
               Palette
             </span>
             <div className="grid grid-cols-4 gap-2">
@@ -209,8 +209,8 @@ export const BingoView: React.FC<BingoViewProps> = () => {
                       animateSpringPop(cardRef.current, 'swap');
                     }}
                     style={{ backgroundColor: pal.bg, color: pal.ink, borderColor: pal.border }}
-                    className={`interactive-tactile min-h-[44px] rounded-xl border-2 flex items-center justify-center text-[10px] font-bold transition-transform cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
-                      active ? 'ring-2 ring-[var(--app-accent)] scale-[1.03]' : ''
+                    className={`interactive-tactile min-h-[44px] rounded-xl border-2 flex items-center justify-center text-xs font-medium transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
+                      active ? 'ring-2 ring-[var(--app-accent)]' : ''
                     }`}
                   >
                     {active ? <Check className="h-4 w-4" aria-hidden="true" /> : pal.name.split(' ')[0]}
@@ -225,7 +225,7 @@ export const BingoView: React.FC<BingoViewProps> = () => {
               <button
                 type="button"
                 onClick={handleShuffle}
-                className="interactive-tactile min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--app-border-strong)] bg-[var(--app-surface-secondary)] px-3 text-xs font-semibold text-[var(--app-text-primary)] hover:bg-[var(--app-border-subtle)] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+                className="interactive-tactile min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--app-border-strong)] bg-[var(--app-surface-secondary)] px-3 text-[13px] font-medium text-[var(--app-text-primary)] hover:bg-[var(--app-border-subtle)] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
               >
                 <Shuffle className="h-3.5 w-3.5" aria-hidden="true" />
                 Shuffle
@@ -234,21 +234,21 @@ export const BingoView: React.FC<BingoViewProps> = () => {
                 type="button"
                 aria-pressed={editMode}
                 onClick={() => setEditMode((prev) => !prev)}
-                className={`interactive-tactile min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
+                className={`interactive-tactile min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 text-[13px] font-medium transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
                   editMode
                     ? 'border-[var(--app-accent)] bg-[var(--app-accent)] text-[var(--app-accent-ink)]'
                     : 'border-[var(--app-border-strong)] bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] hover:bg-[var(--app-border-subtle)]'
                 }`}
               >
                 <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
-                {editMode ? 'Done' : 'Edit'}
+                {editMode ? 'Done editing' : 'Edit squares'}
               </button>
             </div>
 
             <button
               type="button"
               onClick={handleClearStamps}
-              className="interactive-tactile min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--app-border-subtle)] px-3 text-xs font-medium text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-[var(--app-surface-secondary)] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+              className="interactive-tactile min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--app-border-subtle)] px-3 text-[13px] font-medium text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)] hover:bg-[var(--app-surface-secondary)] transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
             >
               <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
               Reset ({stampedCount}/25)
@@ -258,14 +258,14 @@ export const BingoView: React.FC<BingoViewProps> = () => {
               type="button"
               onClick={handleExportPng}
               disabled={exporting}
-              className="btn-sheen interactive-tactile min-h-[44px] mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--app-accent)] px-4 text-xs font-bold text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] disabled:opacity-60 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
+              className="btn-sheen interactive-tactile min-h-[44px] mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--app-accent)] px-4 text-[13px] font-semibold text-[var(--app-accent-ink)] hover:bg-[var(--app-accent-hover)] disabled:opacity-60 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)]"
             >
               <Download className="h-4 w-4" aria-hidden="true" />
               {exporting ? 'Exporting...' : 'Download PNG'}
             </button>
           </div>
 
-          <p role="status" aria-live="polite" className="min-h-[16px] text-[11px] text-[var(--app-text-muted)]">
+          <p role="status" aria-live="polite" className="min-h-[18px] text-[13px] text-[var(--app-text-muted)]">
             {statusMsg}
           </p>
         </section>
@@ -286,16 +286,16 @@ export const BingoView: React.FC<BingoViewProps> = () => {
           >
             <div className="flex items-baseline justify-between gap-2 pb-3 border-b" style={{ borderColor: palette.border }}>
               <div>
-                <h2 className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight leading-none">
-                  {title || 'BINGO'}
+                <h2 className="font-heading text-xl sm:text-2xl font-medium tracking-tight leading-none">
+                  {title || 'Bingo'}
                 </h2>
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] opacity-75">
+                <p className="mt-1 font-mono text-[11px] opacity-75">
                   {subtitle || activeKind.label}
                 </p>
               </div>
               <span
                 style={{ backgroundColor: palette.stampBg, color: palette.stampInk }}
-                className="rounded-md px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider shrink-0"
+                className="rounded-md px-2 py-1 font-mono text-[11px] font-medium shrink-0"
               >
                 {activeKind.label}
               </span>
@@ -305,7 +305,7 @@ export const BingoView: React.FC<BingoViewProps> = () => {
               {HEADERS.map((letter) => (
                 <div
                   key={letter}
-                  className="text-center font-heading text-base sm:text-xl font-black tracking-widest py-1"
+                  className="text-center font-heading text-base sm:text-xl font-semibold tracking-widest py-1"
                 >
                   {letter}
                 </div>
@@ -349,11 +349,11 @@ export const BingoView: React.FC<BingoViewProps> = () => {
                       color: isStamped ? palette.stampInk : palette.ink,
                       borderColor: isStamped ? palette.stampBg : palette.border,
                     }}
-                    className={`aspect-square w-full rounded-lg border p-1 sm:p-1.5 flex items-center justify-center text-center transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-current ${
+                    className={`aspect-square w-full rounded-lg border p-1 sm:p-1.5 flex items-center justify-center text-center transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-current tabular-nums ${
                       kindId === 'classic'
-                        ? 'text-sm sm:text-lg font-extrabold font-mono'
-                        : 'text-[10px] sm:text-xs font-semibold leading-tight'
-                    } ${isCenter ? 'tracking-wider font-extrabold uppercase' : ''}`}
+                        ? 'text-sm sm:text-lg font-semibold font-mono'
+                        : 'text-[10px] sm:text-xs font-medium leading-tight'
+                    } ${isCenter ? 'font-semibold' : ''}`}
                   >
                     <span className="break-words overflow-hidden line-clamp-3">
                       {cellText}
@@ -364,7 +364,7 @@ export const BingoView: React.FC<BingoViewProps> = () => {
             </div>
 
             <div
-              className="mt-3 pt-2.5 border-t flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.12em] opacity-70"
+              className="mt-3 pt-2.5 border-t flex items-center justify-between text-[11px] font-mono tabular-nums opacity-70"
               style={{ borderColor: palette.border }}
             >
               <span>ACG</span>

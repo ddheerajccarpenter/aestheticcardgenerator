@@ -17,6 +17,7 @@
     "pages:preview": "npm run build && wrangler pages deploy dist --project-name=aestheticcardgenerator"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@imgly/background-removal": "^1.7.0",
     "@tailwindcss/vite": "^4.3.3",
     "@zakisheriff/liquid-glass": "^0.3.6",

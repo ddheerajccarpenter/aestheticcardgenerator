@@ -12,6 +12,7 @@ import {
   Lock,
   Check,
   Copy,
+  ArrowRight,
 } from 'lucide-react';
 
 interface TrustViewBaseProps {
@@ -20,15 +21,15 @@ interface TrustViewBaseProps {
 }
 
 // --------------------------------------------------------------------------
-// 1. ABOUT PAGE (/about) — Warm Nano-Textured Colophon Card
+// 1. ABOUT PAGE (/about): Warm Nano-Textured Colophon Card
 // --------------------------------------------------------------------------
 export const AboutView: React.FC<TrustViewBaseProps> = () => {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'About — Aesthetic Card Studio',
+      title: 'About: Aesthetic Card Studio',
       description:
-        'Local-first card press and studio designed to format words, poetry, and aesthetic ID cards with tactile dignity.',
+        'Local-first card press and studio designed to format words, poetry, and aesthetic ID cards in your browser.',
       canonicalPath: '/about',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -49,11 +50,11 @@ export const AboutView: React.FC<TrustViewBaseProps> = () => {
           <div className="absolute inset-0 card-noise opacity-20 pointer-events-none" />
 
           <header className="flex flex-col gap-2 border-b pb-5 border-[var(--app-border-subtle)] relative z-10">
-            <h1 className="font-brand text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
+            <h1 className="font-brand text-3xl md:text-5xl font-medium tracking-tight font-heading">
               Aesthetic Card Studio
             </h1>
             <p className="text-sm leading-relaxed text-[var(--app-text-secondary)] max-w-xl font-body">
-              Local-first browser card studio.
+              Local-first browser card studio
             </p>
           </header>
 
@@ -62,50 +63,51 @@ export const AboutView: React.FC<TrustViewBaseProps> = () => {
             {/* Column 1: Local-First Architecture */}
             <div className="p-6 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--app-accent)] block mb-2">
-                  01 • LOCAL-FIRST MEMORY
+                <span className="text-xs font-mono font-medium text-[var(--app-accent)] block mb-2">
+                  Local-first storage
                 </span>
-                <h2 className="text-lg font-bold mb-2 font-heading text-[var(--app-text-primary)]">
-                  Zero Cloud Uploads
+                <h2 className="text-lg font-medium mb-2 font-heading text-[var(--app-text-primary)]">
+                  Zero cloud uploads
                 </h2>
                 <p className="text-xs leading-relaxed text-[var(--app-text-secondary)]">
-                  Your private notes, quotes, and photos never touch a remote server or AI database. All rendering is computed directly inside browser memory via Canvas, SVG, and WebGL.
+                  Notes, quotes, and photos stay on your device. Rendering happens directly in browser memory via Canvas, SVG, and WebGL.
                 </p>
               </div>
-              <div className="pt-4 mt-4 border-t border-[var(--app-border-subtle)] text-[11px] font-mono text-[var(--app-text-muted)]">
-                100% Client-Side Privacy
+              <div className="pt-4 mt-4 border-t border-[var(--app-border-subtle)] text-xs font-mono text-[var(--app-text-muted)]">
+                Client-side privacy
               </div>
             </div>
 
             {/* Column 2: Archival 4K–16K Output */}
             <div className="p-6 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--app-accent)] block mb-2">
-                  02 • PRINT-GRADE FIDELITY
+                <span className="text-xs font-mono font-medium text-[var(--app-accent)] block mb-2">
+                  Print fidelity
                 </span>
-                <h2 className="text-lg font-bold mb-2 font-heading text-[var(--app-text-primary)]">
-                  4K to 16K Ultra-HD Output
+                <h2 className="text-lg font-medium mb-2 font-heading text-[var(--app-text-primary)]">
+                  High-DPI export
                 </h2>
                 <p className="text-xs leading-relaxed text-[var(--app-text-secondary)]">
-                  Over 55 procedural paper surfaces, custom local font uploads, and offline background removal render natively at archival resolutions with zero bitmap blur.
+                  Procedural paper finishes, custom local fonts, and offline background removal render directly at print resolution.
                 </p>
               </div>
-              <div className="pt-4 mt-4 border-t border-[var(--app-border-subtle)] text-[11px] font-mono text-[var(--app-text-muted)]">
-                True High-DPI Vector Export
+              <div className="pt-4 mt-4 border-t border-[var(--app-border-subtle)] text-xs font-mono text-[var(--app-text-muted)]">
+                Vector and Retina export
               </div>
             </div>
           </div>
 
           {/* Ownership Notice */}
-          <div className="p-4 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs relative z-10">
+          <div className="p-4 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] relative z-10">
             <span className="font-semibold text-[var(--app-text-primary)]">
-              Crafted independently. Questions or feedback: ddheerajcarpenter@gmail.com
+              Built independently. Questions or feedback: ddheerajcarpenter@gmail.com
             </span>
             <a
               href="mailto:ddheerajcarpenter@gmail.com?subject=Aesthetic%20Card%20Studio%20Feedback"
-              className="studio-btn-ghost !p-0 !text-xs font-bold underline"
+              className="studio-btn-ghost !p-0 !text-[13px] font-semibold underline inline-flex items-center gap-1"
             >
-              Contact Owner →
+              <span>Email maintainer</span>
+              <ArrowRight className="w-3.5 h-3.5 stroke-[1.5]" aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -117,7 +119,7 @@ export const AboutView: React.FC<TrustViewBaseProps> = () => {
 };
 
 // --------------------------------------------------------------------------
-// 2. CONTACT PAGE (/contact) — Direct Owner Contact (Part 9.3)
+// 2. CONTACT PAGE (/contact) - Direct Owner Contact
 // --------------------------------------------------------------------------
 export const ContactView: React.FC<TrustViewBaseProps> = () => {
   const [copiedEmail, setCopiedEmail] = React.useState(false);
@@ -130,7 +132,7 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Contact & Feedback — Aesthetic Card Studio',
+      title: 'Contact & Feedback: Aesthetic Card Studio',
       description:
         'Direct contact with the creator of Aesthetic Card Studio. Send questions, feature suggestions, and bug reports.',
       canonicalPath: '/contact',
@@ -148,7 +150,7 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
         </nav>
 
         <header className="flex flex-col gap-2 border-b pb-5 border-[var(--app-border-subtle)]">
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading">
             Contact
           </h1>
         </header>
@@ -159,13 +161,13 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
           <div className="studio-panel p-6 sm:p-8 flex flex-col justify-between shadow-xl">
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2.5">
-                <Mail className="w-5 h-5 text-[var(--app-accent)]" />
-                <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">Direct Email</h2>
+                <Mail className="w-4 h-4 stroke-[1.5] text-[var(--app-accent)]" />
+                <h2 className="text-base font-medium font-heading text-[var(--app-text-primary)]">Direct email</h2>
               </div>
               <p className="text-xs text-[var(--app-text-secondary)] leading-relaxed">
-                Send feedback, template requests, or bugs directly to the project owner:
+                Send feedback, template requests, or bugs directly to the maintainer:
               </p>
-              <div className="p-3 rounded-xl bg-[var(--app-surface-secondary)] border border-[var(--app-border-subtle)] font-mono text-xs font-bold text-[var(--app-text-primary)]">
+              <div className="p-3 rounded-xl bg-[var(--app-surface-secondary)] border border-[var(--app-border-subtle)] font-mono text-xs font-medium text-[var(--app-text-primary)]">
                 ddheerajcarpenter@gmail.com
               </div>
             </div>
@@ -175,8 +177,8 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
                 href="mailto:ddheerajcarpenter@gmail.com?subject=Aesthetic%20Card%20Studio%20Feedback"
                 className="studio-btn-primary flex-1 !text-xs !py-2.5"
               >
-                <Mail className="w-4 h-4" />
-                <span>Send Direct Email</span>
+                <Mail className="w-4 h-4 stroke-[1.5]" />
+                <span>Send direct email</span>
               </a>
 
               <button
@@ -194,8 +196,7 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
           <div className="studio-panel p-6 sm:p-8 flex flex-col justify-between shadow-xl">
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-[var(--app-accent)]" />
-                <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">Issue Tracking</h2>
+                <h2 className="text-base font-medium font-heading text-[var(--app-text-primary)]">Issue tracking</h2>
               </div>
               <p className="text-xs text-[var(--app-text-secondary)] leading-relaxed">
                 Found a rendering bug or have a suggestion? Open an issue on GitHub or browse existing templates:
@@ -212,9 +213,10 @@ export const ContactView: React.FC<TrustViewBaseProps> = () => {
                 href="https://github.com/ddheerajccarpenter/aestheticcardgenerator/issues"
                 target="_blank"
                 rel="noreferrer"
-                className="studio-btn-secondary w-full !text-xs !py-2.5"
+                className="studio-btn-secondary w-full min-h-[44px] !text-[13px] !py-2.5 inline-flex items-center justify-center gap-1.5"
               >
-                <span>Open Issue on GitHub →</span>
+                <span>Open GitHub issues</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[1.5]" aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -262,7 +264,7 @@ export const FaqView: React.FC<TrustViewBaseProps> = () => {
         </nav>
 
         <header className="flex flex-col gap-2 border-b pb-5 border-[var(--app-border-subtle)]">
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading">
             FAQ
           </h1>
         </header>
@@ -297,7 +299,7 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Privacy Policy — Aesthetic Card Studio',
+      title: 'Privacy Policy: Aesthetic Card Studio',
       description:
         'Privacy Policy for Aesthetic Card Studio, including local browser storage and externally hosted fonts and interface assets.',
       canonicalPath: '/privacy',
@@ -316,13 +318,13 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
 
         <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-[var(--app-accent)]" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-accent)] font-subheading">
-              Legal Transparency
+            <Lock className="w-4 h-4 stroke-[1.5] text-[var(--app-accent)]" />
+            <span className="text-xs font-medium text-[var(--app-accent)] font-subheading">
+              Privacy
             </span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
-            Privacy Policy
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading">
+            Privacy policy
           </h1>
           <p className="text-xs font-mono text-[var(--app-text-muted)]">
             Effective Date: October 2026 • Studio Version 3.4
@@ -395,7 +397,7 @@ export const PrivacyView: React.FC<TrustViewBaseProps> = () => {
 export const TermsView: React.FC<TrustViewBaseProps> = () => {
   useEffect(() => {
     updatePageSEO({
-      title: 'Terms of Use — Aesthetic Card Studio',
+      title: 'Terms of Use: Aesthetic Card Studio',
       description:
         'Terms of use for Aesthetic Card Studio. Permitted usage, intellectual property guidelines, and liability limitations.',
       canonicalPath: '/terms',
@@ -413,11 +415,11 @@ export const TermsView: React.FC<TrustViewBaseProps> = () => {
         </nav>
 
         <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
-          <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
-            Usage Agreement
+          <span className="text-xs font-medium text-[var(--app-text-muted)] font-subheading block">
+            Usage agreement
           </span>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
-            Terms of Use
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading">
+            Terms of use
           </h1>
           <p className="text-xs font-mono text-[var(--app-text-muted)]">
             Last Updated: October 2026
@@ -463,7 +465,7 @@ export const TermsView: React.FC<TrustViewBaseProps> = () => {
 export const CookieView: React.FC<TrustViewBaseProps> = () => {
   useEffect(() => {
     updatePageSEO({
-      title: 'Cookie Policy — Aesthetic Card Studio',
+      title: 'Cookie Policy: Aesthetic Card Studio',
       description:
         'Cookie and browser-storage policy for Aesthetic Card Studio, including locally saved designs and external font resources.',
       canonicalPath: '/cookies',
@@ -482,13 +484,13 @@ export const CookieView: React.FC<TrustViewBaseProps> = () => {
 
         <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <Cookie className="w-4 h-4 text-[var(--app-accent)]" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
-              Storage Practices
+            <Cookie className="w-4 h-4 stroke-[1.5] text-[var(--app-accent)]" />
+            <span className="text-xs font-medium text-[var(--app-text-muted)] font-subheading block">
+              Storage practices
             </span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
-            Cookie &amp; Storage Policy
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading">
+            Cookie &amp; storage policy
           </h1>
           <p className="text-xs font-mono text-[var(--app-text-muted)]">
             Audited October 2026
@@ -520,12 +522,12 @@ export const CookieView: React.FC<TrustViewBaseProps> = () => {
 };
 
 // --------------------------------------------------------------------------
-// 6b. EDITORIAL, PARODY & DMCA DISCLAIMER (/disclaimer) — AdSense & DMCA Hub
+// 6b. EDITORIAL, PARODY & DMCA DISCLAIMER (/disclaimer): AdSense & DMCA Hub
 // --------------------------------------------------------------------------
 export const DisclaimerView: React.FC<TrustViewBaseProps> = () => {
   useEffect(() => {
     updatePageSEO({
-      title: 'Editorial, Parody & DMCA Copyright Disclaimer — Aesthetic Card Studio',
+      title: 'Editorial, Parody & DMCA Copyright Disclaimer: Aesthetic Card Studio',
       description:
         'Legal, artistic, and DMCA copyright disclaimer for Aesthetic Card Studio. Fictional credential layouts, parody rights, and direct rights-holder contact.',
       canonicalPath: '/disclaimer',
@@ -544,23 +546,23 @@ export const DisclaimerView: React.FC<TrustViewBaseProps> = () => {
 
         <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-[var(--app-accent)]" />
-            <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight font-heading">
-              Editorial, Parody &amp; DMCA Copyright Disclaimer
+            <AlertTriangle className="w-5 h-5 stroke-[1.5] text-[var(--app-accent)]" />
+            <h1 className="text-2xl md:text-4xl font-medium tracking-tight font-heading">
+              Editorial, parody &amp; DMCA disclaimer
             </h1>
           </div>
-          <p className="text-xs text-[var(--app-text-muted)] font-mono">
+          <p className="text-[13px] text-[var(--app-text-muted)] font-mono">
             Effective Date: October 14, 2026 • Studio License Version 3.4
           </p>
         </header>
 
         <div className="studio-panel p-6 sm:p-10 flex flex-col gap-8 text-sm leading-relaxed">
           <section className="flex flex-col gap-3">
-            <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
+            <h2 className="text-base font-semibold font-heading text-[var(--app-text-primary)]">
               1. Artistic Expression, Parody &amp; Creative Templates
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              All sample Aesthetic ID Card designs, vintage transit badges, fan credentials, collector cards, and literary layouts offered on Aesthetic Card Studio are original artistic design compositions created solely for personal entertainment, worldbuilding, graphic design portfolios, and creative self-expression.
+              All example Aesthetic ID Card designs, vintage transit badges, fan credentials, collector cards, and literary layouts offered on Aesthetic Card Studio are original artwork compositions made for personal notes, worldbuilding, design portfolios, and personal creative projects.
             </p>
             <p className="text-[var(--app-text-secondary)]">
               These designs are <strong>NOT</strong> government-issued identity documents, official state IDs, real-world law enforcement credentials, or valid corporate security passes. They possess zero legal status and cannot be used for any official identification, impersonation, deception, or fraudulent activity.
@@ -568,11 +570,11 @@ export const DisclaimerView: React.FC<TrustViewBaseProps> = () => {
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
+            <h2 className="text-base font-semibold font-heading text-[var(--app-text-primary)]">
               2. Fair Use &amp; Pop-Culture Homage
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              Any names, pop-culture motifs, literary citations, or fictional character references (such as parody club badges or fan cards) used in preview templates are protected under fair-use commentary, transformative artistic design, and parody doctrines. All referenced trademarks, intellectual properties, and artist names belong to their respective copyright holders.
+              Any names, pop-culture motifs, literary citations, or fictional character references (such as parody club badges or fan cards) used in preview templates fall under fair-use commentary, parody, and personal artistic critique. All referenced trademarks, intellectual properties, and artist names belong to their respective copyright holders.
             </p>
           </section>
 
@@ -613,7 +615,7 @@ export const DisclaimerView: React.FC<TrustViewBaseProps> = () => {
 export const AccessibilityView: React.FC<TrustViewBaseProps> = () => {
   useEffect(() => {
     updatePageSEO({
-      title: 'Accessibility Statement — Aesthetic Card Studio',
+      title: 'Accessibility Statement: Aesthetic Card Studio',
       description:
         'Accessibility commitment for Aesthetic Card Studio. WCAG AAA touch targets, keyboard navigation, and high-contrast colorways.',
       canonicalPath: '/accessibility',
@@ -632,38 +634,38 @@ export const AccessibilityView: React.FC<TrustViewBaseProps> = () => {
 
         <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <Eye className="w-4 h-4 text-[var(--app-accent)]" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-accent)] font-subheading">
-              Inclusion &amp; Standards
+            <Eye className="w-4 h-4 stroke-[1.5] text-[var(--app-accent)]" />
+            <span className="text-[13px] font-medium text-[var(--app-accent)] font-subheading">
+              Standards
             </span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
-            Accessibility Statement
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading">
+            Accessibility statement
           </h1>
           <p className="text-sm md:text-base leading-relaxed text-[var(--app-text-secondary)]">
-            Our commitment to ensuring digital typography tools remain usable for all readers and creators.
+            Keyboard navigation, 44px touch targets, and WCAG AA+ contrast across both themes.
           </p>
         </header>
 
-        <div className="studio-panel p-6 sm:p-10 flex flex-col gap-6 text-xs md:text-sm leading-relaxed">
+        <div className="studio-panel p-6 sm:p-10 flex flex-col gap-6 text-sm leading-relaxed">
           <section className="flex flex-col gap-2">
-            <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
+            <h2 className="text-base font-semibold font-heading text-[var(--app-text-primary)]">
               Implemented Accessibility Features
             </h2>
-            <ul className="flex flex-col gap-2 pl-4 list-disc text-xs text-[var(--app-text-secondary)]">
-              <li><strong>Keyboard Navigation:</strong> All critical workflows support keyboard shortcuts, including Command Palette (⌘K), Undo (⌘Z), Redo (⌘Shift+Z), and dialog dismissal via Escape.</li>
+            <ul className="flex flex-col gap-2 pl-4 list-disc text-sm text-[var(--app-text-secondary)]">
+              <li><strong>Keyboard Navigation:</strong> Critical workflows support keyboard shortcuts, including Command Palette (⌘K), Undo (⌘Z), Redo (⌘Shift+Z), skip-to-content navigation, and Escape dismissal.</li>
               <li><strong>WCAG Touch Targets:</strong> Interactive toolbar buttons and template cards maintain at least 44x44px bounding hit areas.</li>
               <li><strong>Semantic HTML Landmarks:</strong> Pages use standard HTML5 landmarks (header, nav, main, article, section, footer) for screen reader navigation.</li>
-              <li><strong>Color Contrast:</strong> Both Dark (Obsidian) and Light (Daylight) modes meet WCAG AA/AAA contrast ratios for text readability.</li>
+              <li><strong>Color Contrast:</strong> Both Dark (Projection Room) and Light (Archival Paper) modes meet WCAG AA/AAA contrast ratios for text readability.</li>
             </ul>
           </section>
 
           <section className="flex flex-col gap-2">
-            <h2 className="text-base font-bold font-heading text-[var(--app-text-primary)]">
+            <h2 className="text-base font-semibold font-heading text-[var(--app-text-primary)]">
               Reporting Accessibility Barriers
             </h2>
             <p className="text-[var(--app-text-secondary)]">
-              If you encounter any difficulty navigating or operating any control on this website, please email us at <a href="mailto:ddheerajcarpenter@gmail.com" className="text-[var(--app-accent)] hover:underline font-mono">ddheerajcarpenter@gmail.com</a> so we can promptly address the issue.
+              If you encounter any difficulty navigating or operating any control on this website, please email <a href="mailto:ddheerajcarpenter@gmail.com" className="text-[var(--app-accent)] hover:underline font-mono">ddheerajcarpenter@gmail.com</a>.
             </p>
           </section>
         </div>
@@ -678,7 +680,7 @@ export const AccessibilityView: React.FC<TrustViewBaseProps> = () => {
 export const CreditsView: React.FC<TrustViewBaseProps> = () => {
   useEffect(() => {
     updatePageSEO({
-      title: 'Asset & Font Credits — Aesthetic Card Studio',
+      title: 'Asset & Font Credits: Aesthetic Card Studio',
       description:
         'Open-source licensing and attribution credits for Google Fonts, Lucide icons, and browser libraries utilized by Aesthetic Card Studio.',
       canonicalPath: '/credits',
@@ -742,13 +744,13 @@ export const CreditsView: React.FC<TrustViewBaseProps> = () => {
 
         <header className="flex flex-col gap-3 border-b pb-6 border-[var(--app-border-subtle)]">
           <div className="flex items-center gap-2">
-            <Award className="w-4 h-4 text-[var(--app-accent)]" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--app-text-muted)] font-subheading block">
-              Open Source Attributions
+            <Award className="w-4 h-4 stroke-[1.5] text-[var(--app-accent)]" />
+            <span className="text-xs font-medium text-[var(--app-text-muted)] font-subheading block">
+              Open source attributions
             </span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading">
-            Asset &amp; Font Credits
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading">
+            Asset &amp; font credits
           </h1>
           <p className="text-sm md:text-base leading-relaxed text-[var(--app-text-secondary)]">
             Transparent attribution for all external fonts, icons, and software libraries used in this project.
@@ -762,12 +764,12 @@ export const CreditsView: React.FC<TrustViewBaseProps> = () => {
               className="studio-panel p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
             >
               <div>
-                <h2 className="text-sm font-bold font-heading text-[var(--app-text-primary)]">
+                <h2 className="text-sm font-semibold font-heading text-[var(--app-text-primary)]">
                   {c.name}
                 </h2>
-                <p className="text-xs text-[var(--app-text-secondary)]">{c.purpose}</p>
+                <p className="text-[13px] text-[var(--app-text-secondary)]">{c.purpose}</p>
               </div>
-              <div className="flex items-center gap-2 text-[11px] font-mono shrink-0">
+              <div className="flex items-center gap-2 text-[13px] font-mono shrink-0">
                 <span className="text-[var(--app-text-muted)]">{c.author}</span>
                 <span className="px-2 py-0.5 rounded border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-[var(--app-accent)]">
                   {c.license}
@@ -789,42 +791,42 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Page Not Found (404) — Aesthetic Card Studio',
+      title: 'Page Not Found (404): Aesthetic Card Studio',
       description: 'The requested page could not be found. Return to home or browse our aesthetic template gallery.',
       canonicalPath: '/404',
     });
   }, []);
 
   const suggestions = [
-    { label: 'Homepage', path: '/', description: 'Explore templates and design system' },
-    { label: 'Template Library', path: '/templates', description: `Browse all ${PRESET_TEMPLATES.length} curated styles` },
+    { label: 'Homepage', path: '/', description: 'Browse templates and design system' },
+    { label: 'Template Library', path: '/templates', description: `Browse all ${PRESET_TEMPLATES.length} card styles` },
     { label: 'Aesthetic ID Cards', path: '/templates/aesthetic-id-cards', description: 'Travel passes, badges & credentials' },
     { label: 'Card Creator', path: '/create', description: 'Open the live typesetting editor' },
-    { label: 'Canvas Studio', path: '/canvas', description: 'Open freeform layered canvas' },
+    { label: 'Canvas Studio', path: '/canvas', description: 'Open layered canvas workspace' },
     { label: 'Contact', path: '/contact', description: 'Report a broken link or bug' },
   ];
 
   return (
     <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 flex flex-col transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
-        <div className="studio-panel w-full max-w-2xl overflow-hidden shadow-2xl">
+        <div className="studio-panel w-full max-w-2xl overflow-hidden">
           <div className="h-0.5 w-full bg-[var(--app-accent)]/40" />
           <div className="p-8 md:p-12 flex flex-col items-center gap-8">
             <div className="flex flex-col items-center gap-3">
               <div className="flex items-center justify-center w-20 h-20 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)]">
                 <AlertTriangle className="w-10 h-10 text-[var(--app-accent)]" />
               </div>
-              <span className="text-7xl md:text-8xl font-black tracking-tighter leading-none select-none text-[var(--app-border-strong)] font-heading">
+              <span className="text-7xl md:text-8xl font-medium tracking-tight leading-none select-none tabular-nums text-[var(--app-border-strong)] font-heading">
                 404
               </span>
             </div>
 
             <div className="flex flex-col items-center gap-3 text-center max-w-md">
-              <h1 className="text-2xl md:text-3xl font-extrabold font-heading tracking-tight text-[var(--app-text-primary)]">
-                Not Found
+              <h1 className="text-2xl md:text-3xl font-medium font-heading tracking-tight text-[var(--app-text-primary)]">
+                Not found
               </h1>
               <p className="text-sm leading-relaxed text-[var(--app-text-secondary)]">
-                <code className="px-1.5 py-0.5 rounded text-xs font-mono bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] border border-[var(--app-border-subtle)]">
+                <code className="px-1.5 py-0.5 rounded text-[13px] font-mono bg-[var(--app-surface-secondary)] text-[var(--app-text-primary)] border border-[var(--app-border-subtle)]">
                   {currentPath}
                 </code>
               </p>
@@ -835,9 +837,9 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
                 <a
                   key={s.path}
                   href={s.path}
-                  className="p-3.5 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex flex-col gap-1 transition-all group hover:-translate-y-0.5 hover:border-[var(--app-accent)]"
+                  className="p-3.5 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] flex flex-col gap-1 transition-colors group hover:border-[var(--app-accent)]"
                 >
-                  <span className="text-xs font-bold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors">
+                  <span className="text-[13px] font-semibold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors">
                     {s.label}
                   </span>
                 </a>
@@ -847,15 +849,15 @@ export const NotFoundView: React.FC<TrustViewBaseProps> = () => {
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
               <a
                 href="/"
-                className="studio-btn-primary btn-sheen interactive-tactile w-full !py-3 !text-sm text-center"
+                className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px] w-full !py-3 !text-sm text-center"
               >
-                Home
+                Return home
               </a>
               <a
                 href="/create"
-                className="studio-btn-secondary interactive-tactile w-full !py-3 !text-sm text-center"
+                className="studio-btn-secondary interactive-tactile min-h-[44px] w-full !py-3 !text-sm text-center"
               >
-                Create
+                Create card
               </a>
             </div>
           </div>
@@ -880,7 +882,7 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
 }) => {
   useEffect(() => {
     updatePageSEO({
-      title: 'Something Went Wrong — Aesthetic Card Studio',
+      title: 'Something Went Wrong: Aesthetic Card Studio',
       description: 'An unexpected error occurred. Reload the page or return to the studio homepage.',
       canonicalPath: '/',
     });
@@ -889,33 +891,33 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
   return (
     <div className="w-full min-h-screen pt-8 sm:pt-12 pb-28 md:pb-20 flex flex-col transition-colors duration-200 text-[var(--app-text-primary)]">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
-        <div className="studio-panel w-full max-w-xl overflow-hidden shadow-2xl">
+        <div className="studio-panel w-full max-w-xl overflow-hidden">
           <div className="h-1.5 w-full bg-[var(--app-accent)]" />
           <div className="p-8 md:p-12 flex flex-col items-center gap-8">
             <div className="flex flex-col items-center gap-3">
               <div className="flex items-center justify-center w-20 h-20 rounded-2xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)]">
                 <AlertTriangle className="w-10 h-10 text-[var(--app-accent)]" />
               </div>
-              <span className="text-7xl md:text-8xl font-black tracking-tighter leading-none select-none text-[var(--app-border-strong)] font-heading">
+              <span className="text-7xl md:text-8xl font-medium tracking-tight leading-none select-none tabular-nums text-[var(--app-border-strong)] font-heading">
                 500
               </span>
             </div>
 
             <div className="flex flex-col items-center gap-3 text-center">
-              <h1 className="text-2xl md:text-3xl font-extrabold font-heading tracking-tight text-[var(--app-text-primary)]">
-                Something Went Wrong
+              <h1 className="text-2xl md:text-3xl font-medium font-heading tracking-tight text-[var(--app-text-primary)]">
+                Something went wrong
               </h1>
               <p className="text-sm leading-relaxed max-w-sm text-[var(--app-text-secondary)]">
-                An unexpected error crashed this page. Your data is safe — nothing was uploaded to any server. Try reloading or return to the homepage.
+                An unexpected error interrupted this page. Your saved data remains on this device; reload or return to the gallery.
               </p>
             </div>
 
             {error && error.message && (
               <div className="w-full p-4 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface-secondary)] text-left">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--app-accent)] block mb-1.5 font-subheading">
-                  Error Details
+                <span className="text-xs font-medium text-[var(--app-accent)] block mb-1.5 font-subheading">
+                  Error details
                 </span>
-                <code className="text-[11px] font-mono text-[var(--app-text-primary)] break-all leading-relaxed">
+                <code className="text-[13px] font-mono text-[var(--app-text-primary)] break-all leading-relaxed">
                   {error.message}
                 </code>
               </div>
@@ -925,20 +927,20 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
               {onRetry && (
                 <button
                   onClick={onRetry}
-                  className="studio-btn-primary w-full !py-3 !text-sm"
+                  className="studio-btn-primary min-h-[44px] w-full !py-3 !text-sm"
                 >
-                  Try Again
+                  Reload page
                 </button>
               )}
               <a
                 href="/"
-                className="studio-btn-secondary w-full !py-3 !text-sm text-center"
+                className="studio-btn-secondary min-h-[44px] w-full !py-3 !text-sm text-center"
               >
-                Back to Homepage
+                Return home
               </a>
             </div>
 
-            <p className="text-[11px] text-[var(--app-text-muted)] text-center font-subheading">
+            <p className="text-[13px] text-[var(--app-text-muted)] text-center font-subheading">
               If this keeps happening,{' '}
               <a href="/contact" className="underline hover:text-[var(--app-text-primary)]">contact support</a>{' '}
               or{' '}
@@ -952,9 +954,8 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
           </div>
         </div>
 
-        <div className="mt-6 flex items-center gap-2 text-xs text-[var(--app-text-muted)] font-subheading">
-          <span className="w-2 h-2 rounded-full bg-[var(--app-accent)]" />
-          <span>Runtime error — your card drafts and local data are unaffected</span>
+        <div className="mt-6 text-[13px] text-[var(--app-text-muted)] font-subheading">
+          <span>Runtime error: your card drafts and local data remain intact</span>
         </div>
       </div>
     </div>

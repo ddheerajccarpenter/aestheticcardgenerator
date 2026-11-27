@@ -37,7 +37,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ durationMs = 160
     <div
       data-acg-skeleton
       aria-hidden="true"
-      className={`fixed inset-0 z-50 flex flex-col bg-[var(--app-bg,#121110)] text-[var(--app-text,#efe6d8)] transition-all duration-300 ease-out pointer-events-none select-none ${
+      className={`fixed inset-0 z-50 flex flex-col bg-[var(--app-bg,#121110)] text-[var(--app-text,#efe6d8)] transition-[transform,opacity] duration-300 ease-out pointer-events-none select-none ${
         fading ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
       }`}
     >

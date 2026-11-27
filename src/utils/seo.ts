@@ -12,11 +12,11 @@ export const PRODUCTION_DOMAIN = 'https://aestheticcardgenerator.pages.dev';
 export const HOME_AEO_FAQ = [
   {
     q: 'Is Aesthetic Card Generator free with no watermarks?',
-    a: 'Yes. Every template in the Gallery, Template Library, Bingo Studio, Quick Creator, Canvas Studio, and Signature Free Editions is 100% free to customize and export without watermarks or login walls.',
+    a: 'Yes. Every template across the Gallery, Library, Bingo Studio, Quick Creator, Canvas Studio, and Signature Editions exports watermark-free at zero cost.',
   },
   {
     q: 'What export formats and resolutions are supported?',
-    a: 'Canvas Studio exports PNG (1x, 2x Retina, 3x Print), JPEG, and WebP. Quick Card Maker exports 2x high-DPI PNG images sized for 1:1, 4:5, 9:16 Stories, and 16:9 widescreen layouts.',
+    a: 'Canvas Studio exports lossless PNG (1x, 2x Retina, 3x Print), JPEG, and WebP. Quick Card Maker outputs 2x PNG graphics across 1:1, 4:5, 9:16, and 16:9 ratios.',
   },
   {
     q: 'Are my photos and quote drafts uploaded to a server?',
@@ -24,26 +24,26 @@ export const HOME_AEO_FAQ = [
   },
   {
     q: 'Which template should I start with for layered photo IDs or tickets?',
-    a: 'Choose any card under ID Pass, Signature Editions, or Aesthetic ID Cards to replace photos, dates, serial numbers, and typography layer by layer.',
+    a: 'Pick any card under ID Pass, Signature Editions, or Aesthetic ID Cards to edit portraits, dates, serial codes, and typography on separate layers.',
   },
 ];
 
 export const SITE_FAQ_ITEMS = [
   {
     q: 'Is Aesthetic Card Generator completely free with no watermarks?',
-    a: 'Yes. All base gallery templates, all 14 Signature Editions, Bingo Studio cards, Quick Creator designs, and Canvas Studio exports download 100% free with zero watermarks or login requirements.',
+    a: 'Yes. All 90 templates, all 14 Signature Editions, Bingo boards, Quick Creator cards, and Canvas Studio downloads are free with zero watermarks or login walls.',
   },
   {
     q: 'Does this app send my text or photos to any server?',
-    a: 'Never. The generator runs 100% on client-side browser technology. Your words, custom fonts, and exported cards never touch a database or external API.',
+    a: 'No. All image compositing runs client-side in browser memory so your text, uploaded fonts, and exported images never leave your device.',
   },
   {
     q: 'Can I customize the typography, margins, and paper textures?',
-    a: 'Yes. The Studio Editor provides full granular control over font families (Newsreader, Playfair, Inter, JetBrains Mono), optical font sizes, alignment, padding, border radius, and analog film-grain layers.',
+    a: 'Yes. The Studio Editor lets you configure font stacks (Newsreader, Playfair, Inter, JetBrains Mono), type scale, line alignment, inset padding, corner radius, and paper-grain overlays.',
   },
   {
     q: 'What resolution are the downloaded cards?',
-    a: 'Cards are exported at crisp 2x Retina resolution (up to 2160x2160 or 2160x2700 pixels depending on aspect ratio, and up to 3x PNG/JPEG/WebP in Canvas Studio), ready for Instagram posts, Stories, X, and print.',
+    a: 'Quick Creator exports 2x Retina graphics up to 2160x2160 or 2160x2700 pixels, and Canvas Studio supports up to 3x PNG, JPEG, or WebP exports for print and social feeds.',
   },
   {
     q: 'Can I export in different aspect ratios?',

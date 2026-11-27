@@ -6,13 +6,13 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     slug: 'aesthetic-text-cards',
     path: '/templates/aesthetic-text-cards',
     title: 'Aesthetic Text Cards',
-    subtitle: 'Tactile, archival paper cards for evocative words and creative fragments.',
+    subtitle: 'Tactile, archival paper cards for evocative words and fragments.',
     description:
-      'Transform poetic lines, aphorisms, and micro-essays into balanced digital cards with subtle paper grains and editorial serif typography.',
+      'Typeset poetic lines, aphorisms, and short essays into digital cards with subtle paper grain and serif typography.',
     longDescription:
-      'Aesthetic text cards bridge digital brevity with the physical intimacy of printed stationery. Rather than posting raw text or generic screenshots, this format treats type as a physical imprint on archival linen, soft parchment, or cream cardstock. Designed for writers, poets, and curatorial accounts who value balanced negative space, hanging quotation marks, and subdued earthy tones.',
+      'Aesthetic text cards pair short-form writing with the feel of printed stationery. Instead of posting raw notes app screenshots, this format treats text as ink pressed onto archival linen, soft parchment, or cream cardstock with wide margins, hanging quotation marks, and warm earth palettes.',
     useCase:
-      'Ideal for creative writers sharing original poetry, designers posting typographic axioms, curated quote accounts on Instagram and Threads, and newsletters highlighting key passages.',
+      'Built for poets, designers posting typographic axioms, quote feeds on Instagram and Threads, and newsletters highlighting key passages.',
     designTips: [
       'Keep quote lengths between 15 and 45 words to allow comfortable 36px margins on all four sides.',
       'Use Newsreader or Playfair serif styles for literary and contemplative text.',
@@ -21,7 +21,7 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     ],
     bestAspectRatios: ['1:1', '4:5'],
     matchedTemplateIds: ['st-germain-editorial', 'camus-summer', 'rilke-torso'],
-    metaTitle: 'Aesthetic Text Cards — Curated Typography & Archival Presets',
+    metaTitle: 'Aesthetic Text Cards: Typography & Archival Presets',
     metaDescription:
       'Design aesthetic text cards online for free with editorial serifs, paper grain textures, and balanced margins. 100% browser-based with instant 2x Retina download.',
     keywords: [
@@ -33,8 +33,8 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     ],
     faq: [
       {
-        q: 'What makes a text card feel genuinely aesthetic rather than generic?',
-        a: 'The difference lies in typographic hierarchy and breathing room. Authentic editorial cards use deliberate line lengths (45-65 characters), generous margins (36-44px), organic paper palettes (such as French paper cream and warm linen), and avoid harsh pure black backgrounds.',
+        q: 'What separates an editorial text card from a plain notes screenshot?',
+        a: 'Typography hierarchy and margin discipline make the difference: deliberate line measures (45-65 characters), generous borders (36-44px), unbleached cream or linen paper tones, and warm dark inks.',
       },
       {
         q: 'Can I export cards without watermarks?',
@@ -47,13 +47,13 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     slug: 'quote-cards',
     path: '/templates/quote-cards',
     title: 'Editorial Quote Cards',
-    subtitle: 'Classic literary, architectural, and philosophical quotes rendered with timeless dignity.',
+    subtitle: 'Literary, architectural, and philosophical quote presets with structured citations.',
     description:
       'Format memorable thoughts, historical speeches, and philosophical passages with precise citation blocks and folio headers.',
     longDescription:
-      'Memorable quotes deserve more than default sans-serif overlays. Our editorial quote card templates draw inspiration from classic monograph book jackets, mid-century architectural manifests, and literary reviews. Featuring structured citation rules, folio metadata tags, and optical font scaling to ensure the author and context receive equal dignity.',
+      'Memorable quotes need stronger hierarchy than default sans-serif text boxes. These templates draw from mid-century architectural manifests and classic monograph covers, pairing structured citation rules and folio header tags with scaled author lines.',
     useCase:
-      'Perfect for book clubs, literature teachers, philosophy podcasters, and editorial curators seeking to share passages from classic texts and contemporary thought leaders.',
+      'Useful for book clubs, literature teachers, philosophy podcasts, and readers sharing book passages.',
     designTips: [
       'Ensure the citation line is styled at 40-50% the font size of the primary quote to maintain clear reading hierarchy.',
       'Use folio taglines (e.g. "ESSAY NO. 12 • RETURN TO TIPASA") to anchor historical context.',
@@ -61,9 +61,9 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     ],
     bestAspectRatios: ['1:1', '4:5'],
     matchedTemplateIds: ['oxford-navy-journal', 'st-germain-editorial', 'coral-statement'],
-    metaTitle: 'Editorial Quote Card Generator — Timeless Typography & Citations',
+    metaTitle: 'Editorial Quote Card Generator: Typography & Citations',
     metaDescription:
-      'Typeset literary and philosophical quotes into elegant editorial cards. Features folio metadata, custom typography, and lossless export.',
+      'Typeset literary and philosophical quotes into structured editorial cards. Features folio metadata, custom typography, and lossless export.',
     keywords: [
       'quote card creator',
       'literary quote maker',
@@ -87,23 +87,23 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     slug: 'journal-cards',
     path: '/templates/journal-cards',
     title: 'Digital Journal Cards',
-    subtitle: 'Reflective morning notes, gratitude prompts, and contemplative daily fragments.',
+    subtitle: 'Morning notes, gratitude prompts, and dated daily log fragments.',
     description:
-      'Capture private insights, habit reflections, and morning journal entries with date badges, calm palettes, and intimate spacing.',
+      'Record insights, habit notes, and morning journal entries with date badges, low-glare paper palettes, and generous spacing.',
     longDescription:
-      'Journaling is fundamentally an act of slowing down. Digital journal cards mirror this mindful cadence by pairing peaceful celadon, soft peach, and antique parchment palettes with date stamps, volume numbers, and humanist sans-serif type. Whether recording a daily breakthrough or a quiet evening reflection, the layout keeps attention focused on personal truth.',
+      'Journaling benefits from low visual noise. Digital journal cards pair muted celadon, soft peach, and antique parchment tones with date stamps, volume numbers, and legible humanist sans-serif type so the written entry stays central.',
     useCase:
-      'Used by mindfulness practitioners, bullet journal enthusiasts, wellness coaches, and reflective creators who document daily lessons, weekly reviews, and intentions.',
+      'Used by bullet journal keepers, coaches, and writers logging weekly notes and daily intentions.',
     designTips: [
       'Use the corner badge to denote date, journal day count (e.g. "DAY 42"), or volume number.',
-      'Select soothing colorways like Celadon Mist or Tuscan Peach to evoke calmness.',
+      'Select soothing colorways like Celadon Mist or Tuscan Peach to soften screen glare.',
       'Opt for clean humanist sans-serifs like Inter for an approachable, modern notebook feel.',
     ],
     bestAspectRatios: ['4:5', '9:16'],
     matchedTemplateIds: ['rubin-morning', 'camus-summer'],
-    metaTitle: 'Digital Journal Card Templates — Mindful Daily Reflection Cards',
+    metaTitle: 'Digital Journal Card Templates: Daily Reflection Cards',
     metaDescription:
-      'Create beautiful digital journal cards with date badges, soft paper tones, and clean typography. Perfect for personal reflection and daily habits.',
+      'Create digital journal cards with date badges, soft paper tones, and clean typography. Designed for personal notes and habit tracking.',
     keywords: [
       'digital journal cards',
       'daily reflection card maker',
@@ -131,9 +131,9 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     description:
       'Format book titles, star ratings, favorite passages, and critical assessments into structured literary artifacts.',
     longDescription:
-      'Book reviewers and reading communities need an elegant alternative to busy book-cover collages. Book review cards provide a disciplined typographic template: a header tag for the author and publication year, a bold central thesis or excerpt, and an archival footer for the reviewer’s verdict. Built to highlight the substance of the book rather than promotional clutter.',
+      'Book reviewers and reading communities need an organized alternative to busy book-cover collages. Book review cards provide a structured typographic grid: a header tag for author and publication year, a central passage, and an archival footer for the rating or edition.',
     useCase:
-      'Designed for Bookstagram creators, Goodreads reviewers, literary essayists, and podcast hosts publishing reading lists and thoughtful critiques.',
+      'Designed for Bookstagram readers, Goodreads reviewers, essayists, and podcast hosts sharing reading notes.',
     designTips: [
       'Structure the header with book title and publication date (e.g. "MEDITATIONS • BOOK IV").',
       'Highlight a single sentence that captures the core philosophical thesis of the chapter.',
@@ -141,7 +141,7 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     ],
     bestAspectRatios: ['4:5', '1:1'],
     matchedTemplateIds: ['cambridge-notes', 'vignelli-canon', 'aurelius-meditations'],
-    metaTitle: 'Book Review Card Generator — Literary Notes & Bookstagram Cards',
+    metaTitle: 'Book Review Card Generator: Literary Notes & Bookstagram Cards',
     metaDescription:
       'Design clean book review cards and literature excerpt graphics with bookish serifs and structured citations. Free and browser-native.',
     keywords: [
@@ -154,7 +154,7 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     faq: [
       {
         q: 'How do I credit multiple authors or translators?',
-        a: 'You can use the author field to include both original author and translator (e.g. "Marcus Aurelius — Translated by Gregory Hays") for complete academic rigor.',
+        a: 'You can use the author field to include both original author and translator (e.g. "Marcus Aurelius (Gregory Hays trans.)") for bibliographic clarity.',
       },
     ],
   },
@@ -167,19 +167,19 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     description:
       'Summarize key principles, cognitive heuristics, and revision notes with monospaced precision and high-contrast clarity.',
     longDescription:
-      'Retaining complex knowledge requires distilling large volumes of text into atomic, memorable concepts. Study note cards utilize high-contrast layouts, monospaced metadata, and clear typographic anchors to produce memorable visual flashcards. Ideal for studying engineering principles, historical milestones, and mental models.',
+      'Retaining complex knowledge requires distilling large volumes of text into atomic, memorable concepts. Study note cards utilize high-contrast layouts, monospaced metadata, and clear typographic anchors to produce legible flashcards for engineering principles, historical milestones, and mental models.',
     useCase:
-      'Created for students, software engineers, medical professionals, and lifelong learners publishing visual summaries and flashcards.',
+      'Created for students, software engineers, medical professionals, and researchers publishing visual summaries and flashcards.',
     designTips: [
       'Employ JetBrains Mono for technical codes, formula axioms, and tabular terminology.',
-      'Keep definitions concise and punchy—one core mental model per card.',
+      'Keep definitions concise: focus on one mental model per card.',
       'Use sharp border boundaries and clear category taglines (e.g. "SYS.COGNITION • REF 04").',
     ],
     bestAspectRatios: ['1:1', '16:9'],
     matchedTemplateIds: ['obsidian-monochrome', 'cambridge-notes', 'dieter-rams-minimal'],
-    metaTitle: 'Study Note Cards — Mental Models & Revision Flashcard Generator',
+    metaTitle: 'Study Note Cards: Mental Models & Revision Flashcard Generator',
     metaDescription:
-      'Typeset study notes, revision cards, and technical mental models into high-contrast digital artifacts with monospace and serif fonts.',
+      'Typeset study notes, revision cards, and technical mental models into high-contrast digital flashcards with monospace and serif fonts.',
     keywords: [
       'study note card maker',
       'revision card generator',
@@ -199,13 +199,13 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     slug: 'scrapbook-cards',
     path: '/templates/scrapbook-cards',
     title: 'Scrapbook Text Cards',
-    subtitle: 'Warm kraft paper, vintage ephemera, and tactile collage aesthetics.',
+    subtitle: 'Warm kraft paper, vintage ephemera, and tactile collage styles.',
     description:
-      'Recreate the nostalgic warmth of physical scrapbooking with warm fiber paper, antique stamps, and weathered print tones.',
+      'Recreate the nostalgic warmth of physical scrapbooking with fiber paper textures, antique stamps, and weathered print tones.',
     longDescription:
-      'Scrapbook text cards bring the warmth of physical paper ephemera into the digital realm. Combining warm linen, weathered kraft cardboard, and vintage botanical stamps with classic humanist serif fonts, these templates feel like treasured keepsakes discovered between the yellowed pages of an antique journal.',
+      'Scrapbook text cards bring the feel of physical paper ephemera to the browser. Combining warm linen, weathered kraft cardstock, and vintage botanical stamps with classical serif fonts, each template mirrors the weight of an archival keepsake.',
     useCase:
-      'Loved by scrapbook hobbyists, vintage aesthetics enthusiasts, heritage accounts, and memory-keepers looking to commemorate meaningful moments.',
+      'Used by scrapbook hobbyists, vintage collectors, heritage archives, and memory-keepers printing keepsake notes.',
     designTips: [
       'Choose the Warm Kraft (#fce7cf) or Antique Parchment (#efe6d5) colorways.',
       'Turn on Analog Film Grain to emulate physical unbleached paper fibers.',
@@ -213,7 +213,7 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     ],
     bestAspectRatios: ['1:1', '4:5'],
     matchedTemplateIds: ['camus-summer', 'aurelius-meditations', 'emily-dickinson-mint'],
-    metaTitle: 'Scrapbook Text Cards — Vintage Kraft Paper & Ephemera Typography',
+    metaTitle: 'Scrapbook Text Cards: Vintage Kraft Paper & Ephemera Typography',
     metaDescription:
       'Design scrapbook-style digital cards with kraft paper textures, antique ornaments, and vintage typography. Free, client-side, and high-resolution.',
     keywords: [
@@ -237,11 +237,11 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     title: 'Minimalist Monochrome Cards',
     subtitle: 'Radical negative space, Swiss modernist typography, and gallery monochrome.',
     description:
-      'Embrace the discipline of Dieter Rams and Massimo Vignelli with sparse, razor-sharp typography and uncompromising clarity.',
+      'Embrace the discipline of Dieter Rams and Massimo Vignelli with sparse, razor-sharp typography and clear layout geometry.',
     longDescription:
-      'Minimalism is not the absence of design; it is the presence of clarity. Minimalist monochrome cards eliminate all unnecessary ornamental distractions, letting line weight, letter-spacing, and stark contrast communicate truth. Based on Swiss International Typographic Style and Braun functionalism, these cards present ideas with architectural authority.',
+      'Minimalist monochrome cards remove extra ornamental distractions so line weight, letter-spacing, and stark contrast carry the statement. Based on Swiss International Typographic Style and Braun functionalism, these templates keep layouts structured and legible.',
     useCase:
-      'Essential for product designers, architects, tech essayists, minimalist lifestyle curators, and brand strategists.',
+      'Used by product designers, architects, and essayists.',
     designTips: [
       'Use Gallery White (#ffffff) or Obsidian Dark (#18191c) with zero background noise.',
       'Select Inter Clean Sans or JetBrains Tabular Mono with generous padding (40px+).',
@@ -249,9 +249,9 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     ],
     bestAspectRatios: ['1:1', '16:9'],
     matchedTemplateIds: ['obsidian-monochrome', 'dieter-rams-minimal', 'vignelli-canon'],
-    metaTitle: 'Minimalist Monochrome Cards — Modern Swiss Typography Templates',
+    metaTitle: 'Minimalist Monochrome Cards: Modern Swiss Typography Templates',
     metaDescription:
-      'Create striking minimalist cards with stark monochrome palettes and Swiss modernist typography. Fast, free, and distraction-free.',
+      'Create minimalist cards with stark monochrome palettes and Swiss modernist typography. Fast, free, and browser-based.',
     keywords: [
       'minimalist text cards',
       'monochrome quote maker',
@@ -262,7 +262,7 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     faq: [
       {
         q: 'Why avoid colored backgrounds in minimalist cards?',
-        a: 'Stark black and white contrasts eliminate emotional bias, focusing reader cognition directly on the structural clarity of the statement.',
+        a: 'Stark black and white contrasts eliminate emotional bias, focusing reader attention directly on the structural clarity of the statement.',
       },
     ],
   },
@@ -271,13 +271,13 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     slug: 'social-text-cards',
     path: '/templates/social-text-cards',
     title: 'Social Text Cards',
-    subtitle: 'High-impact aspect ratios optimized for Instagram, Stories, Twitter, and Threads.',
+    subtitle: 'Standard aspect ratios sized for Instagram, Stories, Twitter, and Threads.',
     description:
-      'Format text posts with exact dimensions for social feeds (1:1, 4:5, 9:16) with crisp 2x Retina rendering that never pixelates.',
+      'Format text posts with exact dimensions for social feeds (1:1, 4:5, 9:16) with sharp 2x Retina rendering.',
     longDescription:
-      'Social media feeds compress standard images aggressively, causing blurry text and awkward cropping. Social text cards are engineered specifically for social compression algorithms: exported at crisp 2160px Retina dimensions in 1:1 Square, 4:5 Portrait, or 9:16 Story formats so your typography stays pin-sharp on high-density mobile screens.',
+      'Social media feeds compress standard images aggressively, causing blurry text and awkward cropping. Social text cards export at 2160px Retina resolution in 1:1 Square, 4:5 Portrait, or 9:16 Story formats so type stays sharp on mobile screens.',
     useCase:
-      'Built for content creators, social media managers, newsletter authors, and educators publishing text-first carousel slides and feed posts.',
+      'Built for newsletter authors, educators, and writers publishing text carousel slides and feed posts.',
     designTips: [
       'Choose 4:5 Social Portrait to maximize vertical screen real estate in mobile feeds.',
       'Use 9:16 for Instagram Stories and TikTok text overlays.',
@@ -285,9 +285,9 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     ],
     bestAspectRatios: ['4:5', '1:1', '9:16'],
     matchedTemplateIds: ['coral-statement', 'oxford-navy-journal', 'vignelli-canon'],
-    metaTitle: 'Social Text Card Generator — 4:5 & 1:1 High-Res Social Post Creator',
+    metaTitle: 'Social Text Card Generator: 4:5 & 1:1 High-Res Post Creator',
     metaDescription:
-      'Generate aesthetic text cards formatted perfectly for Instagram 4:5, 1:1, and 9:16 Stories. Export 2x Retina PNGs without watermarks.',
+      'Generate aesthetic text cards formatted for Instagram 4:5, 1:1, and 9:16 Stories. Export 2x Retina PNGs without watermarks.',
     keywords: [
       'social text cards',
       'instagram 4:5 text card generator',
@@ -298,7 +298,7 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     faq: [
       {
         q: 'Why is 4:5 better than 1:1 for social feeds?',
-        a: 'The 4:5 portrait ratio occupies roughly 25% more vertical viewport space on mobile devices than a 1:1 square, significantly improving visibility and reading engagement.',
+        a: 'The 4:5 portrait ratio occupies roughly 25% more vertical viewport space on mobile devices than a 1:1 square, improving reading legibility.',
       },
     ],
   },
@@ -309,14 +309,14 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
     title: 'Aesthetic ID Cards & Badges',
     subtitle: 'Retro passport passes, romantic soulmate cards, Y2K credentials, and kawaii badges.',
     description:
-      'Format nostalgic travel licenses, soulmate clearance passes, cyberpunk studio badges, and student credentials with custom metadata, star borders, and archival typography.',
+      'Format nostalgic travel licenses, soulmate clearance passes, cyberpunk studio badges, and student credentials with custom metadata and star borders.',
     longDescription:
-      'Aesthetic ID cards have become one of the most expressive design formats on Pinterest, Instagram, and TikTok. Blending bureaucratic nostalgia with romantic, artistic, or fictional identities, these cards turn ordinary text into official-feeling physical keepsakes. From Tyler the Creator-inspired "Call Me If You Get Lost" travel licenses and romantic Soulmate Clearance Passes to Y2K cyber creative studio credentials and kawaii pastel member IDs, this collection gives you authentic passport stamps, badge tags, and monospaced codes formatted directly in your browser.',
+      'Aesthetic ID cards turn everyday notes into tactile passbooks, concert badges, and archival permits. Customize Tyler-inspired "Call Me If You Get Lost" travel licenses, romantic Soulmate Clearance Passes, Y2K creative studio badges, and kawaii pastel member IDs directly in your browser.',
     useCase:
-      'Cherished by couples creating personalized anniversary Soulmate Passes, travelers formatting Tyler-inspired passport badges, digital designers publishing studio credentials, fandom accounts designing character member cards, and students making aesthetic campus IDs.',
+      'Used by couples making personalized Soulmate Passes, travelers styling Tyler-inspired passport badges, designers building studio credentials, and students designing campus IDs.',
     designTips: [
       'Use monospaced typography (JetBrains Mono) for official registration numbers, authorization stamps, and clearance codes.',
-      'Frame your card with star borders (★ ★ ★ ★ ★) or double hairline strokes to evoke vintage passbooks and official permits.',
+      'Frame your card with star borders (★ ★ ★ ★ ★) or double hairline strokes to match vintage passbooks and official permits.',
       'Include structured identity fields: Name, Role, Issue Date, Validity ("Forever" or "All-Access"), and Authority ("Love Department" or "Studio Archive").',
       'Choose the 1:1 or 4:5 aspect ratio for social sharing, or 9:16 for vertical mobile lockscreens and phone wallpapers.',
     ],
@@ -329,7 +329,7 @@ export const TEMPLATE_CATEGORIES: CategoryMeta[] = [
       'campus-student-identity',
       'vip-backstage-credentials',
     ],
-    metaTitle: 'Aesthetic ID Card Generator — Retro Passport Passes, Soulmate Badges & Y2K Credentials',
+    metaTitle: 'Aesthetic ID Card Generator: Passport Passes, Soulmate Badges & Y2K IDs',
     metaDescription:
       'Create aesthetic ID card templates online: Call Me If You Get Lost travel passes, romantic soulmate cards, Y2K studio passes, and kawaii badges. 100% free with instant Retina export.',
     keywords: [

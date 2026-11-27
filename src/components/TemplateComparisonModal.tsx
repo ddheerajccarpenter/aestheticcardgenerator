@@ -48,7 +48,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
           <div className="flex items-center gap-3">
             <SquareDuotoneIcon name="compare" size="md" />
             <div>
-              <h2 className="text-lg md:text-xl font-bold tracking-tight font-heading">
+              <h2 className="text-lg md:text-xl font-semibold tracking-tight font-heading">
                 Compare ({templates.length})
               </h2>
             </div>
@@ -78,7 +78,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
             aria-label="Test quote"
             value={testQuote}
             onChange={(e) => setTestQuote(e.target.value)}
-            placeholder="Quote..."
+            placeholder="Quote"
             className="flex-1 w-full px-3 py-1.5 rounded-lg border border-[var(--app-border-subtle)] bg-[var(--app-bg)] text-[var(--app-text-primary)] outline-none font-medium focus:border-[var(--app-accent)]"
           />
           <input
@@ -117,9 +117,9 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                   </div>
                 </div>
 
-                <div className="p-4 flex flex-col gap-2.5 text-xs">
+                <div className="p-4 flex flex-col gap-2.5 text-[13px]">
                   <div className="flex items-center justify-between border-b pb-1.5 border-current/10">
-                    <strong className="font-bold truncate">{tmpl.title}</strong>
+                    <strong className="font-semibold truncate">{tmpl.title}</strong>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span
                         style={{ backgroundColor: tmpl.theme.bg }}
@@ -133,7 +133,7 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                       />
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-[var(--app-text-muted)]">
+                  <div className="flex items-center justify-between text-[13px] text-[var(--app-text-muted)]">
                     <span>{tmpl.categoryLabel}</span>
                     <span className="font-mono">{tmpl.surfaceFinish || 'Cotton'}</span>
                   </div>
@@ -143,9 +143,9 @@ export const TemplateComparisonModal: React.FC<TemplateComparisonModalProps> = (
                       onClose();
                       onOpenTemplate(tmpl);
                     }}
-                    className="mt-1 w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 btn-editorial-primary btn-sheen interactive-tactile"
+                    className="mt-1 w-full min-h-[44px] py-2.5 rounded-xl font-medium text-[13px] transition-colors cursor-pointer flex items-center justify-center gap-2 btn-editorial-primary btn-sheen interactive-tactile"
                   >
-                    <span>Open</span>
+                    <span>Open card</span>
                   </button>
                 </div>
               </div>

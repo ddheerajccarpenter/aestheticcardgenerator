@@ -70,7 +70,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
         </nav>
 
         <header ref={headerRef} className="flex flex-col gap-4 border-b pb-6 border-[var(--app-border-subtle)] sm:flex-row sm:items-end sm:justify-between">
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-heading leading-tight">
+          <h1 className="text-3xl md:text-5xl font-medium tracking-tight font-heading leading-tight">
             {category.title.split(' ').map((word, idx) => (
               <span key={idx} className="press-word-clip mr-[0.22em]">
                 <span data-press-word className="press-word">{word}</span>
@@ -84,14 +84,14 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
                 className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px]"
               >
                 <PenTool className="w-4 h-4" />
-                <span>Create</span>
+                <span>Create card</span>
               </a>
             )}
             <a
               href="/templates"
               className="studio-btn-secondary interactive-tactile min-h-[44px]"
             >
-              <span>All</span>
+              <span>Browse templates</span>
             </a>
           </div>
         </header>
@@ -102,7 +102,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
               <article
                 key={template.id}
                 data-reveal-card
-                className="studio-panel group flex flex-col overflow-hidden shadow-md"
+                className="studio-panel card-editorial-hover group flex flex-col overflow-hidden"
               >
                 <div className="p-3 pb-0">
                   <a
@@ -127,7 +127,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
 
                 <div className="p-4 flex flex-col gap-3 bg-[var(--app-surface-secondary)] border-t border-[var(--app-border-subtle)] mt-3">
                   <a href={`/card/${template.id}`} className="flex items-center justify-between gap-2">
-                    <h2 className="text-sm font-bold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors truncate">
+                    <h2 className="text-[15px] font-semibold font-heading text-[var(--app-text-primary)] group-hover:text-[var(--app-accent)] transition-colors truncate">
                       {template.title}
                     </h2>
                   </a>
@@ -135,19 +135,19 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
                   <div className={`grid gap-2 pt-1 ${template.canvasDoc ? 'grid-cols-1' : 'grid-cols-2'}`}>
                     <a
                       href={`/canvas?template=${template.id}`}
-                      className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
+                      className="studio-btn-primary btn-sheen interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-[13px] !rounded-xl"
                       title="Open in Canvas Studio"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>Canvas</span>
+                      <span>Open Canvas</span>
                     </a>
                     {!template.canvasDoc && (
                       <a
                         href={`/create?template=${template.id}`}
-                        className="studio-btn-secondary interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-xs !rounded-xl"
+                        className="studio-btn-secondary interactive-tactile min-h-[44px] !py-1.5 !px-2.5 !text-[13px] !rounded-xl"
                         title="Open in Card Creator"
                       >
-                        <span>Creator</span>
+                        <span>Quick maker</span>
                         <ArrowRight className="w-3 h-3" />
                       </a>
                     )}

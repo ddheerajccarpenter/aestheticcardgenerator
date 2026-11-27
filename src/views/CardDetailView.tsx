@@ -109,8 +109,8 @@ export const CardDetailView: React.FC<CardDetailViewProps> = ({ template, theme 
 
         <div className="lg:col-span-5 flex flex-col gap-5">
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--app-accent)]">
-              {width} × {height}
+            <span className="font-mono text-xs tabular-nums text-[var(--app-accent)]">
+              {width} × {height} px
             </span>
             <h1 ref={titleRef} className="mt-2 text-3xl sm:text-4xl font-heading tracking-tight leading-tight">
               {template.title.split(' ').map((word, idx) => (
@@ -134,9 +134,9 @@ export const CardDetailView: React.FC<CardDetailViewProps> = ({ template, theme 
             {!template.canvasDoc && (
               <a
                 href={quickHref}
-                className="btn-editorial-ghost interactive-tactile min-h-[44px] w-full justify-center text-xs"
+                className="btn-editorial-ghost interactive-tactile min-h-[44px] w-full justify-center text-[13px]"
               >
-                <span>Quick</span>
+                <span>Open Quick Maker</span>
               </a>
             )}
           </div>
@@ -148,10 +148,10 @@ export const CardDetailView: React.FC<CardDetailViewProps> = ({ template, theme 
       <section aria-labelledby="related-cards-heading" className="mt-10 border-t border-[var(--app-border-subtle)] pt-8">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 id="related-cards-heading" className="text-xl sm:text-2xl font-heading">
-            More
+            Related cards
           </h2>
-          <a href="/templates" className="editorial-link-underline text-xs font-semibold text-[var(--app-accent)]">
-            All
+          <a href="/templates" className="editorial-link-underline text-[13px] font-semibold text-[var(--app-accent)]">
+            Browse templates
           </a>
         </div>
         <div ref={relatedRef} className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
@@ -162,17 +162,17 @@ export const CardDetailView: React.FC<CardDetailViewProps> = ({ template, theme 
               href={`/card/${item.id}`}
               onPointerMove={handleTiltPointerMove}
               onPointerLeave={handleTiltPointerLeave}
-              className="card-tilt-surface group block min-w-0"
+              className="card-tilt-surface card-editorial-hover group block min-w-0 rounded-xl"
             >
               <LazyTemplateCard
                 aspectRatio={getTemplateAspectRatio(item)}
                 stageRatio={1}
                 stageClassName="rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-surface)] p-2.5 sm:p-3.5 transition-colors group-hover:border-[var(--app-border-strong)]"
-                className="card-tilt-glint overflow-hidden rounded-lg ring-1 ring-[var(--app-border-subtle)] shadow-[0_10px_24px_rgba(0,0,0,0.2)] card-artwork-zoom"
+                className="card-tilt-glint overflow-hidden rounded-lg border border-black/15 card-artwork-zoom"
               >
                 <UnifiedCardThumbnail template={item} isLight={theme === 'light'} className="h-full w-full" />
               </LazyTemplateCard>
-              <span className="mt-2 block truncate text-xs sm:text-sm font-semibold group-hover:text-[var(--app-accent)] transition-colors">
+              <span className="mt-2 block truncate text-[13px] sm:text-sm font-medium group-hover:text-[var(--app-accent)] transition-colors">
                 {item.title}
               </span>
             </a>

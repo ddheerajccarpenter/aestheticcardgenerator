@@ -410,13 +410,13 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 transition-all duration-200">
+      <main id="main-content" tabIndex={-1} className="flex-1 transition-colors duration-200 focus:outline-none">
         {renderCurrentRoute()}
       </main>
 
       {/* Global Footer (shown on all public pages except fullscreen editors) */}
       {!isEditor && (
-        <div className="transition-all duration-200">
+        <div className="transition-colors duration-200">
           <Footer
             theme={theme}
             onNavigate={navigate}
@@ -455,7 +455,7 @@ export const App: React.FC = () => {
                 autoFocus
                 value={commandQuery}
                 onChange={(e) => setCommandQuery(e.target.value)}
-                placeholder="Search..."
+                placeholder="Search"
                 className="w-full text-sm bg-transparent focus:outline-none text-[var(--app-text)] placeholder-[var(--app-text-muted)] font-body"
               />
               <button
@@ -471,7 +471,7 @@ export const App: React.FC = () => {
             <div className="p-3 flex flex-col gap-1 max-h-96 overflow-y-auto text-xs">
               {matchingTemplatesInCommand.length > 0 && (
                 <div className="mb-2">
-                  <span className="px-2 py-1 text-[10px] font-subheading font-bold text-[var(--app-text-muted)] uppercase block">
+                  <span className="px-2 py-1 text-[13px] font-subheading font-medium text-[var(--app-text-muted)] block">
                     Cards
                   </span>
                   {matchingTemplatesInCommand.map((tmpl) => (
@@ -490,7 +490,7 @@ export const App: React.FC = () => {
                           {tmpl.title}
                         </span>
                       </div>
-                      <span className="text-[10px] text-[var(--app-accent)] font-semibold">Open</span>
+                      <span className="text-xs text-[var(--app-accent)] font-medium">Open card</span>
                     </a>
                   ))}
                 </div>
@@ -505,7 +505,7 @@ export const App: React.FC = () => {
                   <PenTool className="w-4 h-4 text-[var(--app-accent)]" />
                   <span className="font-medium">Creator</span>
                 </div>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                <span className="px-2 py-0.5 rounded font-mono text-xs bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /create
                 </span>
               </a>
@@ -519,7 +519,7 @@ export const App: React.FC = () => {
                   <Layers className="w-4 h-4 text-[var(--app-accent)]" />
                   <span className="font-medium">Canvas</span>
                 </div>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                <span className="px-2 py-0.5 rounded font-mono text-xs bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /canvas
                 </span>
               </a>
@@ -533,7 +533,7 @@ export const App: React.FC = () => {
                   <Sparkles className="w-4 h-4 text-[var(--app-accent)]" />
                   <span className="font-medium">Signature</span>
                 </div>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                <span className="px-2 py-0.5 rounded font-mono text-xs bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /premium
                 </span>
               </a>
@@ -547,7 +547,7 @@ export const App: React.FC = () => {
                   <Grid3X3 className="w-4 h-4 text-[var(--app-accent)]" />
                   <span className="font-medium">Bingo</span>
                 </div>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                <span className="px-2 py-0.5 rounded font-mono text-xs bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /bingo
                 </span>
               </a>
@@ -561,7 +561,7 @@ export const App: React.FC = () => {
                   <LayoutTemplate className="w-4 h-4 text-[var(--app-accent)]" />
                   <span className="font-medium">Templates</span>
                 </div>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                <span className="px-2 py-0.5 rounded font-mono text-xs bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /templates
                 </span>
               </a>
@@ -575,7 +575,7 @@ export const App: React.FC = () => {
                   <BookOpen className="w-4 h-4 text-[var(--app-text-secondary)]" />
                   <span className="font-medium">Guides</span>
                 </div>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                <span className="px-2 py-0.5 rounded font-mono text-xs bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /guides
                 </span>
               </a>
@@ -589,7 +589,7 @@ export const App: React.FC = () => {
                   <Newspaper className="w-4 h-4 text-[var(--app-text-secondary)]" />
                   <span className="font-medium">Blog</span>
                 </div>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                <span className="px-2 py-0.5 rounded font-mono text-xs bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   /blog
                 </span>
               </a>
@@ -611,13 +611,13 @@ export const App: React.FC = () => {
                     {isLight ? 'Dark' : 'Light'} Mode
                   </span>
                 </div>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
+                <span className="px-2 py-0.5 rounded font-mono text-xs bg-[var(--app-surface-secondary)] text-[var(--app-text-muted)] border border-[var(--app-border-subtle)]">
                   Theme
                 </span>
               </button>
             </div>
 
-            <div className="p-2.5 border-t border-[var(--app-border-subtle)] text-[11px] text-[var(--app-text-muted)] text-center font-body">
+            <div className="p-2.5 border-t border-[var(--app-border-subtle)] text-[13px] text-[var(--app-text-muted)] text-center font-body">
               <kbd className="px-1.5 py-0.5 rounded border border-[var(--app-border-subtle)] text-current">Esc</kbd>
             </div>
           </div>

@@ -6,12 +6,12 @@ export const BLOG_POSTS: BlogPost[] = [
     path: '/blog/how-to-build-a-90s-press-lanyard-id',
     title: 'How to Build an Authentic 90s Press Lanyard ID & VIP Badge',
     subtitle:
-      'From hole-punch geometry and barcode metadata to halftone photo treatments, craft a believable concert press pass.',
+      'From hole-punch geometry and barcode metadata to halftone photo treatments, build a believable concert press pass.',
     description:
       'A hands-on visual recipe tutorial for constructing 90s backstage passes and media credentials in the Freeform Canvas Studio.',
-    metaTitle: 'How to Build a 90s Press Lanyard ID — Visual Recipe Tutorial',
+    metaTitle: 'How to Build a 90s Press Lanyard ID: Visual Recipe Tutorial',
     metaDescription:
-      'Step-by-step visual guide to designing authentic 90s press lanyards, VIP badges, barcode strips, and security seals in Aesthetic Card Studio.',
+      'Step-by-step visual guide to designing 90s press lanyards, VIP badges, barcode strips, and security seals in Aesthetic Card Studio.',
     category: 'Design Trends',
     readTime: '5 min read',
     publishedDate: 'October 14, 2026',
@@ -27,7 +27,7 @@ export const BLOG_POSTS: BlogPost[] = [
           'Color palette: High-voltage acidic yellow (#e0e722) on obsidian ink (#111417) gives an unmistakable backstage vibe.',
         ],
         templateId: 'studio-visitor',
-        actionPrompt: 'Load 90s Press Lanyard Preset in Canvas Studio →',
+        actionPrompt: 'Load 90s Press Lanyard Preset in Canvas Studio',
       },
       {
         heading: '2. Applying 1-Bit Dither or Halftone to the Photo Layer',
@@ -37,13 +37,13 @@ export const BLOG_POSTS: BlogPost[] = [
           text: 'Select your photo layer on /canvas and apply the "1-Bit Atkinson Dither" or "High-Contrast Photocopy" filter in the Right Inspector for immediate tactile texture.',
         },
         templateId: 'identity-2026',
-        actionPrompt: 'Open Dithered Photo ID Style in Studio →',
+        actionPrompt: 'Open Dithered Photo ID Style in Studio',
       },
       {
         heading: '3. Serial Numbers & Code-128 Barcodes',
         body: 'Nothing sells an ID card faster than tabular monospaced metadata. Use JetBrains Mono or Space Mono for authorization tiers (e.g. "TIER 01 • ALL ACCESS") and bind a dynamic Code-128 barcode strip at the card bottom.',
         templateId: 'travel-license-pass',
-        actionPrompt: 'Load Barcode Travel Pass in Studio →',
+        actionPrompt: 'Load Barcode Travel Pass in Studio',
       },
     ],
   },
@@ -55,7 +55,7 @@ export const BLOG_POSTS: BlogPost[] = [
       'Harmonizing Newsreader, Cormorant Garamond, and Instrument Serif with modern monospace citations.',
     description:
       'Learn the exact type scales, line heights, and margins bookish creators use to typeset viral quote cards on Instagram and Pinterest.',
-    metaTitle: 'Pairing Serif Fonts for Bookstagram Quote Cards — Typography Studio Guide',
+    metaTitle: 'Pairing Serif Fonts for Bookstagram Quote Cards: Typography Guide',
     metaDescription:
       'Master serif font pairings for book reflections and quotes. Step-by-step guidance on leading, tracking, and archival paper backgrounds.',
     category: 'Typography Craft',
@@ -66,14 +66,14 @@ export const BLOG_POSTS: BlogPost[] = [
     sections: [
       {
         heading: '1. The Right Serif for the Right Voice',
-        body: 'Not all serifs convey the same acoustic tone. Newsreader feels scholarly and quiet; Cormorant Garamond conveys historical opulence; Instrument Serif delivers high-fashion editorial tension with razor-sharp terminal cuts.',
+        body: 'Each serif family sets a distinct voice: Newsreader reads crisp and scholarly; Cormorant Garamond carries historical weight; Instrument Serif cuts sharp vertical stroke contrast for short headlines.',
         bullets: [
           'Newsreader: Ideal for Marcus Aurelius, Albert Camus, and introspective reflections.',
           'Cormorant Garamond: Unmatched for classic French philosophy and poetry.',
-          'Instrument Serif: Perfect for modern fiction, song lyrics, and minimalist design axioms.',
+          'Instrument Serif: Fits modern fiction, song lyrics, and tight one-line statements.',
         ],
         templateId: 'st-germain-editorial',
-        actionPrompt: 'Load Newsreader Editorial Card in Studio →',
+        actionPrompt: 'Load Newsreader Editorial Card in Studio',
       },
       {
         heading: '2. Granular Leading and Tracking Calibrations',
@@ -83,27 +83,27 @@ export const BLOG_POSTS: BlogPost[] = [
           text: 'Aim for 45 to 65 characters per line. If a line stretches longer, increase canvas padding to tighten the reading measure.',
         },
         templateId: 'camus-summer',
-        actionPrompt: 'Load Warm Kraft Book Page in Studio →',
+        actionPrompt: 'Load Warm Kraft Book Page in Studio',
       },
       {
         heading: '3. Tactile Highlighter Accents (==highlight==)',
         body: 'Direct quotes often contain a single phrase that carries the weight of the whole excerpt. Wrap that key fragment in ==double equal signs== inside the Words tab to render a soft, semi-transparent tactile highlighter swatch.',
         templateId: 'cambridge-notes',
-        actionPrompt: 'Test Tactile Highlighter on Notebook Quote Preset →',
+        actionPrompt: 'Test Tactile Highlighter on Notebook Quote',
       },
     ],
   },
   {
     slug: 'color-psychology-of-archival-paper-palettes',
     path: '/blog/color-psychology-of-archival-paper-palettes',
-    title: 'Archival Paper Tones: The Color Psychology of Cream, Kraft, and Celadon',
+    title: 'Archival Paper Tones: Cream, Kraft, and Celadon Palettes',
     subtitle:
-      'Why pure white feels sterile and how tactile, unbleached tones build emotional resonance.',
+      'Why pure white glares on OLED screens and how unbleached paper tones improve reading comfort.',
     description:
-      'An analysis of tactile paper colorways in digital graphic design. Explore how unbleached linen, warm kraft, and celadon mist calm reader anxiety.',
-    metaTitle: 'Archival Paper Color Psychology — Cream, Kraft, and Celadon Palettes',
+      'How unbleached linen, warm kraft, and soft celadon paper palettes reduce screen glare compared with pure white backgrounds.',
+    metaTitle: 'Archival Paper Color Psychology: Cream, Kraft & Celadon Palettes',
     metaDescription:
-      'Discover why cream, kraft, and vintage paper tones outperform pure white backgrounds in digital reading retention and emotional warmth.',
+      'Why cream, kraft, and unbleached paper tones reduce glare compared with pure white backgrounds on phone and laptop displays.',
     category: 'Color Theory',
     readTime: '5 min read',
     publishedDate: 'October 8, 2026',
@@ -122,19 +122,19 @@ export const BLOG_POSTS: BlogPost[] = [
           text: 'Warm backgrounds require warm ink. Never pair a warm cream (#f4ede4) with cold pitch-black (#000000); use deep charcoal, bronze-black, or espresso brown.',
         },
         templateId: 'st-germain-editorial',
-        actionPrompt: 'Load St. Germain Palette in Studio →',
+        actionPrompt: 'Load St. Germain Palette in Studio',
       },
       {
         heading: '3. Tactile Kraft Paper (#FCE7CF) and Nostalgia',
         body: 'Warm kraft paper evokes memories of vintage envelopes, handmade parcels, and leather-bound journals. Viewers perceive quotes rendered on kraft paper as significantly more authentic and heartfelt than identical words rendered on flat neutral backgrounds.',
         templateId: 'camus-summer',
-        actionPrompt: 'Load Kraft Book Page in Studio →',
+        actionPrompt: 'Load Kraft Book Page in Studio',
       },
       {
-        heading: '4. Soft Celadon and Mindful Reflection',
-        body: 'Derived from ancient pottery glazes, Celadon Mist (#e2ecf9 / #a8d8c4) combines soft pale blue with hints of herbal green. It activates calming responses, making it the ideal palette for morning journals, meditation mantras, and personal wellness notes.',
+        heading: '4. Soft Celadon and Low-Glare Contrast',
+        body: 'Derived from antique ceramic glazes, Celadon Mist (#e2ecf9 / #a8d8c4) blends soft blue with muted green-grey undertones for morning logs, study schedules, and low-glare mobile wallpaper cards.',
         templateId: 'rubin-morning',
-        actionPrompt: 'Load Soft Celadon in Studio →',
+        actionPrompt: 'Load Soft Celadon in Studio',
       },
     ],
   },
@@ -146,7 +146,7 @@ export const BLOG_POSTS: BlogPost[] = [
       'How platform aspect ratios affect visual pacing, mobile viewport saturation, and readability.',
     description:
       'A complete technical guide to choosing aspect ratios for digital cards. Understand Instagram feed algorithms, Story overlays, and desktop presentation modes.',
-    metaTitle: 'Card Aspect Ratios Guide — 1:1, 4:5, 9:16 & 16:9 Dimensions Compared',
+    metaTitle: 'Card Aspect Ratios Guide: 1:1, 4:5, 9:16 & 16:9 Compared',
     metaDescription:
       'Understand which aspect ratio works best for your cards: 1:1 Square, 4:5 Social Portrait, 9:16 Story, or 16:9 Landscape. High-res Retina dimensions explained.',
     category: 'Social Formats',
@@ -167,13 +167,13 @@ export const BLOG_POSTS: BlogPost[] = [
           text: 'Always export at 2160×2700 pixels (2x pixel density). When social media platforms compress your upload, the high base resolution ensures your serif hairlines remain razor-sharp.',
         },
         templateId: 'oxford-navy-journal',
-        actionPrompt: 'Open 4:5 Social Portrait Template →',
+        actionPrompt: 'Open 4:5 Social Portrait Template',
       },
       {
         heading: '3. When to Choose 1:1 Classic Square (1080×1080 / 2160×2160)',
         body: '1:1 remains the gold standard for album cover aesthetics, Twitter/X image previews, carousel cover slides, and print postcards. Its symmetrical geometry creates balanced equilibrium that works exceptionally well for short aphorisms under 25 words.',
         templateId: 'studio-form-study',
-        actionPrompt: 'Open 1:1 Square Studio Template →',
+        actionPrompt: 'Open 1:1 Square Studio Template',
       },
       {
         heading: '4. 9:16 Full-Bleed Stories and Wallpapers (1080×1920 / 2160×3840)',
@@ -184,14 +184,14 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'why-browser-native-tools-are-the-future-of-creative-privacy',
     path: '/blog/why-browser-native-tools-are-the-future-of-creative-privacy',
-    title: 'Why Browser-Native Architecture is the Future of Creative Privacy',
+    title: 'Browser-Native Card Tools and Local Privacy',
     subtitle:
-      'The quiet revolution of zero-server tools that protect your private writing, drafts, and creative fragments.',
+      'Why local-first tools keep private writing, drafts, and uploaded images on your own device.',
     description:
-      'Why cloud-first design software compromises user privacy, and how modern web standards like HTML5 Canvas and local client memory offer a superior alternative.',
-    metaTitle: 'Creative Privacy & Client-Side Design Tools — The Zero-Server Revolution',
+      'Why browser-native HTML5 Canvas and IndexedDB rendering replace cloud upload queues for private quotes and card mockups.',
+    metaTitle: 'Creative Privacy & Client-Side Design Tools',
     metaDescription:
-      'Why zero-backend browser tools are reshaping creative software. Keep your private journaling, quotes, and writing 100% secure in local browser memory.',
+      'How zero-backend browser rendering keeps your private quotes, uploaded images, and custom fonts inside local browser memory.',
     category: 'Philosophy & Tech',
     readTime: '5 min read',
     publishedDate: 'October 2, 2026',
@@ -200,21 +200,21 @@ export const BLOG_POSTS: BlogPost[] = [
     sections: [
       {
         heading: '1. The Creep of Mandatory Cloud Accounts',
-        body: 'Over the last decade, creative software underwent radical centralization. Want to format a quick graphic? You are forced to create an account, verify an email, agree to 40 pages of data telemetry, and store your intimate personal drafts on remote cloud databases.',
+        body: 'Over the last decade, cloud design software added mandatory sign-ins for simple two-layer cards. Exporting a quote card often required creating an account, verifying an email address, and storing personal text on remote servers.',
       },
       {
         heading: '2. Protecting Private Writing and Journaling',
-        body: 'When creators journal, draft vulnerable poems, or record deeply personal reflections, they should not have to wonder whether their unfinished thoughts are being ingested into training sets or indexed by third-party tracking scripts.',
+        body: 'When creators journal, draft unfinished verses, or lay out personal passes, local-first tools keep those drafts off external databases and third-party analytics pipelines.',
         callout: {
-          title: 'The Zero-Knowledge Standard',
-          text: 'If an application does not have a database, it cannot leak your data. If it doesn’t have a backend server, your words physically never leave your laptop or phone.',
+          title: 'Local Storage Architecture',
+          text: 'Because this studio has no backend server or cloud database, your text and uploaded images stay in browser memory and IndexedDB on your device.',
         },
         templateId: 'obsidian-monochrome',
-        actionPrompt: 'Open Private Offline Studio Template →',
+        actionPrompt: 'Open Offline Studio Template',
       },
       {
-        heading: '3. Harnessing Modern Web Standards (HTML5 Canvas & localStorage)',
-        body: 'Modern web browsers are computational powerhouses. With HTML5 Canvas, SVG filter matrices, and Web APIs, a browser can render high-resolution 2x Retina graphics instantly using local GPU acceleration, rendering remote server processing obsolete for typographic tasks.',
+        heading: '3. Local Rendering with HTML5 Canvas & IndexedDB',
+        body: 'Modern browsers handle high-DPI typography and raster exports locally. HTML5 Canvas, inline font embedding, and WebGL previews render 2x Retina graphics without sending assets to a remote server.',
       },
     ],
   },

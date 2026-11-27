@@ -33,100 +33,100 @@ const STATIC_ROUTE_META: Record<
   '/create': {
     title: 'Quick Card Maker - Free Quote & Editorial Card Generator | ACG',
     description:
-      'Compose custom quote cards, book excerpts, and minimalist posters in your browser. Choose curated paper palettes, highlights, and 2x PNG export for free.',
+      'Compose custom quote cards, book excerpts, and minimalist posters in your browser. Choose archival paper palettes and export 2x PNG files for free.',
     eyebrow: 'Quick Card Maker',
     heading: 'Compose Editorial Quote Cards in Minutes',
     paragraphs: [
-      'Write or paste quotes, select archival paper tones and serif or geometric fonts, add optical margins and film grain, and download 2x high-resolution PNG cards without watermarks.',
+      'Write or paste quotes, select archival paper tones and serif or geometric fonts, adjust optical margins with film grain, and download 2x high-resolution PNG cards without watermarks.',
     ],
   },
   '/canvas': {
     title: 'Layered Canvas Studio - Free Online Card & ID Pass Editor | ACG',
     description:
-      'Edit multi-layer card designs, ticket stubs, photo ID badges, and Signature posters directly in your browser. Download free PNG, JPEG, or WebP exports.',
+      'Edit multi-layer card designs, photo ID badges, ticket stubs, and Signature posters directly in your browser with free PNG and WebP export.',
     eyebrow: 'Canvas Studio',
-    heading: 'Multi-Layer Vector, Type & Photo Card Editor',
+    heading: 'Multi-Layer Card, Poster & ID Pass Editor',
     paragraphs: [
-      'Select and reorder text, vector badges, stickers, and cropped photos with undo/redo, custom fonts, zoom controls, and lossless PNG (1x/2x/3x), JPEG, or WebP downloads.',
+      'Select and reorder text, vector badges, stickers, and cropped photos inside one workspace with undo/redo history, custom font uploads, zoom controls, and lossless 1x/2x/3x export.',
     ],
   },
   '/bingo': {
     title: 'Free Aesthetic Bingo Card Generator (5x5 Printable & PNG) | ACG',
     description:
-      'Create, shuffle, customize, interactively stamp, and download 4 styles of aesthetic 5x5 bingo cards in classic and editorial palettes for free.',
+      'Create, customize, stamp live, and download 4 styles of aesthetic 5x5 bingo cards in classic or editorial palettes for free.',
     eyebrow: 'Bingo Studio',
     heading: 'Interactive & Printable 5x5 Aesthetic Bingo Cards',
     paragraphs: [
-      'Pick from 4 card formats, switch archival paper colorways, edit individual cells or shuffle prompts, stamp squares live, and download crisp PNG cards with zero watermarks.',
+      'Pick from 4 card formats, switch archival paper colorways, shuffle prompts or edit squares directly, stamp cells live, and download sharp PNG sheets with no watermark.',
     ],
   },
   '/premium': {
     title: 'Signature Free Editions (14 Flagship Card Templates) | ACG',
     description:
-      'Explore all 14 Signature flagship card styles: chromatic light-leak posters, Swiss refraction glass passes, engraved medallions, and handwritten paper notes, 100% free.',
+      'Browse all 14 Signature card editions: light-leak posters, Swiss glass passes, engraved medallions, and handwritten note cards, 100% free.',
     eyebrow: 'Signature Collection - 100% Free',
     heading: '14 Flagship Signature Card Designs, Free to Edit & Export',
     paragraphs: [
-      'Every Signature Edition opens inside Canvas Studio with editable text, custom typography, and replaceable photography. Edit freely and export PNG, JPEG, or WebP with zero paywalls.',
+      'Every Signature Edition opens inside Canvas Studio with editable text, custom typography, and replaceable photography. Export lossless PNG, JPEG, or WebP files with zero paywalls.',
     ],
   },
   '/templates': {
-    title: 'Aesthetic Card Template Library (90+ Free Editable Designs) | ACG',
+    title: 'Aesthetic Card Template Library (90 Free Editable Designs) | ACG',
     description:
-      'Browse and compare free editable card templates across editorial quotes, digital journals, minimalist posters, book quotes, vintage travel tickets, and ID passes.',
+      'Browse and compare free editable card templates across editorial quotes, digital journals, minimalist posters, and retro ID passes.',
     eyebrow: 'Template Library',
-    heading: 'Browse Free Editable Card & ID Pass Templates',
+    heading: 'Free Editable Card & ID Pass Templates',
     paragraphs: [
-      'Compare dimensions and typography side by side across editorial quotes, Swiss modernist ID passes, music player cards, travel tickets, and flagship Signature graphics.',
+      'Compare dimensions and typography side by side across editorial quote cards, Swiss ID passes, music player cards, travel tickets, and Signature posters.',
     ],
   },
   '/guides': {
     title: 'Card Design Guides - Typography, Aspect Ratios & Export Specs | ACG',
     description:
-      'Step-by-step guides on social media card dimensions, quote hierarchy, archival paper colorways, and high-DPI 2x PNG exports.',
+      'Step-by-step guides on social card dimensions, quote hierarchy, paper palettes, and 2x Retina PNG export settings.',
     eyebrow: 'Design Guides',
-    heading: 'Practical Typography & Layout Guides for Card Creators',
+    heading: 'Typography & Layout Guides for Card Creators',
     paragraphs: [
-      'Learn how to match aspect ratios (1:1, 4:5, 9:16, 16:9), avoid platform compression blur, balance quote citations, and export sharp retina graphics locally.',
+      'Match aspect ratios (1:1, 4:5, 9:16, 16:9), prevent social compression blur, balance quote citations, and export sharp graphics locally.',
     ],
   },
   '/blog': {
     title: 'Studio Journal & Design Notes - Aesthetic Card Generator',
     description:
-      'Editorial articles on Bookstagram serif pairings, unbleached paper palettes, retro Swiss ID card trends, and client-side creative software.',
+      'Editorial articles on Bookstagram serif pairings, unbleached paper palettes, retro Swiss ID cards, and local-first software.',
     eyebrow: 'Studio Journal',
-    heading: 'Notes on Editorial Typography, Paper Color & Card Design',
+    heading: 'Notes on Editorial Typography & Card Design',
     paragraphs: [
-      'In-depth essays covering optical leading, highlighter accents, archival cream and kraft tones, and browser-native design workflows.',
+      'Technical articles covering optical leading, highlighter swatches, archival paper tones, and browser-native design tools.',
     ],
   },
   '/faq': {
     title: 'Frequently Asked Questions - Aesthetic Card Generator',
     description:
-      'Direct answers about free downloads, zero watermarks, PNG/JPEG/WebP resolution, custom font licenses, and private local browser storage.',
+      'Direct answers on free exports, zero watermarks, PNG/WebP print sizing, font licensing, and local browser storage.',
     eyebrow: 'Help & Answers',
     heading: 'Frequently Asked Questions',
     paragraphs: [
-      'Direct answers on pricing, browser storage, export formats, aspect ratios, and commercial font usage inside Aesthetic Card Generator.',
+      'Answers covering pricing, browser storage, supported image resolutions, and commercial font licensing inside Aesthetic Card Generator.',
     ],
   },
   '/about': {
     title: 'About Aesthetic Card Generator - Client-Side Card Studio',
     description:
-      'Independent, privacy-first web studio built for writers, readers, students, and designers to craft expressive cards without accounts or watermarks.',
+      'Independent, local-first web studio built for writers, readers, and designers to typeset cards without accounts or watermarks.',
     eyebrow: 'About ACG',
-    heading: 'A Privacy-First Browser Studio for Expressive Cards',
+    heading: 'A Local-First Browser Studio for Expressive Cards',
     paragraphs: [
-      'Aesthetic Card Generator runs entirely inside your browser using local storage and IndexedDB, keeping every template, editor tool, and download completely free.',
+      'Aesthetic Card Generator runs inside your browser using localStorage and IndexedDB so templates, editing tools, and high-DPI exports stay free and private.',
     ],
   },
   '/contact': {
     title: 'Contact Aesthetic Card Generator',
-    description: 'Reach the Aesthetic Card Generator maintainer for bug reports, accessibility feedback, or template suggestions.',
+    description: 'Reach the Aesthetic Card Generator maintainer for bug reports, accessibility feedback, or template requests.',
     eyebrow: 'Contact',
     heading: 'Contact the Studio Maintainer',
     paragraphs: [
-      'Questions, bug reports, accessibility requests, or partnership inquiries can be sent directly to ddheerajcarpenter@gmail.com.',
+      'Send bug reports, accessibility requests, template ideas, or licensing questions directly to ddheerajcarpenter@gmail.com.',
     ],
   },
   '/privacy': {
@@ -207,7 +207,7 @@ export function resolveRouteSeo(rawPath: string): RouteSeoData {
 
   if (path === '/') {
     const title = 'Aesthetic Card Generator - Free Quote Cards, ID Passes & Posters';
-    const description = `Design and download ${PRESET_TEMPLATES.length}+ aesthetic quote cards, Swiss ID passes, ticket stubs, and printable 5x5 bingo cards for free in your browser with zero watermarks.`;
+    const description = `Edit and export ${PRESET_TEMPLATES.length} aesthetic quote cards, Swiss ID passes, ticket stubs, and printable 5x5 bingo cards in your browser with zero watermarks.`;
     return {
       title,
       description,
@@ -265,10 +265,10 @@ export function resolveRouteSeo(rawPath: string): RouteSeoData {
       },
       fallback: {
         eyebrow: 'Free Browser Card Studio',
-        heading: 'Aesthetic Card Generator: Edit Templates & Download Free',
+        heading: 'Card and poster studio',
         lead: description,
         paragraphs: [
-          'Browse curated editorial quote cards, minimalist posters, Swiss modernist ID badges, vintage travel stubs, and 14 flagship Signature Editions. Customize fonts, text, colors, and uploaded photos right in your browser.',
+          'Browse 90 editorial quote cards, minimalist posters, Swiss modernist ID badges, vintage travel stubs, and 14 Signature Editions. Adjust fonts, paper colors, layout spacing, and uploaded photos right in your browser.',
           'Every card downloads watermark-free as high-DPI PNG, JPEG, or WebP with zero login required.',
         ],
         qaItems: HOME_AEO_FAQ,

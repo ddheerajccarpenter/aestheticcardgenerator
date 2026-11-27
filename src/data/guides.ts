@@ -5,10 +5,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     slug: 'how-to-make-aesthetic-text-cards',
     path: '/guides/how-to-make-aesthetic-text-cards',
     title: 'How to Make Aesthetic Text Cards: The Editorial Typesetting Guide',
-    subtitle: 'A step-by-step guide to transforming raw thoughts into tactile, archival stationery artifacts.',
+    subtitle: 'Step-by-step typography rules for formatting readable cards on archival paper palettes.',
     description:
-      'Learn the core principles of editorial typography, negative space, and analog paper textures to create timeless aesthetic text cards.',
-    metaTitle: 'How to Make Aesthetic Text Cards — Typesetting & Design Guide',
+      'Practical rules for negative space, margins, and analog paper grain on editorial quote and text cards.',
+    metaTitle: 'How to Make Aesthetic Text Cards: Typesetting & Design Guide',
     metaDescription:
       'Comprehensive guide to making aesthetic text cards. Learn optimal line measures, margin ratios, paper palettes, and export standards.',
     category: 'Foundations & Craft',
@@ -16,7 +16,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     publishedDate: 'October 2026',
     featuredAspect: '1:1',
     recommendedTemplateIds: ['st-germain-editorial', 'camus-summer'],
-    actionPrompt: 'Open the Studio Editor and craft your first aesthetic card with balanced margins.',
+    actionPrompt: 'Open the Studio Editor and build your first aesthetic card with balanced margins.',
     sections: [
       {
         heading: '1. Why Most Text Posts Fail the Aesthetic Test',
@@ -35,11 +35,11 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         bullets: [
           'Optical Negative Space: Maintain at least 36px to 44px of internal margin on all sides. The text block should occupy no more than 40-50% of the total card area.',
           'Archival Paper Palettes: Ground your design in real print tones. Substitute pure white with French cream (#f4ede4), warm linen (#fce7cf), or celadon mist (#e2ecf9).',
-          'Curated Serif Pairing: Employ classical serifs like Newsreader or Playfair Display with refined tracking and leading to elevate philosophical and literary reflections.',
+          'Serif Pairing: Employ classical serifs like Newsreader or Playfair Display with even tracking and leading for philosophical and literary excerpts.',
         ],
         callout: {
           title: 'Typesetting Rule of Thumb',
-          text: 'If your card feels crowded, resist the urge to add graphic elements. Instead, reduce your font size by 2px and increase padding by 4px. Whitespace consistently elevates perceived value.',
+          text: 'If your card feels crowded, resist adding graphic ornament. Instead, reduce your font size by 2px and increase padding by 4px for clearer legibility.',
         },
       },
       {
@@ -48,7 +48,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
           'Follow this practical workflow to typeset a text card from scratch in under two minutes:',
         bullets: [
           'Step 1: Paste your text into the Words inspector. Review line breaks to ensure phrases break at natural semantic pauses.',
-          'Step 2: Select an art direction from the Palette tab. Match the emotional tone of the words (e.g., St. Germain for quiet reflection, Obsidian for stoic axioms).',
+          'Step 2: Select a palette preset that fits the tone of your text (for instance, St. Germain warm paper or dark high-contrast charcoal).',
           'Step 3: Adjust the font size slider until your main quote occupies between three and six balanced lines.',
           'Step 4: Enable analog film grain at 30-40% to lend tactile physical micro-texture.',
           'Step 5: Export as a 2x Retina PNG for pixel-perfect social publishing.',
@@ -59,11 +59,11 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
   {
     slug: 'how-to-design-quote-cards',
     path: '/guides/how-to-design-quote-cards',
-    title: 'How to Design Timeless Quote Cards: Hierarchy & Attribution',
+    title: 'How to Design Editorial Quote Cards: Hierarchy & Attribution',
     subtitle: 'Mastering attribution lines, folio headers, and hanging quotation punctuation.',
     description:
       'Learn how to typeset memorable quotes with proper typographic hierarchy, citation placement, and curled quotation marks.',
-    metaTitle: 'How to Design Timeless Quote Cards — Typography & Layout Guide',
+    metaTitle: 'How to Design Quote Cards: Typography & Layout Guide',
     metaDescription:
       'Master quote card design with proper author attribution, folio stamps, and optical font scaling. Free step-by-step tutorial.',
     category: 'Design Technique',
@@ -84,7 +84,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
           'The biggest pitfall in quote graphics is competing scale. The author name should never rival the quote text in size. Follow these proportional ratios:',
         bullets: [
           'Quote Text: Primary visual anchor, sized at 24px - 30px with comfortable 1.5x line height.',
-          'Author Citation: Subordinate anchor, sized at 12px - 14px (roughly 45-50% of the quote scale), preceded by an em-dash (—).',
+          'Author Citation: Subordinate anchor, sized at 12px - 14px (roughly 45-50% of the quote scale).',
           'Folio Tagline: Anchoring metadata, set in small uppercase tracking (10px - 11px font-mono) with subtle 70% opacity.',
         ],
         callout: {
@@ -106,7 +106,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     subtitle: 'The comprehensive guide to aspect ratios, pixel density, and avoiding platform compression blur.',
     description:
       'A technical breakdown of ideal card dimensions for Instagram feeds, Stories, Twitter cards, and desktop presentations.',
-    metaTitle: 'Card Sizes for Social Media — Aspect Ratios & 2x Retina Specs',
+    metaTitle: 'Card Sizes for Social Media: Aspect Ratios & 2x Retina Specs',
     metaDescription:
       'Complete guide to social media card dimensions: 1:1 Square, 4:5 Portrait, 9:16 Stories, and 16:9 Landscape. Prevent compression blur.',
     category: 'Technical Specifications',
@@ -131,10 +131,10 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         body:
           'Reference this exact dimension table when choosing your project aspect ratio:',
         bullets: [
-          'Square (1:1) — 2160 x 2160 px: Best for evergreen profile grids, Twitter/X cards, and carousel slides.',
-          'Social Portrait (4:5) — 2160 x 2700 px: Ideal for Instagram in-feed posts, Threads, and LinkedIn image attachments.',
-          'Story / Reel (9:16) — 2160 x 3840 px: Essential for Instagram Stories, TikTok text cards, and smartphone lockscreen wallpapers.',
-          'Landscape (16:9) — 3840 x 2160 px: Optimal for newsletter header banners, YouTube community tabs, and slide decks.',
+          'Square (1:1), 2160 x 2160 px: Best for profile grids, X image previews, and carousel covers.',
+          'Social Portrait (4:5), 2160 x 2700 px: Fits Instagram feed posts, Threads, and LinkedIn image cards.',
+          'Story / Reel (9:16), 2160 x 3840 px: Built for vertical mobile Stories and smartphone lockscreens.',
+          'Landscape (16:9), 3840 x 2160 px: Built for newsletter banners, wide headers, and slide decks.',
         ],
       },
     ],
@@ -146,7 +146,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     subtitle: 'How to pair classical serifs and modern sans fonts without sacrificing legibility.',
     description:
       'Deep dive into font psychology, x-heights, contrast ratios, and line height calculation for digital card layouts.',
-    metaTitle: 'Typography & Text Readability Guide — Font Stacks & Kerning',
+    metaTitle: 'Typography & Text Readability Guide: Font Stacks & Kerning',
     metaDescription:
       'Learn typographic principles for card design: font pairing, x-height balance, WCAG contrast, and line spacing.',
     category: 'Foundations & Craft',
@@ -186,7 +186,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     subtitle: 'Turn book highlights and critical takeaways into aesthetic Bookstagram cards.',
     description:
       'Structure book excerpts, marginalia, and reading recommendations into disciplined cards that celebrate ideas over hype.',
-    metaTitle: 'How to Make a Book Review Card — Bookstagram & Reading Notes',
+    metaTitle: 'How to Make a Book Review Card: Bookstagram & Reading Notes',
     metaDescription:
       'Step-by-step guide to designing book review cards and reading excerpts for Bookstagram and literary newsletters.',
     category: 'Specific Card Formats',
@@ -199,7 +199,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       {
         heading: '1. Shifting from Promotional Collages to Thought Cards',
         body:
-          'Bookstagram feeds are crowded with staged coffee cups and cluttered book jackets. What readers notice is a thoughtful passage—a single line or reflection that sticks with them. A book card isolates that sentence and presents it cleanly.',
+          'Bookstagram feeds are crowded with staged coffee cups and cluttered book jackets. Readers stop for a single sharp passage: a sentence or observation that earns its own page.',
       },
       {
         heading: '2. Structuring Your Review Layout',
@@ -208,7 +208,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
         bullets: [
           'Header Tag: The book title and chapter or book number (e.g. "ESSAYS • ON THE BREVITY OF LIFE").',
           'Corner Badge: Your reading status, star rating, or volume archive (e.g. "CANON • 5/5").',
-          'Main Quote: The most resonant single sentence from the book—avoid long rambling summaries.',
+          'Main Quote: The single strongest line from the book rather than a long summary.',
           'Footer Signature: The author name, publication year, and translator credit.',
         ],
       },
@@ -218,18 +218,18 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     slug: 'digital-journal-card-design',
     path: '/guides/digital-journal-card-design',
     title: 'Digital Journal Card Design: Preserving Daily Reflections',
-    subtitle: 'How to document habit milestones, gratitude prompts, and private breakthroughs.',
+    subtitle: 'How to document habit milestones, gratitude prompts, and private notes.',
     description:
-      'Design personal digital journal cards with calm colorways, date badges, and mindful typographic pacing.',
-    metaTitle: 'Digital Journal Card Design — Mindful Reflection Cards Guide',
+      'Design personal digital journal cards with low-glare paper colorways, date badges, and structured typography.',
+    metaTitle: 'Digital Journal Card Design: Daily Reflection Cards Guide',
     metaDescription:
-      'Aesthetic design guide for digital journal cards. Learn how to format daily insights, habit reflections, and morning pages.',
+      'Design guide for digital journal cards covering daily logs, habit notes, and morning pages.',
     category: 'Specific Card Formats',
     readTime: '5 min read',
     publishedDate: 'October 2026',
     featuredAspect: '4:5',
     recommendedTemplateIds: ['rubin-morning', 'camus-summer'],
-    actionPrompt: 'Capture today’s key reflection in a quiet journal card.',
+    actionPrompt: 'Record today’s key reflection in a dated journal card.',
     sections: [
       {
         heading: '1. The Value of Atomic Reflections',
@@ -237,13 +237,13 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
           'Traditional journal entries can feel sprawling and difficult to revisit. An atomic journal card forces you to synthesize your daily thoughts into a single core realization. Condensing an experience into 25 words clarifies your thinking and creates an archive of personal growth.',
       },
       {
-        heading: '2. Selecting Calm Palettes for Mindful Focus',
+        heading: '2. Selecting Muted Palettes for Journal Focus',
         body:
-          'Colors influence emotional state. For reflective journaling, choose soothing pastel and linen palettes:',
+          'Colors set reading mood. For daily entries, pick soft mineral and unbleached paper tones:',
         bullets: [
-          'Celadon Mist (#e2ecf9): Fresh morning clarity for goal setting and habit milestones.',
-          'Tuscan Peach (#fcab79): Warm, contemplative afternoon and gratitude reflections.',
-          'Warm Linen (#fce7cf): Classic notebook texture for evening brain dumps and lessons learned.',
+          'Celadon Mist (#e2ecf9): Clear morning legibility for habit milestones.',
+          'Tuscan Peach (#fcab79): Warm paper contrast for afternoon reading notes.',
+          'Warm Linen (#fce7cf): Unbleached fiber base for evening logs and reminders.',
         ],
       },
     ],
@@ -254,8 +254,8 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'How to Use Scrapbook Card Styles: Kraft Paper & Vintage Textures',
     subtitle: 'Recreating tactile stationery ephemera, antique seals, and botanical stamps in the browser.',
     description:
-      'Learn how to leverage procedural grain layers, warm kraft tones, and corner ornaments for vintage aesthetic cards.',
-    metaTitle: 'Scrapbook Card Styles Guide — Kraft Paper & Vintage Ephemera',
+      'Learn how to combine procedural grain layers, warm kraft tones, and corner ornaments for vintage stationery cards.',
+    metaTitle: 'Scrapbook Card Styles Guide: Kraft Paper & Vintage Ephemera',
     metaDescription:
       'How to design scrapbook-style cards with kraft paper tones, analog film grain, and vintage ornaments online.',
     category: 'Specific Card Formats',

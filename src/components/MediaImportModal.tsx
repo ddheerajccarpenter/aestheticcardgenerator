@@ -157,7 +157,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 animate-in fade-in duration-200"
     >
       <div
-        className={`w-full max-w-lg rounded-2xl border shadow-2xl flex flex-col overflow-hidden transition-all ${
+        className={`w-full max-w-lg rounded-2xl border shadow-2xl flex flex-col overflow-hidden transition-colors ${
           isLight ? 'bg-white border-[#e2e8f0]' : 'bg-[#14171d] border-[#262c36]'
         }`}
       >
@@ -184,7 +184,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
           <button
             type="button"
             onClick={() => handleTabChange('book')}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
               activeTab === 'book'
                 ? isLight
                   ? 'bg-white text-[#0f172a] shadow-sm'
@@ -192,13 +192,13 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
                 : 'text-[#707a8a] hover:text-current'
             }`}
           >
-            <Book className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
-            <span>Open Library Books</span>
+            <Book className={`w-3.5 h-3.5 stroke-[1.5] ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
+            <span>Open Library books</span>
           </button>
           <button
             type="button"
             onClick={() => handleTabChange('music')}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
               activeTab === 'music'
                 ? isLight
                   ? 'bg-white text-[#0f172a] shadow-sm'
@@ -206,8 +206,8 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
                 : 'text-[#707a8a] hover:text-current'
             }`}
           >
-            <Music className={`w-3.5 h-3.5 ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
-            <span>iTunes Songs &amp; Albums</span>
+            <Music className={`w-3.5 h-3.5 stroke-[1.5] ${isLight ? 'text-[#111417]' : 'text-[#E2D9C8]'}`} />
+            <span>iTunes tracks</span>
           </button>
         </div>
 
@@ -219,8 +219,8 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={activeTab === 'book' ? 'Search title or author (e.g. Albert Camus, Dune)...' : 'Search song or artist (e.g. Frank Ocean, Blonde)...'}
-              className={`w-full pl-9 pr-20 py-2 rounded-xl text-xs border outline-none transition-all ${
+              placeholder={activeTab === 'book' ? 'Search books' : 'Search tracks'}
+              className={`w-full pl-9 pr-20 py-2 rounded-xl text-xs border outline-none transition-colors ${
                 isLight
                   ? 'bg-white border-[#cbd5e1] text-[#0f172a] focus:border-[#111417]'
                   : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#E2D9C8]'
@@ -230,11 +230,11 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
             <button
               type="submit"
               disabled={isLoading || !query.trim()}
-              className={`absolute right-1.5 px-3 py-1 rounded-lg text-xs font-semibold ${
+              className={`absolute right-1.5 px-3 py-1 rounded-lg text-xs font-medium ${
                 isLight
                   ? 'bg-[#111417] text-white hover:bg-[#222731]'
                   : 'bg-[#E2D9C8] text-[#111417] hover:bg-[#d5cbba]'
-              } disabled:opacity-40 transition-all cursor-pointer`}
+              } disabled:opacity-40 transition-colors cursor-pointer`}
             >
               {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Search'}
             </button>
@@ -250,16 +250,16 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
           )}
 
           {results.length === 0 && !isLoading && !error && !hasSearched && (
-            <div className="p-6 text-center text-xs text-[#707a8a] flex flex-col items-center gap-1">
-              <span>Type a title, author, or track name above and press Search.</span>
-              <span className="text-[10px] opacity-75">Data is loaded directly in your browser without tracking.</span>
+            <div className="p-6 text-center text-[13px] text-[#707a8a] flex flex-col items-center gap-1">
+              <span>Enter a book title, author, or track name</span>
+              <span className="text-[13px] opacity-75">Fetched in your browser without analytics tracking</span>
             </div>
           )}
 
           {results.length === 0 && !isLoading && !error && hasSearched && (
-            <div className="p-6 text-center text-xs text-[#707a8a] flex flex-col items-center gap-1">
-              <span>No results found for “{query}”.</span>
-              <span className="text-[10px] opacity-75">Try searching with a different title, author, or artist keyword.</span>
+            <div className="p-6 text-center text-[13px] text-[#707a8a] flex flex-col items-center gap-1">
+              <span>No matches for &ldquo;{query}&rdquo;</span>
+              <span className="text-[13px] opacity-75">Try a different title, author, or artist</span>
             </div>
           )}
 
@@ -270,7 +270,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
                 onSelect(item);
                 handleCloseModal();
               }}
-              className={`p-2.5 rounded-xl border flex items-center gap-3 transition-all cursor-pointer group ${
+              className={`p-2.5 rounded-xl border flex items-center gap-3 transition-colors cursor-pointer group ${
                 isLight
                   ? 'bg-white border-[#e2e8f0] hover:border-[#cbd5e1] hover:bg-[#f8fafc]'
                   : 'bg-[#181d24] border-[#262c36] hover:border-[#3a4250] hover:bg-[#1f252e]'
@@ -301,14 +301,14 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
               )}
 
               <div className="flex-1 min-w-0 flex flex-col">
-                <span className={`text-xs font-bold truncate ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
+                <span className={`text-sm font-semibold truncate ${isLight ? 'text-[#0f172a]' : 'text-white'}`}>
                   {item.title}
                 </span>
-                <span className="text-[11px] text-[#707a8a] truncate">
-                  {item.type === 'book' ? item.author : `${item.artist} ${item.album ? `• ${item.album}` : ''}`}
+                <span className="text-xs text-[#707a8a] truncate">
+                  {item.type === 'book' ? item.author : `${item.artist} ${item.album ? `· ${item.album}` : ''}`}
                 </span>
                 {item.year && (
-                  <span className="text-[10px] font-mono text-[#111417] dark:text-[#E2D9C8] mt-0.5">
+                  <span className="text-xs font-mono tabular-nums text-[#111417] dark:text-[#E2D9C8] mt-0.5">
                     {item.year}
                   </span>
                 )}
@@ -316,7 +316,7 @@ export const MediaImportModal: React.FC<MediaImportModalProps> = ({
 
               <button
                 type="button"
-                className={`opacity-0 group-hover:opacity-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold ${
+                className={`opacity-0 group-hover:opacity-100 px-3 py-1.5 rounded-lg text-xs font-medium ${
                   isLight ? 'bg-[#111417] text-white' : 'bg-[#E2D9C8] text-[#111417]'
                 } shrink-0 transition-opacity flex items-center gap-1`}
               >

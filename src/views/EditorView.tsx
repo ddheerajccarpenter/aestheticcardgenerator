@@ -106,9 +106,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Online Card Creator Studio — Aesthetic Text-to-Card Generator',
+      title: 'Card Creator Studio: Text-to-Card Generator - ACG',
       description:
-        'Interactive browser-based card creator. Format poetry, literature quotes, and minimal study notes with custom typography, archival color palettes, and instant 2x Retina exports.',
+        'Browser-based card creator for quotes, poetry, and minimalist notes with custom typography, paper palettes, and 2x Retina exports.',
       canonicalPath: '/create',
       ogType: 'website',
       jsonLd: {
@@ -334,7 +334,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           if (data.ink && typeof data.ink === 'string') setInkColor(sanitizeColor(data.ink, '#efe6d8'));
         }
         sessionStorage.removeItem('aesthetic_card_studio_hero_quote');
-        showToast('Loaded custom quote from homepage mini-studio!');
+        showToast('Loaded custom quote');
         const snap = getCurrentSnapshot();
         setHistory([snap]);
         setHistoryIndex(0);
@@ -381,7 +381,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
       if (tint) setTextureIntensity(Number(tint));
       if (holo) setIsHolographic(holo === '1' || holo === 'true');
 
-      showToast('Loaded shared card template from link!');
+      showToast('Loaded shared card template');
       const snap = getCurrentSnapshot();
       setHistory([snap]);
       setHistoryIndex(0);
@@ -758,7 +758,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
     navigator.clipboard.writeText(url.toString());
     setCopied(true);
-    showToast('Shareable style link copied to clipboard!');
+    showToast('Shareable link copied');
     setTimeout(() => setCopied(false), 2500);
   };
 
@@ -791,7 +791,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
     else if (length < 60) optimal = 32;
 
     setFontSize(optimal);
-    showToast(`Adjusted font size to ${optimal}px for optimal typographic balance`);
+    showToast(`Adjusted font size to ${optimal}px`);
   };
 
   // Random quote inspirer
@@ -800,7 +800,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
     setQuote(random.q);
     setAuthor(random.a);
     setTag(random.t);
-    showToast('Loaded inspirational excerpt');
+    showToast('Loaded excerpt');
   };
 
   // Random palette inspirer
@@ -942,7 +942,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           { rotX: -0.14, rotY: 0.24, rotZ: -0.02 },
           resolution
         );
-        showToast(`Exported 3D Card (${resolution}px Transparent PNG)!`);
+        showToast(`Exported 3D card (${resolution}px PNG)`);
         confetti({
           particleCount: 50,
           spread: 60,
@@ -1194,11 +1194,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
         <div className="flex flex-col gap-5">
           <div className="flex items-center justify-between">
             <label
-              className={`text-xs font-semibold uppercase tracking-wider ${
+              className={`text-xs font-medium ${
                 isLight ? 'text-[var(--app-text-primary)]' : 'text-white'
               }`}
             >
-              Quote / Main Body
+              Quote / Main body
             </label>
             <div className="flex items-center gap-2">
               <button
@@ -1297,7 +1297,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
           <div className="flex flex-col gap-1.5">
             <label
-              className={`text-xs font-semibold uppercase tracking-wider ${
+              className={`text-xs font-medium ${
                 isLight ? 'text-[var(--app-text-primary)]' : 'text-white'
               }`}
             >
@@ -1313,7 +1313,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   ? 'bg-white border-[#cbd5e1] text-[var(--app-text-primary)] focus:border-[#111417]'
                   : 'bg-[#181d24] border-[#262c36] text-white focus:border-[#E2D9C8]'
               }`}
-              placeholder="e.g. Albert Camus — Return to Tipasa"
+              placeholder="e.g. Albert Camus, Return to Tipasa"
             />
           </div>
 
@@ -1321,11 +1321,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <label
-                className={`text-xs font-semibold uppercase tracking-wider ${
+                className={`text-xs font-medium ${
                   isLight ? 'text-[var(--app-text-primary)]' : 'text-white'
                 }`}
               >
-                Header Tag
+                Header tag
               </label>
               <input
                 ref={tagInputRef}
@@ -1342,11 +1342,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
             </div>
             <div className="flex flex-col gap-1.5">
               <label
-                className={`text-xs font-semibold uppercase tracking-wider ${
+                className={`text-xs font-medium ${
                   isLight ? 'text-[var(--app-text-primary)]' : 'text-white'
                 }`}
               >
-                Corner Badge
+                Corner badge
               </label>
               <input
                 type="text"
@@ -1362,25 +1362,25 @@ export const EditorView: React.FC<EditorViewProps> = ({
             </div>
           </div>
 
-          {/* Curated Quotes: Naturally Wrapped Cards with Dedicated "Use Quote" Action */}
+          {/* Selected Quotes */}
           <div
             className={`pt-4 border-t flex flex-col gap-2.5 ${
               isLight ? 'border-[var(--app-border-subtle)]' : 'border-[#1f242c]'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-[#707a8a] uppercase tracking-wider">
-                Curated Quotes & Reflections
+              <span className="text-xs font-medium text-[#707a8a]">
+                Quote excerpts
               </span>
-              <span className="text-[10px] text-[#707a8a] font-mono">
-                {SAMPLE_QUOTES.length} Available
+              <span className="text-xs text-[#707a8a] font-mono tabular-nums">
+                {SAMPLE_QUOTES.length} available
               </span>
             </div>
             <div className="flex flex-col gap-2.5 max-h-72 overflow-y-auto pr-1">
               {SAMPLE_QUOTES.map((item, idx) => (
                 <div
                   key={idx}
-                  className={`p-3 rounded-xl border flex flex-col gap-2 transition-all ${
+                  className={`p-3 rounded-xl border flex flex-col gap-2 transition-colors ${
                     isLight
                       ? 'bg-[#f8fafc] border-[var(--app-border-subtle)] hover:border-[#cbd5e1]'
                       : 'bg-[#14171d] border-[#262c36] hover:border-[#444748]'
@@ -1404,13 +1404,13 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         setTag(item.t);
                         showToast('Loaded quote into editor');
                       }}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                         isLight
                           ? 'bg-[#111417] text-white hover:bg-[#222731]'
                           : 'bg-[#E2D9C8] text-[#111417] hover:bg-[#d5cbba]'
                       }`}
                     >
-                      Use Quote
+                      Use quote
                     </button>
                   </div>
                 </div>
@@ -1420,19 +1420,19 @@ export const EditorView: React.FC<EditorViewProps> = ({
         </div>
       )}
 
-      {/* TAB 2: TYPOGRAPHY (12 Curated Fonts in 4 Categories) */}
+      {/* TAB 2: TYPOGRAPHY (12 Font Stacks in 4 Categories) */}
       {activeTab === 'type' && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <label
-                className={`text-xs font-semibold uppercase tracking-wider ${
+                className={`text-xs font-medium ${
                   isLight ? 'text-[var(--app-text-primary)]' : 'text-white'
                 }`}
               >
-                Curated Font Stacks (12)
+                Font stacks (12)
               </label>
-              <span className="text-[10px] text-[#707a8a] font-mono">4 Categories</span>
+              <span className="text-xs text-[#707a8a] font-mono tabular-nums">4 groups</span>
             </div>
 
             {/* Editorial Serif */}
@@ -1621,10 +1621,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
           {/* Font Size Slider */}
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center text-xs">
-              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
-                Type Scale
+              <span className={`font-medium ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
+                Type scale
               </span>
-              <span className="font-mono text-[11px] text-[#707a8a]">{fontSize}px</span>
+              <span className="font-mono text-xs text-[#707a8a] tabular-nums">{fontSize}px</span>
             </div>
             <input
               type="range"
@@ -1635,7 +1635,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               onChange={(e) => setFontSize(Number(e.target.value))}
               className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-[#707a8a]">
+            <div className="flex justify-between text-[11px] text-[#707a8a]">
               <span>Small 14px</span>
               <span>Default 26px</span>
               <span>Hero 42px</span>
@@ -1645,10 +1645,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
           {/* Line Height (Leading) Slider */}
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center text-xs">
-              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
-                Line Height (Leading)
+              <span className={`font-medium ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
+                Line height (leading)
               </span>
-              <span className="font-mono text-[11px] text-[#707a8a] tabular-nums">{lineHeight.toFixed(2)}</span>
+              <span className="font-mono text-xs text-[#707a8a] tabular-nums">{lineHeight.toFixed(2)}</span>
             </div>
             <input
               type="range"
@@ -1659,7 +1659,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               onChange={(e) => setLineHeight(Number(e.target.value))}
               className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-[#707a8a]">
+            <div className="flex justify-between text-[11px] text-[#707a8a]">
               <span>Tight 1.0</span>
               <span>Default 1.45</span>
               <span>Loose 2.0</span>
@@ -1669,10 +1669,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
           {/* Letter Spacing (Tracking) Slider */}
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center text-xs">
-              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
-                Letter Spacing (Tracking)
+              <span className={`font-medium ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
+                Letter spacing (tracking)
               </span>
-              <span className="font-mono text-[11px] text-[#707a8a] tabular-nums">{letterSpacing.toFixed(2)}em</span>
+              <span className="font-mono text-xs text-[#707a8a] tabular-nums">{letterSpacing.toFixed(2)}em</span>
             </div>
             <input
               type="range"
@@ -1683,7 +1683,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               onChange={(e) => setLetterSpacing(Number(e.target.value))}
               className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-[#707a8a]">
+            <div className="flex justify-between text-[11px] text-[#707a8a]">
               <span>Compact -0.04em</span>
               <span>Normal 0.00em</span>
               <span>Spaced 0.20em</span>
@@ -1694,7 +1694,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <label
-                className={`text-xs font-semibold uppercase tracking-wider ${
+                className={`text-xs font-medium ${
                   isLight ? 'text-[var(--app-text-primary)]' : 'text-white'
                 }`}
               >
@@ -1746,11 +1746,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
             <div className="flex flex-col gap-1.5">
               <label
-                className={`text-xs font-semibold uppercase tracking-wider ${
+                className={`text-xs font-medium ${
                   isLight ? 'text-[var(--app-text-primary)]' : 'text-white'
                 }`}
               >
-                Vertical Position
+                Vertical position
               </label>
               <div
                 className={`flex gap-1 border p-1 rounded-xl ${
@@ -1804,11 +1804,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
         <div className="flex flex-col gap-5">
           <div className="flex items-center justify-between">
             <label
-              className={`text-xs font-semibold uppercase tracking-wider ${
+              className={`text-xs font-medium ${
                 isLight ? 'text-[var(--app-text-primary)]' : 'text-white'
               }`}
             >
-              Curated Color Sets
+              Paper palettes
             </label>
             <button
               onClick={handleRandomPalette}
@@ -1829,7 +1829,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   setBgColor(p.bg);
                   setInkColor(p.ink);
                 }}
-                className={`p-2.5 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-all ${
+                className={`p-2.5 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-colors ${
                   bgColor === p.bg && inkColor === p.ink
                     ? isLight
                       ? 'border-[#111417] ring-1 ring-[#111417] shadow-sm'
@@ -1930,7 +1930,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   const pal = await extractPaletteFromImage(sanitized.safeDataUrl);
                   setExtractedPalette(pal);
                   setIsExtractingPalette(false);
-                  showToast('Palette extracted! Click swatches or "Apply".');
+                  showToast('Palette extracted');
                 } catch (err: any) {
                   setIsExtractingPalette(false);
                   showToast(err?.message || 'Failed to extract colors from image');
@@ -1990,10 +1990,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
           {/* Card Padding Slider */}
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center text-xs">
-              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
-                Card Inset Padding
+              <span className={`font-medium ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
+                Card inset padding
               </span>
-              <span className="font-mono text-[11px] text-[#707a8a]">{padding}px</span>
+              <span className="font-mono text-xs text-[#707a8a] tabular-nums">{padding}px</span>
             </div>
             <input
               type="range"
@@ -2004,7 +2004,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               onChange={(e) => setPadding(Number(e.target.value))}
               className="w-full accent-[#111417] dark:accent-[#E2D9C8] cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-[#707a8a]">
+            <div className="flex justify-between text-[11px] text-[#707a8a]">
               <span>Compact 20px</span>
               <span>Spacious 64px</span>
             </div>
@@ -2013,10 +2013,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
           {/* Corner Radius Slider */}
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center text-xs">
-              <span className={`font-semibold uppercase tracking-wider ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
-                Corner Radius
+              <span className={`font-medium ${isLight ? 'text-[var(--app-text-primary)]' : 'text-white'}`}>
+                Corner radius
               </span>
-              <span className="font-mono text-[11px] text-[#707a8a]">{borderRadius}px</span>
+              <span className="font-mono text-xs text-[#707a8a] tabular-nums">{borderRadius}px</span>
             </div>
             <input
               type="range"
@@ -2304,7 +2304,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
       {/* Semantic SEO & Screen Reader Header */}
       <div className="sr-only">
-        <h1>Card Creator Studio — Aesthetic Text-to-Card Generator</h1>
+        <h1>Card Creator Studio: Text-to-Card Generator</h1>
         <p>
           Interactive browser-based typesetting editor. Compose literature quotes, poetry reflections, and study notes
           using custom archival paper palettes, editorial fonts, and standard aspect ratios. Export 2× Retina images locally.
@@ -2753,8 +2753,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   }`}
                 >
                   <div>
-                    <span className="font-semibold block">🧊 3D Card (4K Transparent)</span>
-                    <span className="text-[10px] text-[#707a8a]">PBR surface tilt on 100% alpha</span>
+                    <span className="inline-flex items-center gap-1.5 font-semibold"><Box className="w-3.5 h-3.5 stroke-[1.5] text-[var(--app-text-secondary)]" aria-hidden="true" />3D Card (4K Transparent)</span>
+                    <span className="block text-[10px] text-[#707a8a]">PBR surface tilt on transparent canvas</span>
                   </div>
                   <span className="text-[10px] font-mono text-[var(--app-accent)] font-bold">4K</span>
                 </button>
@@ -2765,8 +2765,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   }`}
                 >
                   <div>
-                    <span className="font-semibold block">🧊 3D Card (8K Transparent)</span>
-                    <span className="text-[10px] text-[#707a8a]">Archival 7680px PBR alpha render</span>
+                    <span className="inline-flex items-center gap-1.5 font-semibold"><Box className="w-3.5 h-3.5 stroke-[1.5] text-[var(--app-text-secondary)]" aria-hidden="true" />3D Card (8K Transparent)</span>
+                    <span className="block text-[10px] text-[#707a8a]">Archival 7680px PBR alpha render</span>
                   </div>
                   <span className="text-[10px] font-mono text-[var(--app-accent)] font-bold">8K</span>
                 </button>
@@ -3233,11 +3233,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
             <div className={`p-3 border-b flex items-center justify-between shrink-0 ${isLight ? 'border-[var(--app-border-subtle)]' : 'border-[#262c36]'}`}>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-1 bg-[var(--app-text-secondary)] rounded-full mr-1" />
-                <h3 className="text-xs font-bold uppercase tracking-wider">
-                  {activeTab === 'content' && 'Words / Text Content'}
-                  {activeTab === 'type' && 'Typography & Layout'}
-                  {activeTab === 'palette' && 'Color & Theme Palette'}
-                  {activeTab === 'decor' && 'Canvas & Details'}
+                <h3 className="text-[13px] font-semibold">
+                  {activeTab === 'content' && 'Words & text content'}
+                  {activeTab === 'type' && 'Typography & layout'}
+                  {activeTab === 'palette' && 'Color palette'}
+                  {activeTab === 'decor' && 'Canvas & details'}
                 </h3>
               </div>
               <button
@@ -3282,7 +3282,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-current/10">
-              <h4 className="text-xs font-bold uppercase tracking-wider">Canvas Options</h4>
+              <h4 className="text-[13px] font-semibold">Canvas options</h4>
               <button
                 onClick={() => setMobileOptionsOpen(false)}
                 className="p-1 rounded-lg hover:bg-white/10"

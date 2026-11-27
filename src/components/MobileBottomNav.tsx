@@ -38,7 +38,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               href={item.path}
               aria-current={active ? 'page' : undefined}
               aria-label={item.label === 'Create' ? 'Create new card' : item.label}
-              className={`relative flex min-h-[48px] flex-col items-center justify-center gap-0.5 px-1 py-1 text-[10px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
+              className={`relative flex min-h-[48px] flex-col items-center justify-center gap-0.5 px-1 py-1 text-[11px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--app-accent)] ${
                 active
                   ? 'text-[var(--app-accent)] font-semibold'
                   : 'text-[var(--app-text-secondary)] hover:text-[var(--app-text-primary)]'
